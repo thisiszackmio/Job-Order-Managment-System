@@ -3,24 +3,30 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Outlet } from 'react-router'
 import { NavLink } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { userStateContext } from '../context/ContextProvider'
 
 const navigation = [
   { name: 'Dashboard', to: '/'},
+  { name: 'Deployment of Personel', to: '/dps' }
 ]
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function DefaultLayout() {
 
-  const { currentUser } = userStateContext();
+  const { currentUser, userToken } = userStateContext();
+
+  if(!userToken){
+    return <Navigate to='login'/>
+  }
 
   const logout = (ev) => {
     ev.preventDefault();
     console.log("Logout");
-  }
+  };
 
   return (
     <>
@@ -59,7 +65,7 @@ export default function DefaultLayout() {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-
+                      
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
                         <div>
@@ -151,7 +157,7 @@ export default function DefaultLayout() {
             </>
           )}
         </Disclosure>
-
+        
         <Outlet />
 
       </div>

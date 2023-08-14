@@ -20,6 +20,7 @@ export default function DeploymentofPersonel(){
   const [selectedSubOption, setSelectedSubOption] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [TextareaValue, setTextareaValue] = useState('');
+  const [numberValue, setNumberValue] = useState('');
   const [showSubmit, setShowSubmit] = useState(false);
 
   const handleOptionChange = (event) => {
@@ -27,6 +28,7 @@ export default function DeploymentofPersonel(){
     setSelectedOption(selectedValue);
     setSelectedSubOption('');
     setInputValue('');
+    setNumberValue('');
     setTextareaValue('');
   };
 
@@ -44,6 +46,11 @@ export default function DeploymentofPersonel(){
     const Textarea = event.target.value;
     setTextareaValue(Textarea.toUpperCase());
     setShowSubmit(true);
+  };
+
+  const handleNumberChange = (event) => {
+    const number = event.target.value;
+    setNumberValue(number);
   };
 
   const handleSubmit = (event) => {
@@ -77,7 +84,7 @@ export default function DeploymentofPersonel(){
               
               {/* Conditional Forms Here */}
 
-              {/* For the REPAIR/CHECKUP only */}
+              {/*For the REPAIR/CHECKUP*/}
               {selectedOption === 'option1' && (
                 <div className="mt-10">
                   <div className="sm:col-span-3">
@@ -142,7 +149,7 @@ export default function DeploymentofPersonel(){
                 </div>
               )}
 
-              {/* For the DEPLOYMENT OF PERSONNEL only */}
+              {/*For the DEPLOYMENT OF PERSONNEL*/}
               {selectedOption === 'option2' && (
                 <div className="mt-10">
                   <div className="sm:col-span-3">
@@ -205,11 +212,38 @@ export default function DeploymentofPersonel(){
                           </div>
                         </div>
                       )}
-
                     </div>
                   </div>
                 </div>
               )}    
+
+              {/*For the Supplies*/}
+              {selectedOption === 'option3' && (
+                <div className="mt-10">
+                  {/* Input the Details */}
+                    <div className="sm:col-span-3">
+                      <h2 className="text-2xl font-semibold leading-7 text-gray-900"> {optionNames[selectedOption]} </h2>
+                    </div>
+                    <div className="mt-4">
+                      <label htmlFor="details" className="block text-sm font-medium leading-6 text-gray-900"> Details: </label>
+                      <div className="mt-2">
+                        <textarea
+                          id="assist_details"
+                          name="assist_details"
+                          rows={3}
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Input the No. of Supplies */}
+                    <div className="mt-10">
+                      <label htmlFor="location" className="block text-sm font-medium leading-6 text-gray-900"> No. of Supplies </label>
+                    </div>
+                </div>
+              )}
 
           </div>
         </div>

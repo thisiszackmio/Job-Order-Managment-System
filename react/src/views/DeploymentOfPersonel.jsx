@@ -30,6 +30,7 @@ export default function DeploymentofPersonel(){
     setInputValue('');
     setNumberValue('');
     setTextareaValue('');
+    setShowSubmit(false);
   };
 
   const handleSubOptionChange = (event) => {
@@ -39,19 +40,40 @@ export default function DeploymentofPersonel(){
 
   const handleInputChange = (event) => {
     const inputText = event.target.value;
-    setInputValue(inputText.toUpperCase());   
+    setInputValue(inputText.toUpperCase());
+
+    // Auto hide if the field is empty
+    if(inputText === ''){
+      setShowSubmit(false);
+    }else{
+      setShowSubmit(true);
+    }
+
   };
 
   const handleTextareChange = (event) => {
     const Textarea = event.target.value;
     setTextareaValue(Textarea.toUpperCase());
-    setShowSubmit(true);
+
+    // Auto hide if the field is empty
+    if(Textarea === ''){
+      setShowSubmit(false);
+      setInputValue('');
+    }
+
   };
 
   const handleNumberChange = (event) => {
     const number = event.target.value;
     setNumberValue(number);
-    setShowSubmit(true);
+
+    // Auto hide if the field is empty
+    if(number === ''){
+      setShowSubmit(false);
+    }else{
+      setShowSubmit(true);
+    }
+    
   };
 
   const handleSubmit = (event) => {
@@ -120,14 +142,15 @@ export default function DeploymentofPersonel(){
                                 id="repair_details"
                                 name="repair_details"
                                 rows={3}
-                                value={inputValue}
-                                onChange={handleInputChange}
+                                value={TextareaValue}
+                                onChange={handleTextareChange}
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                               />
                             </div>
                           </div>
 
                           {/* Input the Location */}
+                          {TextareaValue && (
                           <div className="mt-4">
                             <label htmlFor="location" className="block text-sm font-medium leading-6 text-gray-900"> Location </label>
                             <div className="mt-2">
@@ -135,13 +158,15 @@ export default function DeploymentofPersonel(){
                               type="text"
                               name="repair_location"
                               id="repair_location"
-                              value={TextareaValue}
-                              onChange={handleTextareChange}
+                              value={inputValue}
+                              onChange={handleInputChange}
                               autoComplete="given-location"
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                             </div>
                           </div>
+                          )}
+
                         </div>
                       </div>
                     )}
@@ -229,8 +254,8 @@ export default function DeploymentofPersonel(){
                       <label htmlFor="details" className="block text-sm font-medium leading-6 text-gray-900"> Details: </label>
                       <div className="mt-2">
                         <textarea
-                          id="assist_details"
-                          name="assist_details"
+                          id="supply_details"
+                          name="supply_details"
                           rows={3}
                           value={inputValue}
                           onChange={handleInputChange}
@@ -245,6 +270,8 @@ export default function DeploymentofPersonel(){
                       <div className="mt-2">
                       <input
                         type="number"
+                        id="supply_no"
+                        name="supply_no"
                         value={numberValue}
                         onChange={handleNumberChange}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -264,7 +291,7 @@ export default function DeploymentofPersonel(){
               type="submit"
               className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              Submit
+              Save
             </button>
           </div>
         )}

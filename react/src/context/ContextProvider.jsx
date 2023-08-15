@@ -15,7 +15,7 @@ export const ContextProvider = ({children}) => {
        email: 'tom@example.com',
        imageUrl: '/default/jef_gwapo.jpg'
     });
-    const [userToken, setUserToken] = useState('1234')
+    const [userToken, setUserToken] = useState('')
 
     return(
         <StateContext.Provider value={{ 

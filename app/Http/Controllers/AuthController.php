@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use \App\Models\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,10 +14,10 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
-        $existingUser = User::where('username', $data['username'])->first();
-        if ($existingUser) {
-            return response()->json(['message' => 'Username already exists'], 400);
-        }
+        // $existingUser = User::where('username', $data['username'])->first();
+        // if ($existingUser) {
+        //     return response()->json(['message' => 'Username already exists'], 400);
+        // }
 
         /** @var \App\Models\User $user */
         $user = User::create([

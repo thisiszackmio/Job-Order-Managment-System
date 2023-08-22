@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import axiosClient from "../axios.js";
+import { userStateContext } from "../context/ContextProvider.jsx";
 
 export default function Register() {
+    const { setCurrentUser, setUserToken } = userStateContext();
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
     const [username, setUsername] = useState('');
@@ -26,20 +28,22 @@ export default function Register() {
           password_confirmation: passwordCorfirmation
         })
         .then(({ data }) => {
-          console.log(data);
+          //console.log(data);
+          setCurrentUser(data.user)
+          setUserToken(data.token)
         })
         .catch((error) => {
           if (error.response) {
-            const errorMessages = Object.values(error.response.data.errors)
-              .flatMap((errorArray) => errorArray)
-              .join('<br>');
-              
-            console.log(errorMessages);
-            setError({ __html: errorMessages });
+              const errorMessages = Object.values(error.response.data.errors)
+                  .flatMap((errorArray) => errorArray)
+                  .join('<br>');
+      
+              console.log(errorMessages);
+              setError({ __html: errorMessages });
           }
           
           console.error(error);
-        });
+      });
 
     }
 
@@ -96,7 +100,7 @@ export default function Register() {
               </div>
 
               <div>
-                <label htmlFor="fname" className="block text-sm font-medium leading-6 text-gray-900">
+                <label htmlFor="lname" className="block text-sm font-medium leading-6 text-gray-900">
                   Last Name
                 </label>
                 <div className="mt-2">

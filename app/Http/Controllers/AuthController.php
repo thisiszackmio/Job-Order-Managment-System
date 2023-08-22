@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
+use App\Models\PPAUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,9 +20,9 @@ class AuthController extends Controller
         // }
 
         /** @var \App\Models\User $user */
-        $user = User::create([
-            'user_fname' => $data['fname'],
-            'user_lname' => $data['lname'],
+        $user = PPAUser::create([
+            'fname' => $data['fname'],
+            'lname' => $data['lname'],
             'username' => $data['username'],
             'email' => $data['email'],
             'division' => $data['division'],

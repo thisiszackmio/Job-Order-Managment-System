@@ -13,7 +13,6 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [passwordCorfirmation, setPasswordConfirmation] = useState('');
     const [error, setError] = useState({__html: ''}); 
-    const [errorMessage, setErrorMessage] = useState('');
     
     const onSubmit = (ev) => {
       ev.preventDefault();
@@ -44,7 +43,7 @@ export default function Register() {
           }
           
           console.error(error);
-      });
+        });
 
     }
 
@@ -58,7 +57,7 @@ export default function Register() {
               alt="Your Company"
             />
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-              Register Here
+              Register Here for JOMS
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{" "}

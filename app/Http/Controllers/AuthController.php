@@ -51,11 +51,11 @@ class AuthController extends Controller
     {
         $credentials = $request->validated();
         $remember = $credentials['remember'] ?? false;
-        unset($credentials['remember']); 
+        unset($credentials['remember']);
 
-        if(!Auth::attempt($credentials, $remember)){
+        if (!Auth::attempt($credentials, $remember)) {
             return response([
-                'error' => 'The Provided credentials are not correct'
+                'error' => 'Invalid Credentials'
             ], 422);
         }
         $user = Auth::user();
@@ -69,11 +69,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        /** @var User @user */
+        /** @var PPAUser $user */
         $user = Auth::user();
         $user->currentAccessToken()->delete();
 
-        return reesponse([
+        return response([
             'success' => true
         ]);
     }

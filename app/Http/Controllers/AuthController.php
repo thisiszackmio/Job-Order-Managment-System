@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\PPAUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -50,19 +51,32 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
+
+        $useracc = PPAUser::where('username', $credentials['username'])->first();
+
+        //var_dump($useracc);
+
         $remember = $credentials['remember'] ?? false;
         unset($credentials['remember']);
 
-        if (!Auth::attempt($credentials, $remember)) {
-            return response([
-                'error' => 'Invalid Credentials'
+        if (!$useracc || !Hash::check($credentials['password'], $useracc->password)) {
+            return response()->json([
+                'message' => 'Invalid Credentials',
+                'errors' => [
+                    'credentials' => [
+                        'Invalid Credentials.'
+                    ],
+                ],
+                'credentials' => [
+                    'Invalid Credentials.'
+                ],
             ], 422);
         }
-        $user = Auth::user();
-        $token = $user->createToken('main')->plainTextToken;
+
+        $token = $useracc->createToken('main')->plainTextToken;
 
         return response([
-            'user' => $user,
+            'user' => $useracc,
             'token' => $token
         ]);
     }

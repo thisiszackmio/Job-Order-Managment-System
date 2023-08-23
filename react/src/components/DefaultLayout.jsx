@@ -5,6 +5,7 @@ import { Outlet } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
 import { userStateContext } from '../context/ContextProvider'
+import axiosClient from '../axios'
 
 const navigation = [
   { name: 'Dashboard', to: '/'},
@@ -16,8 +17,7 @@ function classNames(...classes) {
 }
 
 export default function DefaultLayout() {
-
-  const { currentUser, userToken } = userStateContext();
+  const { currentUser, userToken , setCurrentUser, setUserToken } = userStateContext();
 
   if(!userToken){
     return <Navigate to='login'/>
@@ -25,7 +25,11 @@ export default function DefaultLayout() {
 
   const logout = (ev) => {
     ev.preventDefault();
-    console.log("Logout");
+
+    axiosClient.post("/logout").then((res) => {
+      setCurrentUser({});
+      setUserToken(null);
+    });
   };
 
   return (
@@ -73,7 +77,6 @@ export default function DefaultLayout() {
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
                             <UserIcon className="w-8 h-8 bg-black/25 p-2 rounded-full text-white" />
-                            {/* <img className="h-8 w-8 rounded-full" src={currentUser.imageUrl} alt="" /> */}
                           </Menu.Button>
                         </div>
                         <Transition

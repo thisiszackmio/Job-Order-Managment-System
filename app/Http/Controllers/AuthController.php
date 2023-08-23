@@ -14,10 +14,21 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
-        // $existingUser = User::where('username', $data['username'])->first();
-        // if ($existingUser) {
-        //     return response()->json(['message' => 'Username already exists'], 400);
-        // }
+        // Check if the username exists on the database
+        $existingUser = PPAUser::where('username', $data['username'])->first();
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'username already on the database.',
+                'errors' => [
+                    'username' => [
+                        'Username already exist.'
+                    ],
+                ],
+                'username' => [
+                    'Username already exist.'
+                ],
+            ], 422);
+        }
 
         /** @var \App\Models\User $user */
         $user = PPAUser::create([

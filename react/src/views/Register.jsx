@@ -13,6 +13,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [passwordCorfirmation, setPasswordConfirmation] = useState('');
     const [error, setError] = useState({__html: ''}); 
+    const [errorMessage, setErrorMessage] = useState('');
     
     const onSubmit = (ev) => {
       ev.preventDefault();
@@ -70,10 +71,10 @@ export default function Register() {
             </p>
 
             {error.__html && (
-                <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
-                dangerouslySetInnerHTML={error} >
-                </div>
-              )}
+              <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
+              dangerouslySetInnerHTML={error} >
+              </div>
+            )}
 
           </div>
   

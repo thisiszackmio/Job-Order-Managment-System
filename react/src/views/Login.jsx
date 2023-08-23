@@ -1,5 +1,8 @@
 
 export default function Login() {
+  //const [username, setUsername] = useState('');
+
+
     return (
       <>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -13,6 +16,12 @@ export default function Login() {
               Sign in to your account
             </h2>
           </div>
+
+          {/* {error.__html && (
+            <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
+            dangerouslySetInnerHTML={error} >
+            </div>
+          )} */}
   
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form className="space-y-6" action="#" method="POST">

@@ -4,6 +4,7 @@ import Login from "./views/Login";
 import Register from "./views/Register";
 import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
+import DeploymentofPersonel from "./views/DeploymentOfPersonel";
 
 const router = createBrowserRouter([
     {
@@ -11,12 +12,16 @@ const router = createBrowserRouter([
         element: <DefaultLayout />,
         children: [
             {
-                path: '/dashboard',
+                path: "/dashboard",
                 element: <Navigate to="/" />
             },
             {
-                path: '/',
+                path: "/",
                 element: <Dashboard />
+            },
+            {
+                path: "/dps",
+                element: <DeploymentofPersonel />
             }
         ]
     },
@@ -25,11 +30,11 @@ const router = createBrowserRouter([
         element: <GuestLayout />,
         children: [
             {
-                path: '/login',
+                path: "/login",
                 element: <Login />
             },
             {
-                path: '/register',
+                path: "/register",
                 element: <Register />
             }
         ]

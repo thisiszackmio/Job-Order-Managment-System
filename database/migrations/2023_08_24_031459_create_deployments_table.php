@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\PPAUser::class, 'user_id');
             $table->string('type_of_service');
+            $table->string('type_of_repair');
             $table->string('details_repair');
+            $table->string('type_of_personel');
             $table->string('details_personel');
             $table->string('details_supply');
             $table->string('location_repair');

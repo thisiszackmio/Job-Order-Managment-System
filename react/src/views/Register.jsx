@@ -10,6 +10,7 @@ export default function Register() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [division, setDivision] = useState('');
+    const [code_clearance, setCodeClearance] = useState('')
     const [password, setPassword] = useState('');
     const [passwordCorfirmation, setPasswordConfirmation] = useState('');
     const [error, setError] = useState({__html: ''}); 
@@ -23,6 +24,7 @@ export default function Register() {
           lname,
           username,
           division,
+          code_clearance,
           email,
           password,
           password_confirmation: passwordCorfirmation
@@ -176,6 +178,28 @@ export default function Register() {
                     <option value="Port Police Division">Port Police Division</option>
                     <option value="Engineering Service Division">Engineering Service Division</option>
                     <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Code Clearance */}
+              <div>
+                <label htmlFor="code_clearance" className="block text-sm font-medium leading-6 text-gray-900">
+                  Code Clearance
+                </label>
+                <div className="mt-2">
+                  <select 
+                    name="code_clearance" 
+                    id="code_clearance"
+                    value={code_clearance}
+                    onChange={ev => setCodeClearance(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  >
+                    <option value="" disabled>Choose Code Clearance</option>
+                    <option value="1">1 - Division Manager</option>
+                    <option value="2">2 - Authorize Person</option>
+                    <option value="3">3 - Regular</option>
+                    <option value="4">4 - Contract of Service</option>
                   </select>
                 </div>
               </div>

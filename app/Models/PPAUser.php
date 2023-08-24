@@ -18,6 +18,7 @@ class PPAUser extends Model
         'lname', 
         'username', 
         'division', 
+        'code_clearance',
         'email', 
         'password'
     ];

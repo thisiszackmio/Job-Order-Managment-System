@@ -14,16 +14,17 @@ return new class extends Migration
         Schema::create('deployments', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\PPAUser::class, 'user_id');
-            $table->string('type_of_service');
-            $table->string('type_of_repair');
-            $table->string('details_repair');
-            $table->string('type_of_personel');
-            $table->string('details_personel');
-            $table->string('details_supply');
-            $table->string('location_repair');
-            $table->string('location_personel');
-            $table->string('personel_purpose');
-            $table->integer('no_of_supplies');
+            $table->date('request_created')->nullable();
+            $table->string('type_of_service')->nullable();
+            $table->string('type_of_repair')->nullable();
+            $table->string('details_repair')->nullable();
+            $table->string('type_of_personel')->nullable();
+            $table->string('details_personel')->nullable();
+            $table->string('details_supply')->nullable();
+            $table->string('location_repair')->nullable();
+            $table->string('location_personel')->nullable();
+            $table->string('personel_purpose')->nullable();
+            $table->integer('no_of_supplies')->nullable();
             $table->timestamps();
         });
     }

@@ -11,7 +11,14 @@ class DeploymentStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'user_id' => $this->user()->id
+        ]);
     }
 
     /**
@@ -22,7 +29,18 @@ class DeploymentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'exists:user_id',
+            'request_date' => 'required|date_format:m-d-Y',
+            'type_of_service' => 'required|string',
+            'type_of_repair' => 'nullable|string',
+            'details_repair' => 'nullable|string',
+            'location_repair' => 'nullable|string',
+            'type_of_personel' => 'nullable|string',
+            'details_personel' => 'nullable|string',
+            'personel_purpose' => 'nullable|string',
+            'location_personel' => 'nullable|string',
+            'details_supply' => 'nullable|string',
+            'no_of_supplies' => 'nullable|numeric',
         ];
     }
 }

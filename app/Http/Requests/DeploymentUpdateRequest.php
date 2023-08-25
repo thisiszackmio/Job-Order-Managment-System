@@ -11,7 +11,7 @@ class DeploymentUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class DeploymentUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'exists:user_id',
+            'type_of_service' => 'required|string',
+            'type_of_repair' => 'nullable|string',
+            'details_repair' => 'nullable|string',
+            'location_repair' => 'nullable|string',
+            'type_of_personel' => 'nullable|string',
+            'details_personel' => 'nullable|string',
+            'personel_purpose' => 'nullable|string',
+            'location_personel' => 'nullable|string',
+            'details_supply' => 'nullable|string',
+            'no_of_supplies' => 'nullable|numeric',
         ];
     }
 }

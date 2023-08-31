@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import axiosClient from "../axios.js";
-import { userStateContext } from "../context/ContextProvider.jsx";
+import { useUserStateContext } from "../context/ContextProvider.jsx";
 
 export default function Register() {
-    const { setCurrentUser, setUserToken } = userStateContext();
+    const { setCurrentUser, setUserToken } = useUserStateContext();
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
     const [username, setUsername] = useState('');

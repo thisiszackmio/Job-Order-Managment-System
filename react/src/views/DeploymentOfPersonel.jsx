@@ -1,8 +1,13 @@
+import axiosClient from "../axios";
 import PageComponent from "../components/PageComponent";
 import React, { useState } from "react";
+import { useUserStateContext } from "../context/ContextProvider";
 //import { useForm, useFieldArray } from "react-hook-form";
 
 export default function DeploymentofPersonel(){
+  const {currentUser} = useUserStateContext();
+  const userDetails = `${currentUser.fname} ${currentUser.lname}`;
+
   const currentDate = new Date();
   //const requestDate = `${currentDate.getMonth() + 1}-${currentDate.getDate()}-${currentDate.getFullYear()}`;
   const requestDate = currentDate.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', });
@@ -76,55 +81,46 @@ export default function DeploymentofPersonel(){
 
   const isButtonVisibleOnSupplies = detailSupply !== '' && noOfSupply !== '';
 
-  // Testing for the output
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Perform any necessary actions with the selected data
-  
-    console.log(
-      "Type of Service:", typeOfService,
-      "\nDate:", requestDate,
-      "\nRepair/Checkup: {",
-      "\nType of Repair/Checkup:", typeOfRepair,
-      "\nDetails on Repair/Checkup:", detailRepair,
-      "\nLocation on Repair/Checkup:", locationRepair,
-      "\n}",
-      "\nDeployment of Personnel: {",
-      "\nType of Personnel:", typeOfPersonnel,
-      "\nDetails on Personnel:", detailPersonnel,
-      "\nPurpose:", personnelPurpose,
-      "\nLocation on Deployment of Personnel:", locationPersonnel,
-      "\n}",
-      "\nSupplies: {",
-      "\nDetails on Supplies:", detailSupply,
-      "\nNo of Supplies:", noOfSupply,
-      "\n}"
-    )
+  //Submit the form
+  const onSubmit = (ev) => {
+    ev.preventDefault();
 
-  };
-
+    axiosClient.post("/deployment",{
+      type_of_service: typeOfService,
+      type_of_repair: typeOfRepair,
+      detail_repair: detailRepair,
+      location_repair: locationRepair,
+      type_of_personel: typeOfPersonnel,
+      detail_personnel: detailPersonnel,
+      purpose_personnel: personnelPurpose,
+      location_personnel: locationPersonnel,
+      detail_supply: detailSupply,
+      supply_no: noOfSupply
+    });
+  }
 
   return(
     <PageComponent title="Request For Repair/Troubleshooting (Equipment/Facility) and Deployment of Personnel">
-      <form onSubmit={handleSubmit}>
+      <form action="#" method="POST" onSubmit={onSubmit}>
         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div className="sm:col-span-3">
-            <label htmlFor="first-name" className="block text-lg font-medium text-gray-900"> Select Request </label>
-              <div className="mt-2">
-                <select 
-                  name="dps_request" 
-                  id="dps_request" 
-                  autoComplete="request-name" 
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  value={typeOfService} 
-                  onChange={ev => setTypeOfService(ev.target.value)}
-                >
-                  <option value="" disabled>Select an option</option>
-                  <option value="Repair/Checkup">Repair/Checkup</option>
-                  <option value="Deployment of Personel">Deployment of Personel</option>
-                  <option value="Supplies">Supplies</option>
-                </select>
-              </div>
+            <div className="mt-2">
+              <label htmlFor="dps_request" className="block text-lg font-medium text-gray-900"> Select Request </label>
+              <select 
+                name="dps_request" 
+                id="dps_request" 
+                autoComplete="request-name" 
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                value={typeOfService} 
+                readOnly
+                onChange={ev => setTypeOfService(ev.target.value)}
+              >
+                <option value="" disabled>Select an option</option>
+                <option value="Repair/Checkup">Repair/Checkup</option>
+                <option value="Deployment of Personel">Deployment of Personel</option>
+                <option value="Supplies">Supplies</option>
+              </select>
+            </div>
               
               {/* Conditional Forms Here */}
 

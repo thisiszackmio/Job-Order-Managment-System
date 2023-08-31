@@ -1,9 +1,9 @@
 import axiosClient from "../axios";
 import { useState } from "react"
-import { userStateContext } from "../context/ContextProvider";
+import { useUserStateContext  } from "../context/ContextProvider";
 
 export default function Login() {
-  const { setCurrentUser, setUserToken } = userStateContext();
+  const { setCurrentUser, setUserToken } = useUserStateContext ();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 

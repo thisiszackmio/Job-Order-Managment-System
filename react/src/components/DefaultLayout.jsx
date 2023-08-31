@@ -4,7 +4,7 @@ import { Bars3Icon, BellIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/ou
 import { Outlet } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
-import { userStateContext } from '../context/ContextProvider'
+import { useUserStateContext } from '../context/ContextProvider'
 import axiosClient from '../axios'
 
 const navigation = [
@@ -17,7 +17,7 @@ function classNames(...classes) {
 }
 
 export default function DefaultLayout() {
-  const { currentUser, userToken , setCurrentUser, setUserToken } = userStateContext();
+  const { currentUser, userToken , setCurrentUser, setUserToken } = useUserStateContext();
 
   if(!userToken){
     return <Navigate to='login'/>

@@ -1,39 +1,36 @@
-import { useContext } from "react";
-import { useState } from "react";
-import { createContext } from "react";
+import { useContext, useEffect } from "react";
+import { useState, createContext } from "react";
 
 const StateContext = createContext({
     currentUser: {},
     userToken: null,
-    setCurrentUser: () => { },
-    setUserToken: () => { }
-})
+    setCurrentUser: () => {},
+    setUserToken: () => {},
+});
 
-export const ContextProvider = ({children}) => {
+export const ContextProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState({});
-    const [userToken, _setUserToken] = useState(localStorage.getItem('TOKEN') || '')
+    const [userToken, setUserToken] = useState(localStorage.getItem('TOKEN') || '');
 
-    // Contain and Authorized
-    const setUserToken = (token) => {
-        if (token){
-            localStorage.setItem('TOKEN', token)
+    const setUserTokenAndLocalStorage = (token) => {
+        if (token) {
+            localStorage.setItem('TOKEN', token);
+        } else {
+            localStorage.removeItem('TOKEN');
         }
-        else {
-            localStorage.removeItem('TOKEN', token)
-        }
-        _setUserToken(token);
-    }
+        setUserToken(token);
+    };
 
-    return(
-        <StateContext.Provider value={{ 
+    return (
+        <StateContext.Provider value={{
             currentUser,
             setCurrentUser,
             userToken,
-            setUserToken,
-         }}>
+            setUserToken: setUserTokenAndLocalStorage,
+        }}>
             {children}
         </StateContext.Provider>
-    )
-}
+    );
+};
 
-export const userStateContext = () => useContext(StateContext);
+export const useUserStateContext = () => useContext(StateContext);

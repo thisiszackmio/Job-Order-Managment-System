@@ -9,7 +9,7 @@ import axiosClient from '../axios'
 
 const navigation = [
   { name: 'Dashboard', to: '/'},
-  { name: 'Deployment of Personel', to: '/dps' }
+  { name: 'Request Form', to: '/dps' }
 ]
 
 function classNames(...classes) {

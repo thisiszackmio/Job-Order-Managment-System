@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DeploymentController;
+use App\Http\Controllers\DeploymentDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
-    //Route::apiResource('deployment', DeploymentController::class);
+    Route::post('/deployment-data', [DeploymentDataController::class, 'store']);
 });
 
 Route::post('/register', [AuthController::class, 'register']);

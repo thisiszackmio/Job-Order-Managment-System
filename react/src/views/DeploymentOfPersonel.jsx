@@ -1,9 +1,27 @@
 import axiosClient from "../axios";
 import PageComponent from "../components/PageComponent";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate  } from 'react-router-dom';
 
 export default function DeploymentofPersonel(){
+  // Get data from the database on PPD Regular Employees on requesting vehicles
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Use useEffect to fetch data when the component mounts
+  useEffect(() => {
+    axiosClient.get('/ppausers')
+      .then(response => {
+        const usersData = response.data;
+        setUsers(usersData); // Update state when data arrives
+        setLoading(false); // Update loading state
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setLoading(false); // Update loading state in case of an error
+      });
+  }, []);
+
   // Select
   const [typeOfRequest, setTypeOfRequest] = useState('');
 
@@ -83,6 +101,20 @@ export default function DeploymentofPersonel(){
   const [plateNumber, setPlateNumber] = useState('');
   const [getDriver, setGetDriver] = useState('');
 
+  useEffect(() => {
+
+    if(typeOfVehicle === "Toyota Hi-Ace"){ setPlateNumber('SAB 4362'); }
+    else if(typeOfVehicle === "Isuzu Van"){ setPlateNumber('SFT 545'); } 
+    else if(typeOfVehicle === "Isuzu Man Lift"){ setPlateNumber('D2D 188'); }
+    else if(typeOfVehicle === "Toyota Hi-Lux/Fx"){ setPlateNumber('SPF 880'); }
+    else if(typeOfVehicle === "Hyundai Sta Fe"){ setPlateNumber('TEMP 101709'); }
+    else if(typeOfVehicle === "Isuzu Boom Truck"){ setPlateNumber('D2S 454'); }
+    else if(typeOfVehicle === "Isuzu Firetruck"){ setPlateNumber('DIS 060'); }
+    else if(typeOfVehicle === "Toyota Fortuner"){ setPlateNumber('AKA 7787'); setGetDriver('Villanueva, Ricardo S. - COS') }
+    else if(typeOfVehicle === "Toyota Innova"){ setPlateNumber('SHX 195'); }
+  }, [typeOfVehicle]);
+  
+
   //Submit the form
   const handleFormSubmit = (event) => {
     event.preventDefault();
@@ -148,7 +180,7 @@ export default function DeploymentofPersonel(){
         "\nTime of Arrival:", timeArrival,
         "\nType of Vehicle:", typeOfVehicle,
         "\nPlate Number:", plateNumber,
-        "Driver:", getDriver
+        "\nDriver:", getDriver
       )
     }
   };
@@ -887,40 +919,449 @@ export default function DeploymentofPersonel(){
                 {/* ---- */}
                 <div className="col-span-1">
                   <div className="mt-4">
-                    <label htmlFor="vehicle_place" className="block text-sm font-medium leading-6 text-gray-900"> Type of Vehicle : </label>
-                      <input
-                        type="text"
-                        name="vehicle_place"
-                        id="vehicle_place"
-                        value={typeOfVehicle}
-                        onChange={ev => setTypeOfVehicle(ev.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      />
+                    <label htmlFor="vehicle_place" className="block text-sm font-medium leading-6 text-gray-900"> Admin Assign Vehicle : </label>
+                    <select 
+                      name="dps_request" 
+                      id="dps_request" 
+                      autoComplete="request-name"
+                      value={typeOfVehicle}
+                      onChange={ev => setTypeOfVehicle(ev.target.value)}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    >
+                      <option value="" disabled>Select an option</option>
+                      <option value="Mitsubishi Adventure">Mitsubishi Adventure</option>
+                      <option value="Toyota Hi-Ace">Toyota Hi-Ace</option>
+                      <option value="Isuzu Van">Isuzu Van</option>
+                      <option value="Isuzu Man Lift">Isuzu Man Lift</option>
+                      <option value="Toyota Hi-Lux">Toyota Hi-Lux</option>
+                      <option value="Toyota Hi-Lux/Fx">Toyota Hi-Lux/Fx</option>
+                      <option value="Toyota Hi-Lux Patrol">Toyota Hi-Lux Patrol</option>
+                      <option value="Hyundai Sta Fe">Hyundai Sta Fe</option>
+                      <option value="Isuzu Boom Truck">Isuzu Boom Truck</option>
+                      <option value="Toyota Fortuner">Toyota Fortuner</option>
+                      <option value="Isuzu Firetruck">Isuzu Firetruck</option>
+                      <option value="Toyota Innova">Toyota Innova</option>
+                    </select>
                   </div>
-                  {/* -- */}
-                  <div className="mt-4">
-                    <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
-                      <input
-                        type="text"
-                        name="plate_number"
-                        id="plate_number"
-                        value={plateNumber}
-                        onChange={ev => setPlateNumber(ev.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      />
-                  </div>
-                  {/* -- */}
-                  <div className="mt-4">
-                    <label htmlFor="driver" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
-                      <input
-                        type="text"
-                        name="driver"
-                        id="driver"
-                        value={getDriver}
-                        onChange={ev => setGetDriver(ev.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      />
-                  </div>
+                  {/* Condition Statement */}
+                    {/* For Mitsubishi Adventure */}
+                    {typeOfVehicle === "Mitsubishi Adventure" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <select 
+                          name="plate_number" 
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          autoComplete="request-name"
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        >
+                          <option value="" disabled>Select an option</option>
+                          <option value="SLF 432">SLF 432</option>
+                          <option value="SLG 388">SLG 388</option>
+                          <option value="SHL 594">SHL 594</option>
+                        </select>
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="plate_number" 
+                            id="plate_number" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              {users.map(user => (
+                              <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname} - PPD</option>
+                              ))}
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Hi Ace */}
+                    {typeOfVehicle === "Toyota Hi-Ace" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Isuzu Van */}
+                    {typeOfVehicle === "Isuzu Van" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Isuzu Man Lift */}
+                    {typeOfVehicle === "Isuzu Man Lift" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Toyota Hi-Lux */}
+                    {typeOfVehicle === "Toyota Hi-Lux" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <select 
+                          name="plate_number" 
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          autoComplete="request-name"
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        >
+                          <option value="" disabled>Select an option</option>
+                          <option value="SLF 432">SFM 708</option>
+                          <option value="SLG 388">NBG 9724</option>
+                        </select>
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="plate_number" 
+                            id="plate_number" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Villanueva, Ricahrdo S. - COS">Villanueva, Ricahrdo S. - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Mitsubishi Adventure */}
+                    {typeOfVehicle === "Toyota Hi-Lux Patrol" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <select 
+                          name="plate_number" 
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          autoComplete="request-name"
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        >
+                          <option value="" disabled>Select an option</option>
+                          <option value="SAB 4394">SAB 4394</option>
+                          <option value="S6 H167">S6 H167</option>
+                        </select>
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="plate_number" 
+                            id="plate_number" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              {users.map(user => (
+                              <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname} - PPD</option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Toyota Hi-Lux/Fx */}
+                    {typeOfVehicle === "Toyota Hi-Lux/Fx" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Hyundai Sta Fe */}
+                    {typeOfVehicle === "Hyundai Sta Fe" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Isuzu Boom Truck */}
+                    {typeOfVehicle === "Isuzu Boom Truck" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
+                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
+                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
+                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
+                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
+                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Isuzu Firetruck */}
+                    {typeOfVehicle === "Isuzu Firetruck" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                        <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <select 
+                            name="plate_number" 
+                            id="plate_number" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              {users.map(user => (
+                              <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname} - PPD</option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                    {/* For Toyota Fortuner */}
+                    {typeOfVehicle === "Toyota Fortuner" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                            <input
+                            type="text"
+                            name="plate_number"
+                            id="plate_number"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            readOnly
+                            />
+                        </div>
+                      </div>
+                    )}
+                    {/* For Toyota Innova */}
+                    {typeOfVehicle === "Toyota Innova" && (
+                      <div className="mt-4">
+                        <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
+                          <input
+                          type="text"
+                          name="plate_number"
+                          id="plate_number"
+                          value={plateNumber}
+                          onChange={ev => setPlateNumber(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          readOnly
+                          />
+
+                        <div className="mt-4">
+                          <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Driver : </label>
+                          <select 
+                            name="dps_request" 
+                            id="dps_request" 
+                            autoComplete="request-name"
+                            value={getDriver}
+                            onChange={ev => setGetDriver(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            > 
+                              <option value="" disabled>Select an option</option>
+                              <option value="Balmones, Clint Bryan B.">Balmones, Clint Bryan B. - Regular</option>
+                              <option value="Sabdani, Omar A.">Sabdani, Omar A. - Regular</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  {/* End of condition */}
                 </div>
               </div>
             </div>

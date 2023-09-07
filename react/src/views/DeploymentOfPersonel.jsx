@@ -77,6 +77,8 @@ export default function DeploymentofPersonel(){
   const [checkSoundSystem, setCheckSoundSystem] = useState(false);
   const [checkVideoke, setCheckVideoke] = useState(false);
 
+  const [checkDop, setCheckDop] = useState(false);
+
   const handleCheckTable = (e) => {  setCheckTable(e.target.checked); }
   const handleCheckChairs = (e) => { setCheckChair(e.target.checked); }
   const handleCheckOther = (e) => { setCheckOther(e.target.checked); }
@@ -90,6 +92,8 @@ export default function DeploymentofPersonel(){
   const handleCheckTelevision = (e) => { setCheckTelevision(e.target.checked); }
   const handleCheckSoundSystem = (e) => { setCheckSoundSystem(e.target.checked); }
   const handleCheckVideoke = (e) => { setCheckVideoke(e.target.checked); }
+
+  const handleCheckDop = (e) => { setCheckDop(e.target.checked); }
 
   //For Request a Vehicle
   const [getPassengers, setGetPassengers] = useState('');
@@ -110,10 +114,15 @@ export default function DeploymentofPersonel(){
     else if(typeOfVehicle === "Hyundai Sta Fe"){ setPlateNumber('TEMP 101709'); }
     else if(typeOfVehicle === "Isuzu Boom Truck"){ setPlateNumber('D2S 454'); }
     else if(typeOfVehicle === "Isuzu Firetruck"){ setPlateNumber('DIS 060'); }
-    else if(typeOfVehicle === "Toyota Fortuner"){ setPlateNumber('AKA 7787'); setGetDriver('Villanueva, Ricardo S. - COS') }
+    else if(typeOfVehicle === "Toyota Fortuner"){ setPlateNumber('AKA 7787'); setGetDriver('Ricardo S. Villanueva') }
     else if(typeOfVehicle === "Toyota Innova"){ setPlateNumber('SHX 195'); }
   }, [typeOfVehicle]);
-  
+
+  //For Request a Manlift 
+  const [manliftActivity, setManliftActivity] = useState('');
+  const [dateManlift, setDateManlift] = useState('');
+  const [startManlift, setStartManlift] = useState('');
+  const [endManlift, setEndManlift] = useState('');
 
   //Submit the form
   const handleFormSubmit = (event) => {
@@ -135,7 +144,7 @@ export default function DeploymentofPersonel(){
         "\nComplaint/Defect:", ComplainDefect
       );
     }
-    else if (typeOfRequest === 'Facility'){
+    else if(typeOfRequest === 'Facility'){
       console.log(
         "Type of Request:", facility,
         "\nRequesting Office/Division:", requestDivision,
@@ -168,9 +177,9 @@ export default function DeploymentofPersonel(){
         "\nList of Male Guest:", listOfFemaleGuest,
         "\nOther Details:", dormOtherDetails,
         "}"
-      )
+      );
     }
-    else if (typeOfRequest === 'Vehicle Request Slip'){
+    else if(typeOfRequest === 'Vehicle Request Slip'){
       console.log(
         "Type of Request :", vehicle,
         "\nPassenger:", getPassengers,
@@ -181,7 +190,16 @@ export default function DeploymentofPersonel(){
         "\nType of Vehicle:", typeOfVehicle,
         "\nPlate Number:", plateNumber,
         "\nDriver:", getDriver
-      )
+      );
+    }
+    else if(typeOfRequest === 'Use of Manlift'){
+      console.log(
+        "Type of Request:", manlift,
+        "Title/Purpose of Activity:", manliftActivity,
+        "Date of Activity:", dateManlift,
+        "Time Start", startManlift,
+        "Time End", endManlift
+      );
     }
   };
 
@@ -976,12 +994,12 @@ export default function DeploymentofPersonel(){
                               {users.map(user => (
                               <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname} - PPD</option>
                               ))}
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1011,12 +1029,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1046,12 +1064,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1081,12 +1099,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1104,8 +1122,8 @@ export default function DeploymentofPersonel(){
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                         >
                           <option value="" disabled>Select an option</option>
-                          <option value="SLF 432">SFM 708</option>
-                          <option value="SLG 388">NBG 9724</option>
+                          <option value="SFM 708">SFM 708</option>
+                          <option value="NBG 9724">NBG 9724</option>
                         </select>
 
                         <div className="mt-4">
@@ -1119,18 +1137,18 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
-                              <option value="Villanueva, Ricahrdo S. - COS">Villanueva, Ricahrdo S. - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
+                              <option value="Ricahrdo S. Villanueva">Villanueva, Ricahrdo S. - COS</option>
                           </select>
                         </div>
                       </div>
                     )}
-                    {/* For Mitsubishi Adventure */}
+                    {/* For Toyota Hi-Lux Patrol */}
                     {typeOfVehicle === "Toyota Hi-Lux Patrol" && (
                       <div className="mt-4">
                         <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Plate Number : </label>
@@ -1190,12 +1208,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1225,12 +1243,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1260,12 +1278,12 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Loang, Jan Dexter - COS">Loang, Jan Dexter - COS</option>
-                              <option value="Magno, Joel A - Regular">Magno, Joel A - Regular</option>
-                              <option value="Rosero, Noel - Regular">Rosero, Noel - Regular</option>
-                              <option value="Sumanoy, Darly T. - Regular">Sumanoy, Darly T. - Regular</option>
-                              <option value="Sumanoy, Rey T. - COS">Sumanoy, Rey T. - COS</option>
-                              <option value="Turla, Arnold A - COS">Turla, Arnold A - COS</option>
+                              <option value="Jan Dexter Loang">Loang, Jan Dexter - COS</option>
+                              <option value="Joel A. Magno">Magno, Joel A - Regular</option>
+                              <option value="Noel Rosero">Rosero, Noel - Regular</option>
+                              <option value="Darly T. Sumanoy">Sumanoy, Darly T. - Regular</option>
+                              <option value="Rey T. Sumanoy">Sumanoy, Rey T. - COS</option>
+                              <option value="Arnold A. Turla">Turla, Arnold A - COS</option>
                           </select>
                         </div>
                       </div>
@@ -1355,8 +1373,8 @@ export default function DeploymentofPersonel(){
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                             > 
                               <option value="" disabled>Select an option</option>
-                              <option value="Balmones, Clint Bryan B.">Balmones, Clint Bryan B. - Regular</option>
-                              <option value="Sabdani, Omar A.">Sabdani, Omar A. - Regular</option>
+                              <option value="Clint Bryan B. Balmones">Balmones, Clint Bryan B. - Regular</option>
+                              <option value="Omar A. Sabdani">Sabdani, Omar A. - Regular</option>
                           </select>
                         </div>
                       </div>
@@ -1377,7 +1395,9 @@ export default function DeploymentofPersonel(){
                 <textarea
                   id="manlift_activity"
                   name="manlift_activity"
-                  rows={3}                  
+                  rows={3}
+                  value={manliftActivity}
+                  onChange={ev => setManliftActivity(ev.target.value)}         
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
               </div>
@@ -1388,6 +1408,8 @@ export default function DeploymentofPersonel(){
                     type="date"
                     name="date_manlift"
                     id="date_manlift"
+                    value={dateManlift}
+                    onChange={ev => setDateManlift(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
               </div>
@@ -1398,6 +1420,8 @@ export default function DeploymentofPersonel(){
                     type="time"
                     name="start_manlift"
                     id="start_manlift"
+                    value={startManlift}
+                    onChange={ev => setStartManlift(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
               </div>
@@ -1408,6 +1432,8 @@ export default function DeploymentofPersonel(){
                     type="time"
                     name="end_manlift"
                     id="end_manlift"
+                    value={endManlift}
+                    onChange={ev => setEndManlift(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
               </div>
@@ -1421,6 +1447,79 @@ export default function DeploymentofPersonel(){
               <h2 className="text-2xl font-semibold leading-7 text-gray-900"> 
                 Request for Repair/Troubleshooting and Deployment of Personnel 
               </h2>
+              {/* -- */}
+              <div className="mt-2">
+                <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Details: Observation / Description of Defect </label>
+                <textarea
+                  id="specific_details"
+                  name="specific_details"
+                  rows={3}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+              </div>
+              {/* -- */}
+              <div className="mt-6">
+                <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Location </label>
+              </div>
+                <input
+                  type="text"
+                  name="request_div"
+                  id="request_div"
+                  value={requestDivision}
+                  onChange={ev => setRequestDivision(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+              {/* -- */}
+              <div className="mt-6">
+                <div class="relative flex gap-x-3">
+                  <div class="flex h-6 items-center">
+                    <input 
+                      id="dop" 
+                      name="dop" 
+                      type="checkbox"
+                      onChange={handleCheckDop}
+                      class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" 
+                    />
+                  </div>
+                  <div class="text-sm leading-6">
+                    <label for="dop" class="font-medium text-gray-900">Deployment of Personnel</label>
+                  </div>
+                </div>
+              </div>
+              {/* -- */}
+              {checkDop && (
+                <div className="mt-6">
+                  <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Technical Assistance </label>
+                  <select 
+                    name="plate_number" 
+                    id="plate_number"
+                    value={plateNumber}
+                    onChange={ev => setPlateNumber(ev.target.value)}
+                    autoComplete="request-name"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  >
+                    <option value="" disabled>Select an option</option>
+                    <option value="Reulan, Raymart E.">Reulan, Raymart E. - IT Service</option>
+                    <option value="Silao, Jeffrey N.">Silao, Jeffrey N. - IT Service</option>
+                    <option value="Sermon, Zack-Mio A.">Sermon, Zack-Mio A. - IT Service</option>
+                    <option value="Coquilla, Earl S.">Coquilla, Earl S. - IT Service</option>
+                    <option value="Dingcong, Adonis Mc Gabby Ll.">Dingcong, Adonis Mc Gabby Ll. - IT Service</option>
+                    <option value="Denopol, Aldrin B.">Denopol, Aldrin B. - IT Service</option>
+                    <option value="Jacinto, Cris Ian R.">Jacinto, Cris Ian R - IT Service</option>
+                    <option value="Lluisma, Jay Robin S.">Lluisma, Jay Robin S. - Electronics</option>
+                    <option value="Namindang, Sonny Edward B.">Namindang, Sonny Edward B. - Electronics</option>
+                    <option value="Acierto, Stephen B.">Acierto, Stephen B. - Electrical Works</option>
+                    <option value="Gallarde, Jon Carlo D.">Gallarde, Jon Carlo D. - Electrical Works</option>
+                    <option value="Rosero, Noel G.">Rosero, Noel G. - Electrical Works</option>
+                    <option value="Balolong, Noel U.">Balolong, Noel U. - Watering Services</option>
+                    <option value="Sepio, Jolito S.">Sepio, Jolito S. - Engineering Services</option>
+                    <option value="Villacorte, Julito S.">Villacorte, Julito S. - Engineering Services</option>
+                    <option value="Gengone, Mark Jason I.">Gengone, Mark Jason I. - Engineering Services</option>
+                    <option value="Dahunan, Archer A.">Dahunan, Archer A. - Engineering Services</option>
+
+                  </select>
+              </div>
+              )}
             </div>
             )}
             {/* End here */}

@@ -77,7 +77,9 @@ export default function DeploymentofPersonel(){
   const [checkSoundSystem, setCheckSoundSystem] = useState(false);
   const [checkVideoke, setCheckVideoke] = useState(false);
 
-  const [checkDop, setCheckDop] = useState(false);
+  const [checkTechPersonnel, setCheckTechPersonnel] = useState(false);
+  const [checkJanitorPersonnel, setCheckJanitorPersonnel] = useState(false);
+  const [checkOtherDps, setCheckOtherDps] = useState(false);
 
   const handleCheckTable = (e) => {  setCheckTable(e.target.checked); }
   const handleCheckChairs = (e) => { setCheckChair(e.target.checked); }
@@ -93,7 +95,9 @@ export default function DeploymentofPersonel(){
   const handleCheckSoundSystem = (e) => { setCheckSoundSystem(e.target.checked); }
   const handleCheckVideoke = (e) => { setCheckVideoke(e.target.checked); }
 
-  const handleCheckDop = (e) => { setCheckDop(e.target.checked); }
+  const handleCheckTechPersonnel = (e) => { setCheckTechPersonnel(e.target.checked); }
+  const handleCheckJanitorPersonnel = (e) => { setCheckJanitorPersonnel(e.target.checked); }
+  const handleCheckOtherDps = (e) => { setCheckOtherDps(e.target.checked); }
 
   //For Request a Vehicle
   const [getPassengers, setGetPassengers] = useState('');
@@ -123,6 +127,27 @@ export default function DeploymentofPersonel(){
   const [dateManlift, setDateManlift] = useState('');
   const [startManlift, setStartManlift] = useState('');
   const [endManlift, setEndManlift] = useState('');
+
+  //Other Request
+  const [otherSpecificDetails, setOtherSpecificDetails] = useState('');
+  const [otherSpecificLocations, setOtherSpecificLocations] = useState('');
+  const [getTechPersonnel, setTechPersonnel] = useState([]);
+  const [getPersonnelLocation, setPersonnelLocation] = useState('');
+  const [getPersonnelPurpose, setPersonnelPurpose] = useState('');
+  const [getJanitorPersonnel, setJanitorPersonnel] = useState([]);
+  const [getOtherConcern, setOtherConcern] = useState('');
+  const [getSupplyDetail, setSupplyDetail] = useState('');
+  const [getNoSupplies, setNoSupplies] = useState('');
+
+  const handleTechPersonnel = (e) => {
+    const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
+    setTechPersonnel(selectedValues);
+  };
+
+  const handleJanitorPersonnel = (e) => {
+    const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
+    setJanitorPersonnel(selectedValues);
+  };
 
   //Submit the form
   const handleFormSubmit = (event) => {
@@ -199,6 +224,19 @@ export default function DeploymentofPersonel(){
         "Date of Activity:", dateManlift,
         "Time Start", startManlift,
         "Time End", endManlift
+      );
+    }
+    else {
+      console.log(
+        "Type of Request:", deploy,
+        "\nOthers: ", otherSpecificDetails,
+        "\nObservation: ", otherSpecificLocations,
+        "\nTechnical Assistance:", getTechPersonnel,
+        "\nJanitorial Assistance:", getJanitorPersonnel,
+        "\nPurpose:", getPersonnelPurpose,
+        "\nLocation:", getPersonnelLocation,
+        "\nSupply Detail:", getSupplyDetail,
+        "\nNo. of Supply:", getNoSupplies
       );
     }
   };
@@ -1453,73 +1491,234 @@ export default function DeploymentofPersonel(){
                 <textarea
                   id="specific_details"
                   name="specific_details"
+                  value={otherSpecificDetails}
+                  onChange={ev => setOtherSpecificDetails(ev.target.value)}
                   rows={3}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
               </div>
               {/* -- */}
               <div className="mt-6">
-                <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Location </label>
+                <label htmlFor="specific_location" className="block text-sm font-medium leading-6 text-gray-900"> Location </label>
               </div>
                 <input
                   type="text"
-                  name="request_div"
-                  id="request_div"
-                  value={requestDivision}
-                  onChange={ev => setRequestDivision(ev.target.value)}
+                  name="specific_location"
+                  id="specific_location"
+                  value={otherSpecificLocations}
+                  onChange={ev => setOtherSpecificLocations(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
               {/* -- */}
               <div className="mt-6">
-                <div class="relative flex gap-x-3">
-                  <div class="flex h-6 items-center">
-                    <input 
-                      id="dop" 
-                      name="dop" 
-                      type="checkbox"
-                      onChange={handleCheckDop}
-                      class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" 
-                    />
+                <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Deployment of Personnel </label>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {/* --  */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+                    <div class="relative flex gap-x-3">
+                      <div class="flex h-6 items-center">
+                        <input 
+                          id="dop" 
+                          name="dop" 
+                          type="checkbox"
+                          onChange={handleCheckTechPersonnel}
+                          class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" 
+                        />
+                      </div>
+                      <div class="text-sm leading-6">
+                        <label for="dop" class="font-medium text-gray-900">Technical Assistance</label>
+                      </div>
+                    </div>
                   </div>
-                  <div class="text-sm leading-6">
-                    <label for="dop" class="font-medium text-gray-900">Deployment of Personnel</label>
+                  {/* -- Display the Technical Personnel */}
+                  {checkTechPersonnel && (
+                    <div className="mt-4">
+                      <select 
+                        name="tech_personnel" 
+                        id="tech_personnel"
+                        autoComplete="request-name"
+                        multiple
+                        value={getTechPersonnel}
+                        onChange={handleTechPersonnel}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        style={{ height: '200px' }}
+                      >
+                      <option value="" disabled>Select a Personnel</option>
+                      <option value="Raymart E. Reulan">Reulan, Raymart E. - IT Service</option>
+                      <option value="Jeffrey N. Silao">Silao, Jeffrey N. - IT Service</option>
+                      <option value="Zack-Mio A. Sermon">Sermon, Zack-Mio A. - IT Service</option>
+                      <option value="Earl S. Coquilla">Coquilla, Earl S. - IT Service</option>
+                      <option value="Adonis Mc Gabby Ll. Dingcong">Dingcong, Adonis Mc Gabby Ll. - IT Service</option>
+                      <option value="Aldrin B. Denopol">Denopol, Aldrin B. - IT Service</option>
+                      <option value="Cris Ian R. Jacinto">Jacinto, Cris Ian R - IT Service</option>
+                      <option value="Jay Robin S. Lluisma">Lluisma, Jay Robin S. - Electronics</option>
+                      <option value="Sonny Edward B. Namindang">Namindang, Sonny Edward B. - Electronics</option>
+                      <option value="Stephen B. Acierto">Acierto, Stephen B. - Electrical Works</option>
+                      <option value="Jon Carlo D. Gallarde">Gallarde, Jon Carlo D. - Electrical Works</option>
+                      <option value="Noel G. Rosero">Rosero, Noel G. - Electrical Works</option>
+                      <option value="Noel U. Balolong">Balolong, Noel U. - Watering Services</option>
+                      <option value="Jolito S. Sepio">Sepio, Jolito S. - Engineering Services</option>
+                      <option value="Julito S. Villacorte">Villacorte, Julito S. - Engineering Services</option>
+                      <option value="Mark Jason I. Gengone">Gengone, Mark Jason I. - Engineering Services</option>
+                      <option value="Archer A. Dahunan">Dahunan, Archer A. - Engineering Services</option>
+
+                      </select>
+                      <label htmlFor="specific_details" className="block text-xs font-medium leading-6 text-red-600 italic"> Hold crtl key to choose more than 1 Personnel </label>      
+                    </div>
+                  )}
+                </div>
+                {/* -- */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+                    <div class="relative flex gap-x-3">
+                      <div class="flex h-6 items-center">
+                        <input 
+                          id="dop" 
+                          name="dop" 
+                          type="checkbox"
+                          onChange={handleCheckJanitorPersonnel}
+                          class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" 
+                        />
+                      </div>
+                      <div class="text-sm leading-6">
+                        <label for="dop" class="font-medium text-gray-900">Janitorial Assistance</label>
+                      </div>
+                    </div>
+                  </div>
+                  {/* -- */}
+                  {checkJanitorPersonnel && (
+                    <div className="mt-4">
+                      <select 
+                        name="janitor_personnel" 
+                        id="janitor_personnel"
+                        autoComplete="request-name"
+                        multiple
+                        value={getJanitorPersonnel}
+                        onChange={handleJanitorPersonnel}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                        style={{ height: '200px' }}
+                      >
+                      <option value="" disabled>Select a Personnel</option>
+                      <option value="Alindayo, Jason S.">Alindayo, Jason S.</option>
+                      <option value="Alindayo, Reynaldo P.">Alindayo, Reynaldo P.</option>
+                      <option value="Gandillo, Genny M.">Gandillo, Genny M.</option>
+                      <option value="Guillena, Michael Alfe E.">Guillena, Michael Alfe E.</option>
+                      <option value="Meralles, Fatima D.">Meralles, Fatima D.</option>
+                      <option value="Novicio, Jeric B.">Novicio, Jeric B.</option>
+                      <option value="Pagente, Neirmae A.">Pagente, Neirmae A.</option>
+                      <option value="Panuncillo, Rowe P.">Panuncillo, Rowe P.</option>
+                      <option value="Petallo, Locyl L.">Petallo, Locyl L.</option>
+                      <option value="Romeo, Lorenzo G.">Romeo, Lorenzo G.</option>
+                      <option value="Seville, Ryan J.">Seville, Ryan J.</option>
+                      <option value="Sumanoy, Darwin Joseph T.">Sumanoy, Darwin Joseph T.</option>
+                      <option value="Tambus, Evelyn S.">Tambus, Evelyn S.</option>
+                      <option value="Villaver, Erwin Y.">Villaver, Erwin Y.</option>
+                      <option value="Villaver, Rechievue Y.">Villaver, Rechievue Y.</option>
+                      <option value="Ampo, Jesril D.">Ampo, Jesril D.</option>
+                      <option value="Serafin, Angelo P.">Serafin, Angelo P.</option>
+                      <option value="Sade, Michael G.">Sade, Michael G.</option>
+                      <option value="Milmao, Nilo John C.">Milmao, Nilo John C.</option>
+                      <option value="Balbarino, Allan C.">Balbarino, Allan C.</option>
+                      <option value="Diango, Jerome C.">Diango, Jerome C.</option>
+                      </select>
+                      <label htmlFor="specific_details" className="block text-xs font-medium leading-6 text-red-600 italic"> Hold crtl key to choose more than 1 Personnel </label>  
+                    </div>
+                  )}
+                </div>
+                {/* -- */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+                    <div class="relative flex gap-x-3">
+                      <div class="flex h-6 items-center">
+                        <input 
+                          id="dop" 
+                          name="dop" 
+                          type="checkbox"
+                          onChange={handleCheckOtherDps}
+                          class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" 
+                        />
+                      </div>
+                      <div class="text-sm leading-6">
+                        <label for="dop" class="font-medium text-gray-900">Others</label>
+                      </div>
+                    </div>
+                  </div>
+                  {/* -- */}
+                  {checkOtherDps && (
+                    <div className="mt-4">
+                      <textarea
+                        id="other_concern"
+                        name="other_concern"
+                        rows={8}
+                        value={getOtherConcern}
+                        onChange={ev => setOtherConcern(ev.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-4">
+                <label htmlFor="personnel_location" className="block text-sm font-medium leading-6 text-gray-900"> Location : </label>
+              </div>
+                <input
+                  type="text"
+                  name="personnel_location"
+                  id="personnel_location"
+                  value={getPersonnelLocation}
+                  onChange={ev => setPersonnelLocation(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+              <div className="mt-4">
+                <label htmlFor="personnel_purpose" className="block text-sm font-medium leading-6 text-gray-900"> Purpose : </label>
+              </div>
+                <input
+                  type="text"
+                  name="personnel_purpose"
+                  id="personnel_purpose"
+                  value={getPersonnelPurpose}
+                  onChange={ev => setPersonnelPurpose(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+              {/* -- */}
+              <div className="mt-6">
+                <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Supplies </label>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-1">
+                  <div className="mt-6">
+                    <label htmlFor="supply_details" className="block text-sm font-medium leading-6 text-gray-900"> Details :</label>
+                  </div>
+                  <div className="mt-2">
+                  <textarea
+                    id="supply_details"
+                    name="supply_details"
+                    rows={3}
+                    value={getSupplyDetail}
+                    onChange={ev => setSupplyDetail(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  </div>
+                </div>
+                {/* -- */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+                    <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> No. of Supplies </label>
+                  </div>
+                  <div className="mt-2">
+                    <textarea
+                      id="supply_quantity"
+                      name="supply_quantity"
+                      rows={3}
+                      value={getNoSupplies}
+                      onChange={ev => setNoSupplies(ev.target.value)}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    />
                   </div>
                 </div>
               </div>
-              {/* -- */}
-              {checkDop && (
-                <div className="mt-6">
-                  <label htmlFor="specific_details" className="block text-sm font-medium leading-6 text-gray-900"> Technical Assistance </label>
-                  <select 
-                    name="plate_number" 
-                    id="plate_number"
-                    value={plateNumber}
-                    onChange={ev => setPlateNumber(ev.target.value)}
-                    autoComplete="request-name"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  >
-                    <option value="" disabled>Select an option</option>
-                    <option value="Reulan, Raymart E.">Reulan, Raymart E. - IT Service</option>
-                    <option value="Silao, Jeffrey N.">Silao, Jeffrey N. - IT Service</option>
-                    <option value="Sermon, Zack-Mio A.">Sermon, Zack-Mio A. - IT Service</option>
-                    <option value="Coquilla, Earl S.">Coquilla, Earl S. - IT Service</option>
-                    <option value="Dingcong, Adonis Mc Gabby Ll.">Dingcong, Adonis Mc Gabby Ll. - IT Service</option>
-                    <option value="Denopol, Aldrin B.">Denopol, Aldrin B. - IT Service</option>
-                    <option value="Jacinto, Cris Ian R.">Jacinto, Cris Ian R - IT Service</option>
-                    <option value="Lluisma, Jay Robin S.">Lluisma, Jay Robin S. - Electronics</option>
-                    <option value="Namindang, Sonny Edward B.">Namindang, Sonny Edward B. - Electronics</option>
-                    <option value="Acierto, Stephen B.">Acierto, Stephen B. - Electrical Works</option>
-                    <option value="Gallarde, Jon Carlo D.">Gallarde, Jon Carlo D. - Electrical Works</option>
-                    <option value="Rosero, Noel G.">Rosero, Noel G. - Electrical Works</option>
-                    <option value="Balolong, Noel U.">Balolong, Noel U. - Watering Services</option>
-                    <option value="Sepio, Jolito S.">Sepio, Jolito S. - Engineering Services</option>
-                    <option value="Villacorte, Julito S.">Villacorte, Julito S. - Engineering Services</option>
-                    <option value="Gengone, Mark Jason I.">Gengone, Mark Jason I. - Engineering Services</option>
-                    <option value="Dahunan, Archer A.">Dahunan, Archer A. - Engineering Services</option>
-
-                  </select>
-              </div>
-              )}
             </div>
             )}
             {/* End here */}

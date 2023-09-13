@@ -2,35 +2,75 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import axiosClient from "../axios.js";
 import { useUserStateContext } from "../context/ContextProvider.jsx";
+import { useNavigate  } from 'react-router-dom';
 
 export default function Register() {
     const { setCurrentUser, setUserToken } = useUserStateContext();
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
+    const [mname, setMname] = useState('');
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
     const [division, setDivision] = useState('');
     const [code_clearance, setCodeClearance] = useState('')
     const [password, setPassword] = useState('');
     const [passwordCorfirmation, setPasswordConfirmation] = useState('');
-    const [error, setError] = useState({__html: ''}); 
+    const [uploadEsignature, setUploadEsignature] = useState('');
+    const [uploadedFileName, setUploadedFileName] = useState("");
+    const [error, setError] = useState({__html: ''});
+
+    const navigate = useNavigate();
+
+    const capitalizeFirstLetter = (str) => {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
+    const handleFname = (ev) => {
+      const capitalizedValue = capitalizeFirstLetter(ev.target.value);
+      setFname(capitalizedValue);
+    }
+
+    const handleMname = (ev) => {
+      const capitalizedValue = capitalizeFirstLetter(ev.target.value);
+      setMname(capitalizedValue);
+    }
+
+    const handleLname = (ev) => {
+      const capitalizedValue = capitalizeFirstLetter(ev.target.value);
+      setLname(capitalizedValue);
+    }
+
+    const handleFileChange = (e) => {
+      const selectedFile = e.target.files[0];
+      setUploadedFileName(selectedFile.name);
+      setUploadEsignature(selectedFile);
+    };
     
     const onSubmit = (ev) => {
       ev.preventDefault();
       setError({__html: '' })
 
-      axiosClient.post("/register", {
-          fname,
-          lname,
-          username,
-          division,
-          code_clearance,
-          email,
-          password,
-          password_confirmation: passwordCorfirmation
-        })
+      const formData = new FormData();
+      formData.append("fname", fname);
+      formData.append("mname", mname);
+      formData.append("lname", lname);
+      formData.append("image", uploadEsignature);
+      formData.append("username", username);
+      formData.append("division", division);
+      formData.append("code_clearance", code_clearance);
+      formData.append("password", password);
+      formData.append("password_confirmation", passwordCorfirmation);
+
+      
+      axiosClient.post("/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "x-rapidapi-host": "file-upload8.p.rapidapi.com",
+          "x-rapidapi-key": "your-rapidapi-key-here",
+        },
+      })
         .then(({ data }) => {
           //console.log(data);
+          navigate('/');
           setCurrentUser(data.user)
           setUserToken(data.token)
         })
@@ -80,7 +120,7 @@ export default function Register() {
           </div>
   
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
+            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST" enctype="multipart/form-data"> 
               {/* Name */}
               <div>
                 <label htmlFor="fname" className="block text-sm font-medium leading-6 text-gray-900">
@@ -93,8 +133,28 @@ export default function Register() {
                     type="text"
                     autoComplete="fname"
                     value={fname}
-                    onChange={ev => setFname(ev.target.value)}
+                    onChange={handleFname}
                     required
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+
+              </div>
+
+              <div>
+                <label htmlFor="fname" className="block text-sm font-medium leading-6 text-gray-900">
+                  Middle Initial
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="mname"
+                    name="mname"
+                    type="text"
+                    autoComplete="mname"
+                    value={mname}
+                    onChange={handleMname}
+                    required
+                    maxLength={2}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -113,7 +173,7 @@ export default function Register() {
                     autoComplete="lname"
                     required
                     value={lname}
-                    onChange={ev => setLname(ev.target.value)}
+                    onChange={handleLname}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -133,25 +193,6 @@ export default function Register() {
                     required
                     value={username}
                     onChange={ev => setUsername(ev.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={ev => setEmail(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -197,9 +238,10 @@ export default function Register() {
                   >
                     <option value="" disabled>Choose Code Clearance</option>
                     <option value="1">1 - Division Manager</option>
-                    <option value="2">2 - Authorize Person</option>
-                    <option value="3">3 - Regular</option>
-                    <option value="4">4 - Contract of Service</option>
+                    <option value="2">2 - Supervisor</option>
+                    <option value="3">3 - Authorize Person</option>
+                    <option value="4">4 - Regular Employee</option>
+                    <option value="5">5 - Contract of Service Employee</option>
                   </select>
                 </div>
               </div>
@@ -244,6 +286,35 @@ export default function Register() {
                   />
                 </div>
               </div>
+
+              {/* Upload Electronic Signature */}
+              <div class="col-span-full">
+                <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Upload Your E-Signature</label>
+                <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                  <div class="text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                    </svg>
+                    <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                      <label for="esignature" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                        <span>Upload a file</span>
+                        <input 
+                          id="esignature" 
+                          name="esignature" 
+                          type="file" 
+                          accept=".png"
+                          class="sr-only" 
+                          onChange={handleFileChange} 
+                          required 
+                        />
+                      </label>
+                      <p class="pl-1">or drag and drop</p>
+                    </div>
+                    <label class="text-xs leading-5 text-gray-600">PNG only up to 2MB</label>
+                    {uploadedFileName &&  <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedFileName}</label> }
+                  </div>
+                </div>
+              </div>
   
               <div>
                 <button
@@ -254,13 +325,6 @@ export default function Register() {
                 </button>
               </div>
             </form>
-  
-            <p className="mt-10 text-center text-sm text-gray-500">
-              Not a member?{' '}
-              <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                Start a 14 day free trial
-              </a>
-            </p>
           </div>
         </div>
       </>

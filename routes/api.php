@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\InspectionFormController;
 use App\Http\Controllers\DeploymentDataController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/deployment-data', [DeploymentDataController::class, 'store']);
+    Route::post('/inspectionformrequest', [InspectionFormController::class, 'store']);
 });
 
 Route::get('/ppausers', [UserController::class, 'index']);

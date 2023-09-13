@@ -8,47 +8,64 @@ use App\Models\PPAUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-
     public function register(RegisterRequest $request)
     {
-        $data = $request->validated();
-
-        // Check if the username exists on the database
-        $existingUser = PPAUser::where('username', $data['username'])->first();
-        if ($existingUser) {
+        try {
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $image = $request->file('image');
+                $extension = $image->getClientOriginalExtension();
+    
+                // Check if the file is a PNG image
+                if ($extension !== 'png') {
+                    return response()->json([
+                        'message' => "Only PNG images are allowed."
+                    ], 400);
+                }
+    
+                // Generate a filename based on name and timestamp
+                $name = $request->input('lname'); // Change 'fname' to the desired field
+                $timestamp = now()->timestamp;
+                $imageName = $name . '_' . $timestamp . '.' . $extension;
+    
+                /** @var \App\Models\User $user */
+                $user = PPAUser::create([
+                    'fname' => $request->input('fname'),
+                    'mname' => $request->input('mname'),
+                    'lname' => $request->input('lname'),
+                    'image' => $imageName,
+                    'username' => $request->input('username'),
+                    'division' => $request->input('division'),
+                    'code_clearance' => $request->input('code_clearance'),
+                    'password' => Hash::make($request->input('password')),
+                ]);
+                $token = $user->createToken('main')->plainTextToken;
+    
+                Storage::disk('public')->put('esignature/' . $imageName, file_get_contents($image));
+    
+                return response()->json([
+                    'message' => "Product successfully created."
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => "Invalid image file."
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            Log::error('Exception: ' . $e->getMessage());
+    
             return response()->json([
-                'message' => 'username already on the database.',
-                'errors' => [
-                    'username' => [
-                        'Username already exist.'
-                    ],
-                ],
-                'username' => [
-                    'Username already exist.'
-                ],
-            ], 422);
+                'message' => "Something went wrong. Please check the server logs for more details."
+            ], 500);
         }
-
-        /** @var \App\Models\User $user */
-        $user = PPAUser::create([
-            'fname' => $data['fname'],
-            'lname' => $data['lname'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'code_clearance' => $data['code_clearance'],
-            'division' => $data['division'],
-            'password' => bcrypt($data['password'])
-        ]);
-        $token = $user->createToken('main')->plainTextToken;
-
-        return response([
-            'user' => $user,
-            'token' => $token
-        ]);
     }
+    
 
     public function login(LoginRequest $request)
     {

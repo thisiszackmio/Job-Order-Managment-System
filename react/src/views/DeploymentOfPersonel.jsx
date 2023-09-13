@@ -1,10 +1,20 @@
 import axiosClient from "../axios";
+import Modal from "../components/Modal";
 import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
 import { useNavigate  } from 'react-router-dom';
 
 export default function DeploymentofPersonel(){
-  // Get data from the database on PPD Regular Employees on requesting vehicles
+  //Popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+
+  //for Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => { setIsModalOpen(true); };
+  const closeModal = () => { setIsModalOpen(false); };
+
+  //Get data from the database on PPD Regular Employees on requesting vehicles
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +53,7 @@ export default function DeploymentofPersonel(){
   const [propertyDescription, setPropertyDescription] = useState('');
   const [propertyLocation, setPropertyLocation] = useState('');
   const [ComplainDefect, setComplainDefect] = useState('');
+  const [supervisorApproval, setSupervisorApproval] = useState('');
 
   //For the Facility 
   const [requestDivision, setRequestDivision] = useState('');
@@ -139,6 +150,8 @@ export default function DeploymentofPersonel(){
   const [getSupplyDetail, setSupplyDetail] = useState('');
   const [getNoSupplies, setNoSupplies] = useState('');
 
+  const navigate = useNavigate();
+
   const handleTechPersonnel = (e) => {
     const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
     setTechPersonnel(selectedValues);
@@ -149,25 +162,67 @@ export default function DeploymentofPersonel(){
     setJanitorPersonnel(selectedValues);
   };
 
+  const closePopup = () => {
+    setShowPopup(false);
+
+    if (popupMessage === 'Request submitted successfully!') {
+      navigate('/');
+    }
+  };
+
   //Submit the form
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
+    setShowPopup(true);
+
     if(typeOfRequest === 'Equipment' || typeOfRequest === 'Computer' || typeOfRequest === 'Furniture' || typeOfRequest === 'Vehicle'){
-      console.log(
-        "Type of Request:", inspection,
-        "\nDate:", inspectionDate,
-        "\nProperty No.:", propertyNo,
-        "\nAcquisitaion Date:", acquisitionDate,
-        "\nAcquisition Cost:", acquisitionCost,
-        "\nBrand/Model:", BrandModel,
-        "\nSerial/Model No.:", SerialEngineNo,
-        "\nType of Property:", typeOfProperty,
-        "\nSpecify:", propertySpecify,
-        "\nDescription:", propertyDescription,
-        "\nLocation (Div/Section/Unit):", propertyDescription,
-        "\nComplaint/Defect:", ComplainDefect
-      );
+      
+      axiosClient
+      .post("/inspectionformrequest",{
+        date_of_request: inspectionDate,
+        property_number: propertyNo,
+        acq_date: acquisitionDate,
+        acq_cost: acquisitionCost,
+        brand_model: BrandModel,
+        serial_engine_no: SerialEngineNo,
+        type_of_property: typeOfProperty,
+        property_other_specific: propertySpecify,
+        property_description: propertyDescription,
+        location: propertyLocation,
+        complain: ComplainDefect,
+        supervisor_name: supervisorApproval,
+        supervisor_approval: 0
+      })
+      .then((response) => {
+        
+        // Reset all data
+        setTypeOfRequest('');
+        setInspectionDate('');
+        setPropertyNo('');
+        setAcquisitionDate('');
+        setAcquisitionCost('');
+        setBrandModel('');
+        setSerialEngineNo('');
+        setTypeOfProperty('');
+        setPropertySpecify('');
+        setPropertyDescription('');
+        setPropertyLocation('');
+        setComplainDefect('');
+        setSupervisorApproval('');
+
+        setPopupMessage('Request submitted successfully!');
+        setShowPopup(true);
+        setIsModalOpen(false);
+
+        console.log(response.data);
+
+      })
+      .catch((error) => {
+        // Handle error
+        console.error(error);
+      });
+  
     }
     else if(typeOfRequest === 'Facility'){
       console.log(
@@ -371,7 +426,12 @@ export default function DeploymentofPersonel(){
                       id="type_of_property" 
                       autoComplete="type_of_property"
                       value={typeOfProperty}
-                      onChange={ev => setTypeOfProperty(ev.target.value)}
+                      onChange={ev => {
+                        setTypeOfProperty(ev.target.value);
+                        if (ev.target.value !== 'Others') {
+                          setPropertySpecify('');
+                        }
+                      }}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                       >
                         <option value="" disabled>Select an option</option>
@@ -430,8 +490,195 @@ export default function DeploymentofPersonel(){
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     />
                   </div>
+                  {/* -- */}
+                  <div className="mt-4">
+                    <label htmlFor="plate_number" className="block text-sm font-medium leading-6 text-gray-900"> Immediate Supervisor : </label>
+                    <select 
+                      name="plate_number" 
+                      id="plate_number" 
+                      autoComplete="request-name"
+                      value={supervisorApproval}
+                      onChange={ev => setSupervisorApproval(ev.target.value)}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    > 
+                      <option value="" disabled>Select an option</option>
+                      {users.map(user => (
+                      <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
+
+              {/* Modal */}
+              <div className="mt-4">
+                <button 
+                type="button"
+                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                onClick={openModal}>
+                Save
+                </button>
+
+                <Modal isOpen={isModalOpen} onClose={closeModal}>
+
+                  <h2 className="text-2xl font-semibold leading-7 text-gray-900"> Please check your request before submit </h2>
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold leading-7 text-gray-900">{inspection}</h3>
+                    {/* -- */}
+                    <div className="mt-4">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Date: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{inspectionDate}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Propert Number: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{propertyNo}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Acquisitaion Date: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{acquisitionDate}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Acquisition Cost: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{acquisitionCost}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Brand/Model: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{BrandModel}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Serial/Model No.: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{SerialEngineNo}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Type of Property: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{typeOfProperty}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    {typeOfProperty === 'Others' && (
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Specify: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{propertySpecify}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    )}
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Description: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{propertyDescription}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Location (Div/Section/Unit): </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{propertyLocation}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Complaint/Defect: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{ComplainDefect}</label>
+                        </div>                  
+                      </div>
+                    </div>
+                    {/* -- */}
+                    <div className="mt-2">
+                      <div class="relative flex gap-x-3">
+                        <div class="flex h-6 text-base items-center">
+                        <label for="chair_no" class="font-medium text-gray-900">Immediate Supervisor: </label>
+                        </div>
+                        <div class="text-base leading-6">
+                          <label for="chair_no" class="font-normal text-gray-900">{supervisorApproval}</label>
+                        </div>                  
+                      </div>
+                    </div>
+
+                  </div>
+
+                <div className="mt-4">
+                  <button
+                  onClick={closeModal}
+                  className="mt-4 rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" // Add ml-2 for left margin
+                  >
+                  Close
+                  </button>
+                  <button
+                  type="submit"
+                  className="rounded-md ml-2 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                  Submit
+                  </button>
+                </div>
+                </Modal>
+              </div>
+              {/* End of Modal */}
+
             </div>
             )}
             {/* End here */}
@@ -1722,19 +1969,30 @@ export default function DeploymentofPersonel(){
             </div>
             )}
             {/* End here */}
-            
-            {typeOfRequest !== ''  && (
-              <div className="mt-4">
-                <button 
-                  type="submit"
-                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Submit
-                </button>
-              </div>
-            )}
           </div>
         </div>
+
+        {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+           {/* Semi-transparent black overlay */}
+           <div
+             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+           ></div>
+           {/* Popup content with background blur */}
+           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+             <p className="text-lg">{popupMessage}</p>
+             <div className="flex justify-center mt-4">
+              <button
+                onClick={closePopup}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+           </div>
+          </div>
+      )}
+
       </form>
     </PageComponent>
   )

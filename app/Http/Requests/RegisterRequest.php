@@ -24,16 +24,21 @@ class RegisterRequest extends FormRequest
     {
         return [
             'fname' => 'required|string',
+            'mname' => 'required|string',
             'lname' => 'required|string',
             'username' => 'required|string',
             'division' => 'required|string',
-            'email' => 'required|email|string|unique:users,email',
             'code_clearance' => 'required|string',
             'password' => [
                 'required',
                 'confirmed',
                 Password::min(8)->mixedCase()->numbers()->symbols()
-            ]
+            ],
+            'image' => [
+                'required', 
+                'file', 
+                'mimes:png'
+            ],
         ];
     }
 }

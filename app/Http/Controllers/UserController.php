@@ -9,7 +9,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = PPAUser::where('division', 'Port Police Division')->get();
+        $users = PPAUser::where('code_clearance', '2')->get();
         return response()->json($users);
     }
 }

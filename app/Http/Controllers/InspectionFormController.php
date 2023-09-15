@@ -30,27 +30,22 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Inspection_Form $inspection_Form)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Inspection_Form $inspection_Form)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Inspection_Form $inspection_Form)
+    public function update(InspectionFormRequest $request, $id)
     {
-        //
+        $data = $request->validated($id);
+
+        // Check if the button is clicked (you need to determine the specific condition)
+        if ($request->has('button_clicked')) {
+        // Update the supervisor_approval field to 1
+        $inspectionForm->repair['supervisor_approval'] = 1;
+        $inspectionForm->save();
+    }
+
+    // Rest of your update logic here
+
+    return redirect()->back()->with('success', 'Form updated successfully');
     }
 
     /**

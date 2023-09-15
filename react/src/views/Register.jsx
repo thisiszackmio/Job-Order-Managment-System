@@ -308,9 +308,8 @@ export default function Register() {
                           required 
                         />
                       </label>
-                      <p class="pl-1">or drag and drop</p>
+                      <p class="pl-1">PNG only up to 2MB</p>
                     </div>
-                    <label class="text-xs leading-5 text-gray-600">PNG only up to 2MB</label>
                     {uploadedFileName &&  <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedFileName}</label> }
                   </div>
                 </div>

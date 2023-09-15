@@ -7,17 +7,18 @@ import { Navigate } from 'react-router-dom'
 import { useUserStateContext } from '../context/ContextProvider'
 import axiosClient from '../axios'
 
-const navigation = [
-  { name: 'Dashboard', to: '/'},
-  { name: 'Request Form', to: '/dps' }
-]
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function DefaultLayout() {
-  const { currentUser, userToken , setCurrentUser, setUserToken } = useUserStateContext();
+  const { currentUser, userToken, userRole , setCurrentUser, setUserToken } = useUserStateContext();
+
+  const navigation = [
+    { name: 'Dashboard', to: '/' },
+    { name: 'Request Form', to: '/request_form' },
+    userRole === 'admin' && { name: 'Request List', to: '/request_list' },
+  ].filter(Boolean);
 
   if(!userToken){
     return <Navigate to='login'/>
@@ -50,20 +51,22 @@ export default function DefaultLayout() {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
-                          <NavLink
-                            key={item.name}
-                            to={item.to}
-                            className={({ isActive }) => classNames(
-                                isActive
+                      {navigation.map((item) => (
+                        <NavLink
+                          key={item.name}
+                          to={item.to}
+                          className={({ isActive }) =>
+                            classNames(
+                              isActive
                                 ? 'bg-gray-900 text-white'
                                 : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                               'rounded-md px-3 py-2 text-sm font-medium'
-                            )}
-                          >
-                            {item.name}
-                          </NavLink>
-                        ))}
+                            )
+                          }
+                        >
+                          {item.name}
+                        </NavLink>
+                      ))}
                       </div>
                     </div>
                   </div>

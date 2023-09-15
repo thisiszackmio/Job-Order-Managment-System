@@ -73,30 +73,37 @@ class AuthController extends Controller
 
         $useracc = PPAUser::where('username', $credentials['username'])->first();
 
-        //var_dump($useracc);
-
-        $remember = $credentials['remember'] ?? false;
-        unset($credentials['remember']);
-
+        // Check if the user account exists and the password is valid
         if (!$useracc || !Hash::check($credentials['password'], $useracc->password)) {
             return response()->json([
                 'message' => 'Invalid Credentials',
                 'errors' => [
-                    'credentials' => [
-                        'Invalid Credentials.'
-                    ],
-                ],
-                'credentials' => [
-                    'Invalid Credentials.'
+                    'credentials' => ['Invalid Credentials.'],
                 ],
             ], 422);
         }
 
+        // Determine the user's role based on the 'code_clearance' value
+        $userRole = null;
+        $codeClearance = (int) $useracc->code_clearance;
+
+        if ($codeClearance >= 1 && $codeClearance <= 3) {
+            $userRole = 'admin';
+        } elseif ($codeClearance >= 4 && $codeClearance <= 5) {
+            $userRole = 'member';
+        } else {
+            // Handle other 'code_clearance' values as needed
+            $userRole = 'other';
+        }
+
+        // Generate a token for the user
         $token = $useracc->createToken('main')->plainTextToken;
 
+        // Return the response with user data and role
         return response([
             'user' => $useracc,
-            'token' => $token
+            'role' => $userRole, 
+            'token' => $token,
         ]);
     }
 

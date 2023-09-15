@@ -4,7 +4,7 @@ import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
 import { useNavigate  } from 'react-router-dom';
 
-export default function DeploymentofPersonel(){
+export default function RequestForm(){
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');

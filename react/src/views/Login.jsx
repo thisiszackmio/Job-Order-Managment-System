@@ -3,38 +3,67 @@ import { useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
 
 export default function Login() {
-  const { setCurrentUser, setUserToken } = useUserStateContext ();
+  const { setCurrentUser, setUserToken, setUserRole } = useUserStateContext ();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 
 
+  const userRole = 'admin';
+
+  const handleLogin = async (credentials) => {
+    try {
+      // Make a POST request to your login endpoint using axiosClient
+      const response = await axiosClient.post("/login", credentials);
+
+      // Assuming the response contains the user's role in the 'role' field
+      const userRole = response.data.role;
+
+      setUserRole(userRole);
+
+      // Now you have the user's role; you can store it in state, context, or any state management solution you use.
+      // For example, if you are using React state and setUserRole is a state update function:
+      return { userRole, data: response.data };
+    } catch (error) {
+      // Handle login error
+      if (error.response) {
+        const errorMessages = Object.values(error.response.data.errors)
+          .flatMap((errorArray) => errorArray)
+          .join('<br>');
+
+        console.log(errorMessages);
+        setError({ __html: errorMessages });
+      }
+
+      console.error(error);
+    }
+  };
+
 
   const onSubmit = (ev) => {
+
     ev.preventDefault();
     setError({ __html: "" });
 
-    axiosClient.post("/login", {
-        username,
-        password,
-      })
-      .then(({ data }) => {
-        setCurrentUser(data.user)
-        setUserToken(data.token)
+    handleLogin({ username, password }) // Call the handleLogin function with credentials
+      .then(({userRole, data}) => {
+        setCurrentUser(data.user);
+         setUserToken(data.token);
+         setUserRole(userRole);
       })
       .catch((error) => {
         if (error.response) {
-            const errorMessages = Object.values(error.response.data.errors)
-                .flatMap((errorArray) => errorArray)
-                .join('<br>');
-    
-            console.log(errorMessages);
-            setError({ __html: errorMessages });
+          const errorMessages = Object.values(error.response.data.errors)
+              .flatMap((errorArray) => errorArray)
+              .join('<br>');
+  
+          console.log(errorMessages);
+          setError({ __html: errorMessages });
         }
         
         console.error(error);
       });
 
-  }
+  };
 
 
     return (

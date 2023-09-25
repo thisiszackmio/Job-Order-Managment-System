@@ -19,7 +19,7 @@ class InspectionFormRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules()
     {
         return [
             'user_id' => 'exists:users,id',
@@ -34,8 +34,9 @@ class InspectionFormRequest extends FormRequest
             'property_description' => 'required|string',
             'location' => 'required|string',
             'complain' => 'required|string',
-            'supervisor_name' => 'required|string',
-            'supervisor_approval' => 'required|numeric'
+            'supervisor_name' => 'required|numeric',
+            'supervisor_approval' => 'required|numeric',
+            'admin_approval' => 'required|numeric'
         ];
     }
 }

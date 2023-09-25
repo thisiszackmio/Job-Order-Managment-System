@@ -6,6 +6,7 @@ import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
 import RequestForm from "./views/RequestForm";
 import RequestList from "./views/RequestList";
+import ViewRequest from "./views/ViewRequestInspection";
 
 
 const routes = [
@@ -27,7 +28,11 @@ const routes = [
             },
             {
                 path: "/request_list",
-                element: <RequestList />,
+                element: <RequestList />
+            },
+            {
+                path: "/view_request_inspection/:id",
+                element: <ViewRequest />
             }
         ]
     },

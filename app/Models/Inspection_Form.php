@@ -23,6 +23,12 @@ class Inspection_Form extends Model
         'location',
         'complain',
         'supervisor_name',
-        'supervisor_approval'
+        'supervisor_approval',
+        'admin_approval'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(PPAUser::class, 'user_id');
+    }
 }

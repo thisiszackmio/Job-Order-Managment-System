@@ -71,8 +71,6 @@ export default function Register() {
         .then(({ data }) => {
           //console.log(data);
           navigate('/');
-          setCurrentUser(data.user)
-          setUserToken(data.token)
         })
         .catch((error) => {
           if (error.response) {

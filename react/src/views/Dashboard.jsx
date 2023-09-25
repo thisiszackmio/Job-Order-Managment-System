@@ -11,7 +11,7 @@ function formatDate(dateString) {
 
 export default function Dashboard()
 {
-  const { currentUser, userToken, userRole, setUserRole  } = useUserStateContext();
+  const { currentUser } = useUserStateContext();
   const [prePostRepair, setPrePostRepair] = useState([]);
   const [request, setRequest] = useState('');
 
@@ -37,27 +37,6 @@ export default function Dashboard()
       console.error('Error fetching data:', error);
     });
   },[]);
-
-  useEffect(() => {
-    // Replace this with your actual API call logic
-    const fetchUserRoleFromAPI = async () => {
-      try {
-        const response = await fetch('/login');
-        const data = await response.json();
-        
-        // Assuming the API response contains the user's role
-        const newUserRole = data.userRole;
-
-        // Update the user's role in the context
-        setUserRole(newUserRole);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    // Call the function to fetch the user's role
-    fetchUserRoleFromAPI();
-  }, []);
 
   return(
     <PageComponent title={`${getTimeOfDay()}! ${currentUser.fname}`}>

@@ -25,8 +25,9 @@ return new class extends Migration
             $table->string('property_description');
             $table->string('location');
             $table->string('complain');
-            $table->string('supervisor_name');
+            $table->smallInteger('supervisor_name');
             $table->boolean('supervisor_approval')->default(false);
+            $table->boolean('admin_approval')->default(false);
             $table->timestamps();
         });
     }

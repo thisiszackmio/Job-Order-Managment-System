@@ -32,6 +32,7 @@ export default function RequestForm(){
       });
   }, []);
 
+
   // Select
   const [typeOfRequest, setTypeOfRequest] = useState('');
 
@@ -150,7 +151,18 @@ export default function RequestForm(){
   const [getSupplyDetail, setSupplyDetail] = useState('');
   const [getNoSupplies, setNoSupplies] = useState('');
 
+  const [selectedOptionValue, setSelectedOptionValue] = useState('');
+
   const navigate = useNavigate();
+
+  const handleSupervisorName= (event) => {
+    const selectedValue = event.target.value;
+    setSupervisorApproval(selectedValue);
+  
+    const selectedIndex = event.target.selectedIndex;
+    const selectedLabel = event.target.options[selectedIndex].text;
+    setSelectedOptionValue(selectedLabel);
+  };
 
   const handleTechPersonnel = (e) => {
     const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
@@ -192,7 +204,8 @@ export default function RequestForm(){
         location: propertyLocation,
         complain: ComplainDefect,
         supervisor_name: supervisorApproval,
-        supervisor_approval: 0
+        supervisor_approval: 0,
+        admin_approval: 0
       })
       .then((response) => {
         
@@ -498,12 +511,12 @@ export default function RequestForm(){
                       id="plate_number" 
                       autoComplete="request-name"
                       value={supervisorApproval}
-                      onChange={ev => setSupervisorApproval(ev.target.value)}
+                      onChange={handleSupervisorName}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     > 
                       <option value="" disabled>Select an option</option>
                       {users.map(user => (
-                      <option key={user.id} value={`${user.fname} ${user.lname}`}>{user.fname} {user.lname}</option>
+                      <option key={user.id} value={user.id}>{user.fname} {user.lname}</option>
                       ))}
                     </select>
                   </div>
@@ -654,7 +667,7 @@ export default function RequestForm(){
                         <label for="chair_no" class="font-medium text-gray-900">Immediate Supervisor: </label>
                         </div>
                         <div class="text-base leading-6">
-                          <label for="chair_no" class="font-normal text-gray-900">{supervisorApproval}</label>
+                          <label for="chair_no" class="font-normal text-gray-900">{selectedOptionValue}</label>
                         </div>                  
                       </div>
                     </div>

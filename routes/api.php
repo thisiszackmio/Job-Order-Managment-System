@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InspectionFormController;
+use App\Http\Controllers\AssignPersonnelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -21,14 +22,23 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/inspectionformrequest', [InspectionFormController::class, 'store']);
-    Route::put('/updateinspectionformrequest/{id}', [InspectionFormController::class, 'update']);
 
     Route::get('/ppausers', [UserController::class, 'index']);
     Route::get('/getrepair', [DashboardController::class, 'getRepair']);
+
+    // Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
 });
+
+Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
+
+Route::get('/requestrepair', [InspectionFormController::class, 'index']);
+Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
+
+Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
+Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

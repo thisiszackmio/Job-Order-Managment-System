@@ -110,7 +110,7 @@ class InspectionFormController extends Controller
 
         $deploymentData = Inspection_Form::create($data);
 
-        return response()->json(['message' => 'Deployment data created successfully'], 201);
+        return response()->json(['message' => 'Deployment data created successfully'], 200);
     }
 
     /**

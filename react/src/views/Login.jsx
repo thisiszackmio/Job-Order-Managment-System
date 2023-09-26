@@ -1,14 +1,18 @@
 import axiosClient from "../axios";
 import { useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSpinner  } from '@fortawesome/free-solid-svg-icons';
 
 export default function Login() {
   const { setCurrentUser, setUserToken, setUserRole } = useUserStateContext ();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 
+  const [isLoading, setIsLoading] = useState(false);
 
-  const userRole = 'admin';
+  library.add(faSpinner);
 
   const handleLogin = async (credentials) => {
     try {
@@ -44,6 +48,8 @@ export default function Login() {
     ev.preventDefault();
     setError({ __html: "" });
 
+    setIsLoading(true);
+
     handleLogin({ username, password }) // Call the handleLogin function with credentials
       .then(({userRole, data}) => {
         setCurrentUser(data.user);
@@ -51,6 +57,8 @@ export default function Login() {
          setUserRole(userRole);
       })
       .catch((error) => {
+        setIsLoading(false);
+
         if (error.response) {
           const errorMessages = Object.values(error.response.data.errors)
               .flatMap((errorArray) => errorArray)
@@ -88,6 +96,12 @@ export default function Login() {
           </div>
   
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          {isLoading ? (
+            <div className="flex items-center justify-center">
+              <FontAwesomeIcon icon={faSpinner} spin />
+              <span className="ml-2">Redirecting...</span>
+            </div>
+          ) : (
             <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
@@ -141,6 +155,7 @@ export default function Login() {
                 </button>
               </div>
             </form>
+          )}
           </div>
         </div>
       </>

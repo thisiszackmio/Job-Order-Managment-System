@@ -53,10 +53,8 @@ export default function ViewRequest(){
     <div>
     {isLoading ? (
       <div className="flex items-center justify-center h-screen">
-        <div>
-          <FontAwesomeIcon icon={faSpinner} spin className="text-2xl mr-2" />
-          Loading...
-        </div>
+        <FontAwesomeIcon icon={faSpinner} spin />
+        <span className="ml-2">Loading...</span>              
       </div>  
       ) : userRole === 'admin' ? (
         <div>
@@ -69,15 +67,15 @@ export default function ViewRequest(){
             </div>
             {/* ... */}
             <div className="mt-6">
-                  <div className="flex">
-                    <div className="w-36">
-                      <strong>Date</strong> 
-                    </div>
-                    <div className="w-64 border-b border-black pl-1">
-                      <span>{formatDate(displayRequest.viewRequestData.date_of_request)}</span>
-                    </div>
-                  </div>
+              <div className="flex">
+                <div className="w-36">
+                  <strong>Date</strong> 
                 </div>
+                <div className="w-64 border-b border-black pl-1">
+                  <span>{formatDate(displayRequest.viewRequestData.date_of_request)}</span>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-1">
                 {/* ... */}
@@ -293,7 +291,7 @@ export default function ViewRequest(){
                 >
                   Back
                 </button>
-                {currentUser.id === 5 && (
+                {currentUser.code_clearance === 3 && displayRequest.viewRequestData.supervisor_approval === 1 && (
                   <button 
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                     onClick={() => {

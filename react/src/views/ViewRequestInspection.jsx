@@ -3,7 +3,7 @@ import PageComponent from "../components/PageComponent";
 import { useUserStateContext } from "../context/ContextProvider";
 import { useState, useEffect } from "react";
 import axiosClient from "../axios";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner  } from '@fortawesome/free-solid-svg-icons';
@@ -49,7 +49,7 @@ export default function ViewRequest(){
   },[id]);
   
   return(
-    <PageComponent title="View Request">
+    <PageComponent title="Pre-Repair/Post Repair Inspection Form">
     <div>
     {isLoading ? (
       <div className="flex items-center justify-center h-screen">
@@ -61,7 +61,6 @@ export default function ViewRequest(){
         {/* Check if userDetails is defined before accessing properties */}
         {displayRequest.userDetails ? (
           <div>
-            <h2 className="text-2xl font-semibold leading-7 text-gray-900"> Pre-Repair/Post Repair Inspection Form </h2>
             <div className="mt-6">
               <h3 className="text-xl font-normal leading-6 text-gray-900">Part A: To be filled-up by Requesting Party</h3>
             </div>
@@ -261,7 +260,7 @@ export default function ViewRequest(){
 
                   <div className="mt-10">
                     <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                    {displayRequest.viewRequestData.supervisor_approval === 0 ? (
+                    {displayRequest.viewRequestData.supervisor_approval === 0 || displayRequest.viewRequestData.supervisor_approval === 2 ? (
                       <span>{displayRequest.userDetails.supervisor}</span>
                     ) : (
                       <div>
@@ -294,11 +293,10 @@ export default function ViewRequest(){
                 {currentUser.code_clearance === 3 && displayRequest.viewRequestData.supervisor_approval === 1 && (
                   <button 
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => {
-                      window.location.href = '/request_list';
-                    }}
                   >
-                    Proceed to Part B
+                    <Link to={`/edit_request_inspection/${displayRequest.viewRequestData.id}`}>
+                      Proceed to Part B
+                    </Link>
                   </button>
                 )}
               </div>

@@ -84,6 +84,27 @@ class InspectionFormController extends Controller
             $supervisorName = 'No Supervisor Assigned'; // Handle the case where supervisor_id is empty
         }
 
+        //Get GSO ID on the database
+        $gsoUser = PPAUser::find(5); // ID number of Maam Sue
+
+        if (!$gsoUser) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $gsoName = $gsoUser->fname . ' ' . $gsoUser->mname. '. ' . $gsoUser->lname;
+        $gsoSignature = URL::to('/storage/esignature/' . $gsoUser->image);
+
+
+        //Get Admin Division Manager on the Database
+        $ManagerUser = PPAUser::find(8); // ID Number of Maam Daisy
+
+        if (!$ManagerUser) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $ManagerName = $ManagerUser->fname . ' ' . $ManagerUser->mname. '. ' . $ManagerUser->lname;
+        $ManagerSignature = URL::to('/storage/esignature/' . $ManagerUser->image);
+
 
         // Create the response data
         $respondData = [
@@ -93,6 +114,14 @@ class InspectionFormController extends Controller
                 'supervisor' => $supervisorName,
                 'requestor_signature' => $userSignature,
                 'supervisor_signature' => $supervisorSignature,
+            ],
+            'gso_user_details' => [
+                'gso_name' => $gsoName,
+                'gso_signature' => $gsoSignature,
+            ],
+            'manager_user_details' => [
+                'manager_name' => $ManagerName,
+                'manager_signature' => $ManagerSignature,
             ],
         ];
 
@@ -111,6 +140,26 @@ class InspectionFormController extends Controller
         $deploymentData = Inspection_Form::create($data);
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
+
+    /**
+     * Store a Part B of the Form.
+     */
+    public function storeAdmin(Request $request, $id)
+    {
+        $datatwo = $request->validated();
+
+        $findInspection = Inspection_Form::find($id);
+
+        $newRecord = $findInspection->relatedModel()->create([
+            'date_of_filling' => $datatwo['date_of_filling'],
+            'date_of_last_repair' => $datatwo['date_of_last_repair'],
+            'nature_of_last_repair' => $datatwo['nature_of_last_repair'],
+            'assign_personnel' => $datatwo['assign_personnel'],
+        ]);
+
+        return response()->json(['message' => 'Record created successfully'], 200);
+
     }
 
     /**

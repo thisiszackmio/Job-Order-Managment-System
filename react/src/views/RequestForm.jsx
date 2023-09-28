@@ -25,11 +25,9 @@ export default function RequestForm(){
       .then(response => {
         const usersData = response.data;
         setUsers(usersData); // Update state when data arrives
-        setLoading(false); // Update loading state
       })
       .catch(error => {
         console.error('Error fetching data:', error);
-        setLoading(false); // Update loading state in case of an error
       });
   }, []);
 
@@ -459,7 +457,7 @@ export default function RequestForm(){
                     >
                       <option value="" disabled>Select an option</option>
                       <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                      <option value="IT Equipment & Related Materials">It Equipemnt & Related Materials</option>
+                      <option value="It Equipemnt & Related Materials">It Equipemnt & Related Materials</option>
                       <option value="Others">Others</option>
                     </select>
                     {inputErrors.type_of_property && (
@@ -586,7 +584,7 @@ export default function RequestForm(){
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <FontAwesomeIcon icon={faSpinner} spin />
-                    <span className="ml-2">Redirecting...</span>
+                    <span className="ml-2">Processing</span>
                   </div>
                 ) : (
                   'Submit'

@@ -119,19 +119,6 @@ export default function RequestList()
     }
   }
 
- // Supervisor Can view the details
- const handleViewClick = (id) =>{
-  const selectedData = prePostRepair.find(repair => repair.inspection_form.id === id);
-  
-  setSelectedRepair(selectedData);
-  
-  setShowDetails(true);
- }
-
- function handleGSOform(){
-  setShowGSOForm(true);
- }
-
   return(
     <PageComponent title="Request List">
     {userRole === "admin" ?(

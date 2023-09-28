@@ -21,24 +21,30 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //Request Inspection Form Part A - Part D
     Route::post('/inspectionformrequest', [InspectionFormController::class, 'store']);
-
+    Route::post('/inspectionformrequesttwo/{id}', [InspectionFormController::class, 'storeAdmin']);
+   
+    //Get User
     Route::get('/ppausers', [UserController::class, 'index']);
-    Route::get('/getrepair', [DashboardController::class, 'getRepair']);
 
-    // Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
+    //Route::get('/getrepair', [DashboardController::class, 'getRepair']);
+
+    //Get Personnel List
+    Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
+
+    //Display Inpection Request on the site
+    Route::get('/requestrepair', [InspectionFormController::class, 'index']);
+    Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
+
+    //Supervisor Confirmation
+    Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
+    Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
 });
-
-Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
-
-Route::get('/requestrepair', [InspectionFormController::class, 'index']);
-Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
-
-Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
-Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

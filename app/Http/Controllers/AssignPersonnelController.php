@@ -14,30 +14,33 @@ class AssignPersonnelController extends Controller
     public function index()
     {
         $assignPersonnels = AssignPersonnel::with('user')->get();
-        //$assignPersonnels = AssignPersonnel::all();
+        $assignPersonnels = AssignPersonnel::all();
 
         if ($assignPersonnels->isEmpty()) {
             return response()->json($assignPersonnels);
         }
-
+        
         $responseData = [];
 
         foreach ($assignPersonnels as $assignPersonnel) {
             $ppaUser = $assignPersonnel->user;
 
+            $userId = $ppaUser->id;
             $userName = $ppaUser->fname;
             $userMiddleInitial = $ppaUser->mname;
             $userLastName = $ppaUser->lname;
 
-            $responseData[] = [
+            $responseData[]= [
                 'assign_personnel' => $assignPersonnel,
-                'user_details' => [
+                'personnel_details' => [
+                    'id' => $userId,
                     'fname' => $userName,
                     'mname' => $userMiddleInitial,
                     'lname' => $userLastName,
                 ],
             ];
         }
+
 
         return response()->json($responseData);
         

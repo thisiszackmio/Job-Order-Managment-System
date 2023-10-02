@@ -457,7 +457,7 @@ export default function RequestForm(){
                     >
                       <option value="" disabled>Select an option</option>
                       <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                      <option value="It Equipemnt & Related Materials">It Equipemnt & Related Materials</option>
+                      <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
                       <option value="Others">Others</option>
                     </select>
                     {inputErrors.type_of_property && (

@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function(){
     //Request Inspection Form Part A - Part D
     Route::post('/inspectionformrequest', [InspectionFormController::class, 'store']);
     Route::post('/inspectionformrequesttwo/{id}', [InspectionFormController::class, 'storeAdmin']);
+    Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
    
     //Get User
     Route::get('/ppausers', [UserController::class, 'index']);

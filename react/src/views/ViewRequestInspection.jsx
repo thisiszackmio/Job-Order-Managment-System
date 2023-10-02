@@ -21,7 +21,9 @@ export default function ViewRequest(){
   const {id} = useParams();
 
   const[displayRequest, setDisplayRequest] = useState([]);
+  const[adminForm, setAdminForm] = useState([]);
 
+  // Display the Details
   const fetchUser = () => {
     axiosClient
     .get(`/requestrepair/${id}`)
@@ -29,13 +31,15 @@ export default function ViewRequest(){
         const responseData = response.data;
         const viewRequestData = responseData.view_request;
         const userDetails = responseData.user_details;
+        const gsoDetails = responseData.gso_user_details;
+        const manegerDetails = responseData.manager_user_details;
 
         setDisplayRequest({
             viewRequestData: viewRequestData,
             userDetails: userDetails,
+            gsoDetails: gsoDetails,
+            manegerDetails: manegerDetails,
           });
-
-          console.log(responseData);
 
         setIsLoading(false);
     })
@@ -44,9 +48,35 @@ export default function ViewRequest(){
     });
     }
 
+  //for the Part B display
+  const fetchAdmin = () => {
+    axiosClient
+    .get(`/inspectionformtwo/${id}`)
+    .then((response) => {
+      const responseData = response.data;
+
+      const dateOfFilling = responseData.date_of_filling;
+      const dateOfLastRepair = responseData.date_of_last_repair;
+      const natureOfLastRepair = responseData.nature_of_last_repair;
+
+      setAdminForm({
+        dateOfFilling: dateOfFilling,
+        dateOfLastRepair: dateOfLastRepair,
+        natureOfLastRepair: natureOfLastRepair,
+      })
+
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }
+
   useEffect(()=>{
     fetchUser();
+    fetchAdmin();
   },[id]);
+
+  
   
   return(
     <PageComponent title="Pre-Repair/Post Repair Inspection Form">
@@ -61,6 +91,7 @@ export default function ViewRequest(){
         {/* Check if userDetails is defined before accessing properties */}
         {displayRequest.userDetails ? (
           <div>
+            {/* Part A */}
             <div className="mt-6">
               <h3 className="text-xl font-normal leading-6 text-gray-900">Part A: To be filled-up by Requesting Party</h3>
             </div>
@@ -280,7 +311,7 @@ export default function ViewRequest(){
               </div>
             </div>
             
-            <div className="mt-10">
+            {/* <div className="mt-10">
               <div className="flex">
                 <button 
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
@@ -299,6 +330,90 @@ export default function ViewRequest(){
                     </Link>
                   </button>
                 )}
+              </div>
+            </div> */}
+
+            {/* Part B */}
+            <div className="mt-16">
+              <h3 className="text-xl font-normal leading-6 text-gray-900">Part B: To be filled-up by Administrative Division</h3>
+            </div>
+
+            {/* ... */}
+            <div className="mt-10">
+              <div className="flex">
+                <div className="w-36">
+                  <strong>Date</strong> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                  <span>{formatDate(adminForm.dateOfFilling)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ... */}
+            <div className="mt-8">
+              <div className="flex">
+                <div className="w-44">
+                  <strong>Date of Last Repair</strong> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                  <span>{formatDate(adminForm.dateOfLastRepair)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ... */}
+            <div className="mt-4">
+              <div className="flex">
+                <div className="w-52">
+                  <strong>Nature of Last Repair</strong>
+                </div>
+                <div className="w-full border-b border-black pl-1">
+                  <span>{adminForm.natureOfLastRepair}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Signature */}
+            <div className="mt-10">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> REQUESTED BY: </label>
+
+                  <div className="mt-10">
+                    <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                      <div>
+                      <img src={displayRequest.gsoDetails.gso_signature} alt="User Signature" style={{ position: 'absolute', width: '80%', top: '-54px', }} />
+                      </div>
+                      <span>{displayRequest.gsoDetails.gso_name}</span>
+                    </div>
+                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> End-User </label>
+                  </div>
+
+                </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> NOTED: </label>
+
+                  <div className="mt-10">
+                    <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                    {displayRequest.viewRequestData.admin_approval === 0 || displayRequest.viewRequestData.supervisor_approval === 2 ? (
+                      <span>{displayRequest.manegerDetails.manager_name}</span>
+                    ) : (
+                      <div>
+                        <img
+                          src={displayRequest.manegerDetails.manager_signature}
+                          alt="User Signature"
+                          style={{ position: 'absolute', width: '80%', top: '-90px', left: '32px' }}
+                        />
+                        <span>{displayRequest.manegerDetails.manager_name}</span>
+                      </div>
+                    )}
+                    </div>
+                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> Immediate Supervisor </label>
+                  </div>
+
+                </div>
               </div>
             </div>
             

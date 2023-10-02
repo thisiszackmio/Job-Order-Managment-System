@@ -29,6 +29,7 @@ export default function ViewRequest(){
   const [filledDate, setFilledDate] = useState('');
   const [lastfilledDate, setLastFilledDate] = useState('');
   const [natureRepair, setNatureRepair] = useState('');
+  const [pointPersonnel, setPointPersonnel] = useState('');
 
   const fetchUser = () => {
     axiosClient
@@ -81,7 +82,12 @@ export default function ViewRequest(){
     event.preventDefault();
     setSubmitLoading(true);
 
-    axiosClient.post(`/inspectionformrequesttwo/${id}`)
+    axiosClient.post(`/inspectionformrequesttwo/${id}`,{
+      date_of_filling: filledDate,
+      date_of_last_repair: lastfilledDate,
+      nature_of_last_repair: natureRepair,
+      assign_personnel: pointPersonnel
+    })
     .then((response) => { 
       setShowSuccessMessage(true);    
       resetFormFields();
@@ -415,8 +421,8 @@ export default function ViewRequest(){
                     name="plate_number" 
                     id="plate_number" 
                     autoComplete="request-name"
-                    // value={supervisorApproval}
-                    // onChange={handleSupervisorName}
+                    value={pointPersonnel}
+                    onChange={ev => setPointPersonnel(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   > 
                     <option value="" disabled>Select an option</option>

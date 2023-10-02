@@ -8,6 +8,7 @@ import RequestForm from "./views/RequestForm";
 import RequestList from "./views/RequestList";
 import ViewRequestInspection from "./views/ViewRequestInspection";
 import EditRequestInspection from "./views/EditInspectionRequest";
+import MyRequest from "./views/YourRequest";
 
 
 const routes = [
@@ -26,6 +27,10 @@ const routes = [
             {
                 path: "/request_form",
                 element: <RequestForm />
+            },
+            {
+                path: "/my_request",
+                element: <MyRequest />
             },
             {
                 path: "/request_list",

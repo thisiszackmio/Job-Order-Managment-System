@@ -31,4 +31,9 @@ class Inspection_Form extends Model
     {
         return $this->belongsTo(PPAUser::class, 'user_id');
     }
+
+    public function relatedModels()
+    {
+        return $this->hasMany(AdminInspectionForm::class);
+    }
 }

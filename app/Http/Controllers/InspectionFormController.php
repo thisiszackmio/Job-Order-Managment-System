@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InspectionFormRequest;
+use App\Http\Requests\StoreAdminInspectionRequest;
 use App\Models\Inspection_Form;
 use App\Models\PPAUser;
+use App\Models\AdminInspectionForm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -51,7 +53,8 @@ class InspectionFormController extends Controller
     /**
      * Show data.
      */
-    public function show(Request $request, $id){
+    public function show(Request $request, $id)
+    {
 
         $viewRequest = Inspection_Form::with('user')->find($id);
 
@@ -145,13 +148,13 @@ class InspectionFormController extends Controller
     /**
      * Store a Part B of the Form.
      */
-    public function storeAdmin(Request $request, $id)
+    public function storeAdmin(StoreAdminInspectionRequest $request, $id)
     {
         $datatwo = $request->validated();
 
         $findInspection = Inspection_Form::find($id);
 
-        $newRecord = $findInspection->relatedModel()->create([
+        $newRecord = $findInspection->relatedModels()->create([
             'date_of_filling' => $datatwo['date_of_filling'],
             'date_of_last_repair' => $datatwo['date_of_last_repair'],
             'nature_of_last_repair' => $datatwo['nature_of_last_repair'],
@@ -161,6 +164,17 @@ class InspectionFormController extends Controller
         return response()->json(['message' => 'Record created successfully'], 200);
 
     }
+
+    /**
+     * View a Part B of the Form.
+     */
+    public function viewAdmin(Request $request, $id)
+    {
+        $viewAdminRequest = AdminInspectionForm::with('inspection_form')->find($id);
+
+        return response()->json($viewAdminRequest);
+    }
+
 
     /**
      * Update the specified resource in storage.

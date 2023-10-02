@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('inspection_form_admin', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('insp_id')->constrained('inspection__forms');
+            $table->foreignId('inspection__form_id')->constrained('inspection__forms');
             $table->date('date_of_filling');
             $table->date('date_of_last_repair');
             $table->string('nature_of_last_repair');
-            $table->string('assign_personnel');
+            $table->integer('assign_personnel');
             $table->timestamps();
         });
     }

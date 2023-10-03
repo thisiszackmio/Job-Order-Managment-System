@@ -29,7 +29,7 @@ const routes = [
                 element: <RequestForm />
             },
             {
-                path: "/my_request",
+                path: "/my_request/:id",
                 element: <MyRequest />
             },
             {

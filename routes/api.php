@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
 
     //Display Inpection Request on the site
+    Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
     Route::get('/requestrepair', [InspectionFormController::class, 'index']);
     Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
 

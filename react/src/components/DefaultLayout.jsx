@@ -17,7 +17,7 @@ export default function DefaultLayout() {
   const navigation = [
     { name: 'Dashboard', to: '/' },
     { name: 'Request Form', to: '/request_form' },
-    { name: 'My Request', to: '/my_request' },
+    { name: 'My Request', to: `/my_request/${currentUser.id}` },
     userRole === 'admin' && { name: 'Request List', to: '/request_list' },
   ].filter(Boolean);
 

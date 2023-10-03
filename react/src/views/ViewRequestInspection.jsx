@@ -55,9 +55,9 @@ export default function ViewRequest(){
     .then((response) => {
       const responseData = response.data;
 
-      const dateOfFilling = responseData.date_of_filling;
-      const dateOfLastRepair = responseData.date_of_last_repair;
-      const natureOfLastRepair = responseData.nature_of_last_repair;
+      const dateOfFilling = responseData.partB.date_of_filling;
+      const dateOfLastRepair = responseData.partB.date_of_last_repair;
+      const natureOfLastRepair = responseData.partB.nature_of_last_repair;
 
       setAdminForm({
         dateOfFilling: dateOfFilling,
@@ -310,112 +310,118 @@ export default function ViewRequest(){
                 </div>
               </div>
             </div>
-            
-            {/* <div className="mt-10">
-              <div className="flex">
-                <button 
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-                  onClick={() => {
-                    window.location.href = '/request_list';
-                  }}
-                >
-                  Back
-                </button>
-                {currentUser.code_clearance === 3 && displayRequest.viewRequestData.supervisor_approval === 1 && (
-                  <button 
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    <Link to={`/edit_request_inspection/${displayRequest.viewRequestData.id}`}>
-                      Proceed to Part B
-                    </Link>
-                  </button>
-                )}
-              </div>
-            </div> */}
 
             {/* Part B */}
-            <div className="mt-16">
-              <h3 className="text-xl font-normal leading-6 text-gray-900">Part B: To be filled-up by Administrative Division</h3>
-            </div>
+            {adminForm.dateOfFilling ? (
+              // Kung Naa na
+              <div className="mt-16">
+                <h3 className="text-xl font-normal leading-6 text-gray-900">Part B: To be filled-up by Administrative Division</h3>
 
-            {/* ... */}
-            <div className="mt-10">
-              <div className="flex">
-                <div className="w-36">
-                  <strong>Date</strong> 
-                </div>
-                <div className="w-64 border-b border-black pl-1">
-                  <span>{formatDate(adminForm.dateOfFilling)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* ... */}
-            <div className="mt-8">
-              <div className="flex">
-                <div className="w-44">
-                  <strong>Date of Last Repair</strong> 
-                </div>
-                <div className="w-64 border-b border-black pl-1">
-                  <span>{formatDate(adminForm.dateOfLastRepair)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* ... */}
-            <div className="mt-4">
-              <div className="flex">
-                <div className="w-52">
-                  <strong>Nature of Last Repair</strong>
-                </div>
-                <div className="w-full border-b border-black pl-1">
-                  <span>{adminForm.natureOfLastRepair}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Signature */}
-            <div className="mt-10">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> REQUESTED BY: </label>
-
-                  <div className="mt-10">
-                    <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                      <div>
-                      <img src={displayRequest.gsoDetails.gso_signature} alt="User Signature" style={{ position: 'absolute', width: '80%', top: '-54px', }} />
-                      </div>
-                      <span>{displayRequest.gsoDetails.gso_name}</span>
+                {/* Date */}
+                <div className="mt-10">
+                  <div className="flex">
+                    <div className="w-36">
+                      <strong>Date</strong> 
                     </div>
-                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> End-User </label>
+                    <div className="w-64 border-b border-black pl-1">
+                      <span>{formatDate(adminForm.dateOfFilling)}</span>
+                    </div>
                   </div>
-
                 </div>
 
-                <div className="col-span-1">
-                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> NOTED: </label>
-
-                  <div className="mt-10">
-                    <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                    {displayRequest.viewRequestData.admin_approval === 0 || displayRequest.viewRequestData.supervisor_approval === 2 ? (
-                      <span>{displayRequest.manegerDetails.manager_name}</span>
-                    ) : (
-                      <div>
-                        <img
-                          src={displayRequest.manegerDetails.manager_signature}
-                          alt="User Signature"
-                          style={{ position: 'absolute', width: '80%', top: '-90px', left: '32px' }}
-                        />
-                        <span>{displayRequest.manegerDetails.manager_name}</span>
-                      </div>
-                    )}
+                {/* Date of Last Repair */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Date of Last Repair</strong> 
                     </div>
-                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> Immediate Supervisor </label>
+                    <div className="w-64 border-b border-black pl-1">
+                      <span>{formatDate(adminForm.dateOfLastRepair)}</span>
+                    </div>
                   </div>
+                </div>
 
+                {/* Nature of Repair */}
+                <div className="mt-4">
+                  <div className="flex">
+                    <div className="w-52">
+                      <strong>Nature of Last Repair</strong>
+                    </div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span>{adminForm.natureOfLastRepair}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signature */}
+                <div className="mt-10">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> REQUESTED BY: </label>
+
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                          <div>
+                          <img src={displayRequest.gsoDetails.gso_signature} alt="User Signature" style={{ position: 'absolute', width: '80%', top: '-54px', }} />
+                          </div>
+                          <span>{displayRequest.gsoDetails.gso_name}</span>
+                        </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> End-User </label>
+                      </div>
+
+                    </div>
+
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> NOTED: </label>
+
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                        {displayRequest.viewRequestData.admin_approval === 0 || displayRequest.viewRequestData.supervisor_approval === 2 ? (
+                          <span>{displayRequest.manegerDetails.manager_name}</span>
+                        ) : (
+                          <div>
+                            <img
+                              src={displayRequest.manegerDetails.manager_signature}
+                              alt="User Signature"
+                              style={{ position: 'absolute', width: '80%', top: '-90px', left: '32px' }}
+                            />
+                            <span>{displayRequest.manegerDetails.manager_name}</span>
+                          </div>
+                        )}
+                        </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> Immediate Supervisor </label>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            ) : (
+              // If there no Part B data
+              <div className="mt-10">
+                <div className="flex">
+                  <button 
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+                    onClick={() => {
+                      window.location.href = '/request_list';
+                    }}
+                  >
+                    Back
+                  </button>
+                  {currentUser.code_clearance === 3 && displayRequest.viewRequestData.supervisor_approval === 1 && (
+                    <button 
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                      <Link to={`/edit_request_inspection/${displayRequest.viewRequestData.id}`}>
+                        Proceed to Part B
+                      </Link>
+                    </button>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
             
           </div>
         ) : (

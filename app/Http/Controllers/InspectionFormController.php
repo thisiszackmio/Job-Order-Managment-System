@@ -51,6 +51,30 @@ class InspectionFormController extends Controller
     }
 
     /**
+     * Show My Request On Inpection.
+     */
+    public function myRequestInspec(Request $request, $id)
+    {
+        // Find the ID of the User
+        $myRequest = PPAUser::find($id);
+
+        // Get the ID
+        $user_id = $myRequest->id;
+
+        // Query the Inspection Form using the user_id
+        $getInspectionForm = Inspection_Form::where('user_id', $user_id)->first();
+
+        // Display All the data
+        $respondData = [
+            'my_user' => $myRequest,
+            'view_request' => $getInspectionForm
+        ];
+
+        return response()->json($respondData);
+
+    }
+
+    /**
      * Show data.
      */
     public function show(Request $request, $id)
@@ -172,7 +196,15 @@ class InspectionFormController extends Controller
     {
         $viewAdminRequest = AdminInspectionForm::with('inspection_form')->find($id);
 
-        return response()->json($viewAdminRequest);
+        if (!$viewAdminRequest) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $respondData = [
+            'partB' => $viewAdminRequest
+        ];
+
+        return response()->json($respondData);
     }
 
 

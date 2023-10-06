@@ -1,17 +1,20 @@
 import axiosClient from "../axios";
 import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
-import { useNavigate  } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner  } from '@fortawesome/free-solid-svg-icons';
+import { useUserStateContext } from "../context/ContextProvider";
 
 export default function RequestForm(){
 
   library.add(faSpinner);
 
+  const { currentUser } = useUserStateContext();
+
   //Popup
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const [inputErrors, setInputErrors] = useState({});
 
@@ -144,8 +147,6 @@ export default function RequestForm(){
 
   const [activeTab, setActiveTab] = useState("tab1");
 
-  const navigate = useNavigate();
-
   const handleSupervisorName= (event) => {
     const selectedValue = event.target.value;
     setSupervisorApproval(selectedValue);
@@ -163,6 +164,7 @@ export default function RequestForm(){
 
     axiosClient
       .post("/inspectionformrequest",{
+        // For Inspect Submission
         date_of_request: inspectionDate,
         property_number: propertyNo,
         acq_date: acquisitionDate,
@@ -176,11 +178,19 @@ export default function RequestForm(){
         complain: ComplainDefect,
         supervisor_name: supervisorApproval,
         supervisor_approval: 0,
-        admin_approval: 0
+        admin_approval: 0,
+
+        // For Notification Submission
+        sender_id: currentUser.id,
+        receiver_id: supervisorApproval,
+        url: '/request_list',
+        subject: 'Inspection Form Request',
+        get_status: 0
+
       })
       .then((response) => { 
-        setShowSuccessMessage(true);    
-        resetFormFields();
+        setShowPopup(true);
+        setPopupMessage("Form Submitted Successfully");    
         setIsLoading(false);
       })
       .catch((error) => {
@@ -196,24 +206,13 @@ export default function RequestForm(){
       });
   }
 
-  const resetFormFields = () => {
-    setTypeOfRequest('');
-    setInspectionDate('');
-    setPropertyNo('');
-    setAcquisitionDate('');
-    setAcquisitionCost('');
-    setBrandModel('');
-    setSerialEngineNo('');
-    setTypeOfProperty('');
-    setPropertySpecify('');
-    setPropertyDescription('');
-    setPropertyLocation('');
-    setComplainDefect('');
-    setSupervisorApproval('');
-  };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+  };
+
+  const closePopup = () => { 
+    setShowPopup(false); 
   };
   
 
@@ -277,322 +276,329 @@ export default function RequestForm(){
         {/* Tab 1 */}
         {activeTab === "tab1" && 
         <div className="mt-6">
-          {showSuccessMessage ? (
-            // Display success message when showSuccessMessage is true
+          <form onSubmit={SubmitInspectionForm}>
             <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900">Request Form Success</h2>
-              <p className="text-xs font-bold leading-7 text-green-500">We will wait for your supervisor to approve your request.</p>
-              <button 
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-                  onClick={() => {
-                    window.location.href = '/';
-                  }}
-                >
-                  Back
-                </button>
-            </div>
-          ) : (
-            <form onSubmit={SubmitInspectionForm}>
-              <div>
               <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
               <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
-              </div>
-            
+            </div>
+          
+            <div className="grid grid-cols-2 gap-4">
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
 
-                <div className="col-span-1">
-
-                {/* Date */}
-                <div className="flex mt-6">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Date:</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="date"
-                      name="insp_date"
-                      id="insp_date"
-                      value= {inspectionDate}
-                      onChange={ev => setInspectionDate(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.date_of_request && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.date_of_request}</p>
-                    )}
-                  </div>
+              {/* Date */}
+              <div className="flex mt-6">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Date:</label> 
                 </div>
-
-                {/* Property Number */}
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Property No. :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="property_no"
-                      id="property_no"
-                      autoComplete="property_no"
-                      value={propertyNo}
-                      onChange={ev => setPropertyNo(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.property_number && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.property_number}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Acquisition Date */}
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Date :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="date"
-                      name="acquisition_date"
-                      id="acquisition_date"
-                      value={acquisitionDate}
-                      onChange={ev => setAcquisitionDate(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.acq_date && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.acq_date}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Acquisition Cost */}
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Cost :</label> 
-                  </div>
-                  <div className="w-64">
-                  <div className="relative flex items-center">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
-                      ₱
-                    </span>
-                    <input
-                      type="text"
-                      name="acquisition_cost"
-                      id="acquisition_cost"
-                      autoComplete="acquisition_cost"
-                      value={acquisitionCost}
-                      onChange={ev => setAcquisitionCost(ev.target.value)}
-                      className="pl-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                  {inputErrors.acq_cost && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.acq_cost}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Brand/Model */}
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Brand/Model :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="brand_model"
-                      id="brand_model"
-                      autoComplete="brand_model"
-                      value={BrandModel}
-                      onChange={ev => setBrandModel(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.brand_model && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.brand_model}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Serial/Engine No */}
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Serial/Engine No. :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="serial_engine_no"
-                      id="serial_engine_no"
-                      autoComplete="serial_engine_no"
-                      value={SerialEngineNo}
-                      onChange={ev => setSerialEngineNo(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.serial_engine_no && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.serial_engine_no}</p>
-                    )}
-                  </div>
-                </div>
-
-                </div>
-
-                <div className="col-span-1">
-
-                {/* Type of Property */}
-                <div className="flex mt-6">
-                  <div className="w-60">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Type of Property :</label> 
-                  </div>
-                  <div className="w-64">
-                    <select 
-                    name="type_of_property" 
-                    id="type_of_property" 
-                    autoComplete="type_of_property"
-                    value={typeOfProperty}
-                    onChange={ev => {
-                      setTypeOfProperty(ev.target.value);
-                      if (ev.target.value !== 'Others') {
-                        setPropertySpecify('');
-                      }
-                    }}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    >
-                      <option value="" disabled>Select an option</option>
-                      <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                      <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
-                      <option value="Others">Others</option>
-                    </select>
-                    {inputErrors.type_of_property && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.type_of_property}</p>
-                    )}
-                    {typeOfProperty === 'Others' && (
-                    <div className="flex mt-4">
-                      <div className="w-36">
-                        <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Specify:</label> 
-                      </div>
-                      <div className="w-64">
-                        <input
-                          type="text"
-                          name="specify"
-                          id="specify"
-                          value={propertySpecify}
-                          onChange={ev => setPropertySpecify(ev.target.value)}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="flex mt-4">
-                  <div className="w-60">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Description :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="description"
-                      id="description"
-                      value={propertyDescription}
-                      onChange={ev => setPropertyDescription(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.property_description && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.property_description}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div className="flex mt-4">
-                  <div className="w-60">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Location (Div/Section/Unit) :</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="location"
-                      id="location"
-                      value={propertyLocation}
-                      onChange={ev => setPropertyLocation(ev.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    {inputErrors.location && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.location}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Complain / Defect */}
-                <div className="flex mt-4">
-                  <div className="w-60">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Complain/Defect :</label> 
-                  </div>
-                  <div className="w-64">
-                  <textarea
-                    id="complain"
-                    name="complain"
-                    rows={2}
-                    value={ComplainDefect}
-                    onChange={ev => setComplainDefect(ev.target.value)}
+                <div className="w-64">
+                  <input
+                    type="date"
+                    name="insp_date"
+                    id="insp_date"
+                    value= {inspectionDate}
+                    onChange={ev => setInspectionDate(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
-                  {inputErrors.complain && (
-                      <p className="text-red-500 text-xs mt-2">{inputErrors.complain}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Supervisor Name */}
-                <div className="flex mt-4">
-                  <div className="w-60">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Immediate Supervisor :</label> 
-                  </div>
-                  <div className="w-64">
-                  <select 
-                    name="plate_number" 
-                    id="plate_number" 
-                    autoComplete="request-name"
-                    value={supervisorApproval}
-                    onChange={handleSupervisorName}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  > 
-                    <option value="" disabled>Select an option</option>
-                    {users.map(user => (
-                    <option key={user.id} value={user.id}>{user.fname} {user.lname}</option>
-                    ))}
-                  </select>
-                  {inputErrors.supervisor_name && (
-                    <p className="text-red-500 text-xs mt-2">{inputErrors.supervisor_name}</p>
+                  {inputErrors.date_of_request && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.date_of_request}</p>
                   )}
-                  </div>
                 </div>
-
-                </div>
-                  
               </div>
-              
-              {/* Submit Button */}
-              <div className="flex mt-10">
-              <button
-                type="submit"
-                className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                  isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                }`}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <FontAwesomeIcon icon={faSpinner} spin />
-                    <span className="ml-2">Processing</span>
+
+              {/* Property Number */}
+              <div className="flex mt-4">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Property No. :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="property_no"
+                    id="property_no"
+                    autoComplete="property_no"
+                    value={propertyNo}
+                    onChange={ev => setPropertyNo(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.property_number && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.property_number}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Acquisition Date */}
+              <div className="flex mt-4">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Date :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="date"
+                    name="acquisition_date"
+                    id="acquisition_date"
+                    value={acquisitionDate}
+                    onChange={ev => setAcquisitionDate(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.acq_date && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.acq_date}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Acquisition Cost */}
+              <div className="flex mt-4">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Cost :</label> 
+                </div>
+                <div className="w-64">
+                <div className="relative flex items-center">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
+                    ₱
+                  </span>
+                  <input
+                    type="text"
+                    name="acquisition_cost"
+                    id="acquisition_cost"
+                    autoComplete="acquisition_cost"
+                    value={acquisitionCost}
+                    onChange={ev => setAcquisitionCost(ev.target.value)}
+                    className="pl-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+                {inputErrors.acq_cost && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.acq_cost}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Brand/Model */}
+              <div className="flex mt-4">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Brand/Model :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="brand_model"
+                    id="brand_model"
+                    autoComplete="brand_model"
+                    value={BrandModel}
+                    onChange={ev => setBrandModel(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.brand_model && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.brand_model}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Serial/Engine No */}
+              <div className="flex mt-4">
+                <div className="w-36">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Serial/Engine No. :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="serial_engine_no"
+                    id="serial_engine_no"
+                    autoComplete="serial_engine_no"
+                    value={SerialEngineNo}
+                    onChange={ev => setSerialEngineNo(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.serial_engine_no && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.serial_engine_no}</p>
+                  )}
+                </div>
+              </div>
+
+              </div>
+
+              <div className="col-span-1">
+
+              {/* Type of Property */}
+              <div className="flex mt-6">
+                <div className="w-60">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Type of Property :</label> 
+                </div>
+                <div className="w-64">
+                  <select 
+                  name="type_of_property" 
+                  id="type_of_property" 
+                  autoComplete="type_of_property"
+                  value={typeOfProperty}
+                  onChange={ev => {
+                    setTypeOfProperty(ev.target.value);
+                    if (ev.target.value !== 'Others') {
+                      setPropertySpecify('');
+                    }
+                  }}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  >
+                    <option value="" disabled>Select an option</option>
+                    <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
+                    <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
+                    <option value="Others">Others</option>
+                  </select>
+                  {inputErrors.type_of_property && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.type_of_property}</p>
+                  )}
+                  {typeOfProperty === 'Others' && (
+                  <div className="flex mt-4">
+                    <div className="w-36">
+                      <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Specify:</label> 
+                    </div>
+                    <div className="w-64">
+                      <input
+                        type="text"
+                        name="specify"
+                        id="specify"
+                        value={propertySpecify}
+                        onChange={ev => setPropertySpecify(ev.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      />
+                    </div>
                   </div>
-                ) : (
-                  'Submit'
                 )}
-              </button>
+                </div>
               </div>
 
-            </form>
+              {/* Description */}
+              <div className="flex mt-4">
+                <div className="w-60">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Description :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="description"
+                    id="description"
+                    value={propertyDescription}
+                    onChange={ev => setPropertyDescription(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.property_description && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.property_description}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex mt-4">
+                <div className="w-60">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Location (Div/Section/Unit) :</label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="location"
+                    id="location"
+                    value={propertyLocation}
+                    onChange={ev => setPropertyLocation(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  {inputErrors.location && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.location}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Complain / Defect */}
+              <div className="flex mt-4">
+                <div className="w-60">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Complain/Defect :</label> 
+                </div>
+                <div className="w-64">
+                <textarea
+                  id="complain"
+                  name="complain"
+                  rows={2}
+                  value={ComplainDefect}
+                  onChange={ev => setComplainDefect(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                {inputErrors.complain && (
+                    <p className="text-red-500 text-xs mt-2">{inputErrors.complain}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Supervisor Name */}
+              <div className="flex mt-4">
+                <div className="w-60">
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Immediate Supervisor :</label> 
+                </div>
+                <div className="w-64">
+                <select 
+                  name="plate_number" 
+                  id="plate_number" 
+                  autoComplete="request-name"
+                  value={supervisorApproval}
+                  onChange={handleSupervisorName}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                > 
+                  <option value="" disabled>Select an option</option>
+                  {users.map(user => (
+                  <option key={user.id} value={user.id}>{user.fname} {user.lname}</option>
+                  ))}
+                </select>
+                {inputErrors.supervisor_name && (
+                  <p className="text-red-500 text-xs mt-2">{inputErrors.supervisor_name}</p>
+                )}
+                </div>
+              </div>
+
+              </div>
+                
+            </div>
+            
+            {/* Submit Button */}
+            <div className="flex mt-10">
+            <button
+              type="submit"
+              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  <span className="ml-2">Processing</span>
+                </div>
+              ) : (
+                'Submit'
+              )}
+            </button>
+            </div>
+
+          </form>
+
+          {/* Show Successfull Popup */}
+          {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+           {/* Semi-transparent black overlay */}
+           <div
+             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+           ></div>
+           {/* Popup content with background blur */}
+           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+             <p className="text-lg">{popupMessage}</p>
+             <div className="flex justify-center mt-4">
+              <button
+                onClick={() => {
+                  window.location.href = `/my_request/${currentUser.id}`;
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+           </div>
+          </div>
           )}
         </div>
         }

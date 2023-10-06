@@ -26,18 +26,6 @@ export default function Dashboard()
     }
   };
 
-  // Get your Request on Repair
-  useEffect( ()=>{
-    axiosClient.get('/getrepair')
-    .then(response => {
-      const getRepair = response.data;
-      setPrePostRepair(getRepair); // Update state when data arrives
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  },[]);
-
   return(
     <PageComponent title={`${getTimeOfDay()}! ${currentUser.fname}`}>
        

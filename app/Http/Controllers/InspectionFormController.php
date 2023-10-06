@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InspectionFormRequest;
+use App\Http\Requests\GetNotificationRequest;
 use App\Http\Requests\StoreAdminInspectionRequest;
 use App\Models\Inspection_Form;
 use App\Models\PPAUser;
 use App\Models\AdminInspectionForm;
+use App\Models\GetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -59,12 +61,12 @@ class InspectionFormController extends Controller
         $myRequest = PPAUser::find($id);
 
         // Get the ID
-        $user_id = $myRequest->id;
+        //$user_id = $myRequest->id;
 
         // Query the Inspection Form using the user_id
-        $getInspectionForm = Inspection_Form::where('user_id', $user_id)->first();
+        $getInspectionForm = Inspection_Form::where('user_id', $id)->get();
 
-        // Display All the data
+        //Display All the data
         $respondData = [
             'my_user' => $myRequest,
             'view_request' => $getInspectionForm
@@ -159,12 +161,38 @@ class InspectionFormController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(InspectionFormRequest $request)
+    public function store(InspectionFormRequest $request, GetNotificationRequest $notificationRequest)
     {
         $data = $request->validated();
+        $notificationData = $notificationRequest->validated();
         $data['user_id'] = auth()->user()->id;
 
+        // Get The sender name
+        $userId = PPAUser::find($data['user_id']);
+        $userSender = $userId->fname . ' ' . $userId->lname;
+        
+        // Create a notification message
+        $message = $userSender . ' has sent you a request for a Pre/Post Repair Inspection.';
+        
+        // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
+
+        if(!$deploymentData){
+            return response()->json(['error' => 'Data Error'], 500);
+        }
+
+        $storeNotification = GetNotification::create([
+            'sender_id' => $notificationData['sender_id'],
+            'receiver_id' => $notificationData['receiver_id'],
+            'url' => $notificationData['url'],
+            'subject' => $notificationData['subject'],
+            'message' => $message, 
+            'get_status' => $notificationData['get_status'],
+        ]);
+
+        if(!$storeNotification){
+            return response()->json(['error' => 'Data Error'], 500);
+        }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
     }
@@ -200,8 +228,67 @@ class InspectionFormController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
 
+        // Get the inspector ID
+        $getInspectorId = $viewAdminRequest->assign_personnel;
+
+        // Get the inspector details
+        $getInspector = PPAUser::find($getInspectorId);
+
+        // Concatenate the inspector's full name
+        $InspectorFullName = $getInspector->fname . ' ' . $getInspector->mname . '. ' . $getInspector->lname;
+
         $respondData = [
-            'partB' => $viewAdminRequest
+            'partB' => $viewAdminRequest,
+            'inspector_name' => $InspectorFullName,
+        ];
+
+        return response()->json($respondData);
+    }
+
+    /**
+     * Admin manager List of Request.
+     */
+    public function AdminInspectView(Request $request)
+    {
+        $viewAdminRequest = AdminInspectionForm::with('inspection_form')->get();
+
+        if (!$viewAdminRequest) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        // get assign personnel name
+        $paId = $viewAdminRequest->pluck('assign_personnel')->first();
+
+        //get the name of the assign personnel
+        $paNames = PPAUser::where('id', $paId)->get();
+
+        // Extract user_id from inspection_form relationship
+        $userIds = $viewAdminRequest->pluck('inspection_form.user_id');
+
+        // Query Inspection_Form using the extracted user_ids
+        $getNames = Inspection_Form::whereIn('user_id', $userIds)->with('user')->get();
+
+        //get the name data
+        //$ppaNames = $getNames->user;
+
+        $respondData = [
+            'request_list' => $getNames->map(function ($inspectionForm) {
+                $user = $inspectionForm->user;
+            
+                return [
+                    'id' => $inspectionForm->id,
+                    'date_of_request' => $inspectionForm->date_of_request,
+                    'full_name' => $user->fname . ' ' . $user->mname . '. ' . $user->lname,
+                    'property_no' => $inspectionForm->property_number,
+                    'complain' => $inspectionForm->complain,
+                    'approval' => $inspectionForm->admin_approval,
+                ];
+            }),
+            'personnel' => $paNames->map(function ($personnelName){
+                return [
+                    'personnel_name' => $personnelName->fname . ' ' . $personnelName->mname . '. ' . $personnelName->lname,
+                ];
+            })
         ];
 
         return response()->json($respondData);
@@ -215,9 +302,52 @@ class InspectionFormController extends Controller
     public function updateApprove(Request $request, $id)
     {
         $approveRequest = Inspection_Form::find($id);
-    
+        
+        // Update the Approval
         $approveRequest->update([
             'supervisor_approval' => 1,
+        ]);
+
+        // Get the ID and name of the supervisor
+        $getUserId = $approveRequest->supervisor_name;   
+        $findName = PPAUser::find($getUserId);
+        $supervisorName =  $findName->fname . ' ' . $findName->lname;
+
+        // Creating a notification
+        $senderID = $approveRequest->supervisor_name;
+        $receiverID = $approveRequest->user_id;
+        $urlName = '/my_request/'.$receiverID;
+        $subject = 'Your Request has been approved';
+        $message = 'We will wait for the Admin Division to fill up the other forms';
+        $getStatus = 0;
+
+        // Store the Notification
+        $storeNotification = GetNotification::create([
+            'sender_id' => $senderID,
+            'receiver_id' => $receiverID,
+            'url' => $urlName,
+            'subject' => $subject,
+            'message' => $message,
+            'get_status' => $getStatus,
+        ]);
+
+        if(!$storeNotification){
+            return response()->json(['error' => 'Data Error'], 500);
+        }
+
+        return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * For Admin Approval
+     */
+    public function updateAdminApprove(Request $request, $id)
+    {
+        $approveRequest = Inspection_Form::find($id);
+    
+        $approveRequest->update([
+            'admin_approval' => 1,
         ]);
     
         return $approveRequest;
@@ -233,6 +363,21 @@ class InspectionFormController extends Controller
     
         $approveRequest->update([
             'supervisor_approval' => 2,
+        ]);
+    
+        return $approveRequest;
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * For Admin Disapproval
+     */
+    public function updateAdminDisapprove(Request $request, $id)
+    {
+        $approveRequest = Inspection_Form::find($id);
+    
+        $approveRequest->update([
+            'admin_approval' => 2,
         ]);
     
         return $approveRequest;

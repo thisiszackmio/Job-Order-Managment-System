@@ -1,11 +1,13 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Outlet } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import { useUserStateContext } from '../context/ContextProvider'
 import axiosClient from '../axios'
+import Logout from '../views/Logout';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -13,25 +15,79 @@ function classNames(...classes) {
 
 export default function DefaultLayout() {
   const { currentUser, userToken, userRole , setCurrentUser, setUserToken } = useUserStateContext();
+  const[displayRequest, setDisplayRequest] = useState([]);
+
+  const navigate = useNavigate();
 
   const navigation = [
     { name: 'Dashboard', to: '/' },
     { name: 'Request Form', to: '/request_form' },
     { name: 'My Request', to: `/my_request/${currentUser.id}` },
-    userRole === 'admin' && { name: 'Request List', to: '/request_list' },
+    userRole === 'admin' ? { name: 'Request List', to: '/request_list' } : null,
+    (currentUser.id === 8 || currentUser.code_clearance === 3) ? { name: 'Admin Approval', to: '/admin_manager_request' } : null
   ].filter(Boolean);
+
 
   if(!userToken){
     return <Navigate to='login'/>
   }
 
-  const logout = (ev) => {
-    ev.preventDefault();
-
-    axiosClient.post("/logout").then((res) => {
+  const logout = () => {
+    // Perform the logout logic
+    axiosClient.post('/logout').then((response) => {
       setCurrentUser({});
       setUserToken(null);
+
+      // Redirect to the login page using the navigate function
+      navigate('/login');
     });
+  };
+
+  const GetNotification = () => {
+    axiosClient
+    .get('/getnotification')
+    .then((response) => {
+      const responseData = response.data;
+
+      // Filter notifications where receiver_id matches currentUser.id
+      const filteredData = responseData.filter((dataItem) => {
+        return dataItem.receiver_id === currentUser.id;
+      });
+
+      const mappedData = filteredData.map((dataItem) => {
+        return {
+          id: dataItem.id,
+          receiver_id: dataItem.receiver_id,
+          message: dataItem.message,
+          subject: dataItem.subject,
+          url: dataItem.url,
+          status: dataItem.get_status,
+        };
+      });
+
+      setDisplayRequest(mappedData);
+    })
+    .catch((error) => {
+      console.error('Error fetching notifications:', error);
+    });
+  };
+
+  useEffect(() => { 
+    GetNotification(); 
+  }, []);
+
+  const handleLinkClick = (id, url) => {
+    axiosClient
+      .put(`/setstatus/${id}`)
+      .then((response) => {
+        setTimeout(() => {
+          GetNotification(); 
+          window.location.href = url;
+        }, 500);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -52,28 +108,105 @@ export default function DefaultLayout() {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                      {navigation.map((item) => (
-                        <NavLink
-                          key={item.name}
-                          to={item.to}
-                          className={({ isActive }) =>
-                            classNames(
-                              isActive
-                                ? 'bg-gray-900 text-white'
-                                : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                              'rounded-md px-3 py-2 text-sm font-medium'
-                            )
-                          }
-                        >
-                          {item.name}
-                        </NavLink>
-                      ))}
+                        {navigation.map((item) => (
+                          <NavLink
+                            key={item.name}
+                            to={item.to}
+                            className={({ isActive }) =>
+                              classNames(
+                                isActive
+                                  ? 'bg-gray-900 text-white'
+                                  : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                'rounded-md px-3 py-2 text-sm font-medium'
+                              )
+                            }
+                          >
+                            {item.name}
+                          </NavLink>
+                        ))}
                       </div>
                     </div>
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      
+                      {/* Notification dropdown */}
+                      <div className="relative ml-3">
+                        <Menu as="div" className="relative ml-3">
+                        <div>
+                          <Menu.Button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          <span className="absolute -inset-1.5" />
+                          <span className="sr-only">View notifications</span>
+                          <BellIcon className="h-6 w-6" aria-hidden="true" />
+                          </Menu.Button>
+                          {
+                            displayRequest.filter(
+                              (item) => item.receiver_id === currentUser.id && item.status === 0
+                            ).length > 0 ? (
+                              <span
+                                style={{
+                                  color: '#ffff',
+                                  backgroundColor: '#ff0000',
+                                  borderRadius: '25px',
+                                  padding: '12px 8px',
+                                  lineHeight: '0px',
+                                  fontSize: '14px',
+                                  display: 'inline',
+                                  position: 'absolute',
+                                  left: '17px',
+                                  top: '-6px',
+                                }}
+                              >
+                                {displayRequest.filter((item) => item.receiver_id === currentUser.id && item.status === 0).length}
+                              </span>
+                            ) : null
+                          }
+
+                        </div>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items className="absolute right-0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            {displayRequest.length > 0 ? (
+                              displayRequest.map((getData) => (
+                                <div key={getData.id}>
+                                  <p className="text-xs font-bold leading-7 text-red-500 ml-2">
+                                    {getData.status === 0 ? 'New Notification' : 'Recent Notification'}
+                                  </p>
+                                  <Menu.Item>
+                                    <a
+                                      href="#"
+                                      onClick={() => handleLinkClick(getData.id, getData.url)}
+                                      className={`block px-4 py-2 text-sm text-gray-700 ${
+                                        getData.status === 0
+                                          ? 'bg-blue-200 hover:bg-blue-300'
+                                          : 'bg-gray-100 hover:bg-blue-200 hover:text-blue-800'
+                                      }`}
+                                    >
+                                      <b>{getData.subject}:</b>
+                                      <p>{getData.message}</p>
+                                    </a>
+                                  </Menu.Item>
+                                </div>
+                              ))
+                            ) : (
+                              <Menu.Item>
+                                <a className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200'}>
+                                  No Notifications
+                                </a>
+                              </Menu.Item>
+                            )}
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                        
+                      </div>       
+
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
                         <div>
@@ -93,15 +226,15 @@ export default function DefaultLayout() {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <Menu.Item>
-                                  <a
-                                    href="#"
-                                    onClick={(ev) => logout(ev)}
-                                    className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100'}
-                                  >
-                                    Sign out
-                                  </a>
-                              </Menu.Item>
+                            <Menu.Item>
+                              <a
+                                href="#"
+                                onClick={logout}
+                                className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100'}
+                              >
+                                Sign out
+                              </a>
+                            </Menu.Item>
                           </Menu.Items>
                         </Transition>
                       </Menu>
@@ -121,6 +254,7 @@ export default function DefaultLayout() {
                   </div>
                 </div>
               </div>
+
 
               <Disclosure.Panel className="md:hidden">
                 <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">

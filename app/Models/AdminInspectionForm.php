@@ -22,4 +22,8 @@ class AdminInspectionForm extends Model
     {
         return $this->belongsTo(Inspection_Form::class, 'inspection__form_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(PPAUser::class, 'user_id');
+    }
 }

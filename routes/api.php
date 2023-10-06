@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InspectionFormController;
 use App\Http\Controllers\AssignPersonnelController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GetNotificationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/inspectionformrequest', [InspectionFormController::class, 'store']);
     Route::post('/inspectionformrequesttwo/{id}', [InspectionFormController::class, 'storeAdmin']);
     Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
+    Route::get('/inspectionformtwo', [InspectionFormController::class, 'AdminInspectView']);
    
     //Get User
     Route::get('/ppausers', [UserController::class, 'index']);
@@ -40,13 +42,21 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/requestrepair', [InspectionFormController::class, 'index']);
     Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
 
-    //Supervisor Confirmation
+    //Supervisor Approval
     Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
     Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
+
+    //Admin Approval
+    Route::put('/admin_approve/{id}', [InspectionFormController::class, 'updateAdminApprove']);
+    Route::put('/admin_disapprove/{id}', [InspectionFormController::class, 'updateAdminDisapprove']);
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
 });
+// Get Notifications
+Route::get('/getnotification', [GetNotificationController::class, 'index']);
+Route::put('/setstatus/{id}', [GetNotificationController::class, 'changeStatus']);
 
+// Landing Page
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

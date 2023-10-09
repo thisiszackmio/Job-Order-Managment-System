@@ -7,7 +7,6 @@ import { Navigate } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import { useUserStateContext } from '../context/ContextProvider'
 import axiosClient from '../axios'
-import Logout from '../views/Logout';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -172,36 +171,51 @@ export default function DefaultLayout() {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="absolute right-0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {displayRequest.length > 0 ? (
-                              displayRequest.map((getData) => (
-                                <div key={getData.id}>
-                                  <p className="text-xs font-bold leading-7 text-red-500 ml-2">
-                                    {getData.status === 0 ? 'New Notification' : 'Recent Notification'}
-                                  </p>
-                                  <Menu.Item>
-                                    <a
-                                      href="#"
-                                      onClick={() => handleLinkClick(getData.id, getData.url)}
-                                      className={`block px-4 py-2 text-sm text-gray-700 ${
-                                        getData.status === 0
-                                          ? 'bg-blue-200 hover:bg-blue-300'
-                                          : 'bg-gray-100 hover:bg-blue-200 hover:text-blue-800'
-                                      }`}
-                                    >
-                                      <b>{getData.subject}:</b>
-                                      <p>{getData.message}</p>
-                                    </a>
-                                  </Menu.Item>
-                                </div>
-                              ))
-                            ) : (
-                              <Menu.Item>
-                                <a className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200'}>
-                                  No Notifications
-                                </a>
-                              </Menu.Item>
-                            )}
-                          </Menu.Items>
+                          {displayRequest.length > 0 ? (
+                            <>
+                              <div>
+                                <p className="text-xs font-bold leading-7 text-red-500 ml-2">New Notifications</p>
+                                {displayRequest.map((getData) => (
+                                  getData.status === 0 && (
+                                    <Menu.Item key={getData.id}>
+                                      <a
+                                        href="#"
+                                        onClick={() => handleLinkClick(getData.id, getData.url)}
+                                        className={`block px-4 py-2 text-sm text-gray-700 bg-blue-200 hover:bg-blue-300`}
+                                      >
+                                        <b>{getData.subject}:</b>
+                                        <p>{getData.message}</p>
+                                      </a>
+                                    </Menu.Item>
+                                  )
+                                ))}
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold leading-7 text-red-500 ml-2">Recent Notifications</p>
+                                {displayRequest.map((getData) => (
+                                  getData.status === 1 && (
+                                    <Menu.Item key={getData.id}>
+                                      <a
+                                        href="#"
+                                        onClick={() => handleLinkClick(getData.id, getData.url)}
+                                        className={`block px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-blue-200 hover:text-blue-800`}
+                                      >
+                                        <b>{getData.subject}:</b>
+                                        <p>{getData.message}</p>
+                                      </a>
+                                    </Menu.Item>
+                                  )
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <Menu.Item>
+                              <a className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200'}>
+                                No Notifications
+                              </a>
+                            </Menu.Item>
+                          )}
+                        </Menu.Items>
                         </Transition>
                       </Menu>
                         

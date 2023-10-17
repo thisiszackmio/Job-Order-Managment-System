@@ -55,6 +55,7 @@ export default function Login() {
         setCurrentUser(data.user);
          setUserToken(data.token);
          setUserRole(userRole);
+         window.location.href = '/';
       })
       .catch((error) => {
         setIsLoading(false);

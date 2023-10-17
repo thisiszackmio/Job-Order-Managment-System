@@ -18,8 +18,9 @@ export default function ViewRequest(){
   const { userRole } = useUserStateContext();
   const [isLoading, setIsLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [assignPersonnel, setAssignPersonnel] = useState([]);
+
+  const [showPopup, setShowPopup] = useState(false);
 
   const {id} = useParams();
 
@@ -89,7 +90,7 @@ export default function ViewRequest(){
       assign_personnel: pointPersonnel
     })
     .then((response) => { 
-      setShowSuccessMessage(true);    
+      setShowPopup(true);   
       resetFormFields();
       setSubmitLoading(false);
     })
@@ -346,21 +347,6 @@ export default function ViewRequest(){
               <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
             </div>
 
-            {showSuccessMessage ? (
-            // Display success message when showSuccessMessage is true
-              <div>
-                <h2 className="text-base font-bold leading-7 text-gray-900">Request Form Success</h2>
-                <p className="text-xs font-bold leading-7 text-green-500">We will wait for your supervisor to approve your request.</p>
-                <button 
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-                    onClick={() => {
-                      window.location.href = '/request_list';
-                    }}
-                  >
-                    Back
-                  </button>
-              </div>
-            ) : (
             <form onSubmit={event => SubmitInspectionFormTo(event, displayRequest.viewRequestData.id)}>
               <div className="grid grid-cols-2 gap-4 mt-10">
                 {/* Date */}
@@ -455,32 +441,30 @@ export default function ViewRequest(){
               </button>
               </div>
             </form>
-            )}
-            
-            
 
-            {/* <div className="mt-10">
-              <div className="flex">
-                <button 
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+            {/* Show Successfull Popup */}
+            {showPopup && (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+            {/* Semi-transparent black overlay */}
+            <div
+              className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+            ></div>
+            {/* Popup content with background blur */}
+            <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+              <p className="text-lg">Form Submitted Successfully</p>
+              <div className="flex justify-center mt-4">
+                <button
                   onClick={() => {
-                    window.location.href = '/request_list';
+                    window.location.href = `/request_list/`;
                   }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                  Back
+                  Close
                 </button>
-                {currentUser.code_clearance === 3 && displayRequest.viewRequestData.supervisor_approval === 1 && (
-                  <button 
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => {
-                      window.location.href = '/request_list';
-                    }}
-                  >
-                    Proceed to Part B
-                  </button>
-                )}
               </div>
-            </div> */}
+            </div>
+            </div>
+            )}
             
           </div>
         ) : (

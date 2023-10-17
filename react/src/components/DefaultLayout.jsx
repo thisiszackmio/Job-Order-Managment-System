@@ -5,6 +5,7 @@ import { Outlet } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { useUserStateContext } from '../context/ContextProvider'
 import axiosClient from '../axios'
 
@@ -42,52 +43,50 @@ export default function DefaultLayout() {
     });
   };
 
-  const GetNotification = () => {
-    axiosClient
-    .get('/getnotification')
-    .then((response) => {
-      const responseData = response.data;
+  // const GetNotification = () => {
+  //   axiosClient
+  //   .get('/getnotification')
+  //   .then((response) => {
+  //     const responseData = response.data;
 
-      // Filter notifications where receiver_id matches currentUser.id
-      const filteredData = responseData.filter((dataItem) => {
-        return dataItem.receiver_id === currentUser.id;
-      });
+  //     // Filter notifications where receiver_id matches currentUser.id
+  //     const filteredData = responseData.filter((dataItem) => {
+  //       return dataItem.receiver_id === currentUser.id;
+  //     });
 
-      const mappedData = filteredData.map((dataItem) => {
-        return {
-          id: dataItem.id,
-          receiver_id: dataItem.receiver_id,
-          message: dataItem.message,
-          subject: dataItem.subject,
-          url: dataItem.url,
-          status: dataItem.get_status,
-        };
-      });
+  //     const mappedData = filteredData.map((dataItem) => {
+  //       return {
+  //         id: dataItem.id,
+  //         receiver_id: dataItem.receiver_id,
+  //         message: dataItem.message,
+  //         subject: dataItem.subject,
+  //         url: dataItem.url,
+  //         status: dataItem.get_status,
+  //       };
+  //     });
 
-      setDisplayRequest(mappedData);
-    })
-    .catch((error) => {
-      console.error('Error fetching notifications:', error);
-    });
-  };
+  //     setDisplayRequest(mappedData);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Error fetching notifications:', error);
+  //   });
+  // };
 
-  useEffect(() => { 
-    GetNotification(); 
-  }, []);
+  // useEffect(() => { 
+  //   GetNotification(); 
+  // }, []);
 
-  const handleLinkClick = (id, url) => {
-    axiosClient
-      .put(`/setstatus/${id}`)
-      .then((response) => {
-        setTimeout(() => {
-          GetNotification(); 
-          window.location.href = url;
-        }, 500);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  // const handleLinkClick = (id, url) => {
+  //   axiosClient
+  //     .put(`/setstatus/${id}`)
+  //     .then((response) => {
+  //       GetNotification();
+  //       //setDisplayRequest();
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   return (
     <>
@@ -128,8 +127,8 @@ export default function DefaultLayout() {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      {/* Notification dropdown */}
-                      <div className="relative ml-3">
+                      {/* Notification dropdown (Temp Shut down) */}
+                      {/* <div className="relative ml-3">
                         <Menu as="div" className="relative ml-3">
                         <div>
                           <Menu.Button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -174,18 +173,25 @@ export default function DefaultLayout() {
                           {displayRequest.length > 0 ? (
                             <>
                               <div>
-                                <p className="text-xs font-bold leading-7 text-red-500 ml-2">New Notifications</p>
+                                {displayRequest.some((getData) => getData.status === 0) && (
+                                  <p className="text-xs font-bold leading-7 text-red-500 ml-2">New Notifications</p>
+                                )}
+
                                 {displayRequest.map((getData) => (
                                   getData.status === 0 && (
                                     <Menu.Item key={getData.id}>
-                                      <a
-                                        href="#"
-                                        onClick={() => handleLinkClick(getData.id, getData.url)}
-                                        className={`block px-4 py-2 text-sm text-gray-700 bg-blue-200 hover:bg-blue-300`}
+                                      <Link
+                                        to={getData.url}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleLinkClick(getData.id, getData.url);
+                                        }}
+                                        className={`block px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-blue-200 hover:text-blue-800`}
+                                        title="View Request"
                                       >
                                         <b>{getData.subject}:</b>
                                         <p>{getData.message}</p>
-                                      </a>
+                                      </Link>
                                     </Menu.Item>
                                   )
                                 ))}
@@ -195,6 +201,7 @@ export default function DefaultLayout() {
                                 {displayRequest.map((getData) => (
                                   getData.status === 1 && (
                                     <Menu.Item key={getData.id}>
+                                      
                                       <a
                                         href="#"
                                         onClick={() => handleLinkClick(getData.id, getData.url)}
@@ -219,7 +226,7 @@ export default function DefaultLayout() {
                         </Transition>
                       </Menu>
                         
-                      </div>       
+                      </div>        */}
 
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">

@@ -36,4 +36,9 @@ class Inspection_Form extends Model
     {
         return $this->hasMany(AdminInspectionForm::class);
     }
+
+    public function ForInspector()
+    {
+        return $this->hasMany(Inspector_Form::class);
+    }
 }

@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function(){
     //Route::get('/getrepair', [DashboardController::class, 'getRepair']);
 
     //Get Personnel List
-    Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
+    //Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
 
     //Display Inpection Request on the site
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
@@ -49,6 +49,12 @@ Route::middleware('auth:sanctum')->group(function(){
     //Admin Approval
     Route::put('/admin_approve/{id}', [InspectionFormController::class, 'updateAdminApprove']);
     Route::put('/admin_disapprove/{id}', [InspectionFormController::class, 'updateAdminDisapprove']);
+
+    //Inspector
+    Route::post('/inspector/{id}', [InspectionFormController::class, 'storeInspectorForm']);
+    Route::get('/inspectorparta/{id}', [InspectionFormController::class, 'InspectorPartA']);
+    Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);     
+
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
@@ -60,3 +66,7 @@ Route::put('/setstatus/{id}', [GetNotificationController::class, 'changeStatus']
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
+Route::get('/getpersonnel/{id}', [AssignPersonnelController::class, 'showPersonnel']);
+Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);

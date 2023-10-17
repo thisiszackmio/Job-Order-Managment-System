@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create a context with initial values
 const StateContext = createContext({
   currentUser: {},
   userToken: null,
@@ -17,9 +16,9 @@ export const ContextProvider = ({ children }) => {
 
   // Use useEffect to set the initial user data from localStorage
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('USER'));
-    if (storedUser) {
-      setCurrentUser(storedUser);
+    const storedUserData = JSON.parse(localStorage.getItem('USER'));
+    if (storedUserData) {
+      setCurrentUser(storedUserData);
     }
   }, []);
 
@@ -55,7 +54,7 @@ export const ContextProvider = ({ children }) => {
         userToken,
         setUserToken: setUserTokenAndLocalStorage,
         userRole,
-        setUserRole,
+        setUserRole: updateUserRole,
       }}
     >
       {children}

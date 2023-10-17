@@ -12,6 +12,7 @@ import EditRequestInspection from "./views/EditInspectionRequest";
 import MyRequest from "./views/YourRequest";
 import AdminManagerRequest from "./views/AdminMangerRequestList";
 import AdminManagerViewRequest from "./views/AdminMangerViewRequest";
+import PrepostRepairForm from "./views/PrePostRepairForm";
 
 
 const routes = [
@@ -55,6 +56,11 @@ const routes = [
             {
                 path: "/admin_manager_view_inspection_request/:id",
                 element: <AdminManagerViewRequest />
+            },
+            // For Assign Personnel
+            {
+                path: "/assign_personnel/:id",
+                element: <PrepostRepairForm />
             }
         ]
     },

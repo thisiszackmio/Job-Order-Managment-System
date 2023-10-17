@@ -254,6 +254,7 @@ export default function ViewRequest(){
                     </div>
                   </div>
                 </div>
+                
               </div>
             </div>
 
@@ -277,7 +278,7 @@ export default function ViewRequest(){
                   <div className="mt-10">
                     <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                       <div>
-                      <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '80%', top: '-54px', }} />
+                      <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '90%', top: '-42px', left: '12px' }} />
                       </div>
                       <span>{displayRequest.userDetails.enduser}</span>
                     </div>

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InspectionFormRequest;
 use App\Http\Requests\GetNotificationRequest;
 use App\Http\Requests\StoreAdminInspectionRequest;
+use App\Http\Requests\Inspector_Form_Request;
 use App\Models\Inspection_Form;
 use App\Models\PPAUser;
+use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\GetNotification;
 use Illuminate\Http\Request;
@@ -161,10 +163,10 @@ class InspectionFormController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(InspectionFormRequest $request, GetNotificationRequest $notificationRequest)
+    public function store(InspectionFormRequest $request)
     {
         $data = $request->validated();
-        $notificationData = $notificationRequest->validated();
+        // $notificationData = $notificationRequest->validated();
         $data['user_id'] = auth()->user()->id;
 
         // Get The sender name
@@ -172,7 +174,7 @@ class InspectionFormController extends Controller
         $userSender = $userId->fname . ' ' . $userId->lname;
         
         // Create a notification message
-        $message = $userSender . ' has sent you a request for a Pre/Post Repair Inspection.';
+        // $message = $userSender . ' has sent you a request for a Pre/Post Repair Inspection.';
         
         // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
@@ -181,18 +183,18 @@ class InspectionFormController extends Controller
             return response()->json(['error' => 'Data Error'], 500);
         }
 
-        $storeNotification = GetNotification::create([
-            'sender_id' => $notificationData['sender_id'],
-            'receiver_id' => $notificationData['receiver_id'],
-            'url' => $notificationData['url'],
-            'subject' => $notificationData['subject'],
-            'message' => $message, 
-            'get_status' => $notificationData['get_status'],
-        ]);
+        // $storeNotification = GetNotification::create([
+        //     'sender_id' => $notificationData['sender_id'],
+        //     'receiver_id' => $notificationData['receiver_id'],
+        //     'url' => $notificationData['url'],
+        //     'subject' => $notificationData['subject'],
+        //     'message' => $message, 
+        //     'get_status' => $notificationData['get_status'],
+        // ]);
 
-        if(!$storeNotification){
-            return response()->json(['error' => 'Data Error'], 500);
-        }
+        // if(!$storeNotification){
+        //     return response()->json(['error' => 'Data Error'], 500);
+        // }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
     }
@@ -256,32 +258,47 @@ class InspectionFormController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
 
+        //get the inspection form id
+        $insId = $viewAdminRequest->pluck('inspection__form_id')->all();
+
+        //get the Inspection Form by the Part B Form
+        $insDet = Inspection_Form::whereIn('id', $insId)->get();
+
+        //Get the Id sa nag Request
+        $uid = $insDet->pluck('user_id')->first();
+
         // get assign personnel name
         $paId = $viewAdminRequest->pluck('assign_personnel')->first();
 
         //get the name of the assign personnel
         $paNames = PPAUser::where('id', $paId)->get();
+        
+        //Get the name sa nag request
+        $userIds = PPAUser::find($uid);
+
+        // Dispaly the name
+        //$uName = $userIds->fname.' '.$userIds->mname.' '.$userIds->lname ;
 
         // Extract user_id from inspection_form relationship
-        $userIds = $viewAdminRequest->pluck('inspection_form.user_id');
+        //$userIds = $viewAdminRequest->pluck('inspection_form.user_id');
 
         // Query Inspection_Form using the extracted user_ids
-        $getNames = Inspection_Form::whereIn('user_id', $userIds)->with('user')->get();
+        //$getNames = Inspection_Form::whereIn('user_id', $userIds)->with('user')->get();
 
         //get the name data
         //$ppaNames = $getNames->user;
 
         $respondData = [
-            'request_list' => $getNames->map(function ($inspectionForm) {
-                $user = $inspectionForm->user;
+            'request_list' => $insDet->map(function ($inspectionForm) use ($userIds) {
+                $uName = $userIds->fname.' '.$userIds->mname.' '.$userIds->lname ;
             
                 return [
                     'id' => $inspectionForm->id,
                     'date_of_request' => $inspectionForm->date_of_request,
-                    'full_name' => $user->fname . ' ' . $user->mname . '. ' . $user->lname,
+                    'full_name' => $uName,
                     'property_no' => $inspectionForm->property_number,
                     'complain' => $inspectionForm->complain,
-                    'approval' => $inspectionForm->admin_approval,
+                    'approval' => $inspectionForm->admin_approval
                 ];
             }),
             'personnel' => $paNames->map(function ($personnelName){
@@ -293,7 +310,6 @@ class InspectionFormController extends Controller
 
         return response()->json($respondData);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -384,10 +400,65 @@ class InspectionFormController extends Controller
     }
     
     /**
-     * Remove the specified resource from storage.
+     * Input the Details on the Inspector on Part C
      */
-    public function destroy(Inspection_Form $inspection_Form)
+    public function storeInspectorForm(Inspector_Form_Request $request, $id)
     {
-        //
+        $data = $request->validated();
+
+        $findInspection = Inspection_Form::find($id);
+
+        $newRecord = $findInspection->ForInspector()->create([
+            'inspection__form_id' => $data['inspection__form_id'],
+            'before_repair_date' => $data['before_repair_date'],
+            'findings' => $data['findings'],
+            'recommendations' => $data['recommendations'],
+        ]);
+
+        return response()->json(['message' => 'Record created successfully'], 200);
     }
+
+    /**
+     * Show Part C and D data's
+     */
+    public function InspectorPartA(Request $request, $id)
+    {
+
+        $p1 = Inspector_Form::where('inspection__form_id', $id)->get();
+
+        if($p1->isEmpty()) {
+            return response()->json(['message' => 'No data'], 404);
+        }
+
+        $respondData = [
+            'part_c' => $p1
+        ];
+
+        return response()->json($respondData);
+
+    }
+
+    /**
+     * Input Final Data on Inspector on Part D
+     */
+    public function InspectorPartB(Request $request, $id)
+    {
+        $p2 = Inspector_Form::where('inspection__form_id', $id)->get();
+
+        if($p2->isEmpty()) {
+            return response()->json(['message' => 'No data'], 404);
+        }
+
+        foreach ($p2 as $record) {
+            $record->update([
+                'after_reapir_date' => $request->input('after_reapir_date'),
+                'remarks' => $request->input('remarks'),
+                'close' => 1,
+            ]);
+        }
+
+        return response()->json($p2);
+
+    }
+
 }

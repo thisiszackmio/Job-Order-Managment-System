@@ -13,19 +13,13 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-export default function RequestList()
+export default function AdminRequestList()
 {
   library.add(faCheck, faTimes, faEye, faStickyNote, faSpinner);
   const [loading, setLoading] = useState(true);
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState('');
-
   const { userRole, currentUser } = useUserStateContext();
   const [prePostRepair, setPrePostRepair] = useState([]);
-
-  const userClearance = currentUser.code_clearance;
-  const userID = currentUser.id;
 
   const fetchTableData = () => {
     setLoading(true); // Set loading state to true when fetching data
@@ -135,28 +129,6 @@ export default function RequestList()
             )}
             </tbody>
           </table>
-
-          {/* Show Successfull Popup */}
-          {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-           {/* Semi-transparent black overlay */}
-           <div
-             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-           ></div>
-           {/* Popup content with background blur */}
-           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
-             <p className="text-lg">{popupMessage}</p>
-             <div className="flex justify-center mt-4">
-              <button
-                onClick={closePopup}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Close
-              </button>
-            </div>
-           </div>
-          </div>
-          )}
 
         </div>
       </div>

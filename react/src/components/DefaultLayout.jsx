@@ -23,8 +23,10 @@ export default function DefaultLayout() {
     { name: 'Dashboard', to: '/' },
     { name: 'Request Form', to: '/request_form' },
     { name: 'My Request', to: `/my_request/${currentUser.id}` },
-    userRole === 'admin' ? { name: 'Request List', to: '/request_list' } : null,
-    (currentUser.id === 8 || currentUser.code_clearance === 3) ? { name: 'Admin Approval', to: '/admin_manager_request' } : null
+    currentUser.code_clearance === 6 || 
+    currentUser.code_clearance === 3 || 
+    currentUser.code_clearance === 1 ? 
+    { name: 'Request List', to: '/request_list' } : null
   ].filter(Boolean);
 
 

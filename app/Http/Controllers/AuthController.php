@@ -87,9 +87,17 @@ class AuthController extends Controller
         $userRole = null;
         $codeClearance = (int) $useracc->code_clearance;
 
-        if ($codeClearance >= 1 && $codeClearance <= 3) {
+        //Code clearance
+        // 1 = For Admin Division Manager
+        // 2 = For Supervisor
+        // 3 = For GSO and Authorize Person
+        // 4 = Other Division Manager
+        // 5 = Regular and COS Employee
+        // 6 = IT Hackers
+
+        if ($codeClearance === 1 || $codeClearance === 2 || $codeClearance === 3 || $codeClearance === 4 || $codeClearance === 6) {
             $userRole = 'admin';
-        } elseif ($codeClearance >= 4 && $codeClearance <= 5) {
+        } elseif ($codeClearance === 5) {
             $userRole = 'member';
         } else {
             // Handle other 'code_clearance' values as needed

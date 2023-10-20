@@ -36,7 +36,8 @@ class InspectionFormRequest extends FormRequest
             'complain' => 'required|string',
             'supervisor_name' => 'required|numeric',
             'supervisor_approval' => 'required|numeric',
-            'admin_approval' => 'required|numeric'
+            'admin_approval' => 'required|numeric',
+            'remarks' => 'nullable|string'
         ];
     }
 }

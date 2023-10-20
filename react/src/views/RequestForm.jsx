@@ -48,103 +48,6 @@ export default function RequestForm(){
   const [ComplainDefect, setComplainDefect] = useState('');
   const [supervisorApproval, setSupervisorApproval] = useState('');
 
-  //For the Facility 
-  // const [requestDivision, setRequestDivision] = useState('');
-  // const [activityPurpose, setActivityPurpose] = useState('');
-  // const [dateOfActivity, setDateOfActivity] = useState('');
-  // const [activityTimeStart, setActivityTimeStart] = useState('');
-  // const [activityTimeEnd, setActivitTimeEnd] = useState('');
-  // const [beingRequested, setBeingRequested] = useState('');
-  // const [typeOfFacilities, setTypeOfFacilities] = useState('');
-  // const [numberOfTable, setNumberOfTable] = useState('');
-  // const [numberOfChairs, setNumberOfChairs] = useState('');
-  // const [numberOfMicrophone, setNumberOfMicrophone] = useState('');
-  // const [mphSpecify, setMphSpecify] = useState('');
-  // const [numberOfMaleGuest, setNumberOfMaleGuest] = useState('');
-  // const [numberOfFemaleGuest, setNumberOfFemaleGuest] = useState('');
-  // const [listOfMaleGuest, setListOfMaleGuest] = useState('');
-  // const [listOfFemaleGuest, setListOfFemaleGuest] = useState('');
-  // const [dormOtherDetails, setDormOtherDetails] = useState('');
-
-  // Checkbox
-  // const [checkTable, setCheckTable] = useState(false);
-  // const [checkChair, setCheckChair] = useState(false);
-  // const [checkOther, setCheckOther] = useState(false);
-  // const [checkMicrophone, setCheckMicrophone] = useState(false);
-  // const [checkMaleGuest, setCheckMaleGuest] = useState(false);
-  // const [checkFemaleGuest, setCheckFemaleGuest] = useState(false);
-  // const [checkProjector, setCheckProjector] = useState(false);
-  // const [checkProjectorScreen, setCheckProjectorScreen] = useState(false);
-  // const [checkDocumentCamera, setCheckDocumentCamera] = useState(false);
-  // const [checkLaptop, setCheckLaptop] = useState(false);
-  // const [checkTelevision, setCheckTelevision] = useState(false);
-  // const [checkSoundSystem, setCheckSoundSystem] = useState(false);
-  // const [checkVideoke, setCheckVideoke] = useState(false);
-
-  // const [checkTechPersonnel, setCheckTechPersonnel] = useState(false);
-  // const [checkJanitorPersonnel, setCheckJanitorPersonnel] = useState(false);
-  // const [checkOtherDps, setCheckOtherDps] = useState(false);
-
-  // const handleCheckTable = (e) => {  setCheckTable(e.target.checked); }
-  // const handleCheckChairs = (e) => { setCheckChair(e.target.checked); }
-  // const handleCheckOther = (e) => { setCheckOther(e.target.checked); }
-  // const handleCheckMicrophone = (e) => { setCheckMicrophone(e.target.checked); }
-  // const handleCheckMaleGuest = (e) => { setCheckMaleGuest(e.target.checked); }
-  // const handleCheckFemaleGuest = (e) => { setCheckFemaleGuest(e.target.checked); }
-  // const handleCheckProjector = (e) => { setCheckProjector(e.target.checked); }
-  // const handleCheckProjectorScreen = (e) => { setCheckProjectorScreen(e.target.checked); }
-  // const handleCheckDocumentCamera = (e) => { setCheckDocumentCamera(e.target.checked); }
-  // const handleCheckLaptop = (e) => { setCheckLaptop(e.target.checked); }
-  // const handleCheckTelevision = (e) => { setCheckTelevision(e.target.checked); }
-  // const handleCheckSoundSystem = (e) => { setCheckSoundSystem(e.target.checked); }
-  // const handleCheckVideoke = (e) => { setCheckVideoke(e.target.checked); }
-
-  // const handleCheckTechPersonnel = (e) => { setCheckTechPersonnel(e.target.checked); }
-  // const handleCheckJanitorPersonnel = (e) => { setCheckJanitorPersonnel(e.target.checked); }
-  // const handleCheckOtherDps = (e) => { setCheckOtherDps(e.target.checked); }
-
-  //For Request a Vehicle
-  // const [getPassengers, setGetPassengers] = useState('');
-  // const [vehiclePurpose, setVehiclePurpose] = useState('');
-  // const [vehiclePlace, setVehiclePlace] = useState('');
-  // const [dateArrival, setDateArrival] = useState('');
-  // const [timeArrival, setTimeArrival] = useState('');
-  // const [typeOfVehicle, setTypeOfVehicle] = useState('');
-  // const [plateNumber, setPlateNumber] = useState('');
-  // const [getDriver, setGetDriver] = useState('');
-
-  // useEffect(() => {
-
-  //   if(typeOfVehicle === "Toyota Hi-Ace"){ setPlateNumber('SAB 4362'); }
-  //   else if(typeOfVehicle === "Isuzu Van"){ setPlateNumber('SFT 545'); } 
-  //   else if(typeOfVehicle === "Isuzu Man Lift"){ setPlateNumber('D2D 188'); }
-  //   else if(typeOfVehicle === "Toyota Hi-Lux/Fx"){ setPlateNumber('SPF 880'); }
-  //   else if(typeOfVehicle === "Hyundai Sta Fe"){ setPlateNumber('TEMP 101709'); }
-  //   else if(typeOfVehicle === "Isuzu Boom Truck"){ setPlateNumber('D2S 454'); }
-  //   else if(typeOfVehicle === "Isuzu Firetruck"){ setPlateNumber('DIS 060'); }
-  //   else if(typeOfVehicle === "Toyota Fortuner"){ setPlateNumber('AKA 7787'); setGetDriver('Ricardo S. Villanueva') }
-  //   else if(typeOfVehicle === "Toyota Innova"){ setPlateNumber('SHX 195'); }
-  // }, [typeOfVehicle]);
-
-  //For Request a Manlift 
-  // const [manliftActivity, setManliftActivity] = useState('');
-  // const [dateManlift, setDateManlift] = useState('');
-  // const [startManlift, setStartManlift] = useState('');
-  // const [endManlift, setEndManlift] = useState('');
-
-  //Other Request
-  // const [otherSpecificDetails, setOtherSpecificDetails] = useState('');
-  // const [otherSpecificLocations, setOtherSpecificLocations] = useState('');
-  // const [getTechPersonnel, setTechPersonnel] = useState([]);
-  // const [getPersonnelLocation, setPersonnelLocation] = useState('');
-  // const [getPersonnelPurpose, setPersonnelPurpose] = useState('');
-  // const [getJanitorPersonnel, setJanitorPersonnel] = useState([]);
-  // const [getOtherConcern, setOtherConcern] = useState('');
-  // const [getSupplyDetail, setSupplyDetail] = useState('');
-  // const [getNoSupplies, setNoSupplies] = useState('');
-
-  const [selectedOptionValue, setSelectedOptionValue] = useState('');
-
   const [activeTab, setActiveTab] = useState("tab1");
 
   const handleSupervisorName= (event) => {
@@ -178,14 +81,7 @@ export default function RequestForm(){
         complain: ComplainDefect,
         supervisor_name: supervisorApproval,
         supervisor_approval: 0,
-        admin_approval: 0,
-
-        // For Notification Submission
-        sender_id: currentUser.id,
-        receiver_id: supervisorApproval,
-        url: '/request_list',
-        subject: 'Inspection Form Request',
-        get_status: 0
+        admin_approval: 0
 
       })
       .then((response) => { 
@@ -206,20 +102,15 @@ export default function RequestForm(){
       });
   }
 
-
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-
-  const closePopup = () => { 
-    setShowPopup(false); 
-  };
   
-
   return(
     <PageComponent title="Request Form">
 
       <div className="flex">
+        {/* Tab 1 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab1"
@@ -230,6 +121,7 @@ export default function RequestForm(){
         >
           Request for Repair Inspection
         </button>
+        {/* Tab 2 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab2"
@@ -240,6 +132,7 @@ export default function RequestForm(){
         >
           Request for use of Facility/Venue
         </button>
+        {/* Tab 3 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab3"
@@ -250,6 +143,7 @@ export default function RequestForm(){
         >
           Request for Vehicle Slip
         </button>
+        {/* Tab 4 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab4"
@@ -260,6 +154,7 @@ export default function RequestForm(){
         >
           Request for use of Manlift
         </button>
+        {/* Tab 5 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab5"
@@ -273,7 +168,7 @@ export default function RequestForm(){
       </div>
 
       <div className="mt-4">
-        {/* Tab 1 */}
+        {/* Tab 1 (Request For Repair Inspection) */}
         {activeTab === "tab1" && 
         <div className="mt-6">
           <form onSubmit={SubmitInspectionForm}>
@@ -289,7 +184,10 @@ export default function RequestForm(){
               {/* Date */}
               <div className="flex mt-6">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Date:</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Date:
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -309,7 +207,10 @@ export default function RequestForm(){
               {/* Property Number */}
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Property No. :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Property No. :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -330,7 +231,10 @@ export default function RequestForm(){
               {/* Acquisition Date */}
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Date :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Acquisition Date :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -350,7 +254,10 @@ export default function RequestForm(){
               {/* Acquisition Cost */}
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Acquisition Cost :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Acquisition Cost :
+                  </label> 
                 </div>
                 <div className="w-64">
                 <div className="relative flex items-center">
@@ -376,7 +283,10 @@ export default function RequestForm(){
               {/* Brand/Model */}
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Brand/Model :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Brand/Model :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -397,7 +307,10 @@ export default function RequestForm(){
               {/* Serial/Engine No */}
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Serial/Engine No. :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Serial/Engine No. :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -422,7 +335,10 @@ export default function RequestForm(){
               {/* Type of Property */}
               <div className="flex mt-6">
                 <div className="w-60">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Type of Property :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Type of Property :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <select 
@@ -469,7 +385,10 @@ export default function RequestForm(){
               {/* Description */}
               <div className="flex mt-4">
                 <div className="w-60">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Description :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Description :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -489,7 +408,10 @@ export default function RequestForm(){
               {/* Location */}
               <div className="flex mt-4">
                 <div className="w-60">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Location (Div/Section/Unit) :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Location (Div/Section/Unit) :
+                  </label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -509,7 +431,10 @@ export default function RequestForm(){
               {/* Complain / Defect */}
               <div className="flex mt-4">
                 <div className="w-60">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Complain/Defect :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Complain/Defect :
+                  </label> 
                 </div>
                 <div className="w-64">
                 <textarea
@@ -529,7 +454,10 @@ export default function RequestForm(){
               {/* Supervisor Name */}
               <div className="flex mt-4">
                 <div className="w-60">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Immediate Supervisor :</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                    <span className="text-red-500">*</span>
+                    Immediate Supervisor :
+                  </label> 
                 </div>
                 <div className="w-64">
                 <select 
@@ -556,7 +484,8 @@ export default function RequestForm(){
             </div>
             
             {/* Submit Button */}
-            <div className="flex mt-10">
+            <div className="mt-10">
+              <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
             <button
               type="submit"
               className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
@@ -577,7 +506,7 @@ export default function RequestForm(){
 
           </form>
 
-          {/* Show Successfull Popup */}
+          {/* Show Popup */}
           {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
            {/* Semi-transparent black overlay */}

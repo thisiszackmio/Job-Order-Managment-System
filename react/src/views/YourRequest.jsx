@@ -5,7 +5,7 @@ import axiosClient from "../axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function MyRequest(){
   const { currentUser } = useUserStateContext();
@@ -30,9 +30,9 @@ export default function MyRequest(){
     .then((response) => {
         const responseData = response.data;
         const viewRequestData = responseData.view_request;
+        const viewInspectorData = responseData.inspector;
 
         const mappedData = viewRequestData.map((dataItem) => {
-
           return{
             id: dataItem.id,
             date_of_request: dataItem.date_of_request,
@@ -42,16 +42,26 @@ export default function MyRequest(){
             brand_model: dataItem.brand_model,
             serial_engine_no: dataItem.serial_engine_no,
             type_of_property: dataItem.type_of_property,
+            property_other_specific: dataItem.property_other_specific,
             property_description: dataItem.property_description,
             location: dataItem.location,
             complain: dataItem.complain,
             supervisor_approval: dataItem.supervisor_approval,
-            admin_approval: dataItem.admin_approval
+            admin_approval: dataItem.admin_approval,
+            remarks: dataItem.remarks
           }
-
         });
 
-        setDisplayRequest(mappedData);
+        const inspectData = viewInspectorData.map((inspect) => {
+          return{
+            close: inspect.close
+          }
+        });
+
+        setDisplayRequest({
+          mappedData: mappedData,
+          inspectData: inspectData
+        });
 
         setLoading(false);
     })
@@ -133,73 +143,58 @@ export default function MyRequest(){
 
     <div className="mt-4">
       {activeTab === "tab1" && 
-        <div>
-          {loading ? (
-              <tr>
-                <td colSpan="6" className="px-6 py-4 text-center whitespace-nowrap">
-                  <FontAwesomeIcon icon={faSpinner} spin /> Loading...
-                </td>
-              </tr>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Date of Requested</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Property No.</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Acquisition Date</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Acquisition Cost</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Brand/Model</th>   
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Serial/Engine No.</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Type of Property</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Complain/Defect</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Remarks</th>
+      <div>
+        {loading ? (
+            <tr>
+              <td colSpan="6" className="px-6 py-4 text-center whitespace-nowrap">
+                <FontAwesomeIcon icon={faSpinner} spin /> Loading...
+              </td>
+            </tr>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="border-collapse w-full mb-10">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Property No</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Property</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Complain</th> 
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Remarks</th>  
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayRequest.mappedData.length > 0 ? (
+                  displayRequest.mappedData.map((getData) => (
+                    <tr key={getData.id}>
+                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.id}</td>
+                      <td className="px-6 py-4 text-center border-2 border-custom">{formatDate(getData.date_of_request)}</td>
+                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.property_number}</td>
+                      {getData.type_of_property === "Others" ? (
+                        <td className="px-6 py-4 text-center border-2 border-custom">Others: <i>{getData.property_other_specific}</i></td>
+                      ):(
+                        <td className="px-6 py-4 text-center border-2 border-custom">{getData.type_of_property}</td>
+                      )}
+                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.complain}</td>
+                      <td className="px-6 py-4 text-center border-2 w-66 border-custom">{getData.remarks}</td>
+                      <td className="px-6 py-4 text-center border-2 border-custom">
+                      {getData.remarks === "The Request has been close you can view it now" ? (
+                      <h1>naa</h1>
+                      ): null }            
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {displayRequest.length > 0 ? (
-                    displayRequest.map((getData) => (
-                      <tr key={getData.id}>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{formatDate(getData.date_of_request)}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.property_number}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{formatDate(getData.acq_date)}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.acq_cost}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.brand_model}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.serial_engine_no}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">
-                          {getData.type_of_property === "Others" ? (
-                            <td className="px-6 py-4 text-center whitespace-nowrap">Others: {getData.property_other_specific}</td>
-                          )
-                          : (
-                            <td className="px-6 py-4 text-center whitespace-nowrap">{getData.type_of_property}</td>
-                          )
-                          }
-                        </td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.property_description}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.location}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">{getData.complain}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">
-                          {(getData.supervisor_approval === 0 && getData.admin_approval === 0) && (
-                            <td className="px-6 py-4 text-center whitespace-nowrap">Waiting for Supervisor Approval</td>
-                          )}
-                          {(getData.supervisor_approval === 1 && getData.admin_approval === 0) && (
-                            <td className="px-6 py-4 text-center whitespace-nowrap">Waiting for Admin Division Manager Approval</td>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                   ):(
-                   <tr>
-                      <td colSpan="10" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
-                     </tr>
-                   )}
-                  </tbody>
-                </table>
-              </div>
-          )}
-        </div>
+                  ))
+                  ):(
+                  <tr>
+                    <td colSpan="10" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+        )}
+      </div>
       }
 
 

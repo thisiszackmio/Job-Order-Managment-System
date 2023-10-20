@@ -158,6 +158,16 @@ export default function Login() {
             </form>
           )}
           </div>
+
+
+
+          {/* Para sa taak nko next day */}
+          <div className="mt-20">
+            Task For Monday:
+            <p>1. Fixing the Part C Condition Button (dapat si Assign Personnel ra ang maka kita sa button)</p>
+            <p>2. Fixing the Inspection Form on Part C and Part D</p>
+          </div>
+
         </div>
       </>
     )

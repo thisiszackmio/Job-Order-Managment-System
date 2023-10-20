@@ -28,6 +28,7 @@ return new class extends Migration
             $table->smallInteger('supervisor_name');
             $table->boolean('supervisor_approval')->default(false);
             $table->boolean('admin_approval')->default(false);
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

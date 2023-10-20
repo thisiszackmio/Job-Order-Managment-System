@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\AssignPersonnel;
 use App\Models\AdminInspectionForm;
 use App\Models\Inspection_Form;
+use App\Models\Inspector_Form;
 use App\Models\PPAUser;
 use Illuminate\Support\Facades\URL;
 
@@ -20,9 +21,9 @@ class AssignPersonnelController extends Controller
         $assignPersonnels = AssignPersonnel::with('user')->get();
         $assignPersonnels = AssignPersonnel::all();
 
-        if ($assignPersonnels->isEmpty()) {
-            return response()->json($assignPersonnels);
-        }
+        // if ($assignPersonnels->isEmpty()) {
+        //     return response()->json($assignPersonnels);
+        // }
         
         $responseData = [];
 
@@ -40,6 +41,7 @@ class AssignPersonnelController extends Controller
                     'fname' => $userName,
                     'mname' => $userMiddleInitial,
                     'lname' => $userLastName,
+                    'type' => $assignPersonnel->type_of_personnel
                 ],
             ];
         }
@@ -66,10 +68,15 @@ class AssignPersonnelController extends Controller
         $getForm = AdminInspectionForm::where('assign_personnel', $perID)->get();
         $gformId = $getForm->pluck('inspection__form_id')->all();
 
-        //Get the Request Details
-        $getInspDet = Inspection_Form::whereIn('id', $gformId)->get();
+        //Get Inspector Details
+        $ins = Inspector_Form::whereIn('inspection__form_id', $gformId)
+        ->where('close', 0)->get();
 
-        // Get the name of the requestor
+        //Get the Request Details
+        $gId = $ins->pluck('inspection__form_id')->all();
+        $getInspDet = Inspection_Form::whereIn('id', $gId)->get();
+
+        //Get the name of the requestor
         $emId = $getInspDet->pluck('user_id')->all();
         $emName = PPAUser::whereIn('id', $emId)->get();
 
@@ -90,6 +97,12 @@ class AssignPersonnelController extends Controller
                     'description' => $showDetail->property_description,
                     'location' => $showDetail->location,
                     'complain' => $showDetail->complain
+                ];
+            }),
+
+            'inspection_status' => $ins->map(function ($getStat){
+                return[
+                    'status' => $getStat->close
                 ];
             })
         ];
@@ -120,6 +133,7 @@ class AssignPersonnelController extends Controller
             'personnel_details' => $pDet->map(function ($PersonnelDetail) {
                 $signature = URL::to('/storage/esignature/' . $PersonnelDetail->image);
                 return[
+                    'p_id' => $PersonnelDetail->id,
                     'p_name' => $PersonnelDetail->fname.' '.$PersonnelDetail->mname.'. '.$PersonnelDetail->lname,
                     'p_signature' => $signature,
                 ];

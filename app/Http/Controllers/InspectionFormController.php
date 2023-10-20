@@ -23,9 +23,9 @@ class InspectionFormController extends Controller
     {
         $inspectionForms = Inspection_Form::with('user')->get();
 
-        if ($inspectionForms->isEmpty()) {
-            return response()->json(['message' => 'No data found'], 404);
-        }
+        // if ($inspectionForms->isEmpty()) {
+        //     return response()->json(['message' => 'No data found'], 404);
+        // }
 
         $responseData = [];
 
@@ -47,35 +47,11 @@ class InspectionFormController extends Controller
                     'mname' => $userMiddleInitial,
                     'lname' => $userLastName,
                     'code_clearance' => $userclearance,
-                ],
+                ]
             ];
         }
 
         return response()->json($responseData);
-    }
-
-    /**
-     * Show My Request On Inpection.
-     */
-    public function myRequestInspec(Request $request, $id)
-    {
-        // Find the ID of the User
-        $myRequest = PPAUser::find($id);
-
-        // Get the ID
-        //$user_id = $myRequest->id;
-
-        // Query the Inspection Form using the user_id
-        $getInspectionForm = Inspection_Form::where('user_id', $id)->get();
-
-        //Display All the data
-        $respondData = [
-            'my_user' => $myRequest,
-            'view_request' => $getInspectionForm
-        ];
-
-        return response()->json($respondData);
-
     }
 
     /**
@@ -86,9 +62,9 @@ class InspectionFormController extends Controller
 
         $viewRequest = Inspection_Form::with('user')->find($id);
 
-        if (!$viewRequest) {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
+        // if (!$viewRequest) {
+        //     return response()->json(['message' => 'Data not found'], 404);
+        // }
 
         // Access the related PPAUser data
         $ppaUser = $viewRequest->user;
@@ -161,7 +137,35 @@ class InspectionFormController extends Controller
     }
 
     /**
+     * Show My Request On Inspection.
+     */
+    public function myRequestInspec(Request $request, $id)
+    {
+        //Find the ID of the User
+        $myRequest = PPAUser::find($id);
+
+        //Get the request
+        $getInspectionForm = Inspection_Form::where('user_id', $id)->get(); 
+        $inspR = $getInspectionForm->pluck('id')->all();
+
+
+        //Get the Inspector View
+        $inspector = Inspector_Form::where('inspection__form_id', $inspR)->get();      
+
+        //Display All the data
+        $respondData = [
+            'my_user' => $myRequest,
+            'view_request' => $getInspectionForm,
+            'inspector' => $inspector, 
+        ];
+
+        return response()->json($respondData);
+
+    }
+
+    /**
      * Store a newly created resource in storage.
+     * Part A
      */
     public function store(InspectionFormRequest $request)
     {
@@ -172,29 +176,17 @@ class InspectionFormController extends Controller
         // Get The sender name
         $userId = PPAUser::find($data['user_id']);
         $userSender = $userId->fname . ' ' . $userId->lname;
-        
-        // Create a notification message
-        // $message = $userSender . ' has sent you a request for a Pre/Post Repair Inspection.';
+
+        $remarks = "Your form has been submitted and waiting for Supervisor Approval";
         
         // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
+        $deploymentData->remarks = $remarks;
+        $deploymentData->save();
 
         if(!$deploymentData){
             return response()->json(['error' => 'Data Error'], 500);
         }
-
-        // $storeNotification = GetNotification::create([
-        //     'sender_id' => $notificationData['sender_id'],
-        //     'receiver_id' => $notificationData['receiver_id'],
-        //     'url' => $notificationData['url'],
-        //     'subject' => $notificationData['subject'],
-        //     'message' => $message, 
-        //     'get_status' => $notificationData['get_status'],
-        // ]);
-
-        // if(!$storeNotification){
-        //     return response()->json(['error' => 'Data Error'], 500);
-        // }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
     }
@@ -215,8 +207,217 @@ class InspectionFormController extends Controller
             'assign_personnel' => $datatwo['assign_personnel'],
         ]);
 
-        return response()->json(['message' => 'Record created successfully'], 200);
+        Inspector_Form::create([
+            'inspection__form_id' => $findInspection->id,
+            'before_repair_date' => '1970/01/01',
+            'findings' => 'no data',
+            'recommendations' => 'no data',
+            'close' => 0
+        ]);
 
+        // After creating the related model, update the admin_approval to 2
+        $findInspection->admin_approval = 3;
+        $findInspection->remarks = "Your Request has been received by GSO and waiting for Admin Manager approval";
+
+        if ($findInspection->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+
+    }
+
+    /**
+     * Input the Details on the Inspector on Part C
+     */
+    public function storeInspectorForm(Request $request, $id)
+    {
+
+        $findInspection = Inspection_Form::find($id);
+
+        $findInspector = Inspector_Form::where('inspection__form_id', $id)->get();
+
+        foreach ($findInspector as $record) {
+            $record->update([
+                'before_repair_date' => $request->input('after_reapir_date'),
+                'findings' => $request->input('remarks'),
+                'recommendations' => $request->input('remarks')
+            ]);
+        }
+
+        $findInspection->remarks = "Your Request has been checked by the Inspector";
+
+        if ($findInspection->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+
+    }
+
+    /**
+     * Input Final Data on Inspector on Part D
+     */
+    public function InspectorPartB(Request $request, $id)
+    {
+        $p2 = Inspector_Form::where('inspection__form_id', $id)->get();
+
+        // if($p2->isEmpty()) {
+        //     return response()->json(['message' => 'No data'], 404);
+        // }
+
+        foreach ($p2 as $record) {
+            $record->update([
+                'after_reapir_date' => $request->input('after_reapir_date'),
+                'remarks' => $request->input('remarks'),
+                'close' => 2,
+            ]);
+        }
+
+        $inspR = $p2->first()->inspection__form_id;
+    
+        $findInspection = Inspection_Form::find($inspR);
+
+        if ($findInspection) {
+            $findInspection->remarks = "The Inspector has completed your request. Waiting for GSO to close the request to view the form.";
+            $findInspection->save();
+            return response()->json(['message' => 'Update successful'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+
+    }
+
+     /**
+     * Update the specified resource in storage.
+     * For Supervisor Approval
+     */
+    public function updateApprove(Request $request, $id)
+    {
+        $approveRequest = Inspection_Form::find($id);
+
+        // if (!$approveRequest) {
+        //     return response()->json(['message' => 'Request not found'], 404);
+        // }
+
+        $approveRequest->supervisor_approval = 1;
+        $approveRequest->remarks = "Your Request has been approved by your Supervisor";
+
+        if ($approveRequest->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * For Supervisor Disapproval
+     */
+    public function updateDisapprove(Request $request, $id)
+    {
+        $disapproveRequest = Inspection_Form::find($id);
+
+        // if (!$disapproveRequest) {
+        //     return response()->json(['message' => 'Request not found'], 404);
+        // }
+
+        $disapproveRequest->supervisor_approval = 2;
+        $disapproveRequest->remarks = "Your Request has been disapproved by your Supervisor";
+
+        if ($disapproveRequest->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * For Admin Approval
+     */
+    public function updateAdminApprove(Request $request, $id)
+    {
+        $approveAdminRequest = Inspection_Form::find($id);
+    
+        // if (!$approveAdminRequest) {
+        //     return response()->json(['message' => 'Request not found'], 404);
+        // }
+
+        $approveAdminRequest->admin_approval = 1;
+        $approveAdminRequest->remarks = "Your Request has been approved by Admin Manager";
+
+        if ($approveAdminRequest->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * For Admin Disapproval
+     */
+    public function updateAdminDisapprove(Request $request, $id)
+    {
+        $disapproveAdminRequest = Inspection_Form::find($id);
+    
+        // if (!$disapproveAdminRequest) {
+        //     return response()->json(['message' => 'Request not found'], 404);
+        // }
+
+        $disapproveAdminRequest->supervisor_approval = 2;
+        $disapproveAdminRequest->remarks = "Your Request has been disapproved by Admin Manager";
+
+        if ($disapproveAdminRequest->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+    }
+
+    /**
+     * Preview Inspection Form on Supervisor Page (Not Approved)
+     * Part A
+     */
+    public function getInspectionDetails(Request $request, $id)
+    {
+
+        $inspectiondata = Inspection_Form::where('supervisor_name', $id)
+        ->where('supervisor_approval', 0)->get();
+
+        // if ($inspectiondata->isEmpty()) {
+        //     return response()->json(['message' => 'No data found'], 404);
+        // }
+
+        //Get the Requestor Details
+        $inspR = $inspectiondata->pluck('user_id')->all();
+        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
+
+        $responseData = [
+            'inspection_form_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
+                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
+                    $fullName = "{$user->fname} ";
+                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
+                    $fullName .= $user->lname;
+                    return $fullName; })
+                    ->implode(', ');
+
+                    return[
+                        'id' => $showDetail->id,
+                        'requester' => $requesters,
+                        'date_requested' => $showDetail->date_of_request,
+                        'property_no' => $showDetail->property_number,
+                        'description' => $showDetail->property_description,
+                        'location' => $showDetail->location,
+                        'complain' => $showDetail->complain,
+                        'supervisor_approval' => $showDetail->supervisor_approval
+                    ];
+
+            })
+        ];
+
+        return response()->json($responseData);
     }
 
     /**
@@ -226,9 +427,9 @@ class InspectionFormController extends Controller
     {
         $viewAdminRequest = AdminInspectionForm::with('inspection_form')->find($id);
 
-        if (!$viewAdminRequest) {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
+        // if (!$viewAdminRequest) {
+        //     return response()->json(['message' => 'Data not found'], 404);
+        // }
 
         // Get the inspector ID
         $getInspectorId = $viewAdminRequest->assign_personnel;
@@ -248,177 +449,6 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Admin manager List of Request.
-     */
-    public function AdminInspectView(Request $request)
-    {
-        $viewAdminRequest = AdminInspectionForm::with('inspection_form')->get();
-
-        if (!$viewAdminRequest) {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
-
-        //get the inspection form id
-        $insId = $viewAdminRequest->pluck('inspection__form_id')->all();
-
-        //get the Inspection Form by the Part B Form
-        $insDet = Inspection_Form::whereIn('id', $insId)->get();
-
-        //Get the Id sa nag Request
-        $uid = $insDet->pluck('user_id')->first();
-
-        // get assign personnel name
-        $paId = $viewAdminRequest->pluck('assign_personnel')->first();
-
-        //get the name of the assign personnel
-        $paNames = PPAUser::where('id', $paId)->get();
-        
-        //Get the name sa nag request
-        $userIds = PPAUser::find($uid);
-
-        // Dispaly the name
-        //$uName = $userIds->fname.' '.$userIds->mname.' '.$userIds->lname ;
-
-        // Extract user_id from inspection_form relationship
-        //$userIds = $viewAdminRequest->pluck('inspection_form.user_id');
-
-        // Query Inspection_Form using the extracted user_ids
-        //$getNames = Inspection_Form::whereIn('user_id', $userIds)->with('user')->get();
-
-        //get the name data
-        //$ppaNames = $getNames->user;
-
-        $respondData = [
-            'request_list' => $insDet->map(function ($inspectionForm) use ($userIds) {
-                $uName = $userIds->fname.' '.$userIds->mname.' '.$userIds->lname ;
-            
-                return [
-                    'id' => $inspectionForm->id,
-                    'date_of_request' => $inspectionForm->date_of_request,
-                    'full_name' => $uName,
-                    'property_no' => $inspectionForm->property_number,
-                    'complain' => $inspectionForm->complain,
-                    'approval' => $inspectionForm->admin_approval
-                ];
-            }),
-            'personnel' => $paNames->map(function ($personnelName){
-                return [
-                    'personnel_name' => $personnelName->fname . ' ' . $personnelName->mname . '. ' . $personnelName->lname,
-                ];
-            })
-        ];
-
-        return response()->json($respondData);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * For Supervisor Approval
-     */
-    public function updateApprove(Request $request, $id)
-    {
-        $approveRequest = Inspection_Form::find($id);
-        
-        // Update the Approval
-        $approveRequest->update([
-            'supervisor_approval' => 1,
-        ]);
-
-        // Get the ID and name of the supervisor
-        $getUserId = $approveRequest->supervisor_name;   
-        $findName = PPAUser::find($getUserId);
-        $supervisorName =  $findName->fname . ' ' . $findName->lname;
-
-        // Creating a notification
-        $senderID = $approveRequest->supervisor_name;
-        $receiverID = $approveRequest->user_id;
-        $urlName = '/my_request/'.$receiverID;
-        $subject = 'Your Request has been approved';
-        $message = 'We will wait for the Admin Division to fill up the other forms';
-        $getStatus = 0;
-
-        // Store the Notification
-        $storeNotification = GetNotification::create([
-            'sender_id' => $senderID,
-            'receiver_id' => $receiverID,
-            'url' => $urlName,
-            'subject' => $subject,
-            'message' => $message,
-            'get_status' => $getStatus,
-        ]);
-
-        if(!$storeNotification){
-            return response()->json(['error' => 'Data Error'], 500);
-        }
-
-        return response()->json(['message' => 'Deployment data created successfully'], 200);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * For Admin Approval
-     */
-    public function updateAdminApprove(Request $request, $id)
-    {
-        $approveRequest = Inspection_Form::find($id);
-    
-        $approveRequest->update([
-            'admin_approval' => 1,
-        ]);
-    
-        return $approveRequest;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * For Supervisor Disapproval
-     */
-    public function updateDisapprove(Request $request, $id)
-    {
-        $approveRequest = Inspection_Form::find($id);
-    
-        $approveRequest->update([
-            'supervisor_approval' => 2,
-        ]);
-    
-        return $approveRequest;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * For Admin Disapproval
-     */
-    public function updateAdminDisapprove(Request $request, $id)
-    {
-        $approveRequest = Inspection_Form::find($id);
-    
-        $approveRequest->update([
-            'admin_approval' => 2,
-        ]);
-    
-        return $approveRequest;
-    }
-    
-    /**
-     * Input the Details on the Inspector on Part C
-     */
-    public function storeInspectorForm(Inspector_Form_Request $request, $id)
-    {
-        $data = $request->validated();
-
-        $findInspection = Inspection_Form::find($id);
-
-        $newRecord = $findInspection->ForInspector()->create([
-            'inspection__form_id' => $data['inspection__form_id'],
-            'before_repair_date' => $data['before_repair_date'],
-            'findings' => $data['findings'],
-            'recommendations' => $data['recommendations'],
-        ]);
-
-        return response()->json(['message' => 'Record created successfully'], 200);
-    }
-
-    /**
      * Show Part C and D data's
      */
     public function InspectorPartA(Request $request, $id)
@@ -426,9 +456,9 @@ class InspectionFormController extends Controller
 
         $p1 = Inspector_Form::where('inspection__form_id', $id)->get();
 
-        if($p1->isEmpty()) {
-            return response()->json(['message' => 'No data'], 404);
-        }
+        // if($p1->isEmpty()) {
+        //     return response()->json(['message' => 'No data'], 404);
+        // }
 
         $respondData = [
             'part_c' => $p1
@@ -439,25 +469,113 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Input Final Data on Inspector on Part D
+     * Preview Inspection Form on GSO or Authorize Person Page
      */
-    public function InspectorPartB(Request $request, $id)
+    public function getInspectionDetailsAuth()
     {
-        $p2 = Inspector_Form::where('inspection__form_id', $id)->get();
 
-        if($p2->isEmpty()) {
-            return response()->json(['message' => 'No data'], 404);
-        }
+        $inspectiondata = Inspection_Form::where('supervisor_approval', 1)
+        ->where('admin_approval', 0)->get();
 
-        foreach ($p2 as $record) {
-            $record->update([
-                'after_reapir_date' => $request->input('after_reapir_date'),
-                'remarks' => $request->input('remarks'),
-                'close' => 1,
-            ]);
-        }
+        // if ($inspectiondata->isEmpty()) {
+        //     return response()->json(['message' => 'No data found'], 404);
+        // }
 
-        return response()->json($p2);
+        //Get the Requestor Details
+        $inspR = $inspectiondata->pluck('user_id')->all();
+        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
+
+        $responseData = [
+            'inspection_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
+                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
+                    $fullName = "{$user->fname} ";
+                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
+                    $fullName .= $user->lname;
+                    return $fullName; })
+                    ->implode(', ');
+
+                    return[
+                        'id' => $showDetail->id,
+                        'requester' => $requesters,
+                        'date_requested' => $showDetail->date_of_request,
+                        'property_no' => $showDetail->property_number,
+                        'description' => $showDetail->property_description,
+                        'location' => $showDetail->location,
+                        'complain' => $showDetail->complain,
+                        'supervisor_approval' => $showDetail->supervisor_approval,
+                        'admin_approval' => $showDetail->admin_approval
+                    ];
+
+            })
+        ];
+
+        return response()->json($responseData);
+    }
+
+    /**
+     * Preview Inspection Form on Admin Division Manager
+     */
+    public function getInspectionDetailAdmin()
+    {
+
+        $inspectiondata = Inspection_Form::where('supervisor_approval', 1)
+        ->where('admin_approval', 3)->get();
+
+        // if ($inspectiondata->isEmpty()) {
+        //     return response()->json(['message' => 'No data found'], 404);
+        // }
+
+        //Get the Requestor Details
+        $inspR = $inspectiondata->pluck('user_id')->all();
+        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
+
+        $responseData = [
+            'inspection_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
+                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
+                    $fullName = "{$user->fname} ";
+                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
+                    $fullName .= $user->lname;
+                    return $fullName; })
+                    ->implode(', ');
+
+                    return[
+                        'id' => $showDetail->id,
+                        'requester' => $requesters,
+                        'date_requested' => $showDetail->date_of_request,
+                        'property_no' => $showDetail->property_number,
+                        'description' => $showDetail->property_description,
+                        'location' => $showDetail->location,
+                        'complain' => $showDetail->complain,
+                        'supervisor_approval' => $showDetail->supervisor_approval,
+                        'admin_approval' => $showDetail->admin_approval
+                    ];
+
+            })
+        ];
+
+        return response()->json($responseData);
+    }
+
+    /**
+     * Close the Request
+     */
+    public function closeRequest(Request $request, $id)
+    {
+
+        $inspectorForm = Inspector_Form::find($id);
+
+        // $inspR = $inspectorForm->first()->inspection__form_id;
+        $findInspection = Inspection_Form::find($id);
+
+        //Update the close status
+        $inspectorForm->close = 1;
+        $inspectorForm->save();
+
+        //Update remarks
+        $findInspection->remarks = "The Request has been close you can view it now";
+        $findInspection->save();    
+        
+        //return response()->json($findInspection);
 
     }
 

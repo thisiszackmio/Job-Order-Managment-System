@@ -7,11 +7,7 @@ import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
 import RequestForm from "./views/RequestForm";
 import RequestList from "./views/RequestList";
-import ViewRequestInspection from "./views/ViewRequestInspection";
-import EditRequestInspection from "./views/EditInspectionRequest";
 import MyRequest from "./views/YourRequest";
-import AdminManagerRequest from "./views/AdminMangerRequestList";
-import AdminManagerViewRequest from "./views/AdminMangerViewRequest";
 import PrepostRepairForm from "./views/PrePostRepairForm";
 
 
@@ -40,26 +36,9 @@ const routes = [
                 path: "/request_list",
                 element: <RequestList />
             },
+            // For Inspection Form
             {
-                path: "/view_request_inspection/:id",
-                element: <ViewRequestInspection />
-            },
-            {
-                path: "/edit_request_inspection/:id",
-                element: <EditRequestInspection />
-            },
-            // For Maam Daisy's page only
-            {
-                path: "/admin_manager_request",
-                element: <AdminManagerRequest />
-            },
-            {
-                path: "/admin_manager_view_inspection_request/:id",
-                element: <AdminManagerViewRequest />
-            },
-            // For Assign Personnel
-            {
-                path: "/assign_personnel/:id",
+                path: "/repairinspectionform/:id",
                 element: <PrepostRepairForm />
             }
         ]

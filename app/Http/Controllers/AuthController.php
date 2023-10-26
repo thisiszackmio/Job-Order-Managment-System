@@ -29,8 +29,8 @@ class AuthController extends Controller
                 }
     
                 // Generate a filename based on name and timestamp
-                $name = $request->input('lname'); // Change 'fname' to the desired field
-                $timestamp = now()->timestamp;
+                $name = str_replace(' ', '_', trim($request->input('fname'))) . '_' . $request->input('lname');
+                $timestamp = now()->format('Y');
                 $imageName = $name . '_' . $timestamp . '.' . $extension;
     
                 /** @var \App\Models\User $user */
@@ -38,6 +38,7 @@ class AuthController extends Controller
                     'fname' => $request->input('fname'),
                     'mname' => $request->input('mname'),
                     'lname' => $request->input('lname'),
+                    'gender' => $request->input('gender'),
                     'image' => $imageName,
                     'username' => $request->input('username'),
                     'division' => $request->input('division'),

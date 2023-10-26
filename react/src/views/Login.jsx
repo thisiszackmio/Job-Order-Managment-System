@@ -80,11 +80,11 @@ export default function Login() {
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
-              className="mx-auto h-10 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              className="mx-auto h-20 w-auto"
+              src="ppa_logo.png"
               alt="Your Company"
             />
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Job Order Management System
             </h2>
 
@@ -163,9 +163,11 @@ export default function Login() {
 
           {/* Para sa taak nko next day */}
           <div className="mt-20">
-            Task For Monday:
-            <p>1. Fixing the Part C Condition Button (dapat si Assign Personnel ra ang maka kita sa button)</p>
-            <p>2. Fixing the Inspection Form on Part C and Part D</p>
+            Task For Tuesday:
+            <p>1. Account User Page</p>
+
+            Pending:
+            <p>1. Update Signature</p>
           </div>
 
         </div>

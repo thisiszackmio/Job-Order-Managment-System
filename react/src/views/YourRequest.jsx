@@ -4,11 +4,10 @@ import { useUserStateContext } from "../context/ContextProvider";
 import axiosClient from "../axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faEye } from '@fortawesome/free-solid-svg-icons';
 import { Link, useParams } from "react-router-dom";
 
 export default function MyRequest(){
-  const { currentUser } = useUserStateContext();
   const {id} = useParams();
 
   function formatDate(dateString) {
@@ -17,11 +16,10 @@ export default function MyRequest(){
 }
 
   const[displayRequest, setDisplayRequest] = useState([]);
-  const [inputErrors, setInputErrors] = useState('');
 
   const [activeTab, setActiveTab] = useState("tab1");
   
-  library.add(faSpinner);
+  library.add(faSpinner, faEye);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = () => {
@@ -180,7 +178,16 @@ export default function MyRequest(){
                       <td className="px-6 py-4 text-center border-2 w-66 border-custom">{getData.remarks}</td>
                       <td className="px-6 py-4 text-center border-2 border-custom">
                       {getData.remarks === "The Request has been close you can view it now" ? (
-                      <h1>naa</h1>
+                      <div className="flex justify-center">
+                        <Link to={`/repairinspectionform/${getData.id}`}>
+                          <button 
+                            className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
+                            title="View Request"
+                          >
+                            <FontAwesomeIcon icon="eye" className="mr-0" />
+                          </button>
+                        </Link>
+                      </div>
                       ): null }            
                       </td>
                     </tr>

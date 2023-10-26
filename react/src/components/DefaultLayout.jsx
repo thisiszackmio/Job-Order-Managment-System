@@ -16,6 +16,7 @@ function classNames(...classes) {
 export default function DefaultLayout() {
   const { currentUser, userToken, userRole , setCurrentUser, setUserToken } = useUserStateContext();
   const[displayRequest, setDisplayRequest] = useState([]);
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const navigate = useNavigate();
 
@@ -26,9 +27,24 @@ export default function DefaultLayout() {
     currentUser.code_clearance === 6 || 
     currentUser.code_clearance === 3 || 
     currentUser.code_clearance === 1 ? 
-    { name: 'Request List', to: '/request_list' } : null
+    { name: 'Request List', to: '/request_list' }:null,
+    currentUser.code_clearance === 6 ?
+    { name: 'Personnel', to: '/account' }:null
   ].filter(Boolean);
 
+  // Function to check if a submenu item is active
+  const isSubmenuActive = (submenuItem) => {
+    return window.location.pathname.startsWith(submenuItem.to);
+  };
+
+  // Function to determine if "Personnel" is active
+  const isPersonnelActive = navigation.find((item) => {
+    if (item.submenu) {
+      return item.submenu.some(isSubmenuActive);
+    } else {
+      return isSubmenuActive(item);
+    }
+  });
 
   if(!userToken){
     return <Navigate to='login'/>
@@ -45,51 +61,6 @@ export default function DefaultLayout() {
     });
   };
 
-  // const GetNotification = () => {
-  //   axiosClient
-  //   .get('/getnotification')
-  //   .then((response) => {
-  //     const responseData = response.data;
-
-  //     // Filter notifications where receiver_id matches currentUser.id
-  //     const filteredData = responseData.filter((dataItem) => {
-  //       return dataItem.receiver_id === currentUser.id;
-  //     });
-
-  //     const mappedData = filteredData.map((dataItem) => {
-  //       return {
-  //         id: dataItem.id,
-  //         receiver_id: dataItem.receiver_id,
-  //         message: dataItem.message,
-  //         subject: dataItem.subject,
-  //         url: dataItem.url,
-  //         status: dataItem.get_status,
-  //       };
-  //     });
-
-  //     setDisplayRequest(mappedData);
-  //   })
-  //   .catch((error) => {
-  //     console.error('Error fetching notifications:', error);
-  //   });
-  // };
-
-  // useEffect(() => { 
-  //   GetNotification(); 
-  // }, []);
-
-  // const handleLinkClick = (id, url) => {
-  //   axiosClient
-  //     .put(`/setstatus/${id}`)
-  //     .then((response) => {
-  //       GetNotification();
-  //       //setDisplayRequest();
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
-
   return (
     <>
       <div className="min-h-full">
@@ -101,29 +72,73 @@ export default function DefaultLayout() {
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <img
-                        className="h-8 w-8"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                        className="h-12 w-12"
+                        src="ppa_logo.png"
                         alt="Your Company"
                       />
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
-                          <NavLink
-                            key={item.name}
-                            to={item.to}
-                            className={({ isActive }) =>
-                              classNames(
-                                isActive
-                                  ? 'bg-gray-900 text-white'
-                                  : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                'rounded-md px-3 py-2 text-sm font-medium'
-                              )
-                            }
-                          >
-                            {item.name}
-                          </NavLink>
-                        ))}
+                        {navigation.map((item) => {
+                          if (item.submenu) {
+                            const isSubmenuActive = activeSubmenu === item.name;
+
+                            // Render submenu items based on activeSubmenu state
+                            return (
+                              <div
+                                key={item.name}
+                                className="relative"
+                                onClick={() => setActiveSubmenu(isSubmenuActive ? null : item.name)}
+                              >
+                                <NavLink
+                                  to={item.to}
+                                  className={({ isActive }) =>
+                                    classNames(
+                                      isActive
+                                        ? 'bg-gray-900 text-white'
+                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                      'rounded-md px-3 py-2 text-sm font-medium'
+                                    )
+                                  }
+                                >
+                                  {item.name}
+                                </NavLink>
+                                {isSubmenuActive && (
+                                  <ul className="absolute left-0 w-40 mt-2 py-2 bg-white rounded-md shadow-lg">
+                                    {item.submenu.map((subItem) => (
+                                      <li key={subItem.name}>
+                                        <NavLink
+                                          to={subItem.to}
+                                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                          {subItem.name}
+                                        </NavLink>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            );
+                          } else {
+                            // Render regular navigation items
+                            return (
+                              <NavLink
+                                key={item.name}
+                                to={item.to}
+                                className={({ isActive }) =>
+                                  classNames(
+                                    isActive
+                                      ? 'bg-gray-900 text-white'
+                                      : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                    'rounded-md px-3 py-2 text-sm font-medium'
+                                  )
+                                }
+                              >
+                                {item.name}
+                              </NavLink>
+                            );
+                          }
+                        })}
                       </div>
                     </div>
                   </div>

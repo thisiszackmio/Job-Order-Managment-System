@@ -1,7 +1,6 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import Dashboard from "./views/Dashboard";
 import Login from "./views/Login";
-import Register from "./views/Register";
 import Logout from "./views/Logout";
 import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
@@ -9,6 +8,8 @@ import RequestForm from "./views/RequestForm";
 import RequestList from "./views/RequestList";
 import MyRequest from "./views/YourRequest";
 import PrepostRepairForm from "./views/PrePostRepairForm";
+import Account from "./views/Personnel"; 
+import AccountEdit from "./views/AccountEdit";
 
 
 const routes = [
@@ -36,6 +37,14 @@ const routes = [
                 path: "/request_list",
                 element: <RequestList />
             },
+            {
+                path: "/account",
+                element: <Account />
+            },
+            {
+                path: "/editaccount/:id",
+                element: <AccountEdit />
+            },
             // For Inspection Form
             {
                 path: "/repairinspectionform/:id",
@@ -50,10 +59,6 @@ const routes = [
             {
                 path: "/login",
                 element: <Login />
-            },
-            {
-                path: "/register",
-                element: <Register />
             },
             {
                 path: "/logout",

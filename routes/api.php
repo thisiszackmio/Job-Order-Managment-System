@@ -38,6 +38,11 @@ Route::middleware('auth:sanctum')->group(function(){
    
     //Get User
     Route::get('/ppausers', [UserController::class, 'index']);
+    Route::get('/users', [UserController::class, 'allUser']);
+    Route::get('/users/{id}', [UserController::class, 'SpecificUser']);
+    Route::put('/changecc/{id}', [UserController::class, 'UpdateCodeClearance']);
+    Route::put('/changepwd/{id}', [UserController::class, 'updatePassword']);
+    // Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
 
     //Display Inpection Request on the site
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
@@ -76,6 +81,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
+Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
 
 // wALAY LABOT
 //Route::get('/getrepair', [DashboardController::class, 'getRepair']);

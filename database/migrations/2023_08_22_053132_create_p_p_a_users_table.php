@@ -9,19 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('p_p_a_users', function (Blueprint $table) {
             $table->id();
             $table->string('fname');
             $table->string('mname');
             $table->string('lname');
+            $table->string('gender');
             $table->string('username');
             $table->string('division');
             $table->integer('code_clearance');
             $table->string('password');
             $table->string('image');
-            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -29,7 +29,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('p_p_a_users');
     }

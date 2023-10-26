@@ -17,7 +17,8 @@ class PPAUser extends Authenticatable
     protected $fillable = [
         'fname',
         'mname', 
-        'lname', 
+        'lname',
+        'gender', 
         'username', 
         'division', 
         'code_clearance',

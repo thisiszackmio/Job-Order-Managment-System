@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.submenu {
+  display: none; /* Initially hide the submenu */
+}
+
+/* Style to show the submenu when the parent is hovered */
+.parent:hover .submenu {
+  display: block;
+}
+
 /* For the table */
 .border-custom { border-color: #142E5F; }
 .body-border { border-color: #1b23334a; }

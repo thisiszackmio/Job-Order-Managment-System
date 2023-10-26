@@ -181,7 +181,7 @@ export default function Dashboard()
   }, []);
 
   return(
-    <PageComponent title={`${getTimeOfDay()}! ${currentUser.fname}`}>
+    <PageComponent title={`${getTimeOfDay()}! ${currentUser.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUser.fname}`}>
 
     {isLoading ? (
       <div className="flex items-center justify-center h-screen">

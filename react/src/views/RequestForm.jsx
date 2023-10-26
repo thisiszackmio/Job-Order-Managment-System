@@ -34,7 +34,7 @@ export default function RequestForm(){
       });
   }, []);
 
-  // For the Equipment - Vehicle
+  //For Inspection Form
   const [inspectionDate, setInspectionDate] = useState('');
   const [propertyNo, setPropertyNo] = useState('');
   const [acquisitionDate, setAcquisitionDate] = useState('');

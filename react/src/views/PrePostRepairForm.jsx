@@ -260,8 +260,6 @@ export default function PrePostRepairForm(){
   //It will switch into form input on Part C
   const handlePartCEditClick = () => { setPartCIsEditing(true); };
 
-
-
   //It will switch into form input on Part D
   const handlePartDEditClick = () => {
     setPartDIsEditing(true);
@@ -1325,6 +1323,7 @@ export default function PrePostRepairForm(){
               ):
               displayRequest.viewRequestData.supervisor_approval === 1 && displayRequest.viewRequestData.admin_approval === 1 ? (
               <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
+
               {partCisEditing ? (
               <>
               <p className="text-xs mt-6"><span className="text-red-500">Please check the field before submit</span></p>
@@ -1458,16 +1457,18 @@ export default function PrePostRepairForm(){
                       <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                        {assignPersonnel.map((item, index) => (
-                          <div key={index} className="personnel-container">
-                            <img
-                              src={item.p_signature}
-                              alt="User Signature"
-                              style={{ position: 'absolute', width: '100%', top: '-42px', left: '0px' }}
-                            />
-                            <span>{item.p_name}</span>
-                          </div>
-                        ))}
+                        {item.findings !== "no data" ? (
+                          assignPersonnel.map((item, index) => (
+                            <div key={index} className="personnel-container">
+                              <img
+                                src={item.p_signature}
+                                alt="User Signature"
+                                style={{ position: 'absolute', width: '100%', top: '-42px', left: '0px' }}
+                              />
+                              <span>{item.p_name}</span>
+                            </div>
+                          ))
+                        ):null}
                         </div>
                         <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
                       </div>
@@ -1477,14 +1478,19 @@ export default function PrePostRepairForm(){
                   </div>
   
                   {/* Button */}
-                  <div className="mt-10">
-                    <button 
-                      onClick={handlePartCEditClick}
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    > 
-                      Fill up the Part C     
-                    </button>
-                  </div>
+                  {adminForm.ps === currentUser.id ? (
+                    item.findings === "no data" ? (
+                    <div className="mt-10">
+                      <button 
+                        onClick={handlePartCEditClick}
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      > 
+                        Fill up the Part C     
+                      </button>
+                    </div>
+                    ):null
+                  ):null}
+                  
   
                 </div>
               ))
@@ -1503,8 +1509,8 @@ export default function PrePostRepairForm(){
               </tr>
 
               {/* Part D Forms */}
-              {displayRequest.viewRequestData.supervisor_approval === 0 && displayRequest.viewRequestData.admin_approval === 0 ? (
               <tr>
+              {displayRequest.viewRequestData.supervisor_approval === 0 && displayRequest.viewRequestData.admin_approval === 0 ? (
                 <td colSpan={3} className="border border-black p-1 font-arial">
 
                 {/* Remarks if has no data */}
@@ -1549,9 +1555,205 @@ export default function PrePostRepairForm(){
                 </div>
 
                 </td>
-              </tr>
-              ):null}
+              ):
+              displayRequest.viewRequestData.supervisor_approval === 1 && displayRequest.viewRequestData.admin_approval === 0 ? (
+                <td colSpan={3} className="border border-black p-1 font-arial">
 
+                {/* Remarks if has no data */}
+                <div className="mt-10">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Remark/s</strong>
+                    </div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signature */}
+                <div className="mt-10 pb-10">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                        DATE INSPECTED
+                      </label>
+                      <div className="mt-12">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                          <span></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                        NOTED:
+                      </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+          
+                        </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
+                          Property Inspector
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                </td>
+              ):
+              displayRequest.viewRequestData.supervisor_approval === 1 && displayRequest.viewRequestData.admin_approval === 1 ? (
+                <td colSpan={3} className="border border-black p-1 font-arial">
+
+                {partDisEditing ? (
+                <form onSubmit={SubmitPartD}>
+                  {/* Date Inspected */}
+                  <div className="flex mt-10">
+                    <div className="w-40">
+                      <label htmlFor="date_insp" className="block text-base font-medium leading-6 text-gray-900">
+                        Date Inspected :
+                      </label>
+                    </div>
+                    <div className="w-64">
+                      <input
+                        type="date"
+                        name="date_insp"
+                        id="date_insp"
+                        value={afterDate}
+                        onChange={(ev) => setAfterDate(ev.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      />
+                    </div>
+                  </div>
+
+                  {/* For Remarks */}
+                  <div className="flex mt-4">
+                    <div className="w-40">
+                      <label htmlFor="recomendations" className="block text-base font-medium leading-6 text-gray-900">
+                        Remark/s :
+                      </label>
+                    </div>
+                    <div className="w-64">
+                      <textarea
+                        id="recomendations"
+                        name="recomendations"
+                        rows={3}
+                        style={{ resize: "none" }}
+                        value={remarks}
+                        onChange={(ev) => setRemarks(ev.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submitt Button */}
+                  <div className="flex mt-10 mb-8">
+                    <button
+                      type="submit"
+                      className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                        submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                      }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex items-center justify-center">
+                          <FontAwesomeIcon icon={faSpinner} spin />
+                          <span className="ml-2">Processing</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
+                    </button>
+                    <button
+                      onClick={handleDisableEdit}
+                      className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded ml-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                ):(
+                getPartC.map((item, index) => (
+                <div key={index}>
+
+                  {/* Remarks if has no data */}
+                  <div className="mt-10">
+                    <div className="flex">
+                      <div className="w-44">
+                        <strong>Remark/s</strong>
+                      </div>
+                      <div className="w-full border-b border-black pl-1">
+                        <span>{item.remarks ? item.remarks : null}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Signature */}
+                  <div className="mt-10 pb-10">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-1">
+                        <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                          DATE INSPECTED
+                        </label>
+                        <div className="mt-12">
+                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                            <span>{item.after_reapir_date ? item.after_reapir_date : null}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-span-1">
+                        <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                          NOTED:
+                        </label>
+                        <div className="mt-10">
+                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                          {item.remarks ? (
+                            assignPersonnel.map((item, index) => (
+                              <div key={index} className="personnel-container">
+                                <img
+                                  src={item.p_signature}
+                                  alt="User Signature"
+                                  style={{ position: 'absolute', width: '100%', top: '-42px', left: '0px' }}
+                                />
+                                <span>{item.p_name}</span>
+                              </div>
+                            ))
+                          ):null}
+                          </div>
+                          <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
+                            Property Inspector
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Button */}
+                  {adminForm.ps === currentUser.id ? (
+                  item.findings ? (
+                    item.remarks ? null:(
+                      <div className="mb-8">
+                        <button
+                          onClick={handlePartDEditClick}
+                          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                          Fill up the Part D
+                        </button>
+                      </div>
+                    )
+                  ):null
+                  ):null}
+                  
+
+                </div>
+                ))
+                )}
+
+                </td>
+              ):
+              null}
+              </tr>
+              
             </table>
             </div>
             
@@ -2100,11 +2302,14 @@ export default function PrePostRepairForm(){
               </button>
               {getPartC.map((item, index) => (
                 <div key={index}>
-                  {item.close === 0 || item.close === 2 ? null : (
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={generatePDF}>
-                      Generate PDF
-                    </button>
-                  )}
+                  {currentUser.code_clearance === 3 || currentUser.code_clearance === 6 ? (
+                    item.close === 0 || item.close === 2 ? null : (
+                      <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={generatePDF}>
+                        Generate PDF
+                      </button>
+                    )
+                  ):null
+                  }
                   {item.close === 2 && currentUser.code_clearance === 3 ? (
                     <button 
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2" 
@@ -2137,7 +2342,7 @@ export default function PrePostRepairForm(){
               <div className="flex justify-center mt-4">
                 <button
                   onClick={() => {
-                    window.location.href = "/";
+                    window.location.reload();
                   }}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >

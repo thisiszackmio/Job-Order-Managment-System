@@ -239,9 +239,9 @@ class InspectionFormController extends Controller
 
         foreach ($findInspector as $record) {
             $record->update([
-                'before_repair_date' => $request->input('after_reapir_date'),
-                'findings' => $request->input('remarks'),
-                'recommendations' => $request->input('remarks')
+                'before_repair_date' => $request->input('before_repair_date'),
+                'findings' => $request->input('findings'),
+                'recommendations' => $request->input('recommendations')
             ]);
         }
 

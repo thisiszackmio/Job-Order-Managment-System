@@ -18,14 +18,10 @@ export default function RequestList()
   library.add(faCheck, faTimes, faEye, faStickyNote, faSpinner);
 
   const [activeTab, setActiveTab] = useState("tab1");
-  const [displayRequest, setDisplayRequest] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState('');
-
-  const { userRole, currentUser } = useUserStateContext();
+  const { userRole } = useUserStateContext();
   const [prePostRepair, setPrePostRepair] = useState([]);
 
   const fetchTableData = () => {
@@ -75,11 +71,6 @@ export default function RequestList()
   };
 
   useEffect(() => { fetchTableData(); }, []);
-
-  const closePopup = () => { 
-    setShowPopup(false); 
-    setShowDetails(false);
-  };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);

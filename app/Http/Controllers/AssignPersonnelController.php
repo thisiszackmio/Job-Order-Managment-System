@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\AssignPersonnelRequest;
 use App\Models\AssignPersonnel;
 use App\Models\AdminInspectionForm;
 use App\Models\Inspection_Form;
@@ -30,6 +31,7 @@ class AssignPersonnelController extends Controller
         foreach ($assignPersonnels as $assignPersonnel) {
             $ppaUser = $assignPersonnel->user;
 
+
             $userId = $ppaUser->id;
             $userName = $ppaUser->fname;
             $userMiddleInitial = $ppaUser->mname;
@@ -37,7 +39,8 @@ class AssignPersonnelController extends Controller
 
             $responseData[]= [
                 'personnel_details' => [
-                    'id' => $userId,
+                    'ap_id' =>  $assignPersonnel->id,
+                    'user_id' => $userId,
                     'fname' => $userName,
                     'mname' => $userMiddleInitial,
                     'lname' => $userLastName,
@@ -50,6 +53,31 @@ class AssignPersonnelController extends Controller
         return response()->json($responseData);
         
     } 
+
+    /**
+     * Assign Personnel.
+     */
+    public function storePersonnel(AssignPersonnelRequest $request)
+    {
+        $data = $request->validated();
+
+        // Check if the data already exists based on your criteria (e.g., user_id and type_of_personnel)
+        $existingData = AssignPersonnel::where('user_id', $data['user_id'])
+            ->where('type_of_personnel', $data['type_of_personnel'])
+            ->first();
+
+        if ($existingData) {
+            return response()->json(['error' => 'Data already exists'], 409); // 409 Conflict status code
+        }
+
+        $deploymentData = AssignPersonnel::create($data);
+
+        if (!$deploymentData) {
+            return response()->json(['error' => 'Data Error'], 500);
+        }
+
+        return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
 
     /**
      * Show Personnel List on Dashboard.
@@ -142,4 +170,21 @@ class AssignPersonnelController extends Controller
 
         return response()->json($respondData);
     }
+
+    /**
+     * Remove Personnel List on View Form.
+     */
+    public function RemovePersonnel($id)
+    {
+        $user = AssignPersonnel::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Personnel not found'], 404);
+        }
+    
+        $user->delete(); 
+    
+        return response()->json(['message' => 'Personnel deleted successfully'], 200);
+    }
+
 }

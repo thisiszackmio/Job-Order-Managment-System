@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
-import { useUserStateContext } from "../context/ContextProvider";
 import axiosClient from "../axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { Link, useParams } from "react-router-dom";
+import loadingAnimation from '../assets/loading.gif';
 
 export default function MyRequest(){
   const {id} = useParams();
@@ -19,9 +19,10 @@ export default function MyRequest(){
 
   const [activeTab, setActiveTab] = useState("tab1");
   
-  library.add(faSpinner, faEye);
+  library.add(faEye);
   const [loading, setLoading] = useState(true);
 
+  //Get all the Request on a specific user
   const fetchUser = () => {
     axiosClient
     .get(`/myinspecreq/${id}`)
@@ -143,63 +144,62 @@ export default function MyRequest(){
       {activeTab === "tab1" && 
       <div>
         {loading ? (
-            <tr>
-              <td colSpan="6" className="px-6 py-4 text-center whitespace-nowrap">
-                <FontAwesomeIcon icon={faSpinner} spin /> Loading...
-              </td>
-            </tr>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="border-collapse w-full mb-10">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Property No</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Property</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Complain</th> 
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Remarks</th>  
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayRequest.mappedData.length > 0 ? (
-                  displayRequest.mappedData.map((getData) => (
-                    <tr key={getData.id}>
-                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.id}</td>
-                      <td className="px-6 py-4 text-center border-2 border-custom">{formatDate(getData.date_of_request)}</td>
-                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.property_number}</td>
-                      {getData.type_of_property === "Others" ? (
-                        <td className="px-6 py-4 text-center border-2 border-custom">Others: <i>{getData.property_other_specific}</i></td>
-                      ):(
-                        <td className="px-6 py-4 text-center border-2 border-custom">{getData.type_of_property}</td>
-                      )}
-                      <td className="px-6 py-4 text-center border-2 border-custom">{getData.complain}</td>
-                      <td className="px-6 py-4 text-center border-2 w-66 border-custom">{getData.remarks}</td>
-                      <td className="px-6 py-4 text-center border-2 border-custom">
-                      {getData.remarks === "The Request has been close you can view it now" ? (
-                      <div className="flex justify-center">
-                        <Link to={`/repairinspectionform/${getData.id}`}>
-                          <button 
-                            className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
-                            title="View Request"
-                          >
-                            <FontAwesomeIcon icon="eye" className="mr-0" />
-                          </button>
-                        </Link>
-                      </div>
-                      ): null }            
-                      </td>
-                    </tr>
-                  ))
+        <div className="flex items-center justify-center">
+          <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
+          <span className="ml-2">Loading My Request List...</span>
+        </div>
+        ):(
+        <div className="overflow-x-auto">
+          <table className="border-collapse w-full mb-10">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Property No</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Property</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Complain</th> 
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Remarks</th>  
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayRequest.mappedData.length > 0 ? (
+              displayRequest.mappedData.map((getData) => (
+                <tr key={getData.id}>
+                  <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
+                  <td className="px-6 py-4 text-center border-2 border-custom">{formatDate(getData.date_of_request)}</td>
+                  <td className="px-6 py-4 text-center border-2 border-custom">{getData.property_number}</td>
+                  {getData.type_of_property === "Others" ? (
+                    <td className="px-6 py-4 text-center border-2 border-custom">Others: <i>{getData.property_other_specific}</i></td>
                   ):(
-                  <tr>
-                    <td colSpan="10" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
-                    </tr>
+                    <td className="px-6 py-4 text-center border-2 border-custom">{getData.type_of_property}</td>
                   )}
-                </tbody>
-              </table>
-            </div>
+                  <td className="px-6 py-4 text-center border-2 border-custom">{getData.complain}</td>
+                  <td className="px-6 py-4 text-center border-2 w-66 border-custom">{getData.remarks}</td>
+                  <td className="px-6 py-4 text-center border-2 border-custom">
+                  {getData.remarks === "The Request has been close you can view it now" ? (
+                  <div className="flex justify-center">
+                    <Link to={`/repairinspectionform/${getData.id}`}>
+                      <button 
+                        className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
+                        title="View Request"
+                      >
+                        <FontAwesomeIcon icon="eye" className="mr-0" />
+                      </button>
+                    </Link>
+                  </div>
+                  ): null }            
+                  </td>
+                </tr>
+              ))
+              ):(
+              <tr>
+                <td colSpan="10" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
         )}
       </div>
       }

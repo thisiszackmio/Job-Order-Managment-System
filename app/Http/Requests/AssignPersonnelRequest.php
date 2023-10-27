@@ -22,7 +22,7 @@ class AssignPersonnelRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'exists:users,id',
+            'user_id' => 'exists:p_p_a_users,id',
             'type_of_personnel' => 'required|string',
         ];
     }

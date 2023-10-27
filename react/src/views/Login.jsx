@@ -1,9 +1,7 @@
 import axiosClient from "../axios";
 import { useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner  } from '@fortawesome/free-solid-svg-icons';
+import loadingAnimation from '../assets/loading.gif';
 
 export default function Login() {
   const { setCurrentUser, setUserToken, setUserRole } = useUserStateContext ();
@@ -11,8 +9,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 
   const [isLoading, setIsLoading] = useState(false);
-
-  library.add(faSpinner);
 
   const handleLogin = async (credentials) => {
     try {
@@ -74,104 +70,92 @@ export default function Login() {
 
   };
 
+  return (
+    <>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <img
+            className="mx-auto h-20 w-auto"
+            src="ppa_logo.png"
+            alt="Your Company"
+          />
+          <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Job Order Management System
+          </h2>
 
-    return (
-      <>
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            <img
-              className="mx-auto h-20 w-auto"
-              src="ppa_logo.png"
-              alt="Your Company"
-            />
-            <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-              Job Order Management System
-            </h2>
-
-            {error.__html && (
-              <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
-              dangerouslySetInnerHTML={error} >
-              </div>
-            )}
-
-          </div>
-  
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {isLoading ? (
-            <div className="flex items-center justify-center">
-              <FontAwesomeIcon icon={faSpinner} spin />
-              <span className="ml-2">Redirecting...</span>
+          {error.__html && (
+            <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
+            dangerouslySetInnerHTML={error} >
             </div>
-          ) : (
-            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="username"
-                    required
-                    value={username}
-                    onChange={(ev) => setUsername(ev.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-  
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                    Password
-                  </label>
-                  <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      Forgot password?
-                    </a>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(ev) => setPassword(ev.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-  
-              <div>
-                <button
-                  type="submit"
-                  className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Log in
-                </button>
-              </div>
-            </form>
           )}
-          </div>
-
-
-
-          {/* Para sa taak nko next day */}
-          <div className="mt-20">
-            Task For Tuesday:
-            <p>1. Account User Page</p>
-
-            Pending:
-            <p>1. Update Signature</p>
-          </div>
 
         </div>
-      </>
-    )
-  }
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {isLoading ? (
+          <div className="flex items-center justify-center">
+            <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
+            <span className="ml-2">Redirecting...</span>
+          </div>
+        ):(
+          <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+              Username
+              </label>
+              <div className="mt-2">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  value={username}
+                  onChange={(ev) => setUsername(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                  Password
+                </label>
+                <div className="text-sm">
+                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
+              <div className="mt-2">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(ev) => setPassword(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Log in
+              </button>
+            </div>
+          </form>
+        )}
+        </div>
+
+      </div>
+    </>
+  )
+}
   

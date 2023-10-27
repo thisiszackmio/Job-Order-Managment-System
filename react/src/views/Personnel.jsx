@@ -3,13 +3,14 @@ import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner, faStickyNote  } from '@fortawesome/free-solid-svg-icons';
+import { faStickyNote, faTrash  } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import { Link } from "react-router-dom";
+import loadingAnimation from '../assets/loading.gif';
 
 export default function Personnel(){
 
-  library.add(faSpinner , faStickyNote);
+  library.add(faStickyNote , faTrash);
   const { currentUser } = useUserStateContext();
   const [activeTab, setActiveTab] = useState("tab1");
 
@@ -17,6 +18,7 @@ export default function Personnel(){
     setActiveTab(tab);
   };
 
+  const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
@@ -25,7 +27,7 @@ export default function Personnel(){
   const [users, setUsers] = useState([]);
   
   //Get Personnel User List
-  useEffect(() => {
+  const fetchUser = () => {
     axiosClient.get('/users')
       .then(response => {
         const usersData = response.data;
@@ -36,7 +38,7 @@ export default function Personnel(){
       .catch(error => {
         console.error('Error fetching data:', error);
       });
-  }, []);
+  }
 
   //Register
   const [fname, setFname] = useState('');
@@ -122,7 +124,108 @@ export default function Personnel(){
       setIsLoading(false);
     });
 
+  };
+
+  //Assign Personnel
+  const [AssignPersonnel, setAssignPersonnel] = useState('');
+  const [PersonnelCategory, setPersonnelCategory] = useState('');
+
+  const submitPersonnel = (ev) => {
+    ev.preventDefault();
+
+    setSubmitLoading(true);
+
+    const data = {
+      user_id: AssignPersonnel, 
+      type_of_personnel: PersonnelCategory,
+    };
+
+    axiosClient
+      .post("/assignpersonnel", data)
+      .then((response) => { 
+        setShowPopup(true);
+        setPopupMessage("Assign Personnel Successfully");    
+        setSubmitLoading(false);
+
+        setAssignPersonnel('');
+        setPersonnelCategory('');
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 409) {
+          setPopupMessage('Data already exists');
+          setShowPopup(true);
+
+          setAssignPersonnel('');
+          setPersonnelCategory('');
+        } else {
+          setPopupMessage('Error fetching personnel data');
+          setShowPopup(true);
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+  };
+
+  //Get Personnel
+  const [getPersonnel, setGetPersonnel] = useState([]);
+
+  const fetchPersonnel = () => {
+    axiosClient.get('/getpersonnel')
+    .then((response) => {
+      const responseData = response.data;
+      const viewPersonnel = Array.isArray(responseData) ? responseData : responseData.data;
+
+      const mappedData = viewPersonnel.map((dataItem) => {
+        const { personnel_details } = dataItem;
+        const { ap_id, user_id, fname, mname, lname, type } = personnel_details;
+        return {
+          ap: ap_id,
+          id: user_id,
+          name: fname +' ' + mname+'. ' + lname,
+          type: type
+        }
+      });
+      setGetPersonnel(mappedData)
+
+    })
+    .catch((error) => {
+      console.error('Error fetching personnel data:', error);
+    });
   }
+
+  //Remove Personnel
+  function removePersonnel(id){
+    //alert(id);
+
+    const confirmed = window.confirm('Do you want to remove this personnel on category?');
+
+    if(confirmed) {
+      axiosClient.delete(`/removepersonnel/${id}`)
+      .then((response) => {
+        setPopupMessage('Remove Personnel Successfully');
+        setShowPopup(true);
+      })
+      .catch((error) => {
+        console.error('Error fetching personnel data:', error);
+      });
+    } else {
+      setPopupMessage('Remove Personnel is Decline');
+      setShowPopup(true);
+    }
+  };
+
+  //Close Popup
+  const closePopup = () => {
+    fetchPersonnel();
+    setShowPopup(false);
+  }
+
+  //Load the data
+  useEffect(()=>{
+    fetchUser();
+    fetchPersonnel();
+  },[]);
 
   return(
   <PageComponent title="Personnel Page">
@@ -165,8 +268,9 @@ export default function Personnel(){
       </button>
     </div>
 
-    {/* User List */}
     <div className="mt-4">
+
+    {/* User List */}
     {activeTab === "tab1" && 
     <div className="overflow-x-auto">
       <h2 className="text-left text-sm font-bold leading-9 tracking-tight text-gray-900">
@@ -191,34 +295,199 @@ export default function Personnel(){
           </tr>
         </thead>
         <tbody>
-          {users.map(user => ( 
-            <tr key={user.id}>
-              <td className="px-2 py-2 text-center border-2 border-custom">{user.id}</td>
-              <td className="px-2 py-2 text-center border-2 border-custom">{user.fname} {user.mname}. {user.lname}</td>
-              <td className="px-2 py-2 text-center border-2 border-custom">{user.username.split('/').pop()}</td>
-              <td className="px-2 py-2 text-center border-2 border-custom">{user.division}</td>
-              <td className="px-2 py-2 text-center border-2 border-custom">{user.code_clearance}</td>
-              <td className="px-2 py-2 text-center border-2 border-custom">
-                <div className="flex justify-center">
-                  <Link to={`/editaccount/${user.id}`}>
-                    <button 
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                      title="View Request"
-                    >
-                      <FontAwesomeIcon icon={faStickyNote} className="mr-0" />
-                    </button>
-                  </Link>
-                </div>
-              </td>
-            </tr>
-          ))}
+        {loading ? ( // Render loading spinner when loading is true
+          <tr>
+            <td colSpan={6} className="px-2 py-2 text-center border-2 border-custom">
+              <div className="flex items-center justify-center">
+                <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
+                <span className="ml-2">Loading Userlist...</span>
+              </div>
+            </td>       
+          </tr>
+        ):(
+        users.map(user => (
+          <tr key={user.id}>
+            <td className="px-2 py-2 text-center border-2 border-custom">{user.id}</td>
+            <td className="px-2 py-2 text-center border-2 border-custom">{user.fname} {user.mname}. {user.lname}</td>
+            <td className="px-2 py-2 text-center border-2 border-custom">{user.username.split('/').pop()}</td>
+            <td className="px-2 py-2 text-center border-2 border-custom">{user.division}</td>
+            <td className="px-2 py-2 text-center border-2 border-custom">{user.code_clearance}</td>
+            <td className="px-2 py-2 text-center border-2 border-custom">
+              <div className="flex justify-center">
+                <Link to={`/editaccount/${user.id}`}>
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                    title="View Request"
+                  >
+                    <FontAwesomeIcon icon={faStickyNote} className="mr-0" />
+                  </button>
+                </Link>
+              </div>
+            </td>
+          </tr>
+          ))
+        )}
         </tbody>
       </table>
 
     </div>
     }
 
-    {activeTab === "tab2" && <div>Coming Soon</div>}
+    {/* Assign Personnel */}
+    {activeTab === "tab2" && 
+    <div className="mt-10">
+
+      <form onSubmit={submitPersonnel}>
+
+        <div className="grid grid-cols-3 gap-4">
+
+        {/* Personnel Names */}
+        <div className="col-span-1">
+          <div>
+            <div className="mt-2">
+              <select 
+                name="personnel" 
+                id="personnel"
+                value={AssignPersonnel}
+                onChange={ev => setAssignPersonnel(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                required
+              >
+                <option value="" disabled>Choose Personnel</option>
+                {users.map(user => (
+                  <option key={user.id} value={user.id}>{user.fname} {user.lname}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Assigned Category */}
+        <div className="col-span-1">
+          <div>
+            <div className="mt-2">
+              <select 
+                name="assign" 
+                id="assign"
+                value={PersonnelCategory}
+                onChange={ev => setPersonnelCategory(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                required
+              >
+                <option value="" disabled>Choose Assign Category</option>
+                <option value="Driver/Mechanic">Driver/Mechanic</option>
+                <option value="IT Service">IT Service</option>
+                <option value="Janitorial Service">Janitorial Service</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Electrical Works">Electrical Works</option>
+                <option value="Watering Services">Watering Services</option>
+                <option value="Engeneering Services">Engeneering Services</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        {/* Button */}
+        <div className="col-span-1">
+          <div className="mt-2">
+            <button
+              type="submit"
+              className={`rounded-md w-full px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  <span className="ml-2">Processing</span>
+                </div>
+              ) : (
+                'Assign'
+              )}
+            </button>
+          </div>
+        </div>
+
+        </div>
+
+      </form>
+
+      <div className="mt-10">
+        <div className="overflow-x-auto">
+          <h2 className="text-left text-sm font-bold leading-9 tracking-tight text-gray-900">
+            List of Assign Personnels
+          </h2>
+          <table className="border-collapse w-7/12 mb-10">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-2 py-2 text-center text-xs font-medium w-60 text-gray-600 uppercase border-2 border-custom">Name</th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Personnel</th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={3} className="px-2 py-2 text-center border-2 border-custom">
+                  <div className="flex items-center justify-center">
+                    <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
+                    <span className="ml-2">Loading Perosonnel...</span>
+                  </div>
+                </td>       
+              </tr>
+            ) : getPersonnel.length > 0 ? (
+              getPersonnel.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-2 py-2 text-center border-2 border-custom">{user.name}</td>
+                  <td className="px-2 py-2 text-center border-2 border-custom">{user.type}</td>
+                  <td className="px-2 py-2 text-center border-2 border-custom">
+                    <div className="flex justify-center">
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded"
+                        title="Delete"
+                        onClick={() => removePersonnel(user.ap)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="mr-0" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="px-2 py-2 text-center border-2 border-custom">
+                  No records
+                </td>
+              </tr>
+            )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Show Popup */}
+      {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Semi-transparent black overlay */}
+          <div className="fixed inset-0 bg-black opacity-40"></div>
+          {/* Popup content with background blur */}
+          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+            <p className="text-lg text-center">{popupMessage}</p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={closePopup}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          </div>
+        )}
+
+    </div>
+    }
 
     {/* Register */}
     {activeTab === "tab3" && 
@@ -316,7 +585,7 @@ export default function Personnel(){
                 Gender
               </label>
               <div className="mt-2">
-              <select 
+                <select 
                   name="gender" 
                   id="gender"
                   value={gender}
@@ -534,6 +803,7 @@ export default function Personnel(){
       </div>
     </div>
     }
+
     </div>
     </>
   ):(

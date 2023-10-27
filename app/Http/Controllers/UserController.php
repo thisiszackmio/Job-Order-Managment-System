@@ -11,18 +11,27 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+    /**
+     * Display the Supervisor Users.
+     */
     public function index()
     {
         $users = PPAUser::where('code_clearance', '2')->get();
         return response()->json($users);
     }
 
+    /**
+     * Display all Users.
+     */
     public function allUser()
     {
         $Allusers = PPAUser::all();
         return response()->json($Allusers);
     }
 
+    /**
+     * Display the specific user.
+     */
     public function SpecificUser($id)
     {
         $Allusers = PPAUser::find($id);
@@ -36,6 +45,9 @@ class UserController extends Controller
         return response()->json($responseData);
     }
 
+    /**
+     * Update Code Clearance on a Specific User.
+     */
     public function updateCodeClearance(Request $request, $id)
     {
         $user = PPAUser::find($id);
@@ -52,7 +64,9 @@ class UserController extends Controller
         // return response()->json($request->input('code_clearance'));
     }
 
-    // Pending
+    /**
+     * Update Signature on a Specific User.
+     */
     public function updateSignature(Request $request, $id)
     {
         $user = PPAUser::find($id);
@@ -89,6 +103,9 @@ class UserController extends Controller
         return response()->json(['message' => 'E-Signature updated successfully'], 200);
     }
 
+    /**
+     * Update Password on a Specific User.
+     */
     public function updatePassword(Request $request, $id)
     {
         $user = PPAUser::find($id);

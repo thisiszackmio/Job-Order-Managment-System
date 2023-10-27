@@ -1,16 +1,13 @@
 import axiosClient from "../axios";
 import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner  } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
+import submitAnimation from '../assets/bouncing.gif';
 
 export default function RequestForm(){
 
-  library.add(faSpinner);
-
   const { currentUser } = useUserStateContext();
+  const [activeTab, setActiveTab] = useState("tab1");
 
   //Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -20,7 +17,7 @@ export default function RequestForm(){
 
   //Get data from the database on PPD Regular Employees on requesting vehicles
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [sumbitLoading, setSubmitLoading] = useState(false);
 
   // Use useEffect to fetch data when the component mounts
   useEffect(() => {
@@ -48,8 +45,6 @@ export default function RequestForm(){
   const [ComplainDefect, setComplainDefect] = useState('');
   const [supervisorApproval, setSupervisorApproval] = useState('');
 
-  const [activeTab, setActiveTab] = useState("tab1");
-
   const handleSupervisorName= (event) => {
     const selectedValue = event.target.value;
     setSupervisorApproval(selectedValue);
@@ -63,7 +58,7 @@ export default function RequestForm(){
   const SubmitInspectionForm = (event) => {
     event.preventDefault();
 
-    setIsLoading(true);
+    setSubmitLoading(true);
 
     axiosClient
       .post("/inspectionformrequest",{
@@ -87,7 +82,7 @@ export default function RequestForm(){
       .then((response) => { 
         setShowPopup(true);
         setPopupMessage("Form Submitted Successfully");    
-        setIsLoading(false);
+        setSubmitLoading(false);
       })
       .catch((error) => {
         if (error.response) {
@@ -98,7 +93,7 @@ export default function RequestForm(){
         console.error(error);
       })
       .finally(() => {
-        setIsLoading(false);
+        setSubmitLoading(false);
       });
   }
 
@@ -489,14 +484,14 @@ export default function RequestForm(){
             <button
               type="submit"
               className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                sumbitLoading ? 'bg-indigo-600 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
               }`}
-              disabled={isLoading}
+              disabled={sumbitLoading}
             >
-              {isLoading ? (
+              {sumbitLoading ? (
                 <div className="flex items-center justify-center">
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                  <span className="ml-2">Processing</span>
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing...</span>
                 </div>
               ) : (
                 'Submit'

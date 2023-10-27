@@ -60,7 +60,7 @@ class InspectionFormController extends Controller
     public function show(Request $request, $id)
     {
 
-        $viewRequest = Inspection_Form::with('user')->find($id);
+        $viewRequest = Inspection_Form::find($id);
 
         // if (!$viewRequest) {
         //     return response()->json(['message' => 'Data not found'], 404);
@@ -92,7 +92,7 @@ class InspectionFormController extends Controller
         }
 
         //Get GSO ID on the database
-        $gsoUser = PPAUser::find(5); // ID number of Maam Sue
+        $gsoUser = PPAUser::where('code_clearance', 3)->where('lname', 'Sade')->first(); // ID number of Maam Sue
 
         if (!$gsoUser) {
             return response()->json(['message' => 'Data not found'], 404);
@@ -103,7 +103,7 @@ class InspectionFormController extends Controller
 
 
         //Get Admin Division Manager on the Database
-        $ManagerUser = PPAUser::find(8); // ID Number of Maam Daisy
+        $ManagerUser = PPAUser::where('code_clearance', 1)->first(); // ID Number of Maam Daisy
 
         if (!$ManagerUser) {
             return response()->json(['message' => 'Data not found'], 404);

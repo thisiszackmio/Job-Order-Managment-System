@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/users/{id}', [UserController::class, 'SpecificUser']);
     Route::put('/changecc/{id}', [UserController::class, 'UpdateCodeClearance']);
     Route::put('/changepwd/{id}', [UserController::class, 'updatePassword']);
-    // Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
+    Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
 
     //Display Inpection Request on the site
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
     Route::get('/getpersonnel/{id}', [AssignPersonnelController::class, 'showPersonnel']);
     Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);
+    Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
+    Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
 
 });
 Route::middleware(['auth'])->group(function () {
@@ -81,7 +83,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
+
 
 // wALAY LABOT
 //Route::get('/getrepair', [DashboardController::class, 'getRepair']);

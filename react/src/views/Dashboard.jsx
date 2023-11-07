@@ -10,8 +10,8 @@ import loadingAnimation from '../assets/loading.gif';
 
 // Function to format the date as "Month Day, Year"
 function formatDate(dateString) {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString(undefined, options);
+  const options = { month: 'short', day: 'numeric', year: 'numeric' };
+  return new Date(dateString).toLocaleDateString('en-US', options);
 }
 
 // To refrain return null on reloading the page
@@ -406,7 +406,7 @@ export default function Dashboard()
           <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
         </div>
 
-        <div className="border border-solid border-gray-300 rounded-lg p-4">
+        <div className="border border-solid border-gray-300 rounded-lg px-2 py-4">
           <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> these are the forms that are need to be approved</h3>
         
           <div className="max-h-96 overflow-y-scroll mt-6">
@@ -419,19 +419,21 @@ export default function Dashboard()
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Description</th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Location</th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Complain</th>
+                  <th className="px-6 py-3 w-20 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Part</th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">View</th>
                 </tr>
               </thead>
               <tbody>
-              {getAdminInspection && getAdminInspection.length > 0 ? (
-                getAdminInspection.every(items => items.admin_approval === 0) ? (
+              {getAdminInspection && getAdminInspection.length > 0 || getFormInspection && getFormInspection.length > 0 ? (
+                getAdminInspection.some(item => item.admin_approval === 0) || getFormInspection.some(item => item.supervisor_approval === 1) ? (
                   <tr>
-                    <td colSpan={7} className="text-center whitespace-nowrap p-5">
+                    <td colSpan={8} className="text-center whitespace-nowrap p-5">
                       No Request for you Yet
                     </td>
                   </tr>
                 ) : (
-                  getAdminInspection.map((item) => (
+                  <>
+                  {getFormInspection.map((item) => (
                     <tr key={item.id}>
                       <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
                       <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
@@ -439,6 +441,7 @@ export default function Dashboard()
                       <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
                       <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
                       <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
+                      <td className="text-center w-20 border-b-2 body-border">A</td>
                       <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
                         <div className="flex justify-center">
                           <Link to={`/repairinspectionform/${item.id}`}>
@@ -452,11 +455,35 @@ export default function Dashboard()
                         </div>
                       </td>
                     </tr>
-                  ))
-                )
+                  ))}
+                  {getAdminInspection.map((item) => (
+                    <tr key={item.id}>
+                      <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
+                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
+                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
+                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
+                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
+                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
+                      <td className="px-6 py-3 w-20 text-center border-b-2 body-border">B</td>
+                      <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
+                        <div className="flex justify-center">
+                          <Link to={`/repairinspectionform/${item.id}`}>
+                            <button 
+                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded"
+                              title="View Request"
+                            >
+                              <FontAwesomeIcon icon="eye" className="mr-0" />
+                            </button>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  </>
+                 )
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center whitespace-nowrap p-5">No Request for you Yet</td>
+                  <td colSpan={8} className="text-center whitespace-nowrap p-5">No Request for you Yet</td>
                 </tr>
               )}
 

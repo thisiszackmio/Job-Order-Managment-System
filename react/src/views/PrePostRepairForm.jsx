@@ -1762,8 +1762,7 @@ export default function PrePostRepairForm(){
             </tr> 
           </table>
           </div>
-          
-            
+                
           {/* For Generate PDF */}
           {getPartC.map((item, index) => (
           <div key={index}>

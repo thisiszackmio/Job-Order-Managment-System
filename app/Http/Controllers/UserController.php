@@ -16,7 +16,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = PPAUser::where('code_clearance', '2')->get();
+        $users = PPAUser::where('code_clearance', '2')
+        ->orWhere('code_clearance', '1')
+        ->orWhere('code_clearance', '4')
+        ->get();
         return response()->json($users);
     }
 

@@ -7,6 +7,8 @@ import { faStickyNote, faTrash  } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import { Link } from "react-router-dom";
 import loadingAnimation from '../assets/loading.gif';
+import ReactPaginate from "react-paginate";
+import submitAnimation from '../assets/bouncing.gif';
 
 export default function Personnel(){
 
@@ -16,6 +18,17 @@ export default function Personnel(){
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+  };
+
+  //Search
+  const [searchText, setSearchText] = useState("");
+
+  //Table Pagination Limit
+  const itemsPerPage = 25;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
   };
 
   const [loading, setLoading] = useState(true);
@@ -29,16 +42,51 @@ export default function Personnel(){
   //Get Personnel User List
   const fetchUser = () => {
     axiosClient.get('/users')
-      .then(response => {
-        const usersData = response.data;
+    .then(response => {
+      const usersData = response.data;
 
-        setUsers(usersData);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+      setUsers(usersData);
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
   }
+
+  //Table Pagination and Search Filter
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedUsers = users.slice(startIndex, endIndex);
+
+  const filteredUsers = displayedUsers.filter((user) => {
+    return user.fname.toLowerCase().includes(searchText.toLowerCase());
+  });
+
+  const renderedUsers = filteredUsers.map((user) => (
+    <tr key={user.id}>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.id}</td>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
+        {user.fname} {user.mname}. {user.lname}
+      </td>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
+        {user.username.split("/").pop()}
+      </td>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.division}</td>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.code_clearance}</td>
+      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
+        <div className="flex justify-center">
+          <Link to={`/editaccount/${user.id}`}>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+              title="View Request"
+            >
+              <FontAwesomeIcon icon={faStickyNote} className="mr-0" />
+            </button>
+          </Link>
+        </div>
+      </td>
+    </tr>
+  ));
 
   //Register
   const [fname, setFname] = useState('');
@@ -52,10 +100,15 @@ export default function Personnel(){
   const [passwordCorfirmation, setPasswordConfirmation] = useState('');
   const [uploadEsignature, setUploadEsignature] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState("");
-  const [error, setError] = useState({__html: ''});
+  const [showPassword, setShowPassword] = useState(false);
+  const [inputErrors, setInputErrors] = useState({});
 
   const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleFname = (ev) => {
@@ -81,7 +134,6 @@ export default function Personnel(){
   
   const onSubmit = (ev) => {
     ev.preventDefault();
-    setError({__html: '' })
 
     setSubmitLoading(true);
 
@@ -110,18 +162,13 @@ export default function Personnel(){
     })
     .catch((error) => {
       if (error.response) {
-          const errorMessages = Object.values(error.response.data.errors)
-              .flatMap((errorArray) => errorArray)
-              .join('<br>');
-  
-          console.log(errorMessages);
-          setError({ __html: errorMessages });
+        const responseErrors = error.response.data.errors;
+        setInputErrors(responseErrors);
       }
-      
       console.error(error);
     })
     .finally(() => {
-      setIsLoading(false);
+      setSubmitLoading(false);
     });
 
   };
@@ -272,7 +319,8 @@ export default function Personnel(){
 
     {/* User List */}
     {activeTab === "tab1" && 
-    <div className="overflow-x-auto">
+    <div>
+
       <h2 className="text-left text-sm font-bold leading-9 tracking-tight text-gray-900">
         Legends of Code Clearance
       </h2>
@@ -282,8 +330,34 @@ export default function Personnel(){
       <td className="px-2 py-1 text-center border-r-2 border-custom">4 - Other Division Manager</td>
       <td className="px-2 py-1 text-center border-r-2 border-custom">5 - Regular and COS Employee</td>
       <td className="px-2 py-1 text-center">6 - IT Personnel</td>
-
-      <table className="border-collapse w-full mb-10 mt-6">
+      
+      <div className="flex mt-6 mb-0">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={searchText}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
+        <div className="pagination-container ml-auto">
+          <ReactPaginate
+            previousLabel={"<"}
+            nextLabel={">"}
+            breakLabel={"..."}
+            pageCount={Math.ceil(users.length / itemsPerPage)}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageChange}
+            containerClassName={"pagination"}
+            subContainerClassName={"pages pagination"}
+            activeClassName={"active"}
+          />
+        </div>
+      </div>
+      
+      <table className="border-collapse w-full mb-10 mt-2">
         <thead>
           <tr className="bg-gray-100">
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-1 uppercase border-2 border-custom">User No.</th>
@@ -295,7 +369,7 @@ export default function Personnel(){
           </tr>
         </thead>
         <tbody>
-        {loading ? ( // Render loading spinner when loading is true
+        {loading ? (
           <tr>
             <td colSpan={6} className="px-2 py-2 text-center border-2 border-custom">
               <div className="flex items-center justify-center">
@@ -304,31 +378,11 @@ export default function Personnel(){
               </div>
             </td>       
           </tr>
-        ):(
-        users.map(user => (
-          <tr key={user.id}>
-            <td className="px-2 py-2 text-center border-2 border-custom">{user.id}</td>
-            <td className="px-2 py-2 text-center border-2 border-custom">{user.fname} {user.mname}. {user.lname}</td>
-            <td className="px-2 py-2 text-center border-2 border-custom">{user.username.split('/').pop()}</td>
-            <td className="px-2 py-2 text-center border-2 border-custom">{user.division}</td>
-            <td className="px-2 py-2 text-center border-2 border-custom">{user.code_clearance}</td>
-            <td className="px-2 py-2 text-center border-2 border-custom">
-              <div className="flex justify-center">
-                <Link to={`/editaccount/${user.id}`}>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                    title="View Request"
-                  >
-                    <FontAwesomeIcon icon={faStickyNote} className="mr-0" />
-                  </button>
-                </Link>
-              </div>
-            </td>
-          </tr>
-          ))
-        )}
+        ):( renderedUsers )}
         </tbody>
       </table>
+
+      
 
     </div>
     }
@@ -351,7 +405,6 @@ export default function Personnel(){
                 value={AssignPersonnel}
                 onChange={ev => setAssignPersonnel(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Choose Personnel</option>
                 {users.map(user => (
@@ -372,7 +425,6 @@ export default function Personnel(){
                 value={PersonnelCategory}
                 onChange={ev => setPersonnelCategory(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Choose Assign Category</option>
                 <option value="Driver/Mechanic">Driver/Mechanic</option>
@@ -399,8 +451,8 @@ export default function Personnel(){
             >
               {submitLoading ? (
                 <div className="flex items-center justify-center">
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                  <span className="ml-2">Processing</span>
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing...</span>
                 </div>
               ) : (
                 'Assign'
@@ -439,16 +491,16 @@ export default function Personnel(){
             ) : getPersonnel.length > 0 ? (
               getPersonnel.map((user) => (
                 <tr key={user.id}>
-                  <td className="px-2 py-2 text-center border-2 border-custom">{user.name}</td>
-                  <td className="px-2 py-2 text-center border-2 border-custom">{user.type}</td>
-                  <td className="px-2 py-2 text-center border-2 border-custom">
+                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.name}</td>
+                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.type}</td>
+                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">
                     <div className="flex justify-center">
                       <button
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded"
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
                         title="Delete"
                         onClick={() => removePersonnel(user.ap)}
                       >
-                        <FontAwesomeIcon icon={faTrash} className="mr-0" />
+                        <FontAwesomeIcon icon={faTrash} size="1g" className="mr-0" />
                       </button>
                     </div>
                   </td>
@@ -501,12 +553,6 @@ export default function Personnel(){
         <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Register Here for JOMS
         </h2>
-
-        {error.__html && (
-          <div className="mt-10 bg-red-500 rounded py-2 px-3 text-white"
-          dangerouslySetInnerHTML={error} >
-          </div>
-        )}
       </div>
 
       <div className="mt-10">
@@ -528,9 +574,11 @@ export default function Personnel(){
                   autoComplete="fname"
                   value={fname}
                   onChange={handleFname}
-                  required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {inputErrors.fname && (
+                  <p className="text-red-500 text-xs mt-2">First Name is Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -549,10 +597,12 @@ export default function Personnel(){
                   autoComplete="mname"
                   value={mname}
                   onChange={handleMname}
-                  required
                   maxLength={2}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {inputErrors.mname && (
+                  <p className="text-red-500 text-xs mt-2">Middle Initial is Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -569,11 +619,13 @@ export default function Personnel(){
                   name="lname"
                   type="text"
                   autoComplete="lname"
-                  required
                   value={lname}
                   onChange={handleLname}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {inputErrors.lname && (
+                  <p className="text-red-500 text-xs mt-2">Last Name is Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -597,6 +649,9 @@ export default function Personnel(){
                   <option value="Female">Female</option>
                 </select>
               </div>
+              {inputErrors.gender && (
+                <p className="text-red-500 text-xs mt-2">Gender is Required</p>
+              )}
             </div>
           </div>
 
@@ -616,11 +671,13 @@ export default function Personnel(){
                   name="username"
                   type="text"
                   autoComplete="username"
-                  required
                   value={username}
                   onChange={ev => setUsername(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {inputErrors.username && (
+                  <p className="text-red-500 text-xs mt-2">Username is Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -649,6 +706,9 @@ export default function Personnel(){
                   <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
                 </select>
               </div>
+              {inputErrors.division && (
+                <p className="text-red-500 text-xs mt-2">Division is Required</p>
+              )}
             </div>
           </div>
 
@@ -674,6 +734,9 @@ export default function Personnel(){
                   <option value="5">5 - Regular and COS Employee</option>
                   <option value="6">6 - IT People</option>
                 </select>
+                {inputErrors.code_clearance && (
+                  <p className="text-red-500 text-xs mt-2">Code Clearance is Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -690,18 +753,33 @@ export default function Personnel(){
                   Password
                 </label>
               </div>
-              <div className="mt-2">
+              <div className="mt-2 relative">
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  required
                   value={password}
                   onChange={ev => setPassword(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-              </div>
+                <button
+                  type="button"
+                  className="absolute text-sm inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={toggleShowPassword}
+                >
+                  {showPassword ? 'HIDE' : 'SHOW'}
+                </button>
+             </div>
+             {inputErrors.password && (
+                <p className="text-red-500 text-xs mt-2">
+                  {inputErrors.password.map((error, index) => (
+                    <tr key={index}>
+                      <td>{error}</td>
+                    </tr>
+                  ))}
+                </p>
+              )}
             </div>
           </div>
 
@@ -717,8 +795,7 @@ export default function Personnel(){
                 <input
                   id="password_confirmation"
                   name="password_confirmation"
-                  type="password"
-                  required
+                  type={showPassword ? 'text' : 'password'}
                   value={passwordCorfirmation}
                   onChange={ev => setPasswordConfirmation(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -746,8 +823,7 @@ export default function Personnel(){
                     type="file" 
                     accept=".png"
                     class="sr-only" 
-                    onChange={handleFileChange} 
-                    required 
+                    onChange={handleFileChange}  
                   />
                 </label>
                 <p class="pl-1">PNG only up to 2MB</p>
@@ -755,6 +831,9 @@ export default function Personnel(){
               {uploadedFileName &&  <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedFileName}</label> }
             </div>
           </div>
+          {inputErrors.image && (
+            <p className="text-red-500 text-xs mt-2">E Signature is Required</p>
+          )}
         </div>
 
         {/* Buttons */}
@@ -768,8 +847,8 @@ export default function Personnel(){
           >
             {submitLoading ? (
               <div className="flex items-center justify-center">
-                <FontAwesomeIcon icon={faSpinner} spin />
-                <span className="ml-2">Processing</span>
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Processing...</span>
               </div>
             ) : (
               'Register'
@@ -813,8 +892,7 @@ export default function Personnel(){
       </div>
     </div>
   )}
-
-    
+  
   </PageComponent>
   );
 };

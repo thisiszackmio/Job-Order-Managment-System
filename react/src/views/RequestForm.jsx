@@ -100,6 +100,36 @@ export default function RequestForm(){
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+
+  //For Request on Facility and Venue
+  //Checkbox
+  const [mphCheck, setMphCheck] = useState(false);
+  const [confCheck, setConfCheck] = useState(false);
+  const [dormCheck, setDormCheck] = useState(false);
+  const [otherCheck, setOtherCheck] = useState(false);
+
+  //Main Form
+  const [FVDate, setFVDate] = useState('');
+  const [reqOffice, setRegOffice] = useState('');
+  const [titleReq, setTitleReq] = useState('');
+  const [timeStart, setTimeStart] = useState('');
+  const [timeEnd, setTimeEnd] = useState('');
+
+  const SubmitFacilityForm = (event) => {
+    event.preventDefault();
+
+    console.log(
+      '\n', FVDate,
+      '\n', reqOffice,
+      '\n', titleReq,
+      '\n', timeStart,
+      '\n', timeEnd,
+      '\n', mphCheck,
+      '\n', confCheck,
+      '\n', dormCheck,
+      '\n', otherCheck
+    )
+  }
   
   return(
     <PageComponent title="Request Form">
@@ -177,7 +207,7 @@ export default function RequestForm(){
               <div className="col-span-1">
 
               {/* Date */}
-              <div className="flex mt-6">
+              <div className="flex items-center mt-6">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -200,7 +230,7 @@ export default function RequestForm(){
               </div>
 
               {/* Property Number */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -224,7 +254,7 @@ export default function RequestForm(){
               </div>
 
               {/* Acquisition Date */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -247,7 +277,7 @@ export default function RequestForm(){
               </div>
 
               {/* Acquisition Cost */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -276,7 +306,7 @@ export default function RequestForm(){
               </div>
 
               {/* Brand/Model */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -300,7 +330,7 @@ export default function RequestForm(){
               </div>
 
               {/* Serial/Engine No */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-36">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -328,7 +358,7 @@ export default function RequestForm(){
               <div className="col-span-1">
 
               {/* Type of Property */}
-              <div className="flex mt-6">
+              <div className="flex items-center mt-6">
                 <div className="w-60">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -378,7 +408,7 @@ export default function RequestForm(){
               </div>
 
               {/* Description */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-60">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -401,7 +431,7 @@ export default function RequestForm(){
               </div>
 
               {/* Location */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-60">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -424,7 +454,7 @@ export default function RequestForm(){
               </div>
 
               {/* Complain / Defect */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-60">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -447,7 +477,7 @@ export default function RequestForm(){
               </div>
 
               {/* Supervisor Name */}
-              <div className="flex mt-4">
+              <div className="flex items-center mt-4">
                 <div className="w-60">
                   <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                     <span className="text-red-500">*</span>
@@ -527,7 +557,237 @@ export default function RequestForm(){
         </div>
         }
 
-        {activeTab === "tab2" && <div>Coming Soon</div>}
+        {/* Tab  2 (Request For Use of Facility and Venue) */}
+        {activeTab === "tab2" && 
+        <div className="mt-6">
+          <form onSubmit={SubmitFacilityForm}>
+
+          <div>
+            <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <div className="col-span-1">
+
+              {/* Date of Activity */}
+              <div className="flex items-center mt-6">
+                <div className="w-56">
+                  <label htmlFor="form_date" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Date:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="date"
+                    name="form_date"
+                    id="form_date"
+                    value= {FVDate}
+                    onChange={ev => setFVDate(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              {/* Request Office/Division */}
+              <div className="flex items-center mt-4">
+                <div className="w-56">
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Requesting Office/Division :
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="rf_request"
+                    id="rf_request"
+                    autoComplete="rf_request"
+                    value={reqOffice}
+                    onChange={ev => setRegOffice(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              {/* Title/Purpose of Activity */}
+              <div className="flex items-center mt-4">
+                <div className="w-56">
+                  <label htmlFor="purpose" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Title/Purpose of Activity :
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="purpose"
+                    id="purpose"
+                    autoComplete="purpose"
+                    value={titleReq}
+                    onChange={ev => setTitleReq(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              {/* Date Time of Activity (Start) */}
+              <div className="flex items-center mt-6">
+                <div className="w-56">
+                  <label htmlFor="act_date" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Date and Time of Activity (Start):
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="datetime-local"
+                    name="time_start"
+                    id="time_start"
+                    value= {timeStart}
+                    onChange={ev => setTimeStart(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              {/* Date Time of Activity (End) */}
+              <div className="flex items-center mt-6">
+                <div className="w-56">
+                  <label htmlFor="time_date" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Date and Time of Activity (End)
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="datetime-local"
+                    name="time_end"
+                    id="time_end"
+                    value= {timeEnd}
+                    onChange={ev => setTimeEnd(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            <div className="col-span-1">
+
+              <div className="mt-4">
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                  Facilities / Venue being Requested :
+                </label> 
+              </div>
+
+              <div class="space-y-4 mt-6">
+
+                {/* For MPH */}
+                <div class="relative flex items-center">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="mph-checkbox"
+                      type="checkbox"
+                      checked={mphCheck}
+                      onChange={ev => setMphCheck(ev.target.checked)}
+                      class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      Multi-Purpose Hall (MPH)
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Conference Hall */}
+                <div class="relative flex items-center">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="conference-checkbox"
+                      type="checkbox"
+                      checked={confCheck}
+                      onChange={ev => setConfCheck(ev.target.checked)}
+                      class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      Conference Hall
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Dormitory */}
+                <div class="relative flex items-center">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="dormitory-checkbox"
+                      type="checkbox"
+                      checked={dormCheck}
+                      onChange={ev => setDormCheck(ev.target.checked)}
+                      class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      Dormitory
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Other */}
+                <div class="relative flex items-center">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="other-checkbox"
+                      type="checkbox"
+                      checked={otherCheck}
+                      onChange={ev => setOtherCheck(ev.target.checked)}
+                      class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      Other
+                    </label> 
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-10">
+            {/* <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p> */}
+          <button
+            type="submit"
+            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+              sumbitLoading ? 'bg-indigo-600 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+            }`}
+            disabled={sumbitLoading}
+          >
+            {sumbitLoading ? (
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Processing...</span>
+              </div>
+            ) : (
+              'Submit'
+            )}
+          </button>
+          </div>
+          
+          </form>
+          
+        </div>
+        }
+
         {activeTab === "tab3" && <div>Coming Soon</div>}
         {activeTab === "tab4" && <div>Coming Soon</div>}
         {activeTab === "tab5" && <div>Coming Soon</div>}

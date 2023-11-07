@@ -1,39 +1,65 @@
-import { useContext } from "react";
-import { useState } from "react";
-import { createContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StateContext = createContext({
-    currentUser: {},
-    userToken: null,
-    setCurrentUser: () => { },
-    setUserToken: () => { }
-})
+  currentUser: {},
+  userToken: null,
+  userRole: 'member',
+  setCurrentUser: () => {},
+  setUserToken: () => {},
+  setUserRole: () => {},
+});
 
-export const ContextProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({});
-    const [userToken, _setUserToken] = useState(localStorage.getItem('TOKEN') || '')
+export const ContextProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState({});
+  const [userToken, setUserToken] = useState(localStorage.getItem('TOKEN') || '');
+  const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'member');
 
-    // Contain and Authorized
-    const setUserToken = (token) => {
-        if (token){
-            localStorage.setItem('TOKEN', token)
-        }
-        else {
-            localStorage.removeItem('TOKEN', token)
-        }
-        _setUserToken(token);
+  // Use useEffect to set the initial user data from localStorage
+  useEffect(() => {
+    const storedUserData = JSON.parse(localStorage.getItem('USER'));
+    if (storedUserData) {
+      setCurrentUser(storedUserData);
     }
+  }, []);
 
-    return(
-        <StateContext.Provider value={{ 
-            currentUser,
-            setCurrentUser,
-            userToken,
-            setUserToken,
-         }}>
-            {children}
-        </StateContext.Provider>
-    )
-}
+  const setUserTokenAndLocalStorage = (token) => {
+    if (token) {
+      localStorage.setItem('TOKEN', token);
+    } else {
+      localStorage.removeItem('TOKEN');
+    }
+    setUserToken(token);
+  };
 
-export const userStateContext = () => useContext(StateContext);
+  // Create a function to update both the context and localStorage
+  useEffect(() => {
+    localStorage.setItem('userRole', userRole);
+  }, [userRole]);
+
+  const updateUserRole = (role) => {
+    setUserRole(role);
+  };
+
+  // Create a function to update both the context and localStorage
+  const updateCurrentUser = (userData) => {
+    localStorage.setItem('USER', JSON.stringify(userData));
+    setCurrentUser(userData);
+  };
+
+  return (
+    <StateContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser: updateCurrentUser,
+        userToken,
+        setUserToken: setUserTokenAndLocalStorage,
+        userRole,
+        setUserRole: updateUserRole,
+      }}
+    >
+      {children}
+    </StateContext.Provider>
+  );
+};
+
+export const useUserStateContext = () => useContext(StateContext);

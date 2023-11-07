@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.submenu {
+  display: none; /* Initially hide the submenu */
+}
+
+/* Style to show the submenu when the parent is hovered */
+.parent:hover .submenu {
+  display: block;
+}
+
+/* For the table */
+.border-custom { border-color: #142E5F; }
+.body-border { border-color: #1b23334a; }
+
+/* For the Form */
+.title-area{ font-size: 11px; }
+.content-area { font-size: 10px; }
+
+/* Table size */
+.custom-column {
+  width: 200px; /* Adjust the width as needed */
+}
+
+/* Table Pagination */
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+  margin-top: 10px;
+}
+
+.pagination li {
+  display: inline-block;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.pagination a {
+  text-decoration: none;
+  color: #000;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.active a {
+  font-weight: 900;
+}

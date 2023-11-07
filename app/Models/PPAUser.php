@@ -7,20 +7,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class PPAUser extends Model
+class PPAUser extends Authenticatable
 {
 
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'fname', 
-        'lname', 
+        'fname',
+        'mname', 
+        'lname',
+        'gender', 
         'username', 
         'division', 
         'code_clearance',
-        'email', 
-        'password'
+        'password',
+        'image'
     ];
 
     /**
@@ -39,7 +42,18 @@ class PPAUser extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get the user's username.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => url('esignature/'.$value),
+        );
+    }
 }

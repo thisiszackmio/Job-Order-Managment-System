@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InspectionFormController;
+use App\Http\Controllers\FacilityFormController;
 use App\Http\Controllers\AssignPersonnelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GetNotificationController;
@@ -70,6 +71,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
     Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
 
+    //For Facility Form
+    Route::post('/facilityformrequest', [FacilityFormController::class, 'store']);
+
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
@@ -83,7 +87,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-
+// Route::post('/facilityformrequest', [FacilityFormController::class, 'store']);
 
 // wALAY LABOT
 //Route::get('/getrepair', [DashboardController::class, 'getRepair']);

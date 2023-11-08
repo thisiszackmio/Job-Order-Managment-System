@@ -22,7 +22,7 @@ class InspectionFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'exists:users,id',
+            'user_id' => 'exists:p_p_a_users,id',
             'date_of_request' => 'required|string',
             'property_number' => 'required|string',
             'acq_date' => 'required|string',

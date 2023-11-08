@@ -1048,7 +1048,7 @@ export default function PrePostRepairForm(){
                     <strong>Date of Last Repair</strong> 
                   </div>
                   <div className="w-64 border-b border-black pl-1">
-                    <span>{formatDate(adminForm.dateOfLastRepair)}</span>
+                    <span>{adminForm.dateOfLastRepair ? formatDate(adminForm.dateOfLastRepair) : 'N/A'}</span>
                   </div>
                 </div>
               </div>
@@ -1060,7 +1060,7 @@ export default function PrePostRepairForm(){
                     <strong>Nature of Last Repair</strong>
                   </div>
                   <div className="w-full border-b border-black pl-1">
-                    <span>{adminForm.natureOfLastRepair}</span>
+                    <span>{adminForm.natureOfLastRepair ? adminForm.natureOfLastRepair : 'N/A'}</span>
                   </div>
                 </div>
               </div>
@@ -1143,7 +1143,7 @@ export default function PrePostRepairForm(){
                     <strong>Date of Last Repair</strong> 
                   </div>
                   <div className="w-64 border-b border-black pl-1">
-                    <span>{formatDate(adminForm.dateOfLastRepair)}</span>
+                  <span>{adminForm.dateOfLastRepair ? formatDate(adminForm.dateOfLastRepair) : 'N/A'}</span>
                   </div>
                 </div>
               </div>
@@ -1155,7 +1155,7 @@ export default function PrePostRepairForm(){
                     <strong>Nature of Last Repair</strong>
                   </div>
                   <div className="w-full border-b border-black pl-1">
-                    <span>{adminForm.natureOfLastRepair}</span>
+                    <span>{adminForm.natureOfLastRepair ? adminForm.natureOfLastRepair : 'N/A'}</span>
                   </div>
                 </div>
               </div>

@@ -114,21 +114,45 @@ export default function RequestForm(){
   const [titleReq, setTitleReq] = useState('');
   const [timeStart, setTimeStart] = useState('');
   const [timeEnd, setTimeEnd] = useState('');
+  const [DateStart, setDateStart] = useState('');
+  const [DateEnd, setDateEnd] = useState('');
 
   const SubmitFacilityForm = (event) => {
     event.preventDefault();
 
-    console.log(
-      '\n', FVDate,
-      '\n', reqOffice,
-      '\n', titleReq,
-      '\n', timeStart,
-      '\n', timeEnd,
-      '\n', mphCheck,
-      '\n', confCheck,
-      '\n', dormCheck,
-      '\n', otherCheck
-    )
+    setSubmitLoading(true);
+
+    if (new Date(timeEnd) < new Date(timeStart)) {
+      alert("End date cannot be before on the start date");
+    } else {
+      axiosClient
+        .post("facilityformrequest", {
+        date_requested: FVDate,
+        request_office: reqOffice,
+        title_of_activity: titleReq,
+        date_start: DateStart,
+        time_start: timeEnd,
+        date_end: DateEnd,
+        time_end: timeEnd,
+        mph: mphCheck,
+        conference: confCheck,
+        dorm: dormCheck,
+        other: otherCheck,
+        admin_approval: 3 // 3 For Pending (Continue Fillup the Form) // 2 For Waiting for Approval // 1 For Approve
+      })
+      .then((response) => { 
+        setShowPopup(true);
+        setPopupMessage("Form Submitted Successfully. You can continue fill up the form on the my request page");    
+        setSubmitLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
+
   }
   
   return(
@@ -637,12 +661,31 @@ export default function RequestForm(){
                 <div className="w-56">
                   <label htmlFor="act_date" className="block text-base font-medium leading-6 text-gray-900">
                     {/* <span className="text-red-500">*</span> */}
-                    Date and Time of Activity (Start):
+                    Date of Activity (Start):
                   </label> 
                 </div>
                 <div className="w-64">
                   <input
-                    type="datetime-local"
+                    type="date"
+                    name="date_start"
+                    id="date_start"
+                    value= {DateStart}
+                    onChange={ev => setDateStart(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center mt-6">
+                <div className="w-56">
+                  <label htmlFor="act_date" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Time of Activity (Start):
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="time"
                     name="time_start"
                     id="time_start"
                     value= {timeStart}
@@ -657,12 +700,31 @@ export default function RequestForm(){
                 <div className="w-56">
                   <label htmlFor="time_date" className="block text-base font-medium leading-6 text-gray-900">
                     {/* <span className="text-red-500">*</span> */}
-                    Date and Time of Activity (End)
+                    Date of Activity (End)
                   </label> 
                 </div>
                 <div className="w-64">
                   <input
-                    type="datetime-local"
+                    type="date"
+                    name="date_end"
+                    id="date_end"
+                    value= {DateEnd}
+                    onChange={ev => setDateEnd(ev.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center mt-6">
+                <div className="w-56">
+                  <label htmlFor="time_date" className="block text-base font-medium leading-6 text-gray-900">
+                    {/* <span className="text-red-500">*</span> */}
+                    Time of Activity (End)
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="time"
                     name="time_end"
                     id="time_end"
                     value= {timeEnd}
@@ -784,6 +846,30 @@ export default function RequestForm(){
           </div>
           
           </form>
+
+          {/* Show Popup */}
+          {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+           {/* Semi-transparent black overlay */}
+           <div
+             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+           ></div>
+           {/* Popup content with background blur */}
+           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+             <p className="text-lg">{popupMessage}</p>
+             <div className="flex justify-center mt-4">
+              <button
+                onClick={() => {
+                  window.location.href = `/my_request/${currentUser.id}`;
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+           </div>
+          </div>
+          )}
           
         </div>
         }

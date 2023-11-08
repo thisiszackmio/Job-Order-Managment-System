@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('inspection__form_id')->constrained('inspection__forms');
             $table->date('date_of_filling');
-            $table->date('date_of_last_repair');
-            $table->string('nature_of_last_repair');
+            $table->date('date_of_last_repair')->nullable();
+            $table->string('nature_of_last_repair')->nullable();
             $table->integer('assign_personnel');
             $table->timestamps();
         });

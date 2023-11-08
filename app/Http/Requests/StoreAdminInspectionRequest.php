@@ -24,8 +24,8 @@ class StoreAdminInspectionRequest extends FormRequest
         return [
             'insp_id' => 'exists:inspection__forms,insp_id',
             'date_of_filling' => 'required|string',
-            'date_of_last_repair' => 'required|string',
-            'nature_of_last_repair' => 'required|string',
+            'date_of_last_repair' => 'nullable|string',
+            'nature_of_last_repair' => 'nullable|string',
             'assign_personnel' => 'required|numeric'
         ];
     }

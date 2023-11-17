@@ -98,7 +98,7 @@ class AssignPersonnelController extends Controller
 
         //Get Inspector Details
         $ins = Inspector_Form::whereIn('inspection__form_id', $gformId)
-        ->where('close', 0)->get();
+        ->where('close', 3)->get();
 
         //Get the Request Details
         $gId = $ins->pluck('inspection__form_id')->all();

@@ -10,6 +10,7 @@ import MyRequest from "./views/YourRequest";
 import PrepostRepairForm from "./views/PrePostRepairForm";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
+import FacilityVenueForm from "./views/FacilityVenueForm";
 
 
 const routes = [
@@ -45,10 +46,15 @@ const routes = [
                 path: "/editaccount/:id",
                 element: <AccountEdit />
             },
-            // For Inspection Form
+            //For Inspection Form
             {
                 path: "/repairinspectionform/:id",
                 element: <PrepostRepairForm />
+            },
+            //For Facility / Venue Room
+            {
+                path: "/facilityvenueform/:id",
+                element: <FacilityVenueForm />
             }
         ]
     },

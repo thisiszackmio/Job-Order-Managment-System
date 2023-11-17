@@ -168,7 +168,7 @@ export default function RequestForm(){
           }`}
           onClick={() => handleTabClick("tab1")}
         >
-          Request for Repair Inspection
+          Request for Repair/Inspection
         </button>
         {/* Tab 2 */}
         <button
@@ -190,7 +190,7 @@ export default function RequestForm(){
           }`}
           onClick={() => handleTabClick("tab3")}
         >
-          Request for Vehicle Slip
+          Request for Vehicle
         </button>
         {/* Tab 4 */}
         <button
@@ -201,7 +201,7 @@ export default function RequestForm(){
           }`}
           onClick={() => handleTabClick("tab4")}
         >
-          Request for use of Manlift
+          Request for use of Equipment
         </button>
         {/* Tab 5 */}
         <button

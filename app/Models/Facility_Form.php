@@ -24,12 +24,28 @@ class Facility_Form extends Model
         'conference',
         'dorm',
         'other',
-        'admin_approval'
+        'admin_approval',
+        'date_approve'
     ];
 
     public function user()
     {
         return $this->belongsTo(PPAUser::class, 'user_id');
+    }
+
+    public function relatedModels()
+    {
+        return $this->hasMany(Facility_Mph::class);
+    }
+
+    public function relatedModelsConference()
+    {
+        return $this->hasMany(Facility_Conference::class);
+    }
+
+    public function relatedModelsDorm()
+    {
+        return $this->hasMany(Facility_Dorm::class);
     }
     
 }

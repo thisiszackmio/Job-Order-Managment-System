@@ -249,7 +249,7 @@ export default function Dashboard()
               ))
               ):(
               <tr>
-                <td className="text-center whitespace-nowrap border-b-2 body-border">No Request for you</td>
+                <td colSpan={8} className="text-center whitespace-nowrap border-b-2 body-border p-4">No Request for you</td>
               </tr>
               )}
               </tbody>

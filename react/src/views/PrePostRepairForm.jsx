@@ -853,9 +853,7 @@ export default function PrePostRepairForm(){
                       onChange={ev => setLastFilledDate(ev.target.value)}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     />
-                    {inputErrors.date_of_last_repair && (
-                      <p className="text-red-500 text-xs mt-2">Last Repair Date is required</p>
-                    )}
+                    <p className="text-black-500 text-xs mt-2">Leave it blank if it's none</p>
                   </div>
                 </div>
 
@@ -873,9 +871,7 @@ export default function PrePostRepairForm(){
                     onChange={ev => setNatureRepair(ev.target.value)}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
-                  {inputErrors.nature_of_last_repair && (
-                    <p className="text-red-500 text-xs mt-2">Nature of Repair is required</p>
-                  )}
+                  <p className="text-black-500 text-xs mt-2">Leave it blank if it's none</p>
                   </div>
                 </div>
 
@@ -2315,11 +2311,11 @@ export default function PrePostRepairForm(){
             {getPartC.map((item, index) => (
               <div key={index}>
                 {currentUser.code_clearance === 3 || currentUser.code_clearance === 6 ? (
-                  item.close === 0 || item.close === 2 ? null : (
+                  item.close === 1 ? (
                     <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={generatePDF}>
                       Generate PDF
                     </button>
-                  )
+                  ):null
                 ):null
                 }
                 {item.close === 2 && currentUser.code_clearance === 3 ? (

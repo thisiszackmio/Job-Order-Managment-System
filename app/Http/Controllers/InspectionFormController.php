@@ -339,19 +339,25 @@ class InspectionFormController extends Controller
     public function updateAdminApprove(Request $request, $id)
     {
         $approveAdminRequest = Inspection_Form::find($id);
-    
-        // if (!$approveAdminRequest) {
-        //     return response()->json(['message' => 'Request not found'], 404);
-        // }
+        $getInspectorStat = Inspector_Form::where('inspection__form_id', $id)->first();
 
-        $approveAdminRequest->admin_approval = 1;
-        $approveAdminRequest->remarks = "Your Request has been approved by Admin Manager";
+        if ($approveAdminRequest) {
+            $approveAdminRequest->admin_approval = 1;
+            $approveAdminRequest->remarks = "Your Request has been approved by Admin Manager";
 
-        if ($approveAdminRequest->save()) {
-            return response()->json(['message' => 'Deployment data created successfully'], 200);
-        } else {
-            return response()->json(['message' => 'Failed to update the request'], 500);
+            if ($approveAdminRequest->save()) {
+                // Successfully updated Inspection_Form, now update Inspector_Form
+                if ($getInspectorStat) {
+                    $getInspectorStat->close = 3;
+                    $getInspectorStat->save();
+                }
+
+                return response()->json(['message' => 'Deployment data created successfully'], 200);
+            }
         }
+
+        return response()->json(['message' => 'Failed to update the request'], 500);
+    
     }
 
     /**

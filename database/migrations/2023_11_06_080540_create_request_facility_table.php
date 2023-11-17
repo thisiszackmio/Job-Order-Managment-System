@@ -26,6 +26,7 @@ return new class extends Migration
             $table->char('dorm', 10);
             $table->char('other', 10);
             $table->boolean('admin_approval')->default(false);
+            $table->date('date_approve')->nullable();
             $table->timestamps();
         });
     }

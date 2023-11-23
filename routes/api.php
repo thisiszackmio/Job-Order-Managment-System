@@ -69,6 +69,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/mphfacilityform/{id}', [FacilityFormController::class, 'storeMPH']);
     Route::post('/conferencefacilityform/{id}', [FacilityFormController::class, 'storeConference']);
     Route::post('/dormfacilityform/{id}', [FacilityFormController::class, 'storeDorm']);
+    Route::put('/saveoprinstruction/{id}', [FacilityFormController::class, 'StoreOPRInstruction']);
+    Route::put('/saveopraction/{id}', [FacilityFormController::class, 'StoreOPRAction']);
+    Route::put('/facilityapproval/{id}', [FacilityFormController::class, 'AdminApproval']);
+    Route::put('/facilitydisapproval/{id}', [FacilityFormController::class, 'AdminDispprove']);
 
 });
 Route::middleware(['auth'])->group(function () {
@@ -83,7 +87,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-// Route::get('/getdormfacilityform/{id}', [FacilityFormController::class, 'showDorm']);
+// Route::put('/saveoprinstruction/{id}', [FacilityFormController::class, 'StoreOPRInstruction']);
 
 // wALAY LABOT
 //Route::get('/getrepair', [DashboardController::class, 'getRepair']);

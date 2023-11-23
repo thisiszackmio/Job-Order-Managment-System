@@ -10,11 +10,13 @@ import submitAnimation from '../assets/bouncing.gif';
 
 export default function PrePostRepairForm(){
 
+  const { currentUser } = useUserStateContext();
+
   const closePopup = () => {
-    setShowPopup(false);
     setIsLoading(true);
     fetchFacilityForm();
-    window.location.reload();
+    setShowPopup(false);
+    //window.location.reload();
   };
 
   //Date Format 
@@ -103,6 +105,10 @@ export default function PrePostRepairForm(){
   const [getFemaleList, setGetFemaleList] = useState('');
 
   const [DormOtherField, setDormOtherField]= useState('');
+
+  //Other
+  const [OprInstruct, setOprInstruct] = useState('');
+  const [OprAction, setOprAction] = useState('');
   
 
   //Show Part A
@@ -112,9 +118,13 @@ export default function PrePostRepairForm(){
     .then((response) => {
         const responseData = response.data;
         const viewFacilityData = responseData.main_form;
+        const requestor = responseData.requestor;
+        const manager = responseData.manager;
 
         setDisplayRequestFacility({
-          viewFacilityData: viewFacilityData
+          viewFacilityData: viewFacilityData,
+          requestor:requestor,
+          manager:manager
         });
 
         setIsLoading(false);
@@ -404,6 +414,94 @@ export default function PrePostRepairForm(){
     .finally(() => {
       setSubmitLoading(false);
     });
+  };
+
+  const SubmitOPRInstruc = (event) => {
+    event.preventDefault();
+
+    axiosClient
+    .put(`saveoprinstruction/${id}`,{
+      obr_instruct: OprInstruct
+    })
+    .then((response) => {
+      setPopupMessage('Done'); 
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      console.error(error);
+      //const responseErrors = error.response.data.errors;
+      //setInputErrors(responseErrors);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+
+  }
+
+  const SubmitOPRAction = (event) => {
+    event.preventDefault();
+
+    axiosClient
+    .put(`saveopraction/${id}`,{
+      obr_comment: OprAction
+    })
+    .then((response) => {
+      setPopupMessage('Done'); 
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      console.error(error);
+      //const responseErrors = error.response.data.errors;
+      //setInputErrors(responseErrors);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
+  function handleApproveClick(id){
+
+    //alert(id);
+    const confirmed = window.confirm('Do you want to approve the request?');
+
+    if(confirmed) {
+      axiosClient.put(`/facilityapproval/${id}`)
+      .then((response) => {
+        setPopupMessage('Form Approve Successfully');
+        setShowPopup(true);
+      })
+      .catch((error) => {
+        console.error(error);
+        setPopupMessage('Failed to approve the form. Please try again later.');
+        setShowPopup(true);
+      });
+    }
+
+  };
+
+  function handleDisapproveClick(id){
+
+    //alert(id);
+    const confirmed = window.confirm('Are you sure to disapprove the request?');
+
+    if(confirmed) {
+      axiosClient.put(`/facilitydisapproval/${id}`)
+    .then((response) => {
+      setPopupMessage('Form Disapprove Successfully');
+      setShowPopup(true);
+    })
+    .catch((error) => {
+      console.error(error);
+      setPopupMessage('Failed to approve the form. Please try again later.');
+      setShowPopup(true);
+    });
+    }
+    else{
+      alert('You change your mind');
+    }
+
   };
 
   
@@ -1809,14 +1907,168 @@ export default function PrePostRepairForm(){
           <table className="w-full border-collapse border border-black mt-4">
               {/* Title and Logo */}
               <tr>
-                <td className="border border-black w-1/2 p-2 text-center">
-                  Hi
+                <td className="border border-black w-1/2 p-2">
+                  <div className="text-base font-arial">
+                    Requested by:
+                  </div>
+                  <div className="relative mt-12">
+                    <img
+                        src={displayRequestFacility.requestor.signature}
+                        style={{ position: 'absolute', width: '50%', top: '-45px', left: '145px' }}
+                        alt="Signature"
+                    />
+                </div>
+                <div className="text-center font-bold text-xl relative mt-12">
+                    {displayRequestFacility.requestor.name}
+                </div>
                 </td>
-                <td className="border text-2xl w-1/2 border-black font-arial text-center">
-                  Hello
+                <td className="border w-1/2 border-black">
+                  <div className="text-base font-arial ml-10">
+                  {displayRequestFacility.viewFacilityData.admin_approval === 1 ? 'Approved' 
+                  : displayRequestFacility.viewFacilityData.admin_approval === 2 ? 'Disapproved'
+                  : 'Approved / Disapproved by:' }
+                  </div>
+                  {displayRequestFacility.viewFacilityData.admin_approval === 1 || displayRequestFacility.viewFacilityData.admin_approval === 2  ? (
+                    <div className="relative mt-12">
+                      <img
+                          src={displayRequestFacility.manager.signature}
+                          style={{ position: 'absolute', width: '200px', top: '-45px', left: '185px' }}
+                          alt="Signature"
+                      />
+                    </div>
+                  ):null}
+                  
+                <div className="text-center font-bold text-xl relative mt-12">
+                    {displayRequestFacility.manager.name}
+                </div>
                 </td>
               </tr>
+
+              <tr>
+                <td className="border border-black w-1/2"></td>
+                <td className="border border-black w-1/2 text-center">Admin. Division Manager</td>
+              </tr>
+
+              <tr>
+                <td className="border text-base border-black w-1/2 text-center"><b>DATE: </b> {formatDateS(displayRequestFacility.viewFacilityData.date_requested)}</td>
+                <td className="border text-base border-black w-1/2 text-center"><b>DATE: </b> 
+                  {displayRequestFacility.viewFacilityData.date_approve ? formatDateS(displayRequestFacility.viewFacilityData.date_approve) : null}
+                </td>
+              </tr>
+
           </table>
+
+          <table className="w-full border-collapse border border-black mt-4">
+
+            <tr>
+              <td className="border border-black w-1/2 p-2" style={{ verticalAlign: 'top' }}>
+                <div className="font-bold font-arial">
+                  Instruction for the OPR for Action
+                </div>
+                
+                  {displayRequestFacility.viewFacilityData.obr_instruct ? (
+                    <div className="px-5 font-arial mt-2" style={{ textDecoration: 'underline' }}>
+                    {displayRequestFacility.viewFacilityData.obr_instruct}
+                    </div>
+                  ):
+                  <form onSubmit={SubmitOPRInstruc}>
+                    <textarea
+                      id="findings"
+                      name="findings"
+                      rows={3}
+                      style={{ resize: "none" }}
+                      value= {OprInstruct}
+                      onChange={ev => setOprInstruct(ev.target.value)}
+                      className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+
+                    <button
+                      type="submit"
+                      className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                        submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                      }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex items-center justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Processing...</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
+                    </button>
+                  </form>
+                  }
+                
+              </td>
+              <td className="border border-black w-1/2 p-2 " style={{ verticalAlign: 'top' }}>
+                <div className="font-bold font-arial">
+                  OPR Action
+                </div>
+                <div className="px-5 font-arial">
+                  Comments / Concerns
+                </div>
+                <div className="px-5 font-arial" style={{ textDecoration: 'underline' }}>
+                  {displayRequestFacility.viewFacilityData.obr_comment ? (
+                    <div className="px-5 font-arial mt-2" style={{ textDecoration: 'underline' }}>
+                    {displayRequestFacility.viewFacilityData.obr_comment}
+                    </div>
+                  ):
+                  <form onSubmit={SubmitOPRAction}>
+                    <textarea
+                      id="findings"
+                      name="findings"
+                      rows={3}
+                      style={{ resize: "none" }}
+                      value= {OprAction}
+                      onChange={ev => setOprAction(ev.target.value)}
+                      className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+
+                    <button
+                      type="submit"
+                      className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                        submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                      }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex items-center justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Processing...</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
+                    </button>
+                  </form>
+                  }
+                </div>
+              </td>
+            </tr>
+
+          </table>
+
+          {currentUser.code_clearance === 6 && displayRequestFacility.viewFacilityData.admin_approval === 3 ? (
+            <div className="flex mt-2">
+              <button 
+                onClick={() => handleApproveClick(displayRequestFacility.viewFacilityData.id)}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                title="Approve"
+              >
+                Approve
+              </button>
+              <button 
+                onClick={() => handleDisapproveClick(displayRequestFacility.viewFacilityData.id)}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
+                title="Disapprove"
+              >
+                Disapprove
+              </button>
+            </div>
+          ) : null}
+          
 
         </div>
 

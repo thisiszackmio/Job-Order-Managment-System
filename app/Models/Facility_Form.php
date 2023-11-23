@@ -25,7 +25,9 @@ class Facility_Form extends Model
         'dorm',
         'other',
         'admin_approval',
-        'date_approve'
+        'date_approve',
+        'obr_instruct',
+        'obr_comment'
     ];
 
     public function user()

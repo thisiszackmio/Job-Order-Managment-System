@@ -12,6 +12,7 @@ use App\Models\Facility_Conference;
 use App\Models\Facility_Dorm;
 use App\Models\PPAUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class FacilityFormController extends Controller
 {
@@ -60,9 +61,26 @@ class FacilityFormController extends Controller
     {
         $viewRequest = Facility_Form::find($id);
 
+        $ppaUser = $viewRequest->user;
+
+        $endUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
+        $userSignature = URL::to('/storage/esignature/' . $ppaUser->image);
+
+        $ManagerUser = PPAUser::where('code_clearance', 1)->first();
+        $ManagerName = $ManagerUser->fname . ' ' . $ManagerUser->mname. '. ' . $ManagerUser->lname;
+        $ManagerSignature = URL::to('/storage/esignature/' . $ManagerUser->image);
+
         // Create the response data
         $respondData = [
-            'main_form' => $viewRequest
+            'main_form' => $viewRequest,
+            'requestor' => [
+                'name' => $endUser,
+                'signature' => $userSignature,
+            ],
+            'manager' => [
+                'name' => $ManagerName,
+                'signature' => $ManagerSignature,
+            ]
         ];
 
         return response()->json($respondData);
@@ -185,6 +203,96 @@ class FacilityFormController extends Controller
         ]);
 
         return response()->json(['message' => 'Data stored successfully'], 200);
+
+    }
+
+    /**
+     * For OPR Instruction
+     */
+    public function StoreOPRInstruction(Request $request, $id)
+    {
+        // Find the facility by ID
+        $facility = Facility_Form::find($id);
+
+        // Check if the facility exists
+        if (!$facility) {
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        // Update the obr_instruct field
+        $facility->update([
+            'obr_instruct' => $request->input('obr_instruct'),
+        ]);
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+
+    }
+
+    /**
+     * For OPR Action
+     */
+    public function StoreOPRAction(Request $request, $id)
+    {
+        // Find the facility by ID
+        $facility = Facility_Form::find($id);
+
+        // Check if the facility exists
+        if (!$facility) {
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        // Update the obr_instruct field
+        $facility->update([
+            'obr_comment' => $request->input('obr_comment'),
+        ]);
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+
+    }
+
+    /**
+     * For Approve Form
+     */
+    public function AdminApproval(Request $request, $id)
+    {
+        // Find the facility by ID
+        $facility = Facility_Form::find($id);
+
+        // Check if the facility exists
+        if (!$facility) {
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        // Update the obr_instruct field
+        $facility->update([
+            'admin_approval' => 1,
+            'date_approve' => today(),
+        ]);
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+
+    }
+
+    /**
+     * For Dispprove Form
+     */
+    public function AdminDispprove(Request $request, $id)
+    {
+        // Find the facility by ID
+        $facility = Facility_Form::find($id);
+
+        // Check if the facility exists
+        if (!$facility) {
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        // Update the obr_instruct field
+        $facility->update([
+            'admin_approval' => 2,
+            'date_approve' => today(),
+        ]);
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 
     }
 

@@ -74,36 +74,40 @@ class UserController extends Controller
     {
         $user = PPAUser::find($id);
 
-        // Define the validation rules
-        $rules = [
+        // Validate the request
+        $request->validate([
             'image' => [
-                'nullable', // The field must be present in the request.
-                'file',     // The field must be a file.
-                'mimes:png', // The file must have a PNG mime type.
+                'nullable',
+                'file',
+                'mimes:png',
+                'max:10240', // 10MB max file size, adjust as needed
             ],
-        ];
+        ]);
 
-        $request->validate($rules);
+        // Check if a file was uploaded
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $extension = $image->getClientOriginalExtension();
 
-        $image = $request->file('image');
-        $extension = $image->getClientOriginalExtension();
+            $name = str_replace(' ', '_', trim($user->fname)) . '_' . $user->lname;
+            $timestamp = now()->format('Y');
+            $imageName = $name . '_' . $timestamp . '.' . $extension;
 
-        $name = str_replace(' ', '_', trim($user->fname)) . '_' . $user->lname;
-        $timestamp = now()->format('Y');
-        $imageName = $name . '_' . $timestamp . '.' . $extension;
+            // Delete the old image
+            if (!empty($user->image) && Storage::disk('public')->exists('esignature/' . $user->image)) {
+                Storage::disk('public')->delete('esignature/' . $user->image);
+            }
 
-        // Save the image to the public disk
-        Storage::disk('public')->put('esignature/' . $imageName, file_get_contents($image));
+            // Save the image to the public disk
+            Storage::disk('public')->put('esignature/' . $imageName, file_get_contents($image));
 
-        // Delete the old image
-        if (!empty($user->image) && Storage::disk('public')->exists('esignature/' . $user->image)) {
-            Storage::disk('public')->delete('esignature/' . $user->image);
+            // Update the user's e-signature field in the database
+            $user->update(['image' => $imageName]);
+
+            return response()->json(['message' => 'E-Signature updated successfully'], 200);
+        } else {
+            return response()->json(['message' => 'No file uploaded'], 422);
         }
-
-        // Update the user's e-signature field in the database
-        $user->update(['image' => $imageName]);
-
-        return response()->json(['message' => 'E-Signature updated successfully'], 200);
     }
 
     /**

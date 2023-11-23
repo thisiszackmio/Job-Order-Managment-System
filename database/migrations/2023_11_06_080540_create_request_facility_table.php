@@ -27,6 +27,8 @@ return new class extends Migration
             $table->char('other', 10);
             $table->boolean('admin_approval')->default(false);
             $table->date('date_approve')->nullable();
+            $table->string('obr_instruct')->nullable();
+            $table->string('obr_comment')->nullable();
             $table->timestamps();
         });
     }

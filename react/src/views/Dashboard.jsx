@@ -97,6 +97,7 @@ export default function Dashboard()
 
         const mappedData = getDet.map((getItem) => {
           return {
+            type: 'Pre-Post Repair Inspection Form',
             id: getItem.id,
             date_requested: getItem.date_requested,
             requester: getItem.requester,
@@ -126,6 +127,7 @@ export default function Dashboard()
 
         const mappedData = gsoDet.map((gsoItem) => {
           return {
+            type: 'Pre-Post Repair Inspection Form',
             id: gsoItem.id,
             date_requested: gsoItem.date_requested,
             requester: gsoItem.requester,
@@ -155,6 +157,7 @@ export default function Dashboard()
 
         const mappedData = gsoDet.map((gsoItem) => {
           return {
+            type: 'Pre-Post Repair Inspection Form',
             id: gsoItem.id,
             date_requested: gsoItem.date_requested,
             requester: gsoItem.requester,
@@ -196,303 +199,131 @@ export default function Dashboard()
       {/* For Personnel Details */}
       {hasError === 'Not Allowed' ? ( null ) 
       : hasError === 'Not Assigned' ? (
+        <>
         <div className="border border-solid border-gray-300 rounded-lg p-4">
-          <h3 className="text-l font-normal leading-6 text-gray-900">You have not assign yet {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b></h3>
-        </div>
-      ) : assignPersonnel && (
-      <>
-        <div className="mt-6 pb-4">
+        <div className="mt-0 pb-4">
           <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
         </div>
-
-        <div className="border border-solid border-gray-300 rounded-lg p-4">
-          <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> you have a assign for you</h3>
-        
-          <div className="max-h-96 overflow-y-scroll mt-6">
-            <table className="table-auto border-collapse w-full">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Control No</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Date Requested</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Requester</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Property Number</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Description</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Location</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Complain</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">View</th>
-                </tr>
-              </thead>
-              <tbody>
-              {getStatus.length > 0 ? (
-              assignPersonnel.map((item) => (
-              <tr key={item.id}>
-                <td className="text-center whitespace-nowrap border-b-2 w-20 body-border">{item.id}</td>
-                <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
-                <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
-                <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
-                <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
-                <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
-                <td className="px-6 py-3 text-center border-b-2 w-60 body-border">{item.complain}</td>
-                <td className="text-center text-xs font-medium text-gray-600 w-24 uppercase tracking-wider border-b-2 body-border">
-                  <div className="flex justify-center">
-                    <Link to={`/repairinspectionform/${item.id}`}>
-                      <button 
-                        className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
-                        title="View Request"
-                      >
-                        <FontAwesomeIcon icon="eye" className="mr-0" />
-                      </button>
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-              ))
-              ):(
-              <tr>
-                <td colSpan={8} className="text-center whitespace-nowrap border-b-2 body-border p-4">No Request for you</td>
-              </tr>
-              )}
-              </tbody>
-            </table>
-          </div>
+          <h3 className="text-l font-normal leading-6 text-gray-900">No notifications for you today</h3>
         </div>
+        </>
+      ) : assignPersonnel && (
+      <>
+      <div className="border border-solid border-gray-300 rounded-lg p-4">
+        <div className="pb-4">
+          <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
+        </div>
+        {getStatus.length > 0 ? (
+          assignPersonnel.map((item) => (
+            <Link to={`/repairinspectionform/${item.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(item.date_requested)}</h4>
+                <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> you have a assign for you.</h3>
+            </Link>
+          ))
+        ):(
+          <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+        )}
+          {/* <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> you have a assign for you</h3> */}
+      </div>
       </>
       )}
 
       {/* For Supervisor */}
       {currentUser.code_clearance === 2 ? (
       <>
-        <div className="mt-6 pb-4">
+      <div className="border border-solid border-gray-300 rounded-lg p-4">
+        <div className="pb-4">
           <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
         </div>
 
-        <div className="border border-solid border-gray-300 rounded-lg p-4">
-          <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> you have a request that needs your approval</h3>
-          
-          <div className="max-h-96 overflow-y-scroll mt-6">
-            <table className="table-fixed border-collapse w-full">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Date Requested</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Requester</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Property Number</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Description</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Location</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Complain</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">View</th>
-                </tr>
-              </thead>
-              <tbody>
-              {getFormInspection && getFormInspection.length > 0 ? (
-                getFormInspection.every(item => item.supervisor_approval === 1) ? (
-                  <tr>
-                    <td colSpan={7} className="text-center whitespace-nowrap p-5">
-                      No Request for you Yet
-                    </td>
-                  </tr>
-                ) : (
-                  getFormInspection.map((item) => (
-                    <tr key={item.id}>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
-                      <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
-                        <div className="flex justify-center">
-                          <Link to={`/repairinspectionform/${item.id}`}>
-                            <button 
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded"
-                              title="View Request"
-                            >
-                              <FontAwesomeIcon icon="eye" className="mr-0" />
-                            </button>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )
-              ) : (
-                <tr>
-                  <td colSpan={7} className="text-center whitespace-nowrap p-5">No Request for you Yet</td>
-                </tr>
-              )}
-
-
-              </tbody>
-            </table>
-          </div>
-
-        </div>
+        {getFormInspection && getFormInspection.length > 0 ? (
+          getFormInspection.every(item => item.supervisor_approval === 1) ? (
+            <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+          ):(
+            getFormInspection.map((item) => (
+              <Link to={`/repairinspectionform/${item.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(item.date_requested)}</h4>
+                <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> you have a request on <i>{item.type}</i> by <b>{item.requester}</b> and needs your approval</h3>
+              </Link>
+            ))
+          )
+        ):(
+          <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+        )}
+      </div>
       </>
       ): null }
 
       {/* For GSO or Authorize Person */}
       {currentUser.code_clearance === 3 ? (
       <>
-        <div className="mt-6 pb-4">
+      <div className="border border-solid border-gray-300 rounded-lg p-4">
+        <div className="pb-4">
           <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
         </div>
 
-        <div className="border border-solid border-gray-300 rounded-lg p-4">
-          <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> these are the forms that are approved by the Supervisor</h3>
-          
-          <div className="max-h-96 overflow-y-scroll mt-6">
-            <table className="table-fixed border-collapse w-full">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Date Requested</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Requester</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Property Number</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Description</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Location</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Complain</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">View</th>
-                </tr>
-              </thead>
-              <tbody>
-              {getGSOInspection && getGSOInspection.length > 0 ? (
-                getGSOInspection.every(items => items.admin_approval === 0) ? (
-                  <tr>
-                    <td colSpan={7} className="text-center whitespace-nowrap p-5">
-                      No Request for you Yet
-                    </td>
-                  </tr>
-                ) : (
-                  getGSOInspection.map((item) => (
-                    <tr key={item.id}>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
-                      <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
-                        <div className="flex justify-center">
-                          <Link to={`/repairinspectionform/${item.id}`}>
-                            <button 
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded"
-                              title="View Request"
-                            >
-                              <FontAwesomeIcon icon="eye" className="mr-0" />
-                            </button>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )
-              ) : (
-                <tr>
-                  <td colSpan={7} className="text-center whitespace-nowrap p-5">No Request for you Yet</td>
-                </tr>
-              )}
-
-
-              </tbody>
-            </table>
-          </div>
+        {getGSOInspection && getGSOInspection.length > 0 ? (
+           getGSOInspection.every(items => items.admin_approval === 0) ? (
+            <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+           ):(
+            getGSOInspection.map((item) => (
+              <Link to={`/repairinspectionform/${item.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(item.date_requested)}</h4>
+                {item.requester === 'Daisy P. Tangcalagan' ? (
+                  <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b>, request on Maam <b>{item.requester}</b> </h3>
+                ):(
+                  <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> the request on <i>{item.type}</i> by <b>{item.requester}</b> is noted by the supervisor</h3>
+                )}
+              </Link>
+            ))
+           )
+        ):(
+          <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+        )}
+        
+          {/* <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> these are the forms that are approved by the Supervisor</h3> */}
 
         </div>
       </>
       ): null }
 
+      {/* <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> these are the forms that are need to be approved</h3> */}
+
       {/* For the Manager */}
       {currentUser.code_clearance === 1 ? (
       <>
-        <div className="mt-6 pb-4">
+      <div className="border border-solid border-gray-300 rounded-lg px-2 py-4">
+        <div className="pb-4">
           <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
         </div>
 
-        <div className="border border-solid border-gray-300 rounded-lg px-2 py-4">
-          <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> these are the forms that are need to be approved</h3>
-        
-          <div className="max-h-96 overflow-y-scroll mt-6">
-            <table className="table-fixed border-collapse w-full">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Date Requested</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Requester</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Property Number</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Description</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Location</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Complain</th>
-                  <th className="px-6 py-3 w-20 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">Part</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 border-b-2 border-custom">View</th>
-                </tr>
-              </thead>
-              <tbody>
-              {getAdminInspection && getAdminInspection.length > 0 || getFormInspection && getFormInspection.length > 0 ? (
-                getAdminInspection.some(item => item.admin_approval === 0) || getFormInspection.some(item => item.supervisor_approval === 1) ? (
-                  <tr>
-                    <td colSpan={8} className="text-center whitespace-nowrap p-5">
-                      No Request for you Yet
-                    </td>
-                  </tr>
-                ) : (
-                  <>
-                  {getFormInspection.map((item) => (
-                    <tr key={item.id}>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
-                      <td className="text-center w-20 border-b-2 body-border">A</td>
-                      <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
-                        <div className="flex justify-center">
-                          <Link to={`/repairinspectionform/${item.id}`}>
-                            <button 
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded"
-                              title="View Request"
-                            >
-                              <FontAwesomeIcon icon="eye" className="mr-0" />
-                            </button>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {getAdminInspection.map((item) => (
-                    <tr key={item.id}>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{formatDate(item.date_requested)}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.requester}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.property_no}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.description}</td>
-                      <td className="text-center whitespace-nowrap border-b-2 body-border">{item.location}</td>
-                      <td className="px-6 py-3 text-center border-b-2 body-border">{item.complain}</td>
-                      <td className="px-6 py-3 w-20 text-center border-b-2 body-border">B</td>
-                      <td className="text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b-2 body-border">
-                        <div className="flex justify-center">
-                          <Link to={`/repairinspectionform/${item.id}`}>
-                            <button 
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded"
-                              title="View Request"
-                            >
-                              <FontAwesomeIcon icon="eye" className="mr-0" />
-                            </button>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  </>
-                 )
-              ) : (
-                <tr>
-                  <td colSpan={8} className="text-center whitespace-nowrap p-5">No Request for you Yet</td>
-                </tr>
-              )}
-
-
-              </tbody>
-            </table>
-          </div>
-        
-        </div>
+        {getAdminInspection && getAdminInspection.length > 0 || getFormInspection && getFormInspection.length > 0 ? (
+          getAdminInspection.some(item => item.admin_approval === 0) || getFormInspection.some(item => item.supervisor_approval === 1) ? (
+            <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+          ) : (
+            <>
+              {getFormInspection.map((item) => (
+                <Link key={item.id} to={`/repairinspectionform/${item.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                  <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(item.date_requested)}</h4>
+                  <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> here's the link on your request</h3>
+                </Link>
+              ))}
+              {getAdminInspection.map((item) => (
+                <Link key={item.id} to={`/repairinspectionform/${item.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                  <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(item.date_requested)}</h4>
+                  {item.requester === 'Daisy P. Tangcalagan' ? (
+                    <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> your request needs approval</h3>
+                  ):(
+                    <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} <b>{currentUser.fname}</b> the request on <i>{item.type}</i> by <b>{item.requester}</b> is waiting for your approval</h3>
+                  )}
+                </Link>
+              ))}
+            </>
+          )
+        ) : (
+          <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+        )}
+      </div>
       </>
       ): null }
     </div>

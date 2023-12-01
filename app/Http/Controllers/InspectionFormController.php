@@ -21,7 +21,7 @@ class InspectionFormController extends Controller
      */
     public function index()
     {
-        $inspectionForms = Inspection_Form::with('user')->get();
+        $inspectionForms = Inspection_Form::with('user')->orderBy('date_of_request', 'desc')->get();
 
         // if ($inspectionForms->isEmpty()) {
         //     return response()->json(['message' => 'No data found'], 404);
@@ -61,10 +61,6 @@ class InspectionFormController extends Controller
     {
 
         $viewRequest = Inspection_Form::find($id);
-
-        // if (!$viewRequest) {
-        //     return response()->json(['message' => 'Data not found'], 404);
-        // }
 
         // Access the related PPAUser data
         $ppaUser = $viewRequest->user;
@@ -232,7 +228,6 @@ class InspectionFormController extends Controller
      */
     public function storeInspectorForm(Request $request, $id)
     {
-
         $findInspection = Inspection_Form::find($id);
 
         $findInspector = Inspector_Form::where('inspection__form_id', $id)->get();
@@ -431,24 +426,14 @@ class InspectionFormController extends Controller
      */
     public function viewAdmin(Request $request, $id)
     {
-        $viewAdminRequest = AdminInspectionForm::with('inspection_form')->find($id);
+        $viewAdminRequest = Inspection_Form::find($id);
 
-        // if (!$viewAdminRequest) {
-        //     return response()->json(['message' => 'Data not found'], 404);
-        // }
+        $formId = $viewAdminRequest->id;
 
-        // Get the inspector ID
-        $getInspectorId = $viewAdminRequest->assign_personnel;
-
-        // Get the inspector details
-        $getInspector = PPAUser::find($getInspectorId);
-
-        // Concatenate the inspector's full name
-        $InspectorFullName = $getInspector->fname . ' ' . $getInspector->mname . '. ' . $getInspector->lname;
+        $viewAdminRequestForm = AdminInspectionForm::where('inspection__form_id', $formId)->get();
 
         $respondData = [
-            'partB' => $viewAdminRequest,
-            'inspector_name' => $InspectorFullName,
+            'partB' => $viewAdminRequestForm
         ];
 
         return response()->json($respondData);
@@ -567,22 +552,23 @@ class InspectionFormController extends Controller
      */
     public function closeRequest(Request $request, $id)
     {
+        // Find the Inspector_Form records associated with the Inspection_Form
+        $inspectorForms = Inspector_Form::where('inspection__form_id', $id)->get();
 
-        $inspectorForm = Inspector_Form::find($id);
+        // Update the close status for each Inspector_Form
+        foreach ($inspectorForms as $inspectorForm) {
+            $inspectorForm->close = 1;
+            $inspectorForm->save();
+        }
 
-        // $inspR = $inspectorForm->first()->inspection__form_id;
+        // Find the Inspection_Form
         $findInspection = Inspection_Form::find($id);
 
-        //Update the close status
-        $inspectorForm->close = 1;
-        $inspectorForm->save();
-
-        //Update remarks
+        // Update remarks for the Inspection_Form
         $findInspection->remarks = "The Request has been close you can view it now";
-        $findInspection->save();    
+        $findInspection->save();
         
-        //return response()->json($findInspection);
-
+        return response()->json(['message' => 'Request closed successfully'], 200);
     }
 
 }

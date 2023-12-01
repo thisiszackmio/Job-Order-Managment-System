@@ -35,7 +35,10 @@ class FacilityFormRequest extends FormRequest
             'dorm' => 'required|boolean',
             'other' => 'required|boolean',
             'admin_approval' => 'required|numeric',
-            'date_approve' => 'nullable|date'
+            'date_approve' => 'nullable|date',
+            'obr_instruct' => 'nullable|string',
+            'obr_comment' => 'nullable|string',
+            'remarks' => 'nullable|string',
         ];
     }
 }

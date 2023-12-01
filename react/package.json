@@ -23,7 +23,8 @@
     "react-hook-form": "^7.45.4",
     "react-paginate": "^8.2.0",
     "react-router-dom": "^6.15.0",
-    "react-to-print": "^2.14.15"
+    "react-to-print": "^2.14.15",
+    "tailwindcss-animated": "^1.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

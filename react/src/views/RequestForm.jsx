@@ -138,11 +138,12 @@ export default function RequestForm(){
         conference: confCheck,
         dorm: dormCheck,
         other: otherCheck,
-        admin_approval: 3 // 3 For Pending (Continue Fillup the Form) // 2 For Waiting for Approval // 1 For Approve
+        admin_approval: 3, // 3 For Pending (Continue Fillup the Form) // 2 For Waiting for Approval // 1 For Approve
+        remarks: 'Pending'
       })
       .then((response) => { 
         setShowPopup(true);
-        setPopupMessage("Form Submitted Successfully. You can continue fill up the form on the my request page");    
+        setPopupMessage("Form Submitted Successfully.\nYou can continue to fill up the form on the My Request page");    
         setSubmitLoading(false);
       })
       .catch((error) => {
@@ -559,11 +560,10 @@ export default function RequestForm(){
           {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
            {/* Semi-transparent black overlay */}
-           <div
-             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-           ></div>
+           <div className="fixed inset-0 bg-black opacity-40"></div>
            {/* Popup content with background blur */}
-           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+            <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
              <p className="text-lg">{popupMessage}</p>
              <div className="flex justify-center mt-4">
               <button
@@ -855,7 +855,8 @@ export default function RequestForm(){
              className="fixed inset-0 bg-black opacity-40" // Close on overlay click
            ></div>
            {/* Popup content with background blur */}
-           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+           <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
              <p className="text-lg">{popupMessage}</p>
              <div className="flex justify-center mt-4">
               <button

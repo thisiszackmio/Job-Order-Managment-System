@@ -16,6 +16,41 @@ use Illuminate\Support\Facades\URL;
 
 class FacilityFormController extends Controller
 {
+
+    /**
+     * Display the information
+     */
+    public function index()
+    {
+        $facilityForms = Facility_Form::with('user')->get();
+
+        $responseData = [];
+
+        foreach ($facilityForms as $facilityForm){
+            // Access the related PPAUser data
+            $ppaUser = $facilityForm->user;
+
+            // You can now access PPAUser properties like fname, lname, etc.
+            $userName = $ppaUser->fname;
+            $userMiddleInitial = $ppaUser->mname;
+            $userLastName = $ppaUser->lname;
+            $userclearance = $ppaUser->code_clearance;
+
+            $responseData[] = [
+                'inspection_form' => $facilityForm,
+                'user_details' => [
+                    'fname' => $userName,
+                    'mname' => $userMiddleInitial,
+                    'lname' => $userLastName,
+                    'code_clearance' => $userclearance,
+                ]
+            ];
+        }
+
+        return response()->json($responseData);
+    }
+
+
     /**
      * Display the information on myRequest
      */
@@ -127,6 +162,14 @@ class FacilityFormController extends Controller
             'sound_system' => $data['sound_system'],
             'videoke' => $data['videoke']
         ]);
+
+        $findFacility->remarks = "Done fillup the MPH Form";
+
+        if ($findFacility->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
     }
 
     /**
@@ -268,6 +311,14 @@ class FacilityFormController extends Controller
             'admin_approval' => 1,
             'date_approve' => today(),
         ]);
+
+        $facility->remarks = "The Admin Manager has approve your request";
+
+        if ($facility->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 

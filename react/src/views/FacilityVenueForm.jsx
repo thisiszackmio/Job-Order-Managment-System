@@ -1971,34 +1971,37 @@ export default function PrePostRepairForm(){
                     {displayRequestFacility.viewFacilityData.obr_instruct}
                     </div>
                   ):
-                  <form onSubmit={SubmitOPRInstruc}>
-                    <textarea
-                      id="findings"
-                      name="findings"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {OprInstruct}
-                      onChange={ev => setOprInstruct(ev.target.value)}
-                      className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
+                  currentUser.code_clearance === 1 && (
+                    <form onSubmit={SubmitOPRInstruc}>
+                      <textarea
+                        id="findings"
+                        name="findings"
+                        rows={3}
+                        style={{ resize: "none" }}
+                        value= {OprInstruct}
+                        onChange={ev => setOprInstruct(ev.target.value)}
+                        className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
 
-                    <button
-                      type="submit"
-                      className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                        submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                      }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex items-center justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Processing...</span>
-                        </div>
-                      ) : (
-                        'Submit'
-                      )}
-                    </button>
-                  </form>
+                      <button
+                        type="submit"
+                        className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                          submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                        }`}
+                        disabled={submitLoading}
+                      >
+                        {submitLoading ? (
+                          <div className="flex items-center justify-center">
+                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                            <span className="ml-2">Processing...</span>
+                          </div>
+                        ) : (
+                          'Submit'
+                        )}
+                      </button>
+                    </form>
+                  )
+                  
                   }
                 
               </td>
@@ -2015,7 +2018,8 @@ export default function PrePostRepairForm(){
                     {displayRequestFacility.viewFacilityData.obr_comment}
                     </div>
                   ):
-                  <form onSubmit={SubmitOPRAction}>
+                  currentUser.code_clearance === 3 && (
+                    <form onSubmit={SubmitOPRAction}>
                     <textarea
                       id="findings"
                       name="findings"
@@ -2043,6 +2047,8 @@ export default function PrePostRepairForm(){
                       )}
                     </button>
                   </form>
+                  )
+                  
                   }
                 </div>
               </td>
@@ -2050,7 +2056,7 @@ export default function PrePostRepairForm(){
 
           </table>
 
-          {currentUser.code_clearance === 6 && displayRequestFacility.viewFacilityData.admin_approval === 3 ? (
+          {currentUser.code_clearance === 1 && displayRequestFacility.viewFacilityData.admin_approval === 3 ? (
             <div className="flex mt-2">
               <button 
                 onClick={() => handleApproveClick(displayRequestFacility.viewFacilityData.id)}
@@ -2080,7 +2086,8 @@ export default function PrePostRepairForm(){
             className="fixed inset-0 bg-black opacity-40" // Close on overlay click
           ></div>
           {/* Popup content with background blur */}
-          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+            <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
             <p className="text-lg text-center">{popupMessage}</p>
             <div className="flex justify-center mt-4">
               <button

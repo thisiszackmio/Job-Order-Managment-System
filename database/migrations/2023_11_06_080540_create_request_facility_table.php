@@ -29,6 +29,7 @@ return new class extends Migration
             $table->date('date_approve')->nullable();
             $table->string('obr_instruct')->nullable();
             $table->string('obr_comment')->nullable();
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

@@ -27,7 +27,8 @@ class Facility_Form extends Model
         'admin_approval',
         'date_approve',
         'obr_instruct',
-        'obr_comment'
+        'obr_comment',
+        'remarks'
     ];
 
     public function user()

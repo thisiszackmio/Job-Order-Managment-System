@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/requestclose/{id}', [InspectionFormController::class, 'closeRequest']);     
 
     //For Facility Form
+    Route::get('/facilityform', [FacilityFormController::class, 'index']);
     Route::get('/myfacilityformrequest/{id}', [FacilityFormController::class, 'myRequest']);
     Route::get('/facilityformrequest/{id}', [FacilityFormController::class, 'show']);
     Route::get('/facilitymphrequest/{id}', [FacilityFormController::class, 'showMPH']);
@@ -87,7 +88,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-// Route::put('/saveoprinstruction/{id}', [FacilityFormController::class, 'StoreOPRInstruction']);
+// Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
+// Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
 
 // wALAY LABOT
 //Route::get('/getrepair', [DashboardController::class, 'getRepair']);

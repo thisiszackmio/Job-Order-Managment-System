@@ -111,6 +111,7 @@ export default function MyRequest(){
             dorm: dataItem.dorm,
             other: dataItem.other,
             admin_approval: dataItem.admin_approval,
+            remarks: dataItem.remarks
           }
         });
 
@@ -308,10 +309,7 @@ export default function MyRequest(){
                           null}
                         </td>
                         <td className="px-2 py-4 text-center border-2 border-custom">
-                          {getData.admin_approval === 3 ? ("Pending"):
-                          getData.admin_approval === 2 ? ("Waiting for Admin's Approval"):
-                          getData.admin_approval === 1 ? ("Approved"):
-                          null}
+                          {getData.remarks}
                         </td>
                         <td className="px-2 py-4 text-center border-2 border-custom">
                           <div className="flex justify-center">

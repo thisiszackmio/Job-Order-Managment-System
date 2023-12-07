@@ -23,9 +23,9 @@ class FormDormFacilityRequest extends FormRequest
     {
         return [
             'facility_id' => 'exists:request__facility,facility_id',
-            'name_male' => 'required|string',
-            'name_female' => 'required|string',
-            'other_details' => 'required|string',
+            'name_male' => 'nullable|string',
+            'name_female' => 'nullable|string',
+            'other_details' => 'nullable|string',
         ];
     }
 }

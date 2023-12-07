@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    //Get Notifications
+    // Route::get('/supinspectform/{id}', [GetNotificationController::class, 'SupervisorInspectNoti']);
+
     //Get User Details
     Route::get('/ppausers', [UserController::class, 'index']);
     Route::get('/users', [UserController::class, 'allUser']);
@@ -34,16 +37,12 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //Personnel (For the assignment task)
     Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
-    Route::get('/getpersonnel/{id}', [AssignPersonnelController::class, 'showPersonnel']);
     Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);
     Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
     Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
 
     //Inspection Form
-    Route::get('/inspectiondetails', [InspectionFormController::class, 'getInspectionDetailsAuth']);
-    Route::get('/inspectiondetails/{id}', [InspectionFormController::class, 'getInspectionDetails']);
-    Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
-    Route::get('/inspectionadmin', [InspectionFormController::class, 'getInspectionDetailAdmin']);
+    // Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
     Route::get('/inspectionformtwo', [InspectionFormController::class, 'AdminInspectView']);
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
     Route::get('/requestrepair', [InspectionFormController::class, 'index']);
@@ -66,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/facilitymphrequest/{id}', [FacilityFormController::class, 'showMPH']);
     Route::get('/getconferencefacilityform/{id}', [FacilityFormController::class, 'showConference']);
     Route::get('/getdormfacilityform/{id}', [FacilityFormController::class, 'showDorm']);
+    Route::get('/facilityadmin', [FacilityFormController::class, 'AdminViewFacility']);
     Route::post('/facilityformrequest', [FacilityFormController::class, 'store']);
     Route::post('/mphfacilityform/{id}', [FacilityFormController::class, 'storeMPH']);
     Route::post('/conferencefacilityform/{id}', [FacilityFormController::class, 'storeConference']);
@@ -88,12 +88,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-// Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
-// Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
+Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
+Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']);
+Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
+Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
 
-// wALAY LABOT
-//Route::get('/getrepair', [DashboardController::class, 'getRepair']);
-//Get Personnel List
-//Route::get('/getpersonnel', [AssignPersonnelController::class, 'index']);
+Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
 
 

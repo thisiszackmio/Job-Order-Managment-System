@@ -163,8 +163,6 @@ export default function PrePostRepairForm(){
 
       setPartB(processedData);
 
-      console.log(processedData);
-
       setIsLoading(false);
 
     })
@@ -228,7 +226,7 @@ export default function PrePostRepairForm(){
       assign_personnel: pointPersonnel
     })
     .then((response) => {
-      setPopupMessage('Done'); 
+      setPopupMessage('Submit successfully'); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
@@ -256,7 +254,7 @@ export default function PrePostRepairForm(){
     })
     .then((response) => { 
       setShowPopup(true);
-      setPopupMessage("Done");    
+      setPopupMessage("Submit successfully");    
       setSubmitLoading(false);
     })
     .catch((error) => {
@@ -281,7 +279,7 @@ export default function PrePostRepairForm(){
     })
     .then((response) => { 
       setShowPopup(true);
-      setPopupMessage("Done");    
+      setPopupMessage("Submit successfully");    
       setSubmitLoading(false);
     })
     .catch((error) => {
@@ -1526,7 +1524,7 @@ export default function PrePostRepairForm(){
                       <>
                        {getPartB.map((item, index) => (
                         <div key={index} className="mb-8">
-                          {currentUser.id === item.assign_personnel && item.close === 3 ? (
+                          {currentUser.id === item.assign_personnel ? (
                             <button
                               onClick={handlePartDEditClick}
                               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"

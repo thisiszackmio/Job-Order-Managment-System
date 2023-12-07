@@ -13,11 +13,17 @@ export default function PrePostRepairForm(){
   const { currentUser } = useUserStateContext();
 
   const closePopup = () => {
+    fetchMPHForm();
+    fetchConferenceForm();
+    fetchDormForm();
     setIsLoading(true);
     fetchFacilityForm();
     setShowPopup(false);
-    //window.location.reload();
   };
+
+  //Set Errors
+  const [MPHErrors, setMPHErrors] = useState({});
+  const [ConferenceErrors, setConferenceErrors] = useState({});
 
   //Date Format 
   function formatDate(dateString) {
@@ -192,7 +198,9 @@ export default function PrePostRepairForm(){
         setDisplayDormFacility({
           viewDormFacilityData: viewDormFacilityData,
           maleNamesArray: maleNamesArray,
-          femaleNamesArray: femaleNamesArray
+          femaleNamesArray: femaleNamesArray,
+          femaleNamesString:femaleNamesString,
+          maleNamesString:maleNamesString
         });
 
         setIsLoading(false);
@@ -345,9 +353,9 @@ export default function PrePostRepairForm(){
       setSubmitLoading(false);
     })
     .catch((error) => {
-      console.error(error);
-      //const responseErrors = error.response.data.errors;
-      //setInputErrors(responseErrors);
+      //console.error(error);
+      const responseErrors = error.response.data.errors;
+      setMPHErrors(responseErrors);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -383,8 +391,8 @@ export default function PrePostRepairForm(){
     })
     .catch((error) => {
       console.error(error);
-      //const responseErrors = error.response.data.errors;
-      //setInputErrors(responseErrors);
+      const responseErrors = error.response.data.errors;
+      setConferenceErrors(responseErrors);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -881,6 +889,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {MPHErrors.no_table && (
+                          <p className="text-red-500 text-xs mt-1">No. of table is required</p>
+                        )}
 
                         {/* Chair */}
                         <div class="relative flex items-center mt-2">
@@ -918,6 +929,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {MPHErrors.no_chair && (
+                          <p className="text-red-500 text-xs mt-1">No. of chair is required</p>
+                        )}
 
                         {/* Projector */}
                         <div class="relative flex items-center mt-2">
@@ -1006,6 +1020,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {MPHErrors.specify && (
+                          <p className="text-red-500 text-xs mt-1">please specify your request</p>
+                        )}
 
                       </div>
 
@@ -1119,6 +1136,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {MPHErrors.no_microphone && (
+                          <p className="text-red-500 text-xs mt-1">No. of microphone is required</p>
+                        )}
 
                       </div>
 
@@ -1378,6 +1398,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {ConferenceErrors.no_table && (
+                          <p className="text-red-500 text-xs mt-1">No. of table is required</p>
+                        )}
 
                         {/* Chair */}
                         <div class="relative flex items-center mt-2">
@@ -1415,6 +1438,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {ConferenceErrors.no_chair && (
+                          <p className="text-red-500 text-xs mt-1">No. of table is required</p>
+                        )}
 
                         {/* Projector */}
                         <div class="relative flex items-center mt-2">
@@ -1478,7 +1504,7 @@ export default function PrePostRepairForm(){
                               name="mph-checkmicrophone"
                               type="checkbox"
                               checked={checkConferenceOther}
-                              onChange={ev => setCheckConferenceOther(!checkcheckConferenceOtherOther)}
+                              onChange={ev => setCheckConferenceOther(!checkConferenceOther)}
                               class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
                             />
                           </div>
@@ -1503,6 +1529,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {ConferenceErrors.specify && (
+                          <p className="text-red-500 text-xs mt-1">please specify your request</p>
+                        )}
 
                       </div>
 
@@ -1616,6 +1645,9 @@ export default function PrePostRepairForm(){
                             </div>
                           )}
                         </div>
+                        {ConferenceErrors.no_microphone && (
+                          <p className="text-red-500 text-xs mt-1">No. of microphone is required</p>
+                        )}
 
                       </div>
 
@@ -1652,7 +1684,7 @@ export default function PrePostRepairForm(){
             : null}
 
             {/* For Dormitory Room */}
-            {displayRequestFacility.viewFacilityData.conference == 1 ?
+            {displayRequestFacility.viewFacilityData.dorm == 1 ?
             <>
             <tr>
               <td colSpan={3} className="border border-black p-2 font-arial"></td>
@@ -1676,7 +1708,9 @@ export default function PrePostRepairForm(){
                       <div className="flex">
                         <div className="w-24 border-b border-black font-bold text-center">
                           <span>
-                          {displayDormFacility.maleNamesArray.length}
+                          {displayDormFacility.maleNamesString === "N/A" ? null:(
+                            displayDormFacility.maleNamesArray.length
+                          )}
                           </span>
                         </div>
                         <div className="w-full ml-2">
@@ -1690,12 +1724,17 @@ export default function PrePostRepairForm(){
                         <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
                       </div>
                     </div>
-                    {displayDormFacility.maleNamesArray.map((maleName, index) => (
-                      <div key={index} className="flex">
-                        <span className="font-bold">{`${index + 1}.`}</span>
-                        <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
-                      </div>
-                    ))}
+                    {displayDormFacility.maleNamesString === "N/A" ? (
+                      <span className="font-meduim">No Male Guest</span>
+                    ):(
+                      displayDormFacility.maleNamesArray.map((maleName, index) => (
+                        <div key={index} className="flex">
+                          <span className="font-bold">{`${index + 1}.`}</span>
+                          <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
+                        </div>
+                      ))
+                    )}
+                    
 
                   </div>
 
@@ -1706,7 +1745,9 @@ export default function PrePostRepairForm(){
                       <div className="flex">
                         <div className="w-24 border-b border-black font-bold text-center">
                           <span>
-                          {displayDormFacility.femaleNamesArray.length}
+                          {displayDormFacility.femaleNamesString === "N/A" ? null:(
+                            displayDormFacility.femaleNamesArray.length
+                          )}
                           </span>
                         </div>
                         <div className="w-full ml-2">
@@ -1720,12 +1761,16 @@ export default function PrePostRepairForm(){
                         <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
                       </div>
                     </div>
-                    {displayDormFacility.femaleNamesArray.map((femaleName, index) => (
-                      <div key={index} className="flex">
-                        <span className="font-bold">{`${index + 1}.`}</span>
-                        <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
-                      </div>
-                    ))}
+                    {displayDormFacility.femaleNamesString === "N/A" ? (
+                      <span className="font-meduim">No Female Guest</span>
+                    ):(
+                      displayDormFacility.femaleNamesArray.map((femaleName, index) => (
+                        <div key={index} className="flex">
+                          <span className="font-bold">{`${index + 1}.`}</span>
+                          <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                        </div>
+                      ))
+                    )}
 
                   </div>
 

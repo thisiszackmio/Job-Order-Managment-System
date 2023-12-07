@@ -138,79 +138,86 @@ export default function MyRequest(){
   
   return(
     <PageComponent title="My Request List">
-    {/* {currentUser.fname} */}
+    {loading ? (
+    <div className="flex items-center justify-center">
+      <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
+      <span className="ml-2">Loading My Request List...</span>
+    </div>
+    ):(
+    <>
+      {/* Button Tabs */}
+      <div className="flex">
 
-    <div className="flex">
-      {/* Tab 1 */}
-      <button
-        className={`w-full px-4 py-2 m-0 ${
-          activeTab === "tab1"
+        {/* Tab 1 */}
+        <button
+          className={`w-full px-4 py-2 m-0 ${
+            activeTab === "tab1"
+              ? "bg-gray-200 border-b-4 border-gray-800"
+              : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
+          }`}
+          onClick={() => handleTabClick("tab1")}
+        >
+          Request for Repair Inspection
+        </button>
+
+        {/* Tab 2 */}
+        <button
+          className={`w-full px-4 py-2 m-0 ${
+            activeTab === "tab2"
             ? "bg-gray-200 border-b-4 border-gray-800"
             : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-        }`}
-        onClick={() => handleTabClick("tab1")}
-      >
-        Request for Repair Inspection
-      </button>
-      {/* Tab 2 */}
-      <button
-        className={`w-full px-4 py-2 m-0 ${
-          activeTab === "tab2"
-          ? "bg-gray-200 border-b-4 border-gray-800"
-          : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-        }`}
-        onClick={() => handleTabClick("tab2")}
-      >
-        Request for use of Facility/Venue
-      </button>
-      {/* Tab 3 */}
-      <button
-        className={`w-full px-4 py-2 m-0 ${
-          activeTab === "tab3"
-          ? "bg-gray-200 border-b-4 border-gray-800"
-          : "bg-gray-200 bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-        }`}
-        onClick={() => handleTabClick("tab3")}
-      >
-        Request for Vehicle Slip
-      </button>
-      {/* Tab 4 */}
-      <button
-        className={`w-full px-4 py-2 m-0 ${
-          activeTab === "tab4"
-          ? "bg-gray-200 border-b-4 border-gray-800"
-          : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-        }`}
-        onClick={() => handleTabClick("tab4")}
-      >
-        Request for use of Manlift
-      </button>
-      {/* Tab 5 */}
-      <button
-        className={`w-full px-4 py-2 m-0 ${
-          activeTab === "tab5"
-          ? "bg-gray-200 border-b-4 border-gray-800"
-          : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-        }`}
-        onClick={() => handleTabClick("tab5")}
-      >
-        Other Request
-      </button>
-    </div>
+          }`}
+          onClick={() => handleTabClick("tab2")}
+        >
+          Request for use of Facility/Venue
+        </button>
 
-    <div className="mt-4">
-      {/* Pre-Repair/Post Repair Inspection Form */}
-      {activeTab === "tab1" && 
-      <div>
-        {loading ? (
-        <div className="flex items-center justify-center">
-          <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
-          <span className="ml-2">Loading My Request List...</span>
-        </div>
-        ):(
+        {/* Tab 3 */}
+        <button
+          className={`w-full px-4 py-2 m-0 ${
+            activeTab === "tab3"
+            ? "bg-gray-200 border-b-4 border-gray-800"
+            : "bg-gray-200 bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
+          }`}
+          onClick={() => handleTabClick("tab3")}
+        >
+          Request for Vehicle Slip
+        </button>
+
+        {/* Tab 4 */}
+        <button
+          className={`w-full px-4 py-2 m-0 ${
+            activeTab === "tab4"
+            ? "bg-gray-200 border-b-4 border-gray-800"
+            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
+          }`}
+          onClick={() => handleTabClick("tab4")}
+        >
+          Request for use of Manlift
+        </button>
+
+        {/* Tab 5 */}
+        <button
+          className={`w-full px-4 py-2 m-0 ${
+            activeTab === "tab5"
+            ? "bg-gray-200 border-b-4 border-gray-800"
+            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
+          }`}
+          onClick={() => handleTabClick("tab5")}
+        >
+          Other Request
+        </button>
+
+      </div>
+
+      <div className="mt-4">
+
+        {/* Pre-Repair/Post Repair Inspection Form */}
+        {activeTab === "tab1" && (
         <div className="overflow-x-auto">
           <table className="border-collapse w-full mb-10">
             <thead>
+            {displayRequest.mappedData.length > 0 ? (
               <tr className="bg-gray-100">
                 <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
@@ -220,9 +227,10 @@ export default function MyRequest(){
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Remarks</th>  
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
               </tr>
+            ):null}
             </thead>
             <tbody>
-              {displayRequest.mappedData.length > 0 ? (
+            {displayRequest.mappedData.length > 0 ? (
               displayRequest.mappedData.map((getData) => (
                 <tr key={getData.id}>
                   <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
@@ -251,97 +259,91 @@ export default function MyRequest(){
                   </td>
                 </tr>
               ))
-              ):(
-              <tr>
-                <td colSpan="10" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
-                </tr>
-              )}
+            ):(
+            <tr>
+              <td colSpan="7" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
+              </tr>
+            )}
             </tbody>
           </table>
         </div>
         )}
-      </div>
-      }
 
-      {/* Request For The Use Of Facility / Venue */}
-      {activeTab === "tab2" && (
-        <div>
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
-              <span className="ml-2">Loading My Request List...</span>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="border-collapse w-full mb-10">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Title/Purpose of Activity</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (Start)</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (End)</th> 
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Facility/Venue</th>  
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Status</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+        {/* Request For The Use Of Facility / Venue */}
+        {activeTab === "tab2" && (
+          <div className="overflow-x-auto">
+            <table className="border-collapse w-full mb-10">
+              <thead>
+              {displayRequestFacility.mappedData.length > 0 ? (
+                <tr className="bg-gray-100">
+                  <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Title/Purpose of Activity</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (Start)</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (End)</th> 
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Facility/Venue</th>  
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Status</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+                </tr>
+              ):null}
+              </thead>
+              <tbody>
+              {displayRequestFacility.mappedData.length > 0 ? (
+                displayRequestFacility.mappedData.map((getData) => (
+                  <tr key={getData.id}>
+                    <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
+                    <td className="px-2 py-4 text-center border-2 border-custom">{formatDate(getData.date_requested)}</td>
+                    <td className="px-2 py-4 text-center border-2 border-custom">{getData.title_of_activity}</td>
+                    <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_start)} @ {formatTime(getData.time_start)}</td>
+                    <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_end)} @ {formatTime(getData.time_end)}</td>
+                    <td className="px-2 py-4 w-10 text-center border-2 border-custom">
+                      {getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "0" ? ("MPH"):
+                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("Conference Room"):
+                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("Dormitory"):
+                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("Others"):
+                      getData.mph === "1" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("MPH and Conference Room"):
+                      getData.mph === "1" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("MPH and Dormitory"):
+                      getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("MPH and Other"):
+                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "1" && getData.other === "0" ? ("Conference and Dormitory"):
+                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "1" ? ("Conference and Other"):
+                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "1" ? ("Dorm and Other"):  
+                      null}
+                    </td>
+                    <td className="px-2 py-4 text-center border-2 border-custom">
+                      {getData.remarks}
+                    </td>
+                    <td className="px-2 py-4 text-center border-2 border-custom">
+                      <div className="flex justify-center">
+                        <Link to={`/facilityvenueform/${getData.id}`}>
+                          <button 
+                            className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
+                            title="View Request"
+                          >
+                            <FontAwesomeIcon icon="eye" className="mr-0" />
+                          </button>
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {displayRequestFacility.mappedData.length > 0 ? (
-                    displayRequestFacility.mappedData.map((getData) => (
-                      <tr key={getData.id}>
-                        <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
-                        <td className="px-2 py-4 text-center border-2 border-custom">{formatDate(getData.date_requested)}</td>
-                        <td className="px-2 py-4 text-center border-2 border-custom">{getData.title_of_activity}</td>
-                        <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_start)} @ {formatTime(getData.time_start)}</td>
-                        <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_end)} @ {formatTime(getData.time_end)}</td>
-                        <td className="px-2 py-4 w-10 text-center border-2 border-custom">
-                          {getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "0" ? ("MPH"):
-                          getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("Conference Room"):
-                          getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("Dormitory"):
-                          getData.mph === "0" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("Others"):
-                          getData.mph === "1" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("MPH and Conference Room"):
-                          getData.mph === "1" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("MPH and Dormitory"):
-                          getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("MPH and Other"):
-                          getData.mph === "0" && getData.conference === "1" && getData.dorm === "1" && getData.other === "0" ? ("Conference and Dormitory"):
-                          getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "1" ? ("Conference and Other"):
-                          getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "1" ? ("Dorm and Other"):  
-                          null}
-                        </td>
-                        <td className="px-2 py-4 text-center border-2 border-custom">
-                          {getData.remarks}
-                        </td>
-                        <td className="px-2 py-4 text-center border-2 border-custom">
-                          <div className="flex justify-center">
-                            <Link to={`/facilityvenueform/${getData.id}`}>
-                              <button 
-                                className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
-                                title="View Request"
-                              >
-                                <FontAwesomeIcon icon="eye" className="mr-0" />
-                              </button>
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="7" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-6 py-4 text-center font-bold whitespace-nowrap">No Request</td>
+                </tr>
+              )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {activeTab === "tab3" && <div>Coming Soon</div>}
-      {activeTab === "tab4" && <div>Coming Soon</div>}
-      {activeTab === "tab5" && <div>Coming Soon</div>}
-    </div>
+        {activeTab === "tab3" && <div className="text-center">Coming Soon</div>}
+        {activeTab === "tab4" && <div className="text-center">Coming Soon</div>}
+        {activeTab === "tab5" && <div className="text-center">Coming Soon</div>}
 
+      </div>
+
+    </>
+    )}
     </PageComponent>
   );
 }

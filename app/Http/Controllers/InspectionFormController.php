@@ -236,7 +236,8 @@ class InspectionFormController extends Controller
             $record->update([
                 'before_repair_date' => $request->input('before_repair_date'),
                 'findings' => $request->input('findings'),
-                'recommendations' => $request->input('recommendations')
+                'recommendations' => $request->input('recommendations'),
+                'close' => 3
             ]);
         }
 
@@ -343,7 +344,7 @@ class InspectionFormController extends Controller
             if ($approveAdminRequest->save()) {
                 // Successfully updated Inspection_Form, now update Inspector_Form
                 if ($getInspectorStat) {
-                    $getInspectorStat->close = 3;
+                    $getInspectorStat->close = 4;
                     $getInspectorStat->save();
                 }
 
@@ -367,7 +368,7 @@ class InspectionFormController extends Controller
         //     return response()->json(['message' => 'Request not found'], 404);
         // }
 
-        $disapproveAdminRequest->supervisor_approval = 2;
+        $disapproveAdminRequest->admin_approval = 2;
         $disapproveAdminRequest->remarks = "Your Request has been disapproved by Admin Manager";
 
         if ($disapproveAdminRequest->save()) {
@@ -375,50 +376,6 @@ class InspectionFormController extends Controller
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
-    }
-
-    /**
-     * Preview Inspection Form on Supervisor Page (Not Approved)
-     * Part A
-     */
-    public function getInspectionDetails(Request $request, $id)
-    {
-
-        $inspectiondata = Inspection_Form::where('supervisor_name', $id)
-        ->where('supervisor_approval', 0)->get();
-
-        // if ($inspectiondata->isEmpty()) {
-        //     return response()->json(['message' => 'No data found'], 404);
-        // }
-
-        //Get the Requestor Details
-        $inspR = $inspectiondata->pluck('user_id')->all();
-        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
-
-        $responseData = [
-            'inspection_form_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
-                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
-                    $fullName = "{$user->fname} ";
-                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
-                    $fullName .= $user->lname;
-                    return $fullName; })
-                    ->implode(', ');
-
-                    return[
-                        'id' => $showDetail->id,
-                        'requester' => $requesters,
-                        'date_requested' => $showDetail->date_of_request,
-                        'property_no' => $showDetail->property_number,
-                        'description' => $showDetail->property_description,
-                        'location' => $showDetail->location,
-                        'complain' => $showDetail->complain,
-                        'supervisor_approval' => $showDetail->supervisor_approval
-                    ];
-
-            })
-        ];
-
-        return response()->json($responseData);
     }
 
     /**
@@ -457,94 +414,6 @@ class InspectionFormController extends Controller
 
         return response()->json($respondData);
 
-    }
-
-    /**
-     * Preview Inspection Form on GSO or Authorize Person Page
-     */
-    public function getInspectionDetailsAuth()
-    {
-
-        $inspectiondata = Inspection_Form::where('supervisor_approval', 1)
-        ->where('admin_approval', 0)->get();
-
-        // if ($inspectiondata->isEmpty()) {
-        //     return response()->json(['message' => 'No data found'], 404);
-        // }
-
-        //Get the Requestor Details
-        $inspR = $inspectiondata->pluck('user_id')->all();
-        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
-
-        $responseData = [
-            'inspection_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
-                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
-                    $fullName = "{$user->fname} ";
-                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
-                    $fullName .= $user->lname;
-                    return $fullName; })
-                    ->implode(', ');
-
-                    return[
-                        'id' => $showDetail->id,
-                        'requester' => $requesters,
-                        'date_requested' => $showDetail->date_of_request,
-                        'property_no' => $showDetail->property_number,
-                        'description' => $showDetail->property_description,
-                        'location' => $showDetail->location,
-                        'complain' => $showDetail->complain,
-                        'supervisor_approval' => $showDetail->supervisor_approval,
-                        'admin_approval' => $showDetail->admin_approval
-                    ];
-
-            })
-        ];
-
-        return response()->json($responseData);
-    }
-
-    /**
-     * Preview Inspection Form on Admin Division Manager
-     */
-    public function getInspectionDetailAdmin()
-    {
-
-        $inspectiondata = Inspection_Form::where('supervisor_approval', 1)
-        ->where('admin_approval', 3)->get();
-
-        // if ($inspectiondata->isEmpty()) {
-        //     return response()->json(['message' => 'No data found'], 404);
-        // }
-
-        //Get the Requestor Details
-        $inspR = $inspectiondata->pluck('user_id')->all();
-        $inspRD = PPAUSER::whereIn('id', $inspR)->get();
-
-        $responseData = [
-            'inspection_details' => $inspectiondata->map(function ($showDetail) use ($inspRD) {
-                $requesters = $inspRD->where('id', $showDetail->user_id)->map(function ($user) {
-                    $fullName = "{$user->fname} ";
-                    if ($user->mname) { $fullName .= "{$user->mname}. "; }
-                    $fullName .= $user->lname;
-                    return $fullName; })
-                    ->implode(', ');
-
-                    return[
-                        'id' => $showDetail->id,
-                        'requester' => $requesters,
-                        'date_requested' => $showDetail->date_of_request,
-                        'property_no' => $showDetail->property_number,
-                        'description' => $showDetail->property_description,
-                        'location' => $showDetail->location,
-                        'complain' => $showDetail->complain,
-                        'supervisor_approval' => $showDetail->supervisor_approval,
-                        'admin_approval' => $showDetail->admin_approval
-                    ];
-
-            })
-        ];
-
-        return response()->json($responseData);
     }
 
     /**

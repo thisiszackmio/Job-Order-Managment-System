@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('facility_dormitory', function (Blueprint $table) {
             $table->id();
             $table->foreignId('facility__form_id')->constrained('request__facility');
-            $table->string('name_male', 1000);
-            $table->string('name_female', 1000);
-            $table->string('other_details');
+            $table->string('name_male', 1000)->nullable();
+            $table->string('name_female', 1000)->nullable();
+            $table->string('other_details')->nullable();
             $table->timestamps();
         });
     }

@@ -117,6 +117,7 @@ export default function RequestForm(){
   const [DateStart, setDateStart] = useState('');
   const [DateEnd, setDateEnd] = useState('');
 
+
   const SubmitFacilityForm = (event) => {
     event.preventDefault();
 
@@ -143,7 +144,7 @@ export default function RequestForm(){
       })
       .then((response) => { 
         setShowPopup(true);
-        setPopupMessage("Form Submitted Successfully.\nYou can continue to fill up the form on the My Request page");    
+        setPopupMessage("<p>Form Submitted Successfully.</p><p>You can continue to fill up the form on the My Request page</p>");    
         setSubmitLoading(false);
       })
       .catch((error) => {
@@ -857,7 +858,7 @@ export default function RequestForm(){
            {/* Popup content with background blur */}
            <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
            <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
-             <p className="text-lg">{popupMessage}</p>
+             <p className="text-lg text-center" dangerouslySetInnerHTML={{ __html: popupMessage }}></p>
              <div className="flex justify-center mt-4">
               <button
                 onClick={() => {

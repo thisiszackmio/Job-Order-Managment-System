@@ -163,7 +163,7 @@ class FacilityFormController extends Controller
             'videoke' => $data['videoke']
         ]);
 
-        $findFacility->remarks = "Done fillup the MPH Form";
+        $findFacility->admin_approval = 4;
 
         if ($findFacility->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -213,6 +213,15 @@ class FacilityFormController extends Controller
             'sound_system' => $data['sound_system'],
             'videoke' => $data['videoke']
         ]);
+
+        $findFacility->admin_approval = 4;
+
+        if ($findFacility->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+
     }
 
     /**
@@ -240,12 +249,18 @@ class FacilityFormController extends Controller
         $findFacility = Facility_Form::find($id);
 
         $newRecord = $findFacility->relatedModelsDorm()->create([
-            'name_male' => $data['name_male'],
-            'name_female' => $data['name_female'],
-            'other_details' => $data['other_details']
+            'name_male' => $data['name_male'] ?? 'N/A',
+            'name_female' => $data['name_female'] ?? 'N/A',
+            'other_details' => $data['other_details'] ?? 'N/A'
         ]);
 
-        return response()->json(['message' => 'Data stored successfully'], 200);
+        $findFacility->admin_approval = 4;
+
+        if ($findFacility->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
 
     }
 
@@ -345,6 +360,20 @@ class FacilityFormController extends Controller
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 
+    }
+
+    /**
+     * For DashBoard Admin
+     */
+    public function AdminViewFacility()
+    {
+        $facility = Facility_Form::where('admin_approval', 4)->get();
+
+        $respondData = [
+            'data' => $facility
+        ];
+        
+        return response()->json($respondData);
     }
 
 }

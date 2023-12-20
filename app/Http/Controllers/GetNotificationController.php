@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\URL;
 use App\Models\Inspection_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\Inspector_Form;
+use App\Models\Facility_Form;
 
 class GetNotificationController extends Controller
 {
@@ -30,9 +31,11 @@ class GetNotificationController extends Controller
     public function GSONoti()
     {
         $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 0)->get();
-
+        $gsoFacilityNoti = Facility_Form::where('admin_approval', 4)->get();
+        
         $responseData = [
-            'gsoDet' => $gsoInspectNoti
+            'gsoDet' => $gsoInspectNoti,
+            'gsoFacDet' => $gsoFacilityNoti
         ];
 
         return response()->json($responseData);
@@ -44,9 +47,11 @@ class GetNotificationController extends Controller
     public function AdminNoti()
     {
         $adminInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 3)->get();
+        $adminFacilityNoti = Facility_Form::where('admin_approval', 3)->get();
 
         $responseData = [
-            'adminDet' => $adminInspectNoti
+            'adminDet' => $adminInspectNoti,
+            'adminFacDet' => $adminFacilityNoti
         ];
 
         return response()->json($responseData);

@@ -22,7 +22,7 @@ class FacilityFormController extends Controller
      */
     public function index()
     {
-        $facilityForms = Facility_Form::with('user')->get();
+        $facilityForms = Facility_Form::with('user')->orderBy('date_requested', 'desc')->get();
 
         $responseData = [];
 
@@ -37,7 +37,7 @@ class FacilityFormController extends Controller
             $userclearance = $ppaUser->code_clearance;
 
             $responseData[] = [
-                'inspection_form' => $facilityForm,
+                'facility_form' => $facilityForm,
                 'user_details' => [
                     'fname' => $userName,
                     'mname' => $userMiddleInitial,
@@ -164,6 +164,8 @@ class FacilityFormController extends Controller
         ]);
 
         $findFacility->admin_approval = 4;
+        $findFacility->mph = 1;
+        $findFacility->remarks = "Form sent and waiting for approval";
 
         if ($findFacility->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -215,6 +217,8 @@ class FacilityFormController extends Controller
         ]);
 
         $findFacility->admin_approval = 4;
+        $findFacility->conference = 1;
+        $findFacility->remarks = "Form sent and waiting for approval";
 
         if ($findFacility->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -255,6 +259,8 @@ class FacilityFormController extends Controller
         ]);
 
         $findFacility->admin_approval = 4;
+        $findFacility->dorm = 1;
+        $findFacility->remarks = "Form sent and waiting for approval";
 
         if ($findFacility->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -279,7 +285,7 @@ class FacilityFormController extends Controller
 
         // Update the obr_instruct field
         $facility->update([
-            'obr_instruct' => $request->input('obr_instruct'),
+            'obr_instruct' => $request->input('obr_instruct') ?? 'N/A',
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
@@ -301,7 +307,8 @@ class FacilityFormController extends Controller
 
         // Update the obr_instruct field
         $facility->update([
-            'obr_comment' => $request->input('obr_comment'),
+            'obr_comment' => $request->input('obr_comment') ?? 'N/A',
+            'admin_approval' => 3
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);

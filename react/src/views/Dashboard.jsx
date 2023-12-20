@@ -71,6 +71,7 @@ export default function Dashboard()
     .then((response) => {
       const responseData = response.data;
       const getGSOInspDet = responseData.gsoDet;
+      const getGSOFacDet = responseData.gsoFacDet;
 
       const mappedData = getGSOInspDet.map((GInspItem) => {
         return {
@@ -80,7 +81,18 @@ export default function Dashboard()
         };
       });
 
-      setGSOInspNoti(mappedData);
+      const FacilityData = getGSOFacDet.map((GFacItem) => {
+        return{
+          type: 'Request for the use of Facility / Venue',
+          id: GFacItem.id,
+          date_request: GFacItem.date_requested
+        };
+      });
+
+      setGSOInspNoti({
+        mappedData,
+        FacilityData
+      });
     })
     .catch((error) => {
       console.error('Error fetching data:', error);
@@ -94,6 +106,7 @@ export default function Dashboard()
     .then((response) => {
       const responseData = response.data;
       const getAdminInspDet = responseData.adminDet;
+      const getAdminFacDet = responseData.adminFacDet;
 
       const mappedData = getAdminInspDet.map((AInspItem) => {
         return{
@@ -103,7 +116,18 @@ export default function Dashboard()
         };
       });
 
-      setAdminInspNoti(mappedData);
+      const FacilityData = getAdminFacDet.map((AFacItem) => {
+        return{
+          type: 'Request for the use of Facility / Venue',
+          id: AFacItem.id,
+          date_request: AFacItem.date_requested,
+        };
+      });
+
+      setAdminInspNoti({
+        mappedData, 
+        FacilityData
+      });
     })
     .catch((error) => {
       console.error('Error fetching data:', error);
@@ -194,18 +218,35 @@ export default function Dashboard()
         <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
       </div>
 
-      {getGSOInspNoti && getGSOInspNoti.length > 0 ? (
-      getGSOInspNoti.map((GSOItem) => (
+    {getGSOInspNoti?.mappedData?.length > 0 || getGSOInspNoti?.FacilityData?.length > 0 ? (
+    <>
+      {/* For Inspection Request */}
+      {getGSOInspNoti.mappedData.map((GSOItem) => (
         <div key={GSOItem.id}>
           <Link to={`/repairinspectionform/${GSOItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
-          <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(GSOItem.date_request)} ({GSOItem.type})</h4>
-          <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request and already approved by the supervisor</h3>
+            <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(GSOItem.date_request)} ({GSOItem.type})</h4>
+            <h3 className="text-l font-normal leading-6 text-gray-900">
+              Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request and already approved by the supervisor
+            </h3>
           </Link>
         </div>
-      ))
-      ):(
+      ))}
+
+      {/* For Facility Request */}
+      {getGSOInspNoti.FacilityData.map((GSOItem) => (
+      <div key={GSOItem.id}>
+        <Link to={`/facilityvenueform/${GSOItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+          <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(GSOItem.date_request)} ({GSOItem.type})</h4>
+          <h3 className="text-l font-normal leading-6 text-gray-900">
+            Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request for the Facility and Venue
+          </h3>
+        </Link>
+      </div>
+      ))}
+    </>
+    ):(
       <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
-      )}
+    )}
 
     </div>
     </>
@@ -220,17 +261,32 @@ export default function Dashboard()
         <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
       </div>
 
-      {getAdminInspNoti && getAdminInspNoti.length > 0 ? (
-        getAdminInspNoti.map((AdminItem) => (
+      {getAdminInspNoti?.mappedData?.length > 0 || getAdminInspNoti?.FacilityData?.length > 0 ? (
+      <>
+
+        {/* For Inspection Request */}
+        {getAdminInspNoti.mappedData.map((AdminItem) => (
           <div key={AdminItem.id}>
             <Link to={`/repairinspectionform/${AdminItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
             <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(AdminItem.date_request)} ({AdminItem.type})</h4>
-            <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request and needs your approval</h3>
+            <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request and need your approval</h3>
             </Link>
           </div>
-        ))
+        ))}
+
+        {/* For Facility Request */}
+        {getAdminInspNoti.FacilityData.map((AdminFacItem) => (
+          <div key={AdminFacItem.id}>
+            <Link to={`/facilityvenueform/${AdminFacItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+            <h4 className="text-sm text-gray-400 italic">Date Requested: {formatDate(AdminFacItem.date_request)} ({AdminFacItem.type})</h4>
+            <h3 className="text-l font-normal leading-6 text-gray-900">Hello {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}, there is a request and need your approval</h3>
+            </Link>
+          </div>
+        ))}
+
+      </>
       ):(
-      <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
+        <h3 className="text-l font-normal leading-6 text-gray-900">No new notifications for you today</h3>
       )}
 
     </div>
@@ -245,7 +301,7 @@ export default function Dashboard()
       <div className="pb-4">
         <h3 className="text-xl font-bold leading-6 text-gray-900">Notification</h3>
       </div>
-      {getPersonnelNoti.mappedData.length > 0 ? (
+      {getPersonnelNoti?.mappedData?.length > 0 ? (
         getPersonnelNoti.mappedData.map((PerItem) => (
           <div key={PerItem.id}>
             {PerItem.status === 4 ? (
@@ -266,7 +322,6 @@ export default function Dashboard()
     </div>
     </>
     ) : null}
-
 
     </div>
     </>

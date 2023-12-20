@@ -25,7 +25,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //Get Notifications
-    // Route::get('/supinspectform/{id}', [GetNotificationController::class, 'SupervisorInspectNoti']);
+    Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
+    Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']);
+    Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
+    Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
 
     //Get User Details
     Route::get('/ppausers', [UserController::class, 'index']);
@@ -42,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
 
     //Inspection Form
-    // Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
+    Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
     Route::get('/inspectionformtwo', [InspectionFormController::class, 'AdminInspectView']);
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
     Route::get('/requestrepair', [InspectionFormController::class, 'index']);
@@ -88,11 +91,3 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
-Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']);
-Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
-Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
-
-Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
-
-

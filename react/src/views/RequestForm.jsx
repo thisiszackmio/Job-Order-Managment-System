@@ -9,6 +9,10 @@ export default function RequestForm(){
   const { currentUser } = useUserStateContext();
   const [activeTab, setActiveTab] = useState("tab1");
 
+  const today = new Date().toISOString().split('T')[0]; // Get the current date in "yyyy-mm-dd" format
+
+  const [DateEndMin, setDateEndMin] = useState(today);
+
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
@@ -103,10 +107,14 @@ export default function RequestForm(){
 
   //For Request on Facility and Venue
   //Checkbox
-  const [mphCheck, setMphCheck] = useState(false);
-  const [confCheck, setConfCheck] = useState(false);
-  const [dormCheck, setDormCheck] = useState(false);
-  const [otherCheck, setOtherCheck] = useState(false);
+  const [mphCheck, setMphCheck] = useState(0);
+  const [confCheck, setConfCheck] = useState(0);
+  const [dormCheck, setDormCheck] = useState(0);
+  const [otherCheck, setOtherCheck] = useState(0);
+
+  const handleCheckboxChange = (setStateFunction, isChecked) => {
+    setStateFunction(isChecked ? 2 : 0);
+  };
 
   //Main Form
   const [FVDate, setFVDate] = useState('');
@@ -132,7 +140,7 @@ export default function RequestForm(){
         request_office: reqOffice,
         title_of_activity: titleReq,
         date_start: DateStart,
-        time_start: timeEnd,
+        time_start: timeStart,
         date_end: DateEnd,
         time_end: timeEnd,
         mph: mphCheck,
@@ -247,6 +255,7 @@ export default function RequestForm(){
                     id="insp_date"
                     value= {inspectionDate}
                     onChange={ev => setInspectionDate(ev.target.value)}
+                    min={today}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
                   {inputErrors.date_of_request && (
@@ -610,6 +619,7 @@ export default function RequestForm(){
                     id="form_date"
                     value= {FVDate}
                     onChange={ev => setFVDate(ev.target.value)}
+                    min={today}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -671,7 +681,11 @@ export default function RequestForm(){
                     name="date_start"
                     id="date_start"
                     value= {DateStart}
-                    onChange={ev => setDateStart(ev.target.value)}
+                    onChange={ev => {
+                      setDateStart(ev.target.value);
+                      setDateEndMin(ev.target.value);
+                    }}
+                    min={today}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -711,6 +725,7 @@ export default function RequestForm(){
                     id="date_end"
                     value= {DateEnd}
                     onChange={ev => setDateEnd(ev.target.value)}
+                    min={DateEndMin}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -753,8 +768,8 @@ export default function RequestForm(){
                     <input
                       id="mph-checkbox"
                       type="checkbox"
-                      checked={mphCheck}
-                      onChange={ev => setMphCheck(ev.target.checked)}
+                      checked={mphCheck === 2}
+                      onChange={ev => handleCheckboxChange(setMphCheck, ev.target.checked)}
                       class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
                     />
                   </div>
@@ -771,8 +786,8 @@ export default function RequestForm(){
                     <input
                       id="conference-checkbox"
                       type="checkbox"
-                      checked={confCheck}
-                      onChange={ev => setConfCheck(ev.target.checked)}
+                      checked={confCheck === 2}
+                      onChange={ev => handleCheckboxChange(setConfCheck, ev.target.checked)}
                       class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
                     />
                   </div>
@@ -789,8 +804,8 @@ export default function RequestForm(){
                     <input
                       id="dormitory-checkbox"
                       type="checkbox"
-                      checked={dormCheck}
-                      onChange={ev => setDormCheck(ev.target.checked)}
+                      checked={dormCheck === 2}
+                      onChange={ev => handleCheckboxChange(setDormCheck, ev.target.checked)}
                       class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
                     />
                   </div>
@@ -807,8 +822,8 @@ export default function RequestForm(){
                     <input
                       id="other-checkbox"
                       type="checkbox"
-                      checked={otherCheck}
-                      onChange={ev => setOtherCheck(ev.target.checked)}
+                      checked={otherCheck === 2}
+                      onChange={ev => handleCheckboxChange(setOtherCheck, ev.target.checked)}
                       class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
                     />
                   </div>

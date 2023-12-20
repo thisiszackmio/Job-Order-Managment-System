@@ -169,7 +169,7 @@ export default function MyRequest(){
           }`}
           onClick={() => handleTabClick("tab2")}
         >
-          Request for use of Facility/Venue
+          Request for Facility/Venue
         </button>
 
         {/* Tab 3 */}
@@ -181,22 +181,10 @@ export default function MyRequest(){
           }`}
           onClick={() => handleTabClick("tab3")}
         >
-          Request for Vehicle Slip
+          Request for Vehicle
         </button>
 
         {/* Tab 4 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab4"
-            ? "bg-gray-200 border-b-4 border-gray-800"
-            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab4")}
-        >
-          Request for use of Manlift
-        </button>
-
-        {/* Tab 5 */}
         <button
           className={`w-full px-4 py-2 m-0 ${
             activeTab === "tab5"
@@ -214,18 +202,18 @@ export default function MyRequest(){
 
         {/* Pre-Repair/Post Repair Inspection Form */}
         {activeTab === "tab1" && (
-        <div className="overflow-x-auto">
-          <table className="border-collapse w-full mb-10">
+        <div>
+          <table className="border-collapse w-full">
             <thead>
             {displayRequest.mappedData.length > 0 ? (
               <tr className="bg-gray-100">
-                <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Property No</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Property</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Complain</th> 
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Remarks</th>  
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+                <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Ctrl No</th>
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th> 
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>  
+                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
               </tr>
             ):null}
             </thead>
@@ -233,22 +221,22 @@ export default function MyRequest(){
             {displayRequest.mappedData.length > 0 ? (
               displayRequest.mappedData.map((getData) => (
                 <tr key={getData.id}>
-                  <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
-                  <td className="px-6 py-4 text-center border-2 border-custom">{formatDate(getData.date_of_request)}</td>
-                  <td className="px-6 py-4 text-center border-2 border-custom">{getData.property_number}</td>
+                  <td className="px-2 py-1 w-3 text-center border border-custom font-bold">{getData.id}</td>
+                  <td className="px-4 py-1 text-center border border-custom">{formatDate(getData.date_of_request)}</td>
+                  <td className="px-4 py-1 text-center border border-custom">{getData.property_number}</td>
                   {getData.type_of_property === "Others" ? (
-                    <td className="px-6 py-4 text-center border-2 border-custom">Others: <i>{getData.property_other_specific}</i></td>
+                    <td className="px-4 py-1 text-center border border-custom">Others: <i>{getData.property_other_specific}</i></td>
                   ):(
-                    <td className="px-6 py-4 text-center border-2 border-custom">{getData.type_of_property}</td>
+                    <td className="px-4 py-1 text-center border border-custom">{getData.type_of_property}</td>
                   )}
-                  <td className="px-6 py-4 text-center border-2 border-custom">{getData.complain}</td>
-                  <td className="px-6 py-4 text-center border-2 w-66 border-custom">{getData.remarks}</td>
-                  <td className="px-6 py-4 text-center border-2 border-custom">
+                  <td className="px-4 py-1 text-center border border-custom">{getData.complain}</td>
+                  <td className="px-4 py-1 text-center border w-66 border-custom">{getData.remarks}</td>
+                  <td className="px-4 py-1 text-center border border-custom">
                   {getData.remarks === "The Request has been close you can view it now" ? (
                   <div className="flex justify-center">
                     <Link to={`/repairinspectionform/${getData.id}`}>
                       <button 
-                        className="bg-green-500 hover-bg-green-700 text-white font-bold py-2 px-2 rounded"
+                        className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
                         title="View Request"
                       >
                         <FontAwesomeIcon icon="eye" className="mr-0" />
@@ -261,29 +249,34 @@ export default function MyRequest(){
               ))
             ):(
             <tr>
-              <td colSpan="7" className="px-6 py-4 text-center whitespace-nowrap">No Request</td>
+              <td colSpan="7" className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for Repair Inspection</td>
               </tr>
             )}
             </tbody>
           </table>
+          <div className="text-right text-sm/[17px]">
+          {displayRequest.mappedData.length > 0 ? (
+          <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
+          ):null}
+          </div>
         </div>
         )}
 
         {/* Request For The Use Of Facility / Venue */}
         {activeTab === "tab2" && (
-          <div className="overflow-x-auto">
-            <table className="border-collapse w-full mb-10">
+          <div>
+            <table className="border-collapse w-full">
               <thead>
               {displayRequestFacility.mappedData.length > 0 ? (
                 <tr className="bg-gray-100">
-                  <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Control No</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Title/Purpose of Activity</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (Start)</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Date and Time of Activity (End)</th> 
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Facility/Venue</th>  
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Status</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+                  <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Ctrl No</th>
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start)</th>
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (End)</th> 
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+                  <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
                 </tr>
               ):null}
               </thead>
@@ -291,28 +284,21 @@ export default function MyRequest(){
               {displayRequestFacility.mappedData.length > 0 ? (
                 displayRequestFacility.mappedData.map((getData) => (
                   <tr key={getData.id}>
-                    <td className="px-2 py-4 w-3 text-center border-2 border-custom">{getData.id}</td>
-                    <td className="px-2 py-4 text-center border-2 border-custom">{formatDate(getData.date_requested)}</td>
-                    <td className="px-2 py-4 text-center border-2 border-custom">{getData.title_of_activity}</td>
-                    <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_start)} @ {formatTime(getData.time_start)}</td>
-                    <td className="px-2 py-4 w-40 text-center border-2 border-custom">{formatDate(getData.date_end)} @ {formatTime(getData.time_end)}</td>
-                    <td className="px-2 py-4 w-10 text-center border-2 border-custom">
-                      {getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "0" ? ("MPH"):
-                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("Conference Room"):
-                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("Dormitory"):
-                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("Others"):
-                      getData.mph === "1" && getData.conference === "1" && getData.dorm === "0" && getData.other === "0" ? ("MPH and Conference Room"):
-                      getData.mph === "1" && getData.conference === "0" && getData.dorm === "1" && getData.other === "0" ? ("MPH and Dormitory"):
-                      getData.mph === "1" && getData.conference === "0" && getData.dorm === "0" && getData.other === "1" ? ("MPH and Other"):
-                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "1" && getData.other === "0" ? ("Conference and Dormitory"):
-                      getData.mph === "0" && getData.conference === "1" && getData.dorm === "0" && getData.other === "1" ? ("Conference and Other"):
-                      getData.mph === "0" && getData.conference === "0" && getData.dorm === "1" && getData.other === "1" ? ("Dorm and Other"):  
-                      null}
+                    <td className="px-2 py-1 w-3 text-center border border-custom font-bold">{getData.id}</td>
+                    <td className="px-2 py-1 text-center border border-custom">{formatDate(getData.date_requested)}</td>
+                    <td className="px-2 py-1 text-center border border-custom">{getData.title_of_activity}</td>
+                    <td className="px-2 py-1 w-40 text-center border border-custom">{formatDate(getData.date_start)} @ {formatTime(getData.time_start)}</td>
+                    <td className="px-2 py-1 w-40 text-center border border-custom">{formatDate(getData.date_end)} @ {formatTime(getData.time_end)}</td>
+                    <td className="px-0 py-1 w-10 text-center border border-custom">
+                      {getData.mph !== "0" ? (<p>MPH</p>):null}
+                      {getData.conference !== "0" ? (<p>Conference Room</p>):null}
+                      {getData.dorm !== "0" ? (<p>Dormitory</p>):null}
+                      {getData.other !== "0" ? (<p>Other</p>):null}
                     </td>
-                    <td className="px-2 py-4 text-center border-2 border-custom">
+                    <td className="px-2 py-1 text-center border border-custom">
                       {getData.remarks}
                     </td>
-                    <td className="px-2 py-4 text-center border-2 border-custom">
+                    <td className="px-2 py-1 text-center border border-custom">
                       <div className="flex justify-center">
                         <Link to={`/facilityvenueform/${getData.id}`}>
                           <button 
@@ -328,11 +314,16 @@ export default function MyRequest(){
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-6 py-4 text-center font-bold whitespace-nowrap">No Request</td>
+                  <td colSpan="8" className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for Facility/Venue</td>
                 </tr>
               )}
               </tbody>
             </table>
+            <div className="text-right text-sm/[17px]">
+            {displayRequestFacility.mappedData.length > 0 ? (
+            <i>Total of <b> {displayRequestFacility.mappedData.length} </b> Pre/Post Repair Request</i>
+            ):null}
+            </div>
           </div>
         )}
 

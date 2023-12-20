@@ -415,7 +415,7 @@ export default function PrePostRepairForm(){
   //Generate PDF
   const generatePDF = useReactToPrint({
     content: ()=>componentRef.current,
-    documentTitle: `Control No:${id}`
+    documentTitle: `Inspection-Control-No:${id}`
   });
 
   //Close the request
@@ -490,7 +490,7 @@ export default function PrePostRepairForm(){
             {/* Part A Label */}
             <tr>
               <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6 text-gray-900">PART A: To be filled-up by Requesting Party</h3>
+              <h3 className="text-lg font-normal leading-6">PART A: To be filled-up by Requesting Party</h3>
               </td>
             </tr>
 
@@ -597,7 +597,7 @@ export default function PrePostRepairForm(){
                               </div>
 
                               <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
+                                <div className="w-8 h-8 border border-black mr-2"></div>
                                 <span>IT Equipment & Related Materials</span>
                               </div>
 
@@ -694,21 +694,21 @@ export default function PrePostRepairForm(){
 
                       {/* For Requestor Signature */}
                       <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>REQUESTED BY:</strong> </label>
+                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
                         <div className="mt-10">
                           <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                             <div>
-                            <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }} />
+                            <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} />
                             </div>
-                            <span>{displayRequest.userDetails.enduser}</span>
+                            <span className="text-xl">{displayRequest.userDetails.enduser}</span>
                           </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>End-User</strong> </label>
+                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>End-User</strong> </label>
                         </div>
                       </div>
                       
                       {/* For Supervisor Signature */}
                       <div className="col-span-1"> 
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> 
+                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> 
                           <strong>NOTED: {displayRequest.viewRequestData.supervisor_approval === 1 ? "Approve" : displayRequest.viewRequestData.supervisor_approval === 2 ? "Disapprove" : null} </strong>
                         </label>
                         <div className="mt-10">
@@ -718,13 +718,13 @@ export default function PrePostRepairForm(){
                                 <img
                                 src={displayRequest.userDetails.supervisor_signature}
                                 alt="User Signature"
-                                style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }}
+                                style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }}
                               />
                               ): null }
-                              <span>{displayRequest.userDetails.supervisor}</span>
+                              <span className="text-xl">{displayRequest.userDetails.supervisor}</span>
                             </div>
                           </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Immediate Supervisor</strong> </label>
+                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Immediate Supervisor</strong> </label>
                         </div>
                       </div>
 
@@ -759,7 +759,7 @@ export default function PrePostRepairForm(){
             {/* Part B Label */}
             <tr>
               <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6 text-gray-900">PART B: To be filled-up by Administrative Division</h3>
+              <h3 className="text-lg font-normal leading-6">PART B: To be filled-up by Administrative Division</h3>
               </td>
             </tr>
 
@@ -815,23 +815,23 @@ export default function PrePostRepairForm(){
 
                       {/* For GSO Signature */}
                       <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>REQUESTED BY:</strong> </label>
+                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
                         <div className="mt-10">
                           <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                             <img 
                               src={displayRequest.gsoDetails.gso_signature} 
                               alt="User Signature" 
-                              style={{ position: 'absolute', width: '200px', top: '-50px', left: '30px' }} 
+                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
                             />
-                            <span>{displayRequest.gsoDetails.gso_name}</span>
+                            <span className="text-xl">{displayRequest.gsoDetails.gso_name}</span>
                           </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>General Service Officer</strong> </label>
+                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>General Service Officer</strong> </label>
                         </div>
                       </div>
 
                       {/* For Admin Division Manager */}
                       <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6">
                         <strong>NOTED:</strong>
                       </label>
                         <div className="mt-10">
@@ -841,13 +841,13 @@ export default function PrePostRepairForm(){
                               <img
                               src={displayRequest.manegerDetails.manager_signature}
                               alt="User Signature"
-                              style={{ position: 'absolute', width: '200px', top: '-45px', left: '30px' }}
+                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
                             />
                             ):null}
-                            <span>{displayRequest.manegerDetails.manager_name}</span>
+                            <span className="text-xl">{displayRequest.manegerDetails.manager_name}</span>
                           </div>
                         </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Admin Division Manager</strong> </label>
+                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Admin Division Manager</strong> </label>
                         </div>
                       </div>
 
@@ -1066,7 +1066,7 @@ export default function PrePostRepairForm(){
             {/* Part C Label */}
             <tr>
               <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6 text-gray-900">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
+              <h3 className="text-lg font-normal leading-6">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
               </td>
             </tr>
 
@@ -1257,7 +1257,7 @@ export default function PrePostRepairForm(){
 
                     {/* Date Inspected */}
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>DATE INSPECTED</strong> </label>
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>DATE INSPECTED</strong> </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                           <span>{item.before_repair_date !== "1970-01-01" ? formatDate(item.before_repair_date) : null }</span>
@@ -1267,7 +1267,7 @@ export default function PrePostRepairForm(){
 
                     {/* Inspector */}
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>NOTED:</strong> </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>               
                           {assignPersonnel.map((item, index) => (
@@ -1275,13 +1275,13 @@ export default function PrePostRepairForm(){
                               <img
                                 src={item.p_signature}
                                 alt="User Signature"
-                                style={{ position: 'absolute', width: '100%', top: '-42px', left: '0px' }}
+                                style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
                               />
-                              <span>{item.p_name}</span>
+                              <span className="text-lg">{item.p_name}</span>
                             </div>
                           ))}
                         </div>
-                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Property Inspector</strong> </label>
                       </div>
                     </div>
 
@@ -1348,7 +1348,7 @@ export default function PrePostRepairForm(){
             {/* Part D Label */}
             <tr>
               <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6 text-gray-900">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
+              <h3 className="text-lg font-normal leading-6">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
               </td>
             </tr>
 
@@ -1380,7 +1380,7 @@ export default function PrePostRepairForm(){
                         <div className="mt-10 pb-10">
                             <div className="grid grid-cols-2 gap-4">
                               <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
                                   DATE INSPECTED
                                 </label>
                                 <div className="mt-12">
@@ -1390,7 +1390,7 @@ export default function PrePostRepairForm(){
                                 </div>
                               </div>
                               <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
                                   NOTED:
                                 </label>
                                 <div className="mt-10">
@@ -1400,13 +1400,13 @@ export default function PrePostRepairForm(){
                                       <img
                                         src={item.p_signature}
                                         alt="User Signature"
-                                        style={{ position: 'absolute', width: '100%', top: '-42px', left: '0px' }}
+                                        style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
                                       />
-                                      <span>{item.p_name}</span>
+                                      <span className="text-lg">{item.p_name}</span>
                                     </div>
                                   ))}
                                   </div>
-                                  <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
+                                  <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
                                     Property Inspector
                                   </label>
                                 </div>
@@ -1557,7 +1557,7 @@ export default function PrePostRepairForm(){
                 <div className="mt-10 pb-10">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
                         DATE INSPECTED
                       </label>
                       <div className="mt-12">
@@ -1567,14 +1567,14 @@ export default function PrePostRepairForm(){
                       </div>
                     </div>
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
                         NOTED:
                       </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
           
                         </div>
-                        <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
                           Property Inspector
                         </label>
                       </div>
@@ -1653,15 +1653,17 @@ export default function PrePostRepairForm(){
           {getPartC.map((item, index) => (
             <div key={index}>
             {item.close === 1 ? (
-              <div style={{display: 'none'}}>
+              <div className="hidden md:none">
                 <div ref={componentRef}>
-                  <div style={{ width: '210mm', height: '297mm', padding: '20px', border: '1px solid' }}>
+                  <div style={{ width: '216mm', height: '330mm', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '0px solid' }}>
 
                     {/* Control Number */}
-                    <div className="title-area font-arial pr-6 text-right">
+                    <div className="title-area font-arial pr-6 text-right pb-4 pt-2">
                       <span>Control No:</span>{" "}
-                      <span style={{ textDecoration: "underline", fontWeight: "900" }}>       
+                      <span style={{ textDecoration: "underline", fontWeight: "900" }}>    
+                      __________   
                         {displayRequest.viewRequestData.id}
+                      __________
                       </span>
                     </div>
 
@@ -1670,7 +1672,7 @@ export default function PrePostRepairForm(){
                       {/* Title and Logo */}
                       <tr>
                       <td className="border border-black p-1 text-center" style={{ width: '100px' }}>
-                        <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '50px' }} />
+                        <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
                       </td>
                         <td className="border text-lg w-7/12 border-black font-arial text-center">
                           <b>PRE-REPAIR/POST REPAIR INSPECTION FORM</b>
@@ -1689,89 +1691,88 @@ export default function PrePostRepairForm(){
 
                       {/* Part A Label */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 font-arial">
-                          <h3 className="title-area font-semibold leading-6 text-gray-900">PART A: To be filled-up by Requesting Party</h3>
+                        <td colSpan={3} className="border border-black pl-1 pt-0 font-arial">
+                          <h3 className="text-sm font-normal">PART A: To be filled-up by Requesting Party</h3>
                         </td>
                       </tr>
 
                       {/* Part A Forms */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 pr-2 pb-4 font-arial">
+                        <td colSpan={3} className="border border-black pl-1 pr-2 pb-4 font-arial">
                           <div>
 
                             {/* Date Requested */}
                             <div className="mt-4">
                               <div className="flex">
-                                <div className="w-24 content-area">
-                                  <strong>Date</strong>
+                                <div className="w-28 text-sm">
+                                  <span>Date</span>
                                 </div>
-                                <div className="w-64 border-b border-black pl-1 content-area">
+                                <div className="w-64 border-b border-black pl-1 text-sm">
                                   <span>{formatDate(displayRequest.viewRequestData.date_of_request)}</span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* ----- */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
 
                               {/* Column 1 */}
                               <div className="col-span-1">
 
                                 {/* Property Number */}
-                                <div className="mt-8">
+                                <div className="mt-4">
                                   <div className="flex">
-                                    <div className="w-24 content-area">
-                                      <strong>Property No</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Property No</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>{displayRequest.viewRequestData.property_number}</span>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Acquisition Date */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-24 content-area">
-                                      <strong>Acquisition Date</strong>
+                                    <div className="w-28 text-sm">
+                                      <span>Acquisition Date</span>
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>{formatDate(displayRequest.viewRequestData.acq_date)}</span>
                                     </div> 
                                   </div>
                                 </div>
 
                                 {/* Acquisition Cost */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-24 content-area">
-                                      <strong>Acquisition Cost</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Acquisition Cost</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>₱{(displayRequest.viewRequestData.acq_cost)}</span>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Brand/Model */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-24 content-area">
-                                      <strong>Brand/Model</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Brand/Model</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>{displayRequest.viewRequestData.brand_model}</span>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Serial/Engine No. */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-24 content-area">
-                                      <strong>Serial/Engine No.</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Serial/Engine No.</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>{displayRequest.viewRequestData.serial_engine_no}</span>
                                     </div>
                                   </div>
@@ -1783,90 +1784,53 @@ export default function PrePostRepairForm(){
                               <div className="col-span-1">
 
                                 {/* Type of Property */}
-                                <div className="mt-6">
+                                <div className="mt-4">
                                   <div className="flex">
-                                    <div className="w-1/4 content-area">
-                                      <strong>Type of Property</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Type of Property</span> 
                                     </div>
                                     <div className="w-68">
-                                    {displayRequest.viewRequestData.type_of_property === 'Vehicle Supplies & Materials' ? (
-                                      <div>
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 flex items-center justify-center text-black font-bold">X</div>
-                                          <span>Vehicle Supplies & Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>IT Equipment & Related Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>Others: Specify</span>
+                                      {/* Vehicle */}
+                                      <div className="flex items-center text-sm">
+                                        <div className="w-8 h-5 border border-black mr-2 border-b-0 flex items-center justify-center text-black font-bold">{displayRequest.viewRequestData.type_of_property === 'Vehicle Supplies & Materials' ? "X":null}</div>
+                                        <span>Vehicle Supplies & Materials</span>
+                                      </div>
+                                      {/* IT */}
+                                      <div className="flex items-center text-sm">
+                                      <div className="w-8 h-5 border border-black mr-2 flex items-center justify-center text-black font-bold">{displayRequest.viewRequestData.type_of_property === 'IT Equipment & Related Materials' ? "X":null}</div>
+                                        <span>IT Equipment & Related Materials</span>
+                                      </div>
+                                      {/* Other */}
+                                      <div className="flex items-center text-sm">
+                                        <div className="w-8 h-5 border border-black mr-2 border-t-0 flex items-center justify-center text-black font-bold">{displayRequest.viewRequestData.type_of_property === 'Others' ? "X":null}</div>
+                                        <div>
+                                          <span  className="mr-1 text-sm">Others:</span>
+                                          <span className="w-70 border-b border-black text-sm">{displayRequest.viewRequestData.property_other_specific ? displayRequest.viewRequestData.property_other_specific:null}</span>
                                         </div>
                                       </div>
-                                    ) : displayRequest.viewRequestData.type_of_property === 'IT Equipment & Related Materials' ? (
-                                      <div>
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>Vehicle Supplies & Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
-                                          <span>IT Equipment & Related Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>Others: Specify</span>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>Vehicle Supplies & Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                        <div className="w-4 h-4 border border-black mr-2 mt-1"></div>
-                                          <span>IT Equipment & Related Materials</span>
-                                        </div>
-
-                                        <div className="flex items-center content-area">
-                                          <div className="w-4 h-4 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
-                                          <div>
-                                            <span  className="mr-2 content-area">Others:</span>
-                                            <span className="w-70 border-b border-black content-area">{displayRequest.viewRequestData.property_other_specific}</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}        
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Description */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-28 content-area">
-                                      <strong>Description</strong> 
+                                    <div className="w-28 text-sm">
+                                      <span>Description</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl-1 content-area">
+                                    <div className="w-64 border-b border-black pl-1 text-sm">
                                       <span>{displayRequest.viewRequestData.property_description}</span>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Location */}
-                                <div className="mt-2">
+                                <div className="mt-1">
                                   <div className="flex">
-                                    <div className="w-40 content-area">
-                                      <strong>Location (Div/Section/Unit)</strong> 
+                                    <div className="w-56 text-sm">
+                                      <span>Location (Div/Section/Unit)</span> 
                                     </div>
-                                    <div className="w-64 border-b border-black pl- content-area">
+                                    <div className="w-64 border-b border-black pl-4 text-sm">
                                       <span>{displayRequest.viewRequestData.location}</span>
                                     </div>
                                   </div>
@@ -1877,12 +1841,12 @@ export default function PrePostRepairForm(){
                             </div>
 
                             {/* Complain */}
-                            <div className="mt-2">
+                            <div className="mt-1">
                               <div className="flex">
-                                <div className="w-28 content-area">
-                                  <strong>Complain/Defect</strong>
+                                <div className="w-32 text-sm">
+                                  <span>Complain/Defect</span>
                                 </div>
-                                <div className="w-full border-b border-black pl-1 content-area">
+                                <div className="w-full border-b border-black pl-1 text-sm">
                                   <span>{displayRequest.viewRequestData.complain}</span>
                                 </div>
                               </div>
@@ -1894,33 +1858,33 @@ export default function PrePostRepairForm(){
 
                                 {/* For Requestor Signature */}
                                 <div className="col-span-1">
-                                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area"> <strong>REQUESTED BY:</strong> </label>
-                                  <div className="mt-2">
+                                  <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> REQUESTED BY:</label>
+                                  <div className="mt-4">
                                     <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                       <div>
-                                      <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }} />
+                                      <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }} />
                                       </div>
-                                      <span className="content-area">{displayRequest.userDetails.enduser}</span>
+                                      <span className="text-base font-bold">{displayRequest.userDetails.enduser}</span>
                                     </div>
-                                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900 content-area"> <strong>End-User</strong> </label>
+                                    <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> End-User </label>
                                   </div>
                                 </div>
                                 
                                 {/* For Supervisor Signature */}
                                 <div className="col-span-1">
-                                  <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area"> <strong>NOTED:</strong> </label>
-                                  <div className="mt-2">
+                                  <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
+                                  <div className="mt-4">
                                     <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                       <div>
                                         <img
                                           src={displayRequest.userDetails.supervisor_signature}
                                           alt="User Signature"
-                                          style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }}
+                                          style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
                                         />
-                                        <span className="content-area">{displayRequest.userDetails.supervisor}</span>
+                                        <span className="text-base font-bold">{displayRequest.userDetails.supervisor}</span>
                                       </div>
                                     </div>
-                                    <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900 content-area"> <strong>Immediate Supervisor</strong> </label>
+                                    <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> Immediate Supervisor</label>
                                   </div>
                                 </div>
 
@@ -1933,50 +1897,50 @@ export default function PrePostRepairForm(){
                       
                       {/* Part B Label */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 font-arial">
-                        <h3 className="title-area font-semibold leading-6 text-gray-900">PART B: To be filled-up by Administrative Division</h3>
+                        <td colSpan={3} className="border border-black pl-1 font-arial">
+                        <h3 className="text-sm font-normal">PART B: To be filled-up by Administrative Division</h3>
                         </td>
                       </tr>
 
                       {/* Part B Forms */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 pr-2 pb-4 font-arial">
+                        <td colSpan={3} className="border border-black pl-1 pr-2 pb-4 font-arial">
 
                         <div>
                         {getPartB.map((item, index) => (
                         <div key={index}>
 
                           {/* Date */}
-                          <div className="mt-4">
+                          <div className="mt-3">
                             <div className="flex">
-                              <div className="w-28 content-area">
-                                <strong>Date</strong> 
+                              <div className="w-28 text-sm">
+                                <span>Date</span> 
                               </div>
-                              <div className="w-64 border-b border-black pl-1 content-area">
+                              <div className="w-64 border-b border-black pl-1 text-sm">
                                 <span>{formatDate(item.date_of_filling)}</span>
                               </div>
                             </div>
                           </div>
 
                           {/* Date of Last Repair */}
-                          <div className="mt-8">
+                          <div className="mt-6">
                             <div className="flex">
-                              <div className="w-28 content-area">
-                                <strong>Date of Last Repair</strong> 
+                              <div className="w-36 text-sm">
+                                <span>Date of Last Repair</span> 
                               </div>
-                              <div className="w-64 border-b border-black pl-1 content-area">
+                              <div className="w-64 border-b border-black pl-1 text-sm">
                                 <span>{formatDate(item.date_of_last_repair)}</span>
                               </div>
                             </div>
                           </div>
 
                           {/* Nature of Repair */}
-                          <div className="mt-4">
+                          <div className="mt-1">
                             <div className="flex">
-                              <div className="w-36 content-area">
-                                <strong>Nature of Last Repair</strong>
+                              <div className="w-44 text-sm">
+                                <span>Nature of Last Repair</span>
                               </div>
-                              <div className="w-full border-b border-black pl-1 content-area">
+                              <div className="w-full border-b border-black pl-1 text-sm">
                                 <span>{item.nature_of_last_repair}</span>
                               </div>
                             </div>
@@ -1991,33 +1955,33 @@ export default function PrePostRepairForm(){
 
                             {/* For GSO Signature */}
                             <div className="col-span-1">
-                              <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area"> <strong>REQUESTED BY:</strong> </label>
-                              <div className="mt-2">
+                              <label htmlFor="type_of_property" className="block font-normal leading-6 text-sm">REQUESTED BY: </label>
+                              <div className="mt-4">
                                 <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                   <div>
-                                  <img src={displayRequest.gsoDetails.gso_signature} alt="User Signature" style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }} />
+                                  <img src={displayRequest.gsoDetails.gso_signature} alt="User Signature" style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }} />
                                   </div>
-                                  <span className="content-area">{displayRequest.gsoDetails.gso_name}</span>
+                                  <span className="font-bold text-base">{displayRequest.gsoDetails.gso_name}</span>
                                 </div>
-                                <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900 content-area"> <strong>General Service Officer</strong> </label>
+                                <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> General Service Officer </label>
                               </div>
                             </div>
 
                             {/* For Admin Division Manager */}
                             <div className="col-span-1">
-                              <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area"> <strong>NOTED:</strong> </label>
-                              <div className="mt-2">
+                              <label htmlFor="type_of_property" className="block font-normal leading-6 text-sm"> NOTED:</label>
+                              <div className="mt-4">
                                 <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                   <div>
                                     <img
                                       src={displayRequest.manegerDetails.manager_signature}
                                       alt="User Signature"
-                                      style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }}
+                                      style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
                                     />
-                                    <span className="content-area">{displayRequest.manegerDetails.manager_name}</span>
+                                    <span className="font-bold text-base">{displayRequest.manegerDetails.manager_name}</span>
                                   </div>
                                 </div>
-                                <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900 content-area"> <strong>Admin Division Manager</strong> </label>
+                                <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Admin Division Manager </label>
                               </div>
                             </div>
 
@@ -2032,39 +1996,39 @@ export default function PrePostRepairForm(){
                       {/* Part C Label */}
                       <tr>
                         <td colSpan={3} className="border border-black pl-1 font-arial">
-                        <h3 className="title-area font-semibold leading-6 text-gray-900">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
+                        <h3 className="text-sm font-normal">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
                         </td>
                       </tr>
 
                       {/* Part C Forms */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 pr-2 pb-4 font-arial">
+                        <td colSpan={3} className="border border-black pl-1 pr-2 pb-4 font-arial">
 
                         <div className="mt-0">
                           {getPartC.map((item, index) => (
                             <div key={index}>
 
                               {/* Finding */}
-                              <div className="mt-4">
+                              <div className="mt-3">
                                 <div className="flex">
-                                  <div className="w-36 content-area">
-                                    <strong>Findings</strong>
+                                  <div className="w-40 text-sm">
+                                    <span>Finding/s</span>
                                   </div>
-                                  <div className="w-full border-b border-black pl-1 content-area">
-                                    <span>{item.findings}</span>
-                                  </div>
+                                </div>
+                                <div className="w-11/12 border-b border-black pl-1 ml-16 mt-1 mb-4 text-sm">
+                                  <span>{item.findings}</span>
                                 </div>
                               </div>
 
                               {/* Recommendations */}
-                              <div className="mt-4">
+                              <div className="mt-2">
                                 <div className="flex">
-                                  <div className="w-36 content-area">
-                                    <strong>Recommendation/s</strong>
+                                  <div className="w-40 text-sm">
+                                    <span>Recommendation/s</span>
                                   </div>
-                                  <div className="w-full border-b border-black pl-1 content-area">
-                                    <span>{item.recommendations}</span>
-                                  </div>
+                                </div>
+                                <div className="w-11/12 border-b border-black pl-1 ml-16 mt-3 mb-6 text-sm">
+                                  <span>{item.recommendations}</span>
                                 </div>
                               </div>
 
@@ -2072,19 +2036,19 @@ export default function PrePostRepairForm(){
                               <div className="mt-4">
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="col-span-1">
-                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area">
-                                      <strong>DATE INSPECTED</strong>
+                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6">
+                                      <span>DATE INSPECTED</span>
                                     </label>
                                     <div className="mt-2">
                                       <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                        <span className="content-area">{formatDate(item.before_repair_date)}</span>
+                                        <span className="text-base">{formatDate(item.before_repair_date)}</span>
                                       </div>
                                     </div>
                                   </div>
 
                                   <div className="col-span-1">
-                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area">
-                                      <strong>NOTED:</strong>
+                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6">
+                                      <span>NOTED:</span>
                                     </label>
                                     <div className="mt-2">
                                       <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
@@ -2094,15 +2058,15 @@ export default function PrePostRepairForm(){
                                               <img
                                                 src={personnel.p_signature}
                                                 alt="User Signature"
-                                                style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }}
+                                                style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
                                               />
-                                              <span className="content-area">{personnel.p_name}</span>
+                                              <span className="text-base font-bold">{personnel.p_name}</span>
                                             </div>
                                           ))}
                                         </div>
                                       </div>
-                                      <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900 content-area">
-                                        <strong>Property Inspector</strong>
+                                      <label htmlFor="type_of_property" className="block text-center font-medium italic text-xs">
+                                        Property Inspector
                                       </label>
                                     </div>
                                   </div>
@@ -2118,13 +2082,13 @@ export default function PrePostRepairForm(){
                       {/* Part D Label */}
                       <tr>
                         <td colSpan={3} className="border border-black pl-1 font-arial">
-                        <h3 className="title-area font-semibold leading-6 text-gray-900">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
+                        <h3 className="text-sm font-normal">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
                         </td>
                       </tr>
 
                       {/* Part D Forms */}
                       <tr>
-                        <td colSpan={3} className="border border-black pl-2 pr-2 pb-2 font-arial">
+                        <td colSpan={3} className="border border-black pl-2 pr-2 pb-4 font-arial">
                           <div className="mt-0">
 
                           {getPartC.map((item, index) => (
@@ -2133,12 +2097,12 @@ export default function PrePostRepairForm(){
                               {/* Remarks if has data */}
                               <div className="mt-4">
                                 <div className="flex">
-                                  <div className="w-20 content-area">
-                                    <strong>Remark/s</strong>
+                                  <div className="w-20 text-sm">
+                                    <span>Remark/s</span>
                                   </div>
-                                  <div className="w-full border-b border-black pl-1 content-area">
-                                    <span>{item.remarks}</span>
-                                  </div>
+                                </div>
+                                <div className="w-11/12 border-b border-black pl-1 ml-16 mt-3 mb-6 text-sm">
+                                  <span>{item.remarks}</span>
                                 </div>
                               </div>
 
@@ -2146,17 +2110,17 @@ export default function PrePostRepairForm(){
                               <div className="mt-6">
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="col-span-1">
-                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900 content-area">
+                                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-sm">
                                       DATE INSPECTED
                                     </label>
                                     <div className="mt-4">
-                                      <div className="w-64 mx-auto border-b text-center border-black pl-1 content-area" style={{ position: 'relative' }}>
+                                      <div className="w-64 mx-auto border-b text-center border-black pl-1 text-base" style={{ position: 'relative' }}>
                                         <span>{formatDate(item.after_reapir_date)}</span>
                                       </div>
                                     </div>
                                   </div>
                                   <div className="col-span-1">
-                                    <label htmlFor="type_of_property" className="block font-medium leading-6 text-gray-900 content-area">
+                                    <label htmlFor="type_of_property" className="block font-medium leading-6 text-sm">
                                       NOTED:
                                     </label>
                                     <div className="mt-2">
@@ -2167,14 +2131,14 @@ export default function PrePostRepairForm(){
                                               <img
                                                 src={item.p_signature}
                                                 alt="User Signature"
-                                                style={{ position: 'absolute', width: '120px', top: '-15px', left: '70px' }}
+                                                style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
                                               />
-                                              <span className="content-area">{item.p_name}</span>
+                                              <span className="font-bold text-base">{item.p_name}</span>
                                             </div>
                                           ))}
                                         </div>
                                       </div>
-                                      <label htmlFor="type_of_property" className="block text-center font-medium italic leading-6 text-gray-900 content-area">
+                                      <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs">
                                         Property Inspector
                                       </label>
                                     </div>

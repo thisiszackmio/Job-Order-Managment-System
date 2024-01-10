@@ -187,4 +187,23 @@ class AssignPersonnelController extends Controller
         return response()->json(['message' => 'Personnel deleted successfully'], 200);
     }
 
+    /**
+     * Get Driver Information.
+     */
+    public function getDriver()
+    {
+        $driverRecords = AssignPersonnel::where('type_of_personnel', 'Driver/Mechanic')->get();
+        $driverIds = $driverRecords->pluck('user_id')->all();
+
+        $drivers = PPAUser::whereIn('id', $driverIds)->get();
+        $driverNames = $drivers->map(function ($driver) {
+            return [
+                'driver_id' => $driver->id,
+                'driver_name' => $driver->fname . ' ' . $driver->mname . '. ' . $driver->lname,
+            ];
+        });
+
+        return response()->json($driverNames);
+    }
+
 }

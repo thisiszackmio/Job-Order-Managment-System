@@ -21,7 +21,7 @@ class InspectionFormController extends Controller
      */
     public function index()
     {
-        $inspectionForms = Inspection_Form::with('user')->orderBy('date_of_request', 'desc')->get();
+        $inspectionForms = Inspection_Form::with('user')->orderBy('id', 'desc')->get();
 
         // if ($inspectionForms->isEmpty()) {
         //     return response()->json(['message' => 'No data found'], 404);
@@ -142,17 +142,11 @@ class InspectionFormController extends Controller
 
         //Get the request
         $getInspectionForm = Inspection_Form::where('user_id', $id)->get(); 
-        $inspR = $getInspectionForm->pluck('id')->all();
-
-
-        //Get the Inspector View
-        $inspector = Inspector_Form::where('inspection__form_id', $inspR)->get();      
 
         //Display All the data
         $respondData = [
             'my_user' => $myRequest,
             'view_request' => $getInspectionForm,
-            'inspector' => $inspector, 
         ];
 
         return response()->json($respondData);
@@ -173,11 +167,9 @@ class InspectionFormController extends Controller
         $userId = PPAUser::find($data['user_id']);
         $userSender = $userId->fname . ' ' . $userId->lname;
 
-        $remarks = "Your form has been submitted and waiting for Supervisor Approval";
         
         // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
-        $deploymentData->remarks = $remarks;
         $deploymentData->save();
 
         if(!$deploymentData){
@@ -213,7 +205,6 @@ class InspectionFormController extends Controller
 
         // After creating the related model, update the admin_approval to 2
         $findInspection->admin_approval = 3;
-        $findInspection->remarks = "Your Request has been received by GSO and waiting for Admin Manager approval";
 
         if ($findInspection->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -241,7 +232,7 @@ class InspectionFormController extends Controller
             ]);
         }
 
-        $findInspection->remarks = "Your Request has been checked by the Inspector";
+        $findInspection->inspector_status = 3;
 
         if ($findInspection->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -275,7 +266,7 @@ class InspectionFormController extends Controller
         $findInspection = Inspection_Form::find($inspR);
 
         if ($findInspection) {
-            $findInspection->remarks = "The Inspector has completed your request. Waiting for GSO to close the request to view the form.";
+            $findInspection->inspector_status = 2;
             $findInspection->save();
             return response()->json(['message' => 'Update successful'], 200);
         } else {
@@ -297,7 +288,6 @@ class InspectionFormController extends Controller
         // }
 
         $approveRequest->supervisor_approval = 1;
-        $approveRequest->remarks = "Your Request has been approved by your Supervisor";
 
         if ($approveRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -319,7 +309,6 @@ class InspectionFormController extends Controller
         // }
 
         $disapproveRequest->supervisor_approval = 2;
-        $disapproveRequest->remarks = "Your Request has been disapproved by your Supervisor";
 
         if ($disapproveRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -339,7 +328,7 @@ class InspectionFormController extends Controller
 
         if ($approveAdminRequest) {
             $approveAdminRequest->admin_approval = 1;
-            $approveAdminRequest->remarks = "Your Request has been approved by Admin Manager";
+            $approveAdminRequest->inspector_status = 4;
 
             if ($approveAdminRequest->save()) {
                 // Successfully updated Inspection_Form, now update Inspector_Form
@@ -369,7 +358,6 @@ class InspectionFormController extends Controller
         // }
 
         $disapproveAdminRequest->admin_approval = 2;
-        $disapproveAdminRequest->remarks = "Your Request has been disapproved by Admin Manager";
 
         if ($disapproveAdminRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -434,7 +422,7 @@ class InspectionFormController extends Controller
         $findInspection = Inspection_Form::find($id);
 
         // Update remarks for the Inspection_Form
-        $findInspection->remarks = "The Request has been close you can view it now";
+        $findInspection->inspector_status = 1;
         $findInspection->save();
         
         return response()->json(['message' => 'Request closed successfully'], 200);

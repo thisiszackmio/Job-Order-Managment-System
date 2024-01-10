@@ -28,7 +28,7 @@ class UserController extends Controller
      */
     public function allUser()
     {
-        $Allusers = PPAUser::all();
+        $Allusers = PPAUser::orderBy('lname')->get();
         return response()->json($Allusers);
     }
 

@@ -49,8 +49,7 @@ class FacilityFormController extends Controller
 
         return response()->json($responseData);
     }
-
-
+    
     /**
      * Display the information on myRequest
      */
@@ -229,7 +228,7 @@ class FacilityFormController extends Controller
     }
 
     /**
-     * Show Conference Info
+     * Show Dorm Info
      */
     public function showDorm(Request $request, $id)
     {

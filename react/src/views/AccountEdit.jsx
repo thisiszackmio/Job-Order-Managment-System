@@ -175,6 +175,18 @@ export default function RequestList()
         </div>
       </div>
 
+      {/* Position */}
+      <div className="flex mt-4">
+        <div className="w-44">
+          <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+          Plantilla Position Title:
+          </label>
+        </div>
+        <div className="w-96">
+          {users.getuserData.position}
+        </div>
+      </div>
+
       {/* Division */}
       <div className="flex mt-4">
         <div className="w-20">
@@ -182,7 +194,7 @@ export default function RequestList()
             Division:
           </label>
         </div>
-        <div className="w-64">
+        <div className="w-72">
           {users.getuserData.division}
         </div>
       </div>
@@ -451,6 +463,7 @@ export default function RequestList()
         ></div>
         {/* Popup content with background blur */}
         <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+        <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
           <p className="text-lg text-center">{popupMessage}</p>
           <div className="flex justify-center mt-4">
             <button

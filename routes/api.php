@@ -7,6 +7,7 @@ use App\Http\Controllers\AssignPersonnelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GetNotificationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehicleFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //Get Notifications
-    Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
+    // Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
     Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']);
     Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
     Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
@@ -43,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);
     Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
     Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
+    Route::get('/getdriver', [AssignPersonnelController::class, 'getDriver']);
 
     //Inspection Form
     Route::get('/inspectionformtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
@@ -78,6 +80,14 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/facilityapproval/{id}', [FacilityFormController::class, 'AdminApproval']);
     Route::put('/facilitydisapproval/{id}', [FacilityFormController::class, 'AdminDispprove']);
 
+    //For Vehicle Slip Form
+    Route::get('/vehicleform', [VehicleFormController::class, 'index']);
+    Route::post('/vehicleformrequest', [VehicleFormController::class, 'store']);
+    Route::get('/vehicleform/{id}', [VehicleFormController::class, 'show']);
+    Route::get('/myvehicleformrequest/{id}', [VehicleFormController::class, 'myRequest']);
+    Route::put('/vehicleformapprove/{id}', [VehicleFormController::class, 'adminApprove']);
+    Route::put('/vehicleformdisapprove/{id}', [VehicleFormController::class, 'adminDisapprove']);
+
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
@@ -91,3 +101,4 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
+Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);

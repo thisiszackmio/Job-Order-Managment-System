@@ -42,6 +42,7 @@ class AuthController extends Controller
                     'image' => $imageName,
                     'username' => $request->input('username'),
                     'division' => $request->input('division'),
+                    'position' => $request->input('position'),
                     'code_clearance' => $request->input('code_clearance'),
                     'password' => Hash::make($request->input('password')),
                 ]);

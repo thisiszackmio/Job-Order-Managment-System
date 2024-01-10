@@ -5,25 +5,14 @@ import axiosClient from "../axios";
 import { useParams, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
-import loadingAnimation from '../assets/loading.gif';
-import submitAnimation from '../assets/bouncing.gif';
+import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import submitAnimation from '../assets/loading_nobg.gif';
 
 export default function PrePostRepairForm(){
 
   const { currentUser } = useUserStateContext();
 
-  const closePopup = () => {
-    setIsLoading(true);
-    fetchUser();
-    fetchPartB();
-    fetchPartC();
-    fetchPersonneData();
-    fetchPersonnel();
-    setShowPopup(false);
-    setPartBIsEditing(false);
-    setPartCIsEditing(false);
-    setPartDIsEditing(false);
-  };
+  const today = new Date().toISOString().split('T')[0];
 
   //Date Format 
   function formatDate(dateString) {
@@ -440,793 +429,721 @@ export default function PrePostRepairForm(){
     }
 
   }
+
+  const closePopup = () => {
+    setIsLoading(true);
+    fetchUser();
+    fetchPartB();
+    fetchPartC();
+    fetchPersonneData();
+    fetchPersonnel();
+    setShowPopup(false);
+    setPartBIsEditing(false);
+    setPartCIsEditing(false);
+    setPartDIsEditing(false);
+  };
+
+  //Count down
+  const [isVisible, setIsVisible] = useState(false);
+  const [seconds, setSeconds] = useState(3);
+
+  const handleButtonClick = () => {
+    setIsVisible(true); 
+    setSeconds(3);
+    setSubmitLoading(true);
+    setTimeout(() => {
+      generatePDF();
+      setSubmitLoading(false);
+      setIsVisible(false); 
+    }, 1000);
+  };
+
+  useEffect(() => {
+    let timer;
+
+    if (isVisible && seconds > 0) {
+      timer = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isVisible, seconds]);
+
+  useEffect(() => {
+    if (seconds === 0) {
+      setIsVisible(false);
+      setSubmitLoading(false);
+    }
+  }, [seconds]);
   
   return(
     <PageComponent title="Pre-Repair/Post Repair Inspection Form">
     <div>
       {isLoading ? (
-      <div className="flex items-center justify-center h-screen">
-        <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
-        <span className="ml-2">Loading Form...</span>
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+        <img
+          className="mx-auto h-44 w-auto"
+          src={loadingAnimation}
+          alt="Your Company"
+        />
+        <span className="ml-2 animate-heartbeat">Loading Form</span>
       </div>
       ):(
+      <div>
+      {displayRequest.viewRequestData.inspector_status == 1 || 
+      currentUser.code_clearance == 1 ||
+      currentUser.code_clearance == 2 ||
+      currentUser.code_clearance == 3 ||
+      currentUser.code_clearance == 4 ||
+      currentUser.code_clearance == 6 ? 
+      displayRequest.userDetails ? (
         <div>
-        {displayRequest.userDetails ? (
-          <div>
-          
-          {/* Display Preview */}   
-          <div>
-            {/* Control Number */}
-            <div className="font-arial text-right">
-              <span>Control No:</span>{" "}
-              <span style={{ textDecoration: "underline", fontWeight: "900" }}>
-                __________
-                {displayRequest.viewRequestData.id}
-                __________
-              </span>
-            </div>
+        
+        {/* Display Preview */}   
+        <div>
+          {/* Control Number */}
+          <div className="font-arial text-right">
+            <span>Control No:</span>{" "}
+            <span style={{ textDecoration: "underline", fontWeight: "900" }}>
+              __________
+              {displayRequest.viewRequestData.id}
+              __________
+            </span>
+          </div>
 
-          <table className="w-full border-collapse border border-black mt-4">
-            {/* Title and Logo */}
-            <tr>
-              <td className="border border-black w-40 p-2 text-center">
-                <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '80px' }} />
-              </td>
-              <td className="border text-2xl w-3/5 border-black font-arial text-center">
-                <b>PRE-REPAIR/POST REPAIR INSPECTION FORM</b>
-              </td>
-              <td className="border border-black p-0 font-arial">
-                <div className="border-b border-black p-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
-                <div className="border-b border-black p-1">Revision No.: 01</div>
-                <div className="p-1">Date of Effectivity: 03/26/2021</div>
-              </td>
-            </tr>
+        <table className="w-full border-collapse border border-black mt-4">
+          {/* Title and Logo */}
+          <tr>
+            <td className="border border-black w-40 p-2 text-center">
+              <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '80px' }} />
+            </td>
+            <td className="border text-2xl w-3/5 border-black font-arial text-center">
+              <b>PRE-REPAIR/POST REPAIR INSPECTION FORM</b>
+            </td>
+            <td className="border border-black p-0 font-arial">
+              <div className="border-b border-black p-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
+              <div className="border-b border-black p-1">Revision No.: 01</div>
+              <div className="p-1">Date of Effectivity: 03/26/2021</div>
+            </td>
+          </tr>
 
-            {/* Black */}
-            <tr>
-              <td colSpan={3} className="border border-black p-3 font-arial"></td>
-            </tr>
+          {/* Black */}
+          <tr>
+            <td colSpan={3} className="border border-black p-3 font-arial"></td>
+          </tr>
 
-            {/* Part A Label */}
-            <tr>
-              <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6">PART A: To be filled-up by Requesting Party</h3>
-              </td>
-            </tr>
+          {/* Part A Label */}
+          <tr>
+            <td colSpan={3} className="border border-black p-1 font-arial">
+            <h3 className="text-lg font-normal leading-6">PART A: To be filled-up by Requesting Party</h3>
+            </td>
+          </tr>
 
-            {/* Part A Forms */}
-            <tr>
-              <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
-                <div>
+          {/* Part A Forms */}
+          <tr>
+            <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
+              <div>
 
-                  {/* Date Requested */}
-                  <div className="mt-6">
-                    <div className="flex">
-                      <div className="w-36">
-                        <strong>Date</strong>
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                        <span>{formatDate(displayRequest.viewRequestData.date_of_request)}</span>
-                      </div>
+                {/* Date Requested */}
+                <div className="mt-6">
+                  <div className="flex">
+                    <div className="w-36">
+                      <strong>Date</strong>
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                      <span>{formatDate(displayRequest.viewRequestData.date_of_request)}</span>
                     </div>
                   </div>
+                </div>
 
-                  {/* ----- */}
-                  <div className="grid grid-cols-2 gap-4">
+                {/* ----- */}
+                <div className="grid grid-cols-2 gap-4">
 
-                    {/* Column 1 */}
-                    <div className="col-span-1">
+                  {/* Column 1 */}
+                  <div className="col-span-1">
 
-                      {/* Property Number */}
-                      <div className="mt-8">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Property No</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{displayRequest.viewRequestData.property_number}</span>
-                          </div>
+                    {/* Property Number */}
+                    <div className="mt-8">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Property No</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{displayRequest.viewRequestData.property_number}</span>
                         </div>
                       </div>
-
-                      {/* Acquisition Date */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Acquisition Date</strong>
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{formatDate(displayRequest.viewRequestData.acq_date)}</span>
-                          </div> 
-                        </div>
-                      </div>
-
-                      {/* Acquisition Cost */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Acquisition Cost</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>₱{(displayRequest.viewRequestData.acq_cost)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Brand/Model */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Brand/Model</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{displayRequest.viewRequestData.brand_model}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Serial/Engine No. */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Serial/Engine No.</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{displayRequest.viewRequestData.serial_engine_no}</span>
-                          </div>
-                        </div>
-                      </div>
-
                     </div>
 
-                    {/* Column 2 */}
-                    <div className="col-span-1">
+                    {/* Acquisition Date */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Acquisition Date</strong>
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{formatDate(displayRequest.viewRequestData.acq_date)}</span>
+                        </div> 
+                      </div>
+                    </div>
 
-                      {/* Type of Property */}
-                      <div className="mt-6">
-                        <div className="flex">
-                          <div className="w-1/4">
-                            <strong>Type of Property</strong> 
+                    {/* Acquisition Cost */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Acquisition Cost</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>₱{(displayRequest.viewRequestData.acq_cost)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Brand/Model */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Brand/Model</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{displayRequest.viewRequestData.brand_model}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Serial/Engine No. */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Serial/Engine No.</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{displayRequest.viewRequestData.serial_engine_no}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Column 2 */}
+                  <div className="col-span-1">
+
+                    {/* Type of Property */}
+                    <div className="mt-6">
+                      <div className="flex">
+                        <div className="w-1/4">
+                          <strong>Type of Property</strong> 
+                        </div>
+                        <div className="w-68">
+                        {displayRequest.viewRequestData.type_of_property === 'Vehicle Supplies & Materials' ? (
+                          <div>
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2 border-b-0 flex items-center justify-center text-black font-bold">X</div>
+                              <span>Vehicle Supplies & Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2"></div>
+                              <span>IT Equipment & Related Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-t-0 border-black mr-2"></div>
+                              <span>Others: Specify</span>
+                            </div>
                           </div>
-                          <div className="w-68">
-                          {displayRequest.viewRequestData.type_of_property === 'Vehicle Supplies & Materials' ? (
-                            <div>
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 flex items-center justify-center text-black font-bold">X</div>
-                                <span>Vehicle Supplies & Materials</span>
-                              </div>
-
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2"></div>
-                                <span>IT Equipment & Related Materials</span>
-                              </div>
-
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
-                                <span>Others: Specify</span>
-                              </div>
-                            </div>
-                          ) : displayRequest.viewRequestData.type_of_property === 'IT Equipment & Related Materials' ? (
-                            <div>
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
-                                <span>Vehicle Supplies & Materials</span>
-                              </div>
-
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
-                                <span>IT Equipment & Related Materials</span>
-                              </div>
-
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
-                                <span>Others: Specify</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
-                                <span>Vehicle Supplies & Materials</span>
-                              </div>
-
-                              <div className="flex items-center">
+                        ) : displayRequest.viewRequestData.type_of_property === 'IT Equipment & Related Materials' ? (
+                          <div>
+                            <div className="flex items-center">
                               <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
-                                <span>IT Equipment & Related Materials</span>
+                              <span>Vehicle Supplies & Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
+                              <span>IT Equipment & Related Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
+                              <span>Others: Specify</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
+                              <span>Vehicle Supplies & Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                            <div className="w-8 h-8 border border-black mr-2 mt-1"></div>
+                              <span>IT Equipment & Related Materials</span>
+                            </div>
+
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
+                              <div>
+                                <span  className="mr-2">Others:</span>
+                                <span className="w-70 border-b border-black">{displayRequest.viewRequestData.property_other_specific}</span>
                               </div>
-
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 border border-black mr-2 flex items-center justify-center text-black font-bold mt-1">X</div>
-                                <div>
-                                  <span  className="mr-2">Others:</span>
-                                  <span className="w-70 border-b border-black">{displayRequest.viewRequestData.property_other_specific}</span>
-                                </div>
-                              </div>
                             </div>
-                          )}        
                           </div>
+                        )}        
                         </div>
                       </div>
+                    </div>
 
-                      {/* Description */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-60">
-                            <strong>Description</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{displayRequest.viewRequestData.property_description}</span>
-                          </div>
+                    {/* Description */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-60">
+                          <strong>Description</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{displayRequest.viewRequestData.property_description}</span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Location */}
-                      <div className="mt-2">
-                        <div className="flex">
-                          <div className="w-60">
-                            <strong>Location (Div/Section/Unit)</strong> 
-                          </div>
-                          <div className="w-64 border-b border-black pl-1">
-                            <span>{displayRequest.viewRequestData.location}</span>
-                          </div>
+                    {/* Location */}
+                    <div className="mt-2">
+                      <div className="flex">
+                        <div className="w-60">
+                          <strong>Location (Div/Section/Unit)</strong> 
+                        </div>
+                        <div className="w-64 border-b border-black pl-1">
+                          <span>{displayRequest.viewRequestData.location}</span>
                         </div>
                       </div>
-
                     </div>
 
                   </div>
-
-                  {/* Complain */}
-                  <div className="mt-2">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Complain/Defect</strong>
-                      </div>
-                      <div className="w-full border-b border-black pl-1">
-                        <span>{displayRequest.viewRequestData.complain}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* For Signature */}
-                  <div className="mt-10">
-                    <div className="grid grid-cols-2 gap-4">
-
-                      {/* For Requestor Signature */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                            <div>
-                            <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} />
-                            </div>
-                            <span className="text-xl">{displayRequest.userDetails.enduser}</span>
-                          </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>End-User</strong> </label>
-                        </div>
-                      </div>
-                      
-                      {/* For Supervisor Signature */}
-                      <div className="col-span-1"> 
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> 
-                          <strong>NOTED: {displayRequest.viewRequestData.supervisor_approval === 1 ? "Approve" : displayRequest.viewRequestData.supervisor_approval === 2 ? "Disapprove" : null} </strong>
-                        </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                            <div>
-                              {displayRequest.viewRequestData.supervisor_approval !== 0 ? (
-                                <img
-                                src={displayRequest.userDetails.supervisor_signature}
-                                alt="User Signature"
-                                style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }}
-                              />
-                              ): null }
-                              <span className="text-xl">{displayRequest.userDetails.supervisor}</span>
-                            </div>
-                          </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Immediate Supervisor</strong> </label>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Buttons */}
-                  {currentUser.id === displayRequest.viewRequestData.supervisor_name && displayRequest.viewRequestData.supervisor_approval === 0 ? 
-                  (
-                  <div className="flex mt-12 justify-center">
-                    <button 
-                      onClick={() => handleApproveClick(displayRequest.viewRequestData.id)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                      title="Approve"
-                    >
-                      Approve
-                    </button>
-                    <button 
-                      onClick={() => handleDisapproveClick(displayRequest.viewRequestData.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
-                      title="Disapprove"
-                    >
-                      Disapprove
-                    </button>
-                  </div>
-                  ) : null }
 
                 </div>
-              </td>
-            </tr>
 
-            {/* Part B Label */}
-            <tr>
-              <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6">PART B: To be filled-up by Administrative Division</h3>
-              </td>
-            </tr>
-
-            {/* Part B Forms */}
-            <tr>
-              <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
-
-                {getPartB.length > 0 ? (
-                <>
-                {getPartB.map((item, index) => (
-                  <div key={index}>
-
-                  {/* Date */}
-                  <div className="mt-8">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Date</strong> 
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                        <span>{formatDate(item.date_of_filling)}</span>
-                      </div>
+                {/* Complain */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Complain/Defect</strong>
+                    </div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span>{displayRequest.viewRequestData.complain}</span>
                     </div>
                   </div>
-                  
-                  {/* Date of Last Repair */}
-                  <div className="mt-8">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Date of Last Repair</strong> 
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                        <span>{item.date_of_last_repair ? (formatDate(item.date_of_last_repair)):("N/A")}</span>
-                      </div>
-                    </div>
-                  </div>
+                </div>
 
-                  {/* Nature of Repair */}
-                  <div className="mt-4">
-                    <div className="flex">
-                      <div className="w-52">
-                        <strong>Nature of Last Repair</strong>
-                      </div>
-                      <div className="w-full border-b border-black pl-1">
-                        <span>{item.nature_of_last_repair ? (item.nature_of_last_repair):("N/A")}</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* For Signature */}
+                <div className="mt-10">
+                  <div className="grid grid-cols-2 gap-4">
 
-                  {/* Signature */}
-                  <div className="mt-10">
-
-                    <div className="grid grid-cols-2 gap-4">
-
-                      {/* For GSO Signature */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                            <img 
-                              src={displayRequest.gsoDetails.gso_signature} 
-                              alt="User Signature" 
-                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
-                            />
-                            <span className="text-xl">{displayRequest.gsoDetails.gso_name}</span>
-                          </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>General Service Officer</strong> </label>
-                        </div>
-                      </div>
-
-                      {/* For Admin Division Manager */}
-                      <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6">
-                        <strong>NOTED:</strong>
-                      </label>
-                        <div className="mt-10">
+                    {/* For Requestor Signature */}
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
+                      <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                           <div>
-                            {displayRequest.viewRequestData.admin_approval === 1 ? (
-                              <img
-                              src={displayRequest.manegerDetails.manager_signature}
-                              alt="User Signature"
-                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
-                            />
-                            ):null}
-                            <span className="text-xl">{displayRequest.manegerDetails.manager_name}</span>
+                          <img src={displayRequest.userDetails.requestor_signature} alt="User Signature" style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} />
                           </div>
+                          <span className="text-xl">{displayRequest.userDetails.enduser}</span>
                         </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Admin Division Manager</strong> </label>
-                        </div>
-                      </div>
-
-                    </div>
-
-                  </div>  
-
-                  {/* Button */}
-                  {displayRequest.viewRequestData.admin_approval !== 1 && currentUser.code_clearance === 1 ? (
-                  <div className="flex mt-12 justify-center">
-                    <button 
-                      onClick={() => handleAdminApproveClick(displayRequest.viewRequestData.id)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                      title="Approve"
-                    >
-                      Approve
-                    </button>
-                    <button 
-                      onClick={() => handleAdminDisapproveClick(displayRequest.viewRequestData.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
-                      title="Disapprove"
-                    >
-                      Disapprove
-                    </button>
-                  </div> 
-                  ):null}
-
-                  </div>
-                ))}
-                </>
-                ):(
-                <form onSubmit={event => SubmitInspectionFormTo(event, displayRequest.viewRequestData.id)}>
-
-                  {/* Date */}
-                  <div className="mt-8">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Date</strong> 
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                        {partBisEditing ? (
-                          <div className="w-64">
-                            <input
-                              type="date"
-                              name="date_filled"
-                              id="date_filled"
-                              value={filledDate}
-                              onChange={ev => setFilledDate(ev.target.value)}
-                              className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            />
-                          </div>
-                        ):null}
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>End-User</strong> </label>
                       </div>
                     </div>
-                  </div>
-                  {inputErrors.date_of_filling && (
-                  <p className="text-red-500 text-xs mt-2" style={{ marginLeft:'180px' }}>Date is required</p>
-                  )}
-
-                  {/* Date of Last Repair */}
-                  <div className="mt-8">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Date of Last Repair</strong> 
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                        {partBisEditing ? (
-                          <div className="w-64">
-                            <input
-                              type="date"
-                              name="last_date_filled"
-                              id="last_date_filled"
-                              value={lastfilledDate}
-                              onChange={ev => setLastFilledDate(ev.target.value)}
-                              className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            />
-                          </div>
-                        ):null}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-400 text-xs mt-2" style={{ marginLeft:'180px' }}>Leave it blank if "N/A"</p>
-
-                  {/* Nature of Repair */}
-                  <div className="mt-4">
-                    <div className="flex">
-                      <div className="w-52">
-                        <strong>Nature of Last Repair</strong>
-                      </div>
-                      <div className="w-full border-b border-black pl-1">
-                      {partBisEditing ? (
-                        <div className="w-full">
-                        <textarea
-                          id="nature_repair"
-                          name="nature_repair"
-                          rows={1}
-                          value={natureRepair}
-                          onChange={ev => setNatureRepair(ev.target.value)}
-                          placeholder="Input here"
-                          className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                        </div>
-                      ):null}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-400 text-xs mt-2" style={{ marginLeft:'180px' }}>Leave it blank if "N/A"</p>
-
-                  {/* Assign Personnel */}
-                  <div className="mt-8">
-                    <div className="flex">
-                      <div className="w-44">
-                        <strong>Assign Personnel</strong> 
-                      </div>
-                      <div className="w-64 border-b border-black pl-1">
-                      {partBisEditing ? (
-                      <select 
-                        name="plate_number" 
-                        id="plate_number" 
-                        autoComplete="request-name"
-                        value={pointPersonnel}
-                        onChange={ev => setPointPersonnel(ev.target.value)}
-                        className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      > 
-                        <option value="" disabled>Select an option</option>
-                        {getPersonnel.map(user => (
-                          <option key={user.id} value={user.id}>{user.name} - {user.type}</option>
-                        ))}
-                      </select>
-                      ):null}
-                      </div>
-                    </div>
-                  </div>
-                  {inputErrors.assign_personnel && (
-                  <p className="text-red-500 text-xs mt-2" style={{ marginLeft:'180px' }}>Assign Personnel is required</p>
-                  )}
-
-                  {/* Signature */}
-                  <div className="mt-10">
-
-                    <div className="grid grid-cols-2 gap-4">
-
-                      {/* For GSO Signature */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>REQUESTED BY:</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>General Service Officer</strong> </label>
-                        </div>
-                      </div>
-
-                      {/* For Admin Division Manager */}
-                      <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900">
-                        <strong>NOTED:</strong>
+                    
+                    {/* For Supervisor Signature */}
+                    <div className="col-span-1"> 
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> 
+                        <strong>NOTED: {displayRequest.viewRequestData.supervisor_approval === 1 ? "Approve" : displayRequest.viewRequestData.supervisor_approval === 2 ? "Disapprove" : null} </strong>
                       </label>
-                        <div className="mt-10">
-                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Admin Division Manager</strong> </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                          <div>
+                            {displayRequest.viewRequestData.supervisor_approval !== 0 ? (
+                              <img
+                              src={displayRequest.userDetails.supervisor_signature}
+                              alt="User Signature"
+                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }}
+                            />
+                            ): null }
+                            <span className="text-xl">{displayRequest.userDetails.supervisor}</span>
+                          </div>
                         </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Immediate Supervisor</strong> </label>
                       </div>
-
                     </div>
 
-                  </div>  
+                  </div>
+                </div>
 
-                  {/* Buttons */}
-                  {getPartB.length > 0 ? null:(
-                    currentUser.code_clearance === 3 ? (
-                      <div className="mt-10">
-                        {button ? (
-                        <button
-                          onClick={handlePartBEditClick}
-                          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                          Fill up the Part B
-                        </button>
-                        ):null}
-                        {partBisEditing ? (
-                          <>
-                          <button
-                            type="submit"
-                            className={`rounded-md px-3 py-2 text-sm ml-2 font-semibold text-white shadow-sm focus:outline-none ${
-                              isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                            }`}
-                            disabled={isLoading}
-                          >
-                            {submitLoading ? (
-                              <div className="flex items-center justify-center">
-                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-2">Processing...</span>
-                              </div>
-                            ) : (
-                              'Submit'
-                            )}
-                          </button>
-                          <button 
-                          onClick={handleDisableEdit}
-                          className="bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2"
-                          > 
-                            Cancel     
-                          </button>
-                          </>
-                        ):null}
-                      </div>
-                    ):null
-                  )}
-      
+                {/* Buttons */}
+                {currentUser.id === displayRequest.viewRequestData.supervisor_name && displayRequest.viewRequestData.supervisor_approval === 0 ? 
+                (
+                <div className="flex mt-12 justify-center">
+                  <button 
+                    onClick={() => handleApproveClick(displayRequest.viewRequestData.id)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                    title="Approve"
+                  >
+                    Approve
+                  </button>
+                  <button 
+                    onClick={() => handleDisapproveClick(displayRequest.viewRequestData.id)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
+                    title="Disapprove"
+                  >
+                    Disapprove
+                  </button>
+                </div>
+                ) : null }
 
-                </form>
-                )}
+              </div>
+            </td>
+          </tr>
 
-              </td>
-            </tr>
+          {/* Part B Label */}
+          <tr>
+            <td colSpan={3} className="border border-black p-1 font-arial">
+            <h3 className="text-lg font-normal leading-6">PART B: To be filled-up by Administrative Division</h3>
+            </td>
+          </tr>
 
-            {/* Part C Label */}
-            <tr>
-              <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
-              </td>
-            </tr>
+          {/* Part B Forms */}
+          <tr>
+            <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
 
-            {/* Part C Forms */}
-            <tr>
-              <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
-              
-              {getPartC.length > 0 ? (
+              {getPartB.length > 0 ? (
               <>
-              {getPartC.map((item, index) => (
+              {getPartB.map((item, index) => (
                 <div key={index}>
 
-                  {item.findings === "no data" || 
-                  item.recommendations === "no data" || 
-                  item.before_repair_date === "1970-01-01" ? (
-                  <>
-                  <form onSubmit={SubmitPartC}>
-                    {/* Findings */}
-                    <div className="mt-10">
-                      <div className="flex">
-                        <div className="w-44">
-                          <strong>Findings</strong>
-                        </div>
-                        <div className="w-full border-b border-black pl-1">
-                        {partCisEditing ? (
-                          <div className="w-full">
-                          <textarea
-                            id="findings"
-                            name="findings"
-                            rows={1}
-                            style={{ resize: "none" }}
-                            placeholder="Input Here"
-                            value= {finding}
-                            onChange={ev => setFinding(ev.target.value)}
-                            className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                {/* Date */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Date</strong> 
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                      <span>{formatDate(item.date_of_filling)}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Date of Last Repair */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Date of Last Repair</strong> 
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                      <span>{item.date_of_last_repair ? (formatDate(item.date_of_last_repair)):("N/A")}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Nature of Repair */}
+                <div className="mt-4">
+                  <div className="flex">
+                    <div className="w-52">
+                      <strong>Nature of Last Repair</strong>
+                    </div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span>{item.nature_of_last_repair ? (item.nature_of_last_repair):("N/A")}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signature */}
+                <div className="mt-10">
+
+                  <div className="grid grid-cols-2 gap-4">
+
+                    {/* For GSO Signature */}
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>REQUESTED BY:</strong> </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                          <img 
+                            src={displayRequest.gsoDetails.gso_signature} 
+                            alt="User Signature" 
+                            style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
                           />
-                          </div>
-                        ):null}
+                          <span className="text-xl">{displayRequest.gsoDetails.gso_name}</span>
                         </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>General Service Officer</strong> </label>
                       </div>
                     </div>
 
-                    {/* Recomendations */}
-                    <div className="mt-4">
-                      <div className="flex">
-                        <div className="w-44">
-                          <strong>Recommendation/s</strong> 
+                    {/* For Admin Division Manager */}
+                    <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6">
+                      <strong>NOTED: {displayRequest.viewRequestData.admin_approval === 1 ? "Approve" : displayRequest.viewRequestData.admin_approval === 2 ? "Disapprove" : null}</strong>
+                    </label>
+                      <div className="mt-10">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                        <div>
+                          {displayRequest.viewRequestData.admin_approval === 1 || displayRequest.viewRequestData.admin_approval === 2 ? (
+                            <img
+                            src={displayRequest.manegerDetails.manager_signature}
+                            alt="User Signature"
+                            style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
+                          />
+                          ):null}
+                          <span className="text-xl">{displayRequest.manegerDetails.manager_name}</span>
                         </div>
-                        <div className="w-full border-b border-black pl-1">
-                        {partCisEditing ? (
-                          <div className="w-full">
-                            <textarea
-                              id="recomendations"
-                              name="recomendations"
-                              rows={1}
-                              style={{ resize: "none" }}
-                              placeholder="Input Here"
-                              value= {recommendation}
-                              onChange={ev => setRecommendation(ev.target.value)}
-                              className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                          </div>
-                        ):null}
-                        </div>
+                      </div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Admin Division Manager</strong> </label>
                       </div>
                     </div>
 
-                    {/* Signature */}
+                  </div>
+
+                </div>  
+
+                {/* Button */}
+                {displayRequest.viewRequestData.admin_approval === 3 && currentUser.code_clearance === 1 ? (
+                <div className="flex mt-12 justify-center">
+                  <button 
+                    onClick={() => handleAdminApproveClick(displayRequest.viewRequestData.id)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                    title="Approve"
+                  >
+                    Approve
+                  </button>
+                  <button 
+                    onClick={() => handleAdminDisapproveClick(displayRequest.viewRequestData.id)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
+                    title="Disapprove"
+                  >
+                    Disapprove
+                  </button>
+                </div> 
+                ):null}
+
+                </div>
+              ))}
+              </>
+              ):(
+              <form onSubmit={event => SubmitInspectionFormTo(event, displayRequest.viewRequestData.id)}>
+
+                {/* Date */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Date</strong> 
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                      {partBisEditing ? (
+                        <div className="w-64">
+                          <input
+                            type="date"
+                            name="date_filled"
+                            id="date_filled"
+                            value={filledDate}
+                            onChange={ev => setFilledDate(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            min={today}
+                          />
+                        </div>
+                      ):null}
+                    </div>
+                  </div>
+                </div>
+                {inputErrors.date_of_filling && (
+                <p className="text-red-500 text-xs mt-2" style={{ marginLeft:'180px' }}>Date is required</p>
+                )}
+
+                {/* Date of Last Repair */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Date of Last Repair</strong> 
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                      {partBisEditing ? (
+                        <div className="w-64">
+                          <input
+                            type="date"
+                            name="last_date_filled"
+                            id="last_date_filled"
+                            value={lastfilledDate}
+                            onChange={ev => setLastFilledDate(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                          />
+                        </div>
+                      ):null}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-xs mt-2" style={{ marginLeft:'180px' }}>Leave it blank if "N/A"</p>
+
+                {/* Nature of Repair */}
+                <div className="mt-4">
+                  <div className="flex">
+                    <div className="w-52">
+                      <strong>Nature of Last Repair</strong>
+                    </div>
+                    <div className="w-full border-b border-black pl-1">
+                    {partBisEditing ? (
+                      <div className="w-full">
+                      <textarea
+                        id="nature_repair"
+                        name="nature_repair"
+                        rows={1}
+                        value={natureRepair}
+                        onChange={ev => setNatureRepair(ev.target.value)}
+                        placeholder="Input here"
+                        className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      </div>
+                    ):null}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-xs mt-2" style={{ marginLeft:'180px' }}>Leave it blank if "N/A"</p>
+
+                {/* Assign Personnel */}
+                <div className="mt-8">
+                  <div className="flex">
+                    <div className="w-44">
+                      <strong>Assign Personnel</strong> 
+                    </div>
+                    <div className="w-64 border-b border-black pl-1">
+                    {partBisEditing ? (
+                    <select 
+                      name="plate_number" 
+                      id="plate_number" 
+                      autoComplete="request-name"
+                      value={pointPersonnel}
+                      onChange={ev => setPointPersonnel(ev.target.value)}
+                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    > 
+                      <option value="" disabled>Select an option</option>
+                      {getPersonnel.map(user => (
+                        <option key={user.id} value={user.id}>{user.name} - {user.type}</option>
+                      ))}
+                    </select>
+                    ):null}
+                    </div>
+                  </div>
+                </div>
+                {inputErrors.assign_personnel && (
+                <p className="text-red-500 text-xs mt-2" style={{ marginLeft:'180px' }}>Assign Personnel is required</p>
+                )}
+
+                {/* Signature */}
+                <div className="mt-10">
+
+                  <div className="grid grid-cols-2 gap-4">
+
+                    {/* For GSO Signature */}
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>REQUESTED BY:</strong> </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>General Service Officer</strong> </label>
+                      </div>
+                    </div>
+
+                    {/* For Admin Division Manager */}
+                    <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900">
+                      <strong>NOTED:</strong>
+                    </label>
+                      <div className="mt-10">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Admin Division Manager</strong> </label>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>  
+
+                {/* Buttons */}
+                {getPartB.length > 0 ? null:(
+                  currentUser.code_clearance === 3 ? (
                     <div className="mt-10">
-                      <div className="grid grid-cols-2 gap-4">
-
-                      {/* Date Inspected */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>DATE INSPECTED</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                          {partCisEditing ? (
-                            <div className="w-64">
-                              <input
-                                type="date"
-                                name="date_insp"
-                                id="date_insp"
-                                value= {beforeDate}
-                                onChange={ev => setBeforeDate(ev.target.value)}
-                                className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                              />
+                      {button ? (
+                      <button
+                        onClick={handlePartBEditClick}
+                        className="bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
+                      >
+                        Fill up the Part B
+                      </button>
+                      ):null}
+                      {partBisEditing ? (
+                        <>
+                        <button
+                          type="submit"
+                          className={`rounded-md px-3 py-2 text-sm ml-2 font-semibold text-white shadow-sm focus:outline-none ${
+                            submitLoading ? 'bg-gray-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
+                          }`}
+                          style={{ position: 'relative', top: '0px' }}
+                          disabled={submitLoading}
+                        >
+                          {submitLoading ? (
+                            <div className="flex items-center justify-center">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-2">Processing...</span>
                             </div>
-                          ):null}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Inspector */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>               
-                            {assignPersonnel.map((item, index) => (
-                              <div key={index} className="personnel-container">
-                                <span>{item.p_name}</span>
-                              </div>
-                            ))}
-                          </div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
-                        </div>
-                      </div>
-
-                      </div>
+                          ) : (
+                            'Submit'
+                          )}
+                        </button>
+                        <button 
+                        onClick={handleDisableEdit}
+                        //className="bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2"
+                        className={`bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2 focus:outline-none ${
+                          submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                        }`}
+                        disabled={submitLoading}
+                        > 
+                          {submitLoading ? (
+                            <div className="flex items-center justify-center">
+                              <span>Cancel</span>
+                            </div>
+                          ) : (
+                            'Cancel'
+                          )}     
+                        </button>
+                        </>
+                      ):null}
                     </div>
+                  ):null
+                )}
+    
 
-                    {/* Buttons */}
-                    {getPartB.map((item, index) => (
-                      <div key={index}>
-                        {currentUser.id === item.assign_personnel ? (
-                          <div className="mt-10">
-                          {button2 ? (
-                            <button 
-                              onClick={handlePartCEditClick}
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                            > 
-                              Fill up the Part C     
-                            </button>
-                          ):null}
-                          
-                          {partCisEditing ? (
-                          <>
-                            <button
-                              type="submit"
-                              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                                submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                              }`}
-                              disabled={submitLoading}
-                            >
-                              {submitLoading ? (
-                                <div className="flex items-center justify-center">
-                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                  <span className="ml-2">Processing...</span>
-                                </div>
-                              ) : (
-                                'Submit'
-                              )}
-                            </button>
-                            <button 
-                              onClick={handleDisableEdit}
-                              className="bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2"
-                            > 
-                              Cancel     
-                            </button>
-                          </>
-                          ):null}
-                        </div>
-                        ):null}
-                      </div>
-                    ))}
-                    
+              </form>
+              )}
 
-                  </form>
-                  </> 
-                  ):(
-                  <>
+            </td>
+          </tr>
+
+          {/* Part C Label */}
+          <tr>
+            <td colSpan={3} className="border border-black p-1 font-arial">
+            <h3 className="text-lg font-normal leading-6">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
+            </td>
+          </tr>
+
+          {/* Part C Forms */}
+          <tr>
+            <td colSpan={3} className="border border-black pl-2 pr-2 pb-8 font-arial">
+            
+            {getPartC.length > 0 ? (
+            <>
+            {getPartC.map((item, index) => (
+              <div key={index}>
+
+                {item.findings === "no data" || 
+                item.recommendations === "no data" || 
+                item.before_repair_date === "1970-01-01" ? (
+                <>
+                <form onSubmit={SubmitPartC}>
                   {/* Findings */}
                   <div className="mt-10">
                     <div className="flex">
@@ -1234,7 +1151,20 @@ export default function PrePostRepairForm(){
                         <strong>Findings</strong>
                       </div>
                       <div className="w-full border-b border-black pl-1">
-                        <span>{item.findings !== "no data" ? item.findings : null}</span>
+                      {partCisEditing ? (
+                        <div className="w-full">
+                        <textarea
+                          id="findings"
+                          name="findings"
+                          rows={1}
+                          style={{ resize: "none" }}
+                          placeholder="Input Here"
+                          value= {finding}
+                          onChange={ev => setFinding(ev.target.value)}
+                          className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        </div>
+                      ):null}
                       </div>
                     </div>
                   </div>
@@ -1246,63 +1176,137 @@ export default function PrePostRepairForm(){
                         <strong>Recommendation/s</strong> 
                       </div>
                       <div className="w-full border-b border-black pl-1">
-                        <span>{item.recommendations !== "no data" ? item.recommendations : null}</span>
+                      {partCisEditing ? (
+                        <div className="w-full">
+                          <textarea
+                            id="recomendations"
+                            name="recomendations"
+                            rows={1}
+                            style={{ resize: "none" }}
+                            placeholder="Input Here"
+                            value= {recommendation}
+                            onChange={ev => setRecommendation(ev.target.value)}
+                            className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                        </div>
+                      ):null}
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Signature */}
                   <div className="mt-10">
                     <div className="grid grid-cols-2 gap-4">
 
                     {/* Date Inspected */}
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>DATE INSPECTED</strong> </label>
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>DATE INSPECTED</strong> </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                          <span>{item.before_repair_date !== "1970-01-01" ? formatDate(item.before_repair_date) : null }</span>
+                        {partCisEditing ? (
+                          <div className="w-64">
+                            <input
+                              type="date"
+                              name="date_insp"
+                              id="date_insp"
+                              value= {beforeDate}
+                              onChange={ev => setBeforeDate(ev.target.value)}
+                              min={today}
+                              className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                            />
+                          </div>
+                        ):null}
                         </div>
                       </div>
                     </div>
 
                     {/* Inspector */}
                     <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>NOTED:</strong> </label>
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
                       <div className="mt-10">
                         <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>               
                           {assignPersonnel.map((item, index) => (
                             <div key={index} className="personnel-container">
-                              <img
-                                src={item.p_signature}
-                                alt="User Signature"
-                                style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
-                              />
-                              <span className="text-lg">{item.p_name}</span>
+                              <span>{item.p_name}</span>
                             </div>
                           ))}
                         </div>
-                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Property Inspector</strong> </label>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
                       </div>
                     </div>
 
                     </div>
                   </div>
 
-                  </>
-                  )}
+                  {/* Buttons */}
+                  {getPartB.map((item, index) => (
+                    <div key={index}>
+                      {currentUser.id === item.assign_personnel && displayRequest.viewRequestData.inspector_status == 4 ? (
+                        <div className="mt-10">
+                        {button2 ? (
+                          <button 
+                            onClick={handlePartCEditClick}
+                            className="bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
+                          > 
+                            Fill up the Part C     
+                          </button>
+                        ):null}
+                        
+                        {partCisEditing ? (
+                        <>
+                          <button
+                            type="submit"
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                              submitLoading ? 'bg-gray-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
+                            }`}
+                            disabled={submitLoading}
+                          >
+                            {submitLoading ? (
+                              <div className="flex items-center justify-center">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-2">Processing...</span>
+                              </div>
+                            ) : (
+                              'Submit'
+                            )}
+                          </button>
+                          <button 
+                            onClick={handleDisableEdit}
+                            //className="bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2"
+                            className={`bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded ml-2 focus:outline-none ${
+                              submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                            }`}
+                            disabled={submitLoading}
+                            > 
+                              {submitLoading ? (
+                                <div className="flex items-center justify-center">
+                                  <span>Cancel</span>
+                                </div>
+                              ) : (
+                                'Cancel'
+                              )}     
+                          </button>
+                        </>
+                        ):null}
+                      </div>
+                      ):null}
+                    </div>
+                  ))}
+                  
 
-                </div>
-              ))}
-              </>
-              ):(
-              <>
+                </form>
+                </> 
+                ):(
+                <>
                 {/* Findings */}
                 <div className="mt-10">
                   <div className="flex">
                     <div className="w-44">
                       <strong>Findings</strong>
                     </div>
-                    <div className="w-full border-b border-black pl-1"></div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span>{item.findings !== "no data" ? item.findings : null}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1312,57 +1316,178 @@ export default function PrePostRepairForm(){
                     <div className="w-44">
                       <strong>Recommendation/s</strong> 
                     </div>
-                    <div className="w-full border-b border-black pl-1"> </div>
+                    <div className="w-full border-b border-black pl-1">
+                      <span>{item.recommendations !== "no data" ? item.recommendations : null}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Signature */}
+                <div className="mt-10">
+                  <div className="grid grid-cols-2 gap-4">
+
+                  {/* Date Inspected */}
+                  <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>DATE INSPECTED</strong> </label>
+                    <div className="mt-10">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                        <span>{item.before_repair_date !== "1970-01-01" ? formatDate(item.before_repair_date) : null }</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Inspector */}
+                  <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-medium leading-6"> <strong>NOTED:</strong> </label>
+                    <div className="mt-10">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>               
+                        {assignPersonnel.map((item, index) => (
+                          <div key={index} className="personnel-container">
+                            <img
+                              src={item.p_signature}
+                              alt="User Signature"
+                              style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
+                            />
+                            <span className="text-lg">{item.p_name}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6"> <strong>Property Inspector</strong> </label>
+                    </div>
+                  </div>
+
                   </div>
                 </div>
 
-                {/* Signature */}
-                <div className="mt-10">
-                      <div className="grid grid-cols-2 gap-4">
+                </>
+                )}
 
-                      {/* Date Inspected */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>DATE INSPECTED</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
-                        </div>
-                      </div>
+              </div>
+            ))}
+            </>
+            ):(
+            <>
+              {/* Findings */}
+              <div className="mt-10">
+                <div className="flex">
+                  <div className="w-44">
+                    <strong>Findings</strong>
+                  </div>
+                  <div className="w-full border-b border-black pl-1"></div>
+                </div>
+              </div>
 
-                      {/* Inspector */}
-                      <div className="col-span-1">
-                        <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
-                        <div className="mt-10">
-                          <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
-                          <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
-                        </div>
-                      </div>
+              {/* Recomendations */}
+              <div className="mt-4">
+                <div className="flex">
+                  <div className="w-44">
+                    <strong>Recommendation/s</strong> 
+                  </div>
+                  <div className="w-full border-b border-black pl-1"> </div>
+                </div>
+              </div>
 
+              {/* Signature */}
+              <div className="mt-10">
+                    <div className="grid grid-cols-2 gap-4">
+
+                    {/* Date Inspected */}
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>DATE INSPECTED</strong> </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
                       </div>
                     </div>
-              </>
-              )}
 
-              </td>
-            </tr>
+                    {/* Inspector */}
+                    <div className="col-span-1">
+                      <label htmlFor="type_of_property" className="block text-sm font-medium leading-6 text-gray-900"> <strong>NOTED:</strong> </label>
+                      <div className="mt-10">
+                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}></div>
+                        <label htmlFor="type_of_property" className="block text-sm text-center font-medium italic leading-6 text-gray-900"> <strong>Property Inspector</strong> </label>
+                      </div>
+                    </div>
 
-            {/* Part D Label */}
-            <tr>
-              <td colSpan={3} className="border border-black p-1 font-arial">
-              <h3 className="text-lg font-normal leading-6">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
-              </td>
-            </tr>
+                    </div>
+                  </div>
+            </>
+            )}
 
-            {/* Part D Forms */}
-            <tr>
-              <td colSpan={3} className="border border-black pl-2 pr-2 font-arial">
+            </td>
+          </tr>
 
-                {getPartC.length > 0 ? (
-                <>
-                  {getPartC.map((item, index) => (
-                    <div key={index}>
-                      {item.after_reapir_date ||
-                      item.remarks ? (
-                      <>
+          {/* Part D Label */}
+          <tr>
+            <td colSpan={3} className="border border-black p-1 font-arial">
+            <h3 className="text-lg font-normal leading-6">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
+            </td>
+          </tr>
+
+          {/* Part D Forms */}
+          <tr>
+            <td colSpan={3} className="border border-black pl-2 pr-2 font-arial">
+
+              {getPartC.length > 0 ? (
+              <>
+                {getPartC.map((item, index) => (
+                  <div key={index}>
+                    {item.after_reapir_date ||
+                    item.remarks ? (
+                    <>
+
+                      {/* Remarks if has no data */}
+                      <div className="mt-10">
+                        <div className="flex">
+                          <div className="w-44">
+                            <strong>Remark/s</strong>
+                          </div>
+                          <div className="w-full border-b border-black pl-1">
+                          <span>{item.remarks}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Signature */}
+                      <div className="mt-10 pb-10">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-1">
+                              <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
+                                DATE INSPECTED
+                              </label>
+                              <div className="mt-12">
+                                <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                                <span>{formatDate(item.after_reapir_date)}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col-span-1">
+                              <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
+                                NOTED:
+                              </label>
+                              <div className="mt-10">
+                                <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                                {assignPersonnel.map((item, index) => (
+                                  <div key={index} className="personnel-container">
+                                    <img
+                                      src={item.p_signature}
+                                      alt="User Signature"
+                                      style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
+                                    />
+                                    <span className="text-lg">{item.p_name}</span>
+                                  </div>
+                                ))}
+                                </div>
+                                <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
+                                  Property Inspector
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                    </>
+                    ):(
+                      <form onSubmit={SubmitPartD}>
 
                         {/* Remarks if has no data */}
                         <div className="mt-10">
@@ -1371,285 +1496,247 @@ export default function PrePostRepairForm(){
                               <strong>Remark/s</strong>
                             </div>
                             <div className="w-full border-b border-black pl-1">
-                            <span>{item.remarks}</span>
+                            {partDisEditing ? (
+                              <div className="w-full">
+                                <textarea
+                                  id="recomendations"
+                                  name="recomendations"
+                                  rows={1}
+                                  style={{ resize: "none" }}
+                                  placeholder="Input Here"
+                                  value={remarks}
+                                  onChange={(ev) => setRemarks(ev.target.value)}
+                                  className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                />
+                              </div>
+                            ):null}
                             </div>
                           </div>
                         </div>
 
                         {/* Signature */}
                         <div className="mt-10 pb-10">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
-                                  DATE INSPECTED
-                                </label>
-                                <div className="mt-12">
-                                  <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                  <span>{formatDate(item.after_reapir_date)}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
-                                  NOTED:
-                                </label>
-                                <div className="mt-10">
-                                  <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                  {assignPersonnel.map((item, index) => (
-                                    <div key={index} className="personnel-container">
-                                      <img
-                                        src={item.p_signature}
-                                        alt="User Signature"
-                                        style={{ position: 'absolute', width: '100%', top: '-55px', left: '0px' }} 
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-1">
+                              <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                                DATE INSPECTED
+                              </label>
+                              <div className="mt-12">
+                                <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                                  {partDisEditing ? (
+                                    <div className="w-64">
+                                      <input
+                                        type="date"
+                                        name="date_insp"
+                                        id="date_insp"
+                                        value={afterDate}
+                                        onChange={(ev) => setAfterDate(ev.target.value)}
+                                        min={today}
+                                        className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                                       />
-                                      <span className="text-lg">{item.p_name}</span>
                                     </div>
-                                  ))}
+                                  ):null}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col-span-1">
+                              <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
+                                NOTED:
+                              </label>
+                              <div className="mt-10">
+                                <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                                {assignPersonnel.map((item, index) => (
+                                  <div key={index} className="personnel-container">
+                                    <span>{item.p_name}</span>
                                   </div>
-                                  <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
-                                    Property Inspector
-                                  </label>
+                                ))}
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-
-                      </>
-                      ):(
-                        <form onSubmit={SubmitPartD}>
-
-                          {/* Remarks if has no data */}
-                          <div className="mt-10">
-                            <div className="flex">
-                              <div className="w-44">
-                                <strong>Remark/s</strong>
-                              </div>
-                              <div className="w-full border-b border-black pl-1">
-                              {partDisEditing ? (
-                                <div className="w-full">
-                                  <textarea
-                                    id="recomendations"
-                                    name="recomendations"
-                                    rows={1}
-                                    style={{ resize: "none" }}
-                                    placeholder="Input Here"
-                                    value={remarks}
-                                    onChange={(ev) => setRemarks(ev.target.value)}
-                                    className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                  />
-                                </div>
-                              ):null}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Signature */}
-                          <div className="mt-10 pb-10">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
-                                  DATE INSPECTED
+                                <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
+                                  Property Inspector
                                 </label>
-                                <div className="mt-12">
-                                  <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                    {partDisEditing ? (
-                                      <div className="w-64">
-                                        <input
-                                          type="date"
-                                          name="date_insp"
-                                          id="date_insp"
-                                          value={afterDate}
-                                          onChange={(ev) => setAfterDate(ev.target.value)}
-                                          className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                        />
-                                      </div>
-                                    ):null}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-span-1">
-                                <label htmlFor="type_of_property" className="block text-sm font-bold leading-6 text-gray-900">
-                                  NOTED:
-                                </label>
-                                <div className="mt-10">
-                                  <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                  {assignPersonnel.map((item, index) => (
-                                    <div key={index} className="personnel-container">
-                                      <span>{item.p_name}</span>
-                                    </div>
-                                  ))}
-                                  </div>
-                                  <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6 text-gray-900">
-                                    Property Inspector
-                                  </label>
-                                </div>
                               </div>
                             </div>
                           </div>
-
-                          {/* Submitt Button */}
-                          {partDisEditing ? (
-                            <div className="flex mt-10 mb-8">
-                            <button
-                              type="submit"
-                              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                                submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                              }`}
-                              disabled={submitLoading}
-                            >
-                              {submitLoading ? (
-                                <div className="flex items-center justify-center">
-                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                  <span className="ml-2">Processing...</span>
-                                </div>
-                              ) : (
-                                'Submit'
-                              )}
-                            </button>
-                            <button
-                              onClick={handleDisableEdit}
-                              className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded ml-2"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                          ):null}
-
-                        </form>
-
-                        
-                      )}
-                      {/* Button */}
-                      {button3 ? (
-                      <>
-                       {getPartB.map((item, index) => (
-                        <div key={index} className="mb-8">
-                          {currentUser.id === item.assign_personnel ? (
-                            <button
-                              onClick={handlePartDEditClick}
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                              Fill up the Part D
-                            </button>
-                          ):null}
                         </div>
-                       ))}
-                      </>
-                      ):null}
+
+                        {/* Submitt Button */}
+                        {partDisEditing ? (
+                          <div className="flex mt-10 mb-8">
+                          <button
+                            type="submit"
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                              submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                            }`}
+                            disabled={submitLoading}
+                          >
+                            {submitLoading ? (
+                              <div className="flex items-center justify-center">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-2">Processing...</span>
+                              </div>
+                            ) : (
+                              'Submit'
+                            )}
+                          </button>
+                          <button
+                            onClick={handleDisableEdit}
+                            className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded ml-2"
+                          >
+                            Cancel
+                          </button>
                         </div>
+                        ):null}
+
+                      </form>
+
+                      
+                    )}
+                    {/* Button */}
+                    {button3 ? (
+                    <>
+                      {getPartB.map((item, index) => (
+                      <div key={index} className="mb-8">
+                        {currentUser.id === item.assign_personnel && displayRequest.viewRequestData.inspector_status == 3 ? (
+                          <button
+                            onClick={handlePartDEditClick}
+                            className="bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
+                          >
+                            Fill up the Part D
+                          </button>
+                        ):null}
+                      </div>
                       ))}
-                </>
-                ):(
-                <>
-                {/* Remarks if has no data */}
-                <div className="mt-10">
-                  <div className="flex">
-                    <div className="w-44">
-                      <strong>Remark/s</strong>
-                    </div>
-                    <div className="w-full border-b border-black pl-1">
-                      <span></span>
-                    </div>
+                    </>
+                    ):null}
+                  </div>
+                ))}
+              </>
+              ):(
+              <>
+              {/* Remarks if has no data */}
+              <div className="mt-10">
+                <div className="flex">
+                  <div className="w-44">
+                    <strong>Remark/s</strong>
+                  </div>
+                  <div className="w-full border-b border-black pl-1">
+                    <span></span>
                   </div>
                 </div>
-
-                {/* Signature */}
-                <div className="mt-10 pb-10">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
-                        DATE INSPECTED
-                      </label>
-                      <div className="mt-12">
-                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-span-1">
-                      <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
-                        NOTED:
-                      </label>
-                      <div className="mt-10">
-                        <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-          
-                        </div>
-                        <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
-                          Property Inspector
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </>
-                )}
-                
-
-              </td>
-            </tr>
-                  
-          </table>
-          </div>
-                
-
-          {/* Button */}
-          <div className="mt-4 flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              <Link to="/">Back to Dashboard</Link>
-            </button>
-            {getPartC.map((item, index) => (
-              <div key={index}>
-                {currentUser.code_clearance === 3 || currentUser.code_clearance === 6 ? (
-                  item.close === 1 ? (
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={generatePDF}>
-                      Generate PDF
-                    </button>
-                  ):null
-                ):null
-                }
-                {item.close === 2 && currentUser.code_clearance === 3 ? (
-                  <button 
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2" 
-                  onClick={() => handleCloseRequest(item.id)}>
-                    Close Request
-                  </button>
-                ) : 
-                item.close === 2 && currentUser.code_clearance === 6 ? (
-                  <button 
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2" 
-                  onClick={() => handleCloseRequest(item.id)}>
-                    Close Request
-                  </button>
-                ) : 
-                item.close === 1 ? null : null}
               </div>
-            ))}
-          </div>
 
-          {/* Show Popup */}
-          {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Semi-transparent black overlay */}
-          <div
-            className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-          ></div>
-          {/* Popup content with background blur */}
-          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-          <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
-            <p className="text-lg text-center">{popupMessage}</p>
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={closePopup}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Close
-              </button>
+              {/* Signature */}
+              <div className="mt-10 pb-10">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
+                      DATE INSPECTED
+                    </label>
+                    <div className="mt-12">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-1">
+                    <label htmlFor="type_of_property" className="block text-sm font-bold leading-6">
+                      NOTED:
+                    </label>
+                    <div className="mt-10">
+                      <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+        
+                      </div>
+                      <label htmlFor="type_of_property" className="block text-sm text-center font-bold italic leading-6">
+                        Property Inspector
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </>
+              )}
+              
+
+            </td>
+          </tr>
+                
+        </table>
+        </div>
+              
+        {/* Button */}
+        <div className="mt-4 flex">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <Link to="/">Back to Dashboard</Link>
+          </button>
+          {getPartC.map((item, index) => (
+            <div key={index}>
+              {currentUser.code_clearance === 3 || currentUser.code_clearance === 6 ? (
+                item.close === 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleButtonClick}
+                    className={`rounded-md px-3 py-2 ml-2 font-bold text-white shadow-sm focus:outline-none ${
+                      submitLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+                    }`}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Generating</span>
+                      </div>
+                    ) : (
+                      'Generate PDF'
+                    )}
+                  </button>
+                ):null
+              ):null
+              }
+              {item.close === 2 && currentUser.code_clearance === 3 ? (
+                <button 
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2" 
+                onClick={() => handleCloseRequest(item.id)}>
+                  Close Request
+                </button>
+              ) : 
+              item.close === 2 && currentUser.code_clearance === 6 ? (
+                <button 
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2" 
+                onClick={() => handleCloseRequest(item.id)}>
+                  Close Request
+                </button>
+              ) : 
+              item.close === 1 ? null : null}
             </div>
-          </div>
-          </div>
-          )}
+          ))}
+        </div>
 
-          {/* For Generate PDF */}
+        {/* Show Popup */}
+        {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+        {/* Semi-transparent black overlay */}
+        <div
+          className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+        ></div>
+        {/* Popup content with background blur */}
+        <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+        <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
+          <p className="text-lg text-center">{popupMessage}</p>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={closePopup}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+        </div>
+        )}
+
+        {/* For Generate PDF */}
+        {isVisible && (
+        <div>
           {getPartC.map((item, index) => (
             <div key={index}>
             {item.close === 1 ? (
@@ -2161,12 +2248,17 @@ export default function PrePostRepairForm(){
             ):null}
             </div>
           ))}
-            
-          </div>
-        ) : (
-          <div>User details not available.</div>
-        )}
         </div>
+          
+        )}
+          
+        </div>
+      ) : (
+        <div>User details not available.</div>
+      )
+      :
+      <div>You cannot view the form unless the request has been close</div>}
+      </div>
       )}
     </div>
     </PageComponent>

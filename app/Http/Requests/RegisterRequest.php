@@ -29,6 +29,7 @@ class RegisterRequest extends FormRequest
             'gender' => 'required|string',
             'username' => 'required|string',
             'division' => 'required|string',
+            'position' => 'required|string',
             'code_clearance' => 'required|string',
             'password' => [
                 'required',

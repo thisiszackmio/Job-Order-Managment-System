@@ -11,6 +11,7 @@ import PrepostRepairForm from "./views/PrePostRepairForm";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
 import FacilityVenueForm from "./views/FacilityVenueForm";
+import VehicleSlipForm from "./views/VehicleSlipForm";
 
 
 const routes = [
@@ -55,6 +56,11 @@ const routes = [
             {
                 path: "/facilityvenueform/:id",
                 element: <FacilityVenueForm />
+            },
+            //For Vehicle Slip Form
+            {
+                path: "/vehicleslipform/:id",
+                element: <VehicleSlipForm />
             }
         ]
     },

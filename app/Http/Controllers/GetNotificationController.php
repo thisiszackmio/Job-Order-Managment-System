@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use App\Models\Inspection_Form;
+use App\Models\PPAUser;
 use App\Models\AdminInspectionForm;
 use App\Models\Inspector_Form;
 use App\Models\Facility_Form;
+use App\Models\VehicleForm;
 
 class GetNotificationController extends Controller
 {
@@ -18,8 +20,20 @@ class GetNotificationController extends Controller
     {
         $supInspectNoti = Inspection_Form::where('supervisor_name', $id)->where('supervisor_approval', 0)->get();
 
+        $iID = $supInspectNoti->pluck('user_id')->all();
+        $getReq = PPAUser::whereIn('id', $iID)->get();
+
+        // Combine Inspection_Form data with PPAUser data
+        $supDet = $supInspectNoti->map(function ($inspectionForm) use ($getReq) {
+            $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            return [
+                'inspection_form' => $inspectionForm,
+                'user' => $user,
+            ];
+        });
+
         $responseData = [
-            'supDet' => $supInspectNoti
+            'supDet' => $supDet
         ];
 
         return response()->json($responseData);
@@ -30,11 +44,24 @@ class GetNotificationController extends Controller
      */
     public function GSONoti()
     {
+        //For Inspection Form
         $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 0)->get();
+        $iID = $gsoInspectNoti->pluck('user_id')->all();
+        $getReq = PPAUser::whereIn('id', $iID)->get();
+
+        $gsoDet = $gsoInspectNoti->map(function ($inspectionForm) use ($getReq) {
+            $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            return [
+                'inspection_form' => $inspectionForm,
+                'user' => $user,
+            ];
+        });
+        
+        //For Facility Form
         $gsoFacilityNoti = Facility_Form::where('admin_approval', 4)->get();
         
         $responseData = [
-            'gsoDet' => $gsoInspectNoti,
+            'gsoDet' => $gsoDet,
             'gsoFacDet' => $gsoFacilityNoti
         ];
 
@@ -46,12 +73,38 @@ class GetNotificationController extends Controller
      */
     public function AdminNoti()
     {
+        //For Inspection Form
         $adminInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 3)->get();
+        $iID = $adminInspectNoti->pluck('user_id')->all();
+        $getReq = PPAUser::whereIn('id', $iID)->get();
+
+        $adminDet = $adminInspectNoti->map(function ($inspectionForm) use ($getReq) {
+            $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            return [
+                'inspection_form' => $inspectionForm,
+                'user' => $user,
+            ];
+        });
+
         $adminFacilityNoti = Facility_Form::where('admin_approval', 3)->get();
 
+        //For Vehicle Slip
+        $adminVehicleNoti = VehicleForm::where('admin_approval', 3)->get();
+        $vID = $adminVehicleNoti->pluck('user_id')->all();
+        $getVReq = PPAUser::whereIn('id', $vID)->get();
+
+        $adminVehDet = $adminVehicleNoti->map(function ($vehicleForm) use ($getVReq) {
+            $user = $getVReq->where('id', $vehicleForm->user_id)->first();
+            return [
+                'vehicle_form' => $vehicleForm,
+                'user' => $user,
+            ];
+        });
+
         $responseData = [
-            'adminDet' => $adminInspectNoti,
-            'adminFacDet' => $adminFacilityNoti
+            'adminDet' => $adminDet,
+            'adminFacDet' => $adminFacilityNoti,
+            'adminVehDet' => $adminVehDet
         ];
 
         return response()->json($responseData);

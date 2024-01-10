@@ -5,8 +5,8 @@ import axiosClient from "../axios";
 import { useParams, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
-import loadingAnimation from '../assets/loading.gif';
-import submitAnimation from '../assets/bouncing.gif';
+import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import submitAnimation from '../assets/loading_nobg.gif';
 
 export default function PrePostRepairForm(){
 
@@ -227,6 +227,66 @@ export default function PrePostRepairForm(){
     fetchDormForm();
   },[id]);
 
+  //For MPH
+  const [checkedCountMPH, setCheckedCountMPH] = useState(0);
+
+  useEffect(()=>{
+    const totalCheckedMPH = [
+      checkTable, 
+      checkChairs,
+      checkProjector,
+      checkProjectorScreen,
+      checkDocumentCamera,
+      checkLaptop,
+      checkTelevision,
+      checkSoundSystem,
+      checkVideoke,
+      checkMicrphone,
+      checkOther
+    ].filter(Boolean).length;
+    setCheckedCountMPH(totalCheckedMPH);
+  },[checkTable, 
+    checkChairs,
+    checkProjector,
+    checkProjectorScreen,
+    checkDocumentCamera,
+    checkLaptop,
+    checkTelevision,
+    checkSoundSystem,
+    checkVideoke,
+    checkMicrphone,
+    checkOther]);
+
+  //For Conference Room
+  const [checkedCountConference, setCheckedCountConference] = useState(0);
+
+  useEffect(()=>{
+    const totalCheckedConference = [
+      checkConferenceTable, 
+      checkConferenceChairs,
+      checkConferenceProjector,
+      checkConferenceProjectorScreen,
+      checkConferenceDocumentCamera,
+      checkConferenceLaptop,
+      checkConferenceTelevision,
+      checkConferenceSoundSystem,
+      checkConferenceVideoke,
+      checkConferenceMicrphone,
+      checkConferenceOther
+    ].filter(Boolean).length;
+    setCheckedCountConference(totalCheckedConference);
+  },[checkConferenceTable, 
+    checkConferenceChairs,
+    checkConferenceProjector,
+    checkConferenceProjectorScreen,
+    checkConferenceDocumentCamera,
+    checkConferenceLaptop,
+    checkConferenceTelevision,
+    checkConferenceSoundSystem,
+    checkConferenceVideoke,
+    checkConferenceMicrphone,
+    checkConferenceOther]);
+
   const handleInputTableChange = (event) => {
     // Extract the input value and convert it to a number
     let inputValue = parseInt(event.target.value, 10);
@@ -436,6 +496,8 @@ export default function PrePostRepairForm(){
   const SubmitOPRInstruc = (event) => {
     event.preventDefault();
 
+    setSubmitLoading(true);
+
     axiosClient
     .put(`saveoprinstruction/${id}`,{
       obr_instruct: OprInstruct
@@ -458,6 +520,8 @@ export default function PrePostRepairForm(){
 
   const SubmitOPRAction = (event) => {
     event.preventDefault();
+
+    setSubmitLoading(true);
 
     axiosClient
     .put(`saveopraction/${id}`,{
@@ -529,13 +593,53 @@ export default function PrePostRepairForm(){
     documentTitle: `Facility-Venue-Control-No:${id}`
   });
 
+  //Count down
+  const [isVisible, setIsVisible] = useState(false);
+  const [seconds, setSeconds] = useState(3);
+
+  const handleButtonClick = () => {
+    setIsVisible(true); 
+    setSeconds(3);
+    setSubmitLoading(true);
+    setTimeout(() => {
+      generatePDF();
+      setSubmitLoading(false);
+      setIsVisible(false); 
+    }, 1000);
+  };
+
+  useEffect(() => {
+    let timer;
+
+    if (isVisible && seconds > 0) {
+      timer = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isVisible, seconds]);
+
+  useEffect(() => {
+    if (seconds === 0) {
+      setIsVisible(false);
+      setSubmitLoading(false);
+    }
+  }, [seconds]);
+
   return(
     <PageComponent title="Request For The Use Of Facility / Venue">
     <div>
     {isLoading ? (
-      <div className="flex items-center justify-center h-screen">
-        <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
-        <span className="ml-2">Loading Form...</span>
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+        <img
+          className="mx-auto h-44 w-auto"
+          src={loadingAnimation}
+          alt="Your Company"
+        />
+        <span className="ml-2 animate-heartbeat">Loading Form</span>
       </div>
       ):(
       <div>
@@ -710,7 +814,8 @@ export default function PrePostRepairForm(){
           </table>
           
           {/* For MPH Table */}
-          {displayRequestFacility?.viewFacilityData.mph == 2 ? (
+          {displayRequestFacility?.viewFacilityData.mph == 2 && 
+          displayRequestFacility?.viewFacilityData?.user_id == currentUser.id ? (
           <>
           <table className="w-full border-collapse border border-black mt-4">
             {/* Forms */}
@@ -718,8 +823,10 @@ export default function PrePostRepairForm(){
               <td colSpan={3} className="text-base w-full border-black font-arial text-left p-2">
 
               <div>
-                <b>* For the Multi-Purpose Hall</b>
+                <b>* For the Multi-Purpose Hall (check atleast 3 checkbox)</b>
               </div>
+
+              
 
               <form onSubmit={SubmitMPHForm}>
 
@@ -1025,6 +1132,8 @@ export default function PrePostRepairForm(){
                 </div>
 
                 <div className="flex mt-10 pl-1 justify-center">
+                  {checkedCountMPH >= 3 ? (
+                  <>
                   <button
                     type="submit"
                     className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
@@ -1041,6 +1150,9 @@ export default function PrePostRepairForm(){
                       'Submit'
                     )}
                   </button>
+                  </>
+                  ):null}
+                  
                 </div>
 
               </form>
@@ -1048,6 +1160,188 @@ export default function PrePostRepairForm(){
               </td>
             </tr>
           </table>      
+          </>
+          ):displayRequestFacility?.viewFacilityData.mph == 2 ? (
+          <>
+          <table className="w-full border-collapse border border-black mt-4">
+            <tr>
+              <td colSpan={3} className="text-base w-full border-black font-arial text-left p-2">
+                
+                <div>
+                  <b>* For the Multi-Purpose Hall</b>
+                </div>
+
+                <div className="mt-4 mb-6">
+                  <div className="w-full">
+
+                    <div className="grid grid-cols-2 gap-4">
+
+                      <div className="col-span-1 ml-40">
+
+                        {/* Table */}
+                        <div className="mt-0">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-12 ml-1">
+                              <strong>Tables</strong>
+                            </div>
+                            <div className="w-30 ml-2">
+                            (No.<span className="border-b border-black px-5 text-center"> </span>)
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Chair */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-12 ml-1">
+                              <strong>Chairs</strong>
+                            </div>
+                            <div className="w-30 ml-2">
+                            (No.<span className="border-b border-black px-5 text-center"> </span>)
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Projector */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-12 ml-1">
+                              <strong>Projector</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Projector Screen */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-22 ml-1">
+                              <strong>Projector Screen</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Document Camera */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-22 ml-1">
+                              <strong>Document Camera</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div className="col-span-1">
+
+                        {/* Laptop */}
+                        <div className="mt-0">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-12 ml-1">
+                              <strong>Laptop</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Television */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-12 ml-1">
+                              <strong>Television</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Sound System */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-32 ml-1">
+                              <strong>Sound System</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Videoke */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-32 ml-1">
+                              <strong>Videoke</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Microphone */}
+                        <div className="mt-1">
+                          <div className="flex">
+                            <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                              
+                            </div>
+                            <div className="w-22 ml-1">
+                              <strong>Microphone</strong>
+                            </div>
+                            <div className="w-30 ml-2">
+                            (No.<span className="border-b border-black px-5 text-center"> </span>)
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div className="mt-2 mb-6">
+                      <div className="w-full">
+
+                      {/* Others */}
+                      <div className="mt-1 ml-40">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-22 ml-1">
+                            <strong>Others</strong>, please specify
+                          </div>
+                          <div className="w-1/2 border-b p-0 pl-2 border-black text-left ml-3">
+                          <span className=""> </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </td>
+            </tr>
+          </table>
           </>
           ):displayRequestFacility?.viewFacilityData.mph == 1 ? (
           <>
@@ -1234,14 +1528,15 @@ export default function PrePostRepairForm(){
           ):null}
 
           {/* For Conference Table */}
-          {displayRequestFacility?.viewFacilityData.conference == 2 ? (
+          {displayRequestFacility?.viewFacilityData.conference == 2 && 
+          displayRequestFacility?.viewFacilityData?.user_id == currentUser.id ? (
           <>
           <table className="w-full border-collapse border border-black mt-4">
             <tr>
               <td colSpan={3} className="text-base w-full border-black font-arial text-left p-2">
 
               <div>
-                <b>* For Conference Room</b>
+                <b>* For Conference Room (check atleast 3 checkbox)</b>
               </div>
 
               <form onSubmit={SubmitConferenceForm}>
@@ -1548,25 +1843,205 @@ export default function PrePostRepairForm(){
                 </div>
 
                 <div className="flex mt-10 mb-2 pl-1 justify-center">
-                  <button
-                    type="submit"
-                    className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                      isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                    }`}
-                    disabled={isLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Processing...</span>
-                      </div>
-                    ) : (
-                      'Submit'
-                    )}
-                  </button>
+                {checkedCountConference >= 3 ? (
+                <>
+                <button
+                  type="submit"
+                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                    isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  }`}
+                  disabled={isLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
+                </button>
+                </>
+                ):null}
                 </div>
 
               </form>
+
+              </td>
+            </tr>
+          </table>
+          </>
+          ):displayRequestFacility?.viewFacilityData.conference == 2 ? (
+          <>
+          <table className="w-full border-collapse border border-black mt-4">
+            <tr>
+              <td colSpan={3} className="text-base w-full border-black font-arial text-left p-2">
+
+              <div>
+                <b>* For Conference Room</b>
+              </div>
+
+              <div className="mt-4 mb-6">
+                <div className="w-full">
+
+                  <div className="grid grid-cols-2 gap-4">
+
+                    <div className="col-span-1 ml-40">
+
+                      {/* Table */}
+                      <div className="mt-0">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-12 ml-1">
+                            <strong>Tables</strong>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 text-center"> </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Chair */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-12 ml-1">
+                            <strong>Chairs</strong>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 text-center"> </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Projector */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-12 ml-1">
+                            <strong>Projector</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Projector Screen */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-22 ml-1">
+                            <strong>Projector Screen</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Document Camera */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-22 ml-1">
+                            <strong>Document Camera</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div className="col-span-1">
+
+                      {/* Laptop */}
+                      <div className="mt-0">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-12 ml-1">
+                            <strong>Laptop</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Television */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-12 ml-1">
+                            <strong>Television</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sound System */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-32 ml-1">
+                            <strong>Sound System</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Videoke */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-32 ml-1">
+                            <strong>Videoke</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Microphone */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                            
+                          </div>
+                          <div className="w-22 ml-1">
+                            <strong>Microphone</strong>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 text-center"> </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  {/* Others */}
+                  <div className="mt-1 ml-40">
+                    <div className="flex">
+                      <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                        {displayConferenceFacility?.viewConferenceFacilityData?.others === 1 ? 'X':null}
+                      </div>
+                      <div className="w-22 ml-1">
+                        <strong>Others</strong>, please specify
+                      </div>
+                      <div className="w-1/2 border-b p-0 pl-2 border-black text-left ml-3">
+                      <span className=""> {displayConferenceFacility?.viewConferenceFacilityData?.specify ? displayConferenceFacility?.viewConferenceFacilityData?.specify:null} </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
 
               </td>
             </tr>
@@ -1751,7 +2226,8 @@ export default function PrePostRepairForm(){
           ):null}
 
           {/* For Dormitort Table */}
-          {displayRequestFacility?.viewFacilityData.dorm == 2 ? (
+          {displayRequestFacility?.viewFacilityData.dorm == 2 && 
+          displayRequestFacility?.viewFacilityData?.user_id == currentUser.id ? (
           <>
           <table className="w-full border-collapse border border-black mt-4">
             <tr>
@@ -1910,6 +2386,91 @@ export default function PrePostRepairForm(){
 
                 </form>
               
+              </td>
+            </tr>
+          </table>
+          </>
+          ):displayRequestFacility?.viewFacilityData.dorm == 2 ?(
+          <>
+          <table className="w-full border-collapse border border-black mt-4">
+            <tr>
+              <td colSpan={3} className="text-base w-full border-black font-arial text-left p-2">
+
+                <div>
+                  <b>* For Dormitory</b>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+
+                  {/* For Male Guest */}
+                  <div className="col-span-1 ml-40">
+
+                    <div className="mt-0 mb-6">
+                      <div className="flex">
+                        <div className="w-24 border-b border-black font-bold text-center">
+                          <span>
+                          
+                          </span>
+                        </div>
+                        <div className="w-full ml-2">
+                          <strong>No. of Male Guests</strong>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <div className="mb-4">
+                        <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+                      </div>
+                    </div>
+                    <span className="font-meduim">No Data</span>
+
+                  </div>
+
+                  {/* For Female Guest */}
+                  <div className="col-span-1">
+
+                    <div className="mt-0 mb-6">
+                      <div className="flex">
+                        <div className="w-24 border-b border-black font-bold text-center">
+                          <span>
+                          
+                          </span>
+                        </div>
+                        <div className="w-full ml-2">
+                          <strong>No. of Female Guests</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6">
+                      <div className="mb-4">
+                        <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+                      </div>
+                    </div>
+                      <span className="font-meduim">No Data</span>
+
+                  </div>
+
+                </div>
+
+                {/* Other Details */}
+                <div className="mt-8 ml-40">
+                  <div className="flex">
+                    <div className="w-full">
+                      <strong>Other Details:</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-2 mb-8 ml-40">
+                  <div className="w-full">
+                    <div className="w-10/12 border-b border-black font-regular text-left pl-2">
+                    No Data
+                    </div>
+                  </div>
+                </div>
+
               </td>
             </tr>
           </table>
@@ -2146,7 +2707,8 @@ export default function PrePostRepairForm(){
                     {displayRequestFacility.viewFacilityData.obr_comment}
                     </div>
                   ):
-                  currentUser.code_clearance === 3 && (
+                  currentUser.code_clearance === 3 && 
+                  (
                     <form onSubmit={SubmitOPRAction}>
                     <textarea
                       id="findings"
@@ -2204,14 +2766,29 @@ export default function PrePostRepairForm(){
             </div>
           ) : null}
           
+          {/* Button */}
           <div className="mt-4 flex">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               <Link to="/">Back to Dashboard</Link>
             </button>
             {currentUser.code_clearance === 3 && displayRequestFacility?.viewFacilityData?.admin_approval === 1 || currentUser.code_clearance === 6 && displayRequestFacility?.viewFacilityData?.admin_approval === 1 ? (
-              <button className="bg-green-500 ml-2 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={generatePDF}>
-                Generate PDF
-              </button>
+              <button
+              type="button"
+              onClick={handleButtonClick}
+              className={`rounded-md px-3 py-2 ml-2 font-bold text-white shadow-sm focus:outline-none ${
+                submitLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+              }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Generating</span>
+                </div>
+              ) : (
+                'Generate PDF'
+              )}
+            </button>
             ):null}
           </div>
 
@@ -2241,6 +2818,7 @@ export default function PrePostRepairForm(){
         )}
 
         {/* PDF Converter */}
+        {isVisible && (
         <div>
           <div className="hidden md:none">
 
@@ -2780,7 +3358,7 @@ export default function PrePostRepairForm(){
                       <div className="grid grid-cols-2 gap-6 mt-4">
 
                         {/* For Male Guest */}
-                        <div className="col-span-1 ml-36">
+                        <div className="col-span-1 ml-16">
 
                           {/* Male Count */}
                           <div>
@@ -2848,7 +3426,7 @@ export default function PrePostRepairForm(){
                             displayDormFacility?.femaleNamesArray?.map((femaleName, index) => (
                               <div key={index} className="flex mt-1">
                                 <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                                <div className="w-1/2 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                                <div className="w-3/4 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
                               </div>
                             ))
                           )}
@@ -2982,6 +3560,7 @@ export default function PrePostRepairForm(){
 
           </div>
         </div>
+        )}
 
       </div>
       )}

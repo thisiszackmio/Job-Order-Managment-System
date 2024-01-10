@@ -59,21 +59,25 @@ export default function Personnel(){
   const displayedUsers = users.slice(startIndex, endIndex);
 
   const filteredUsers = displayedUsers.filter((user) => {
-    return user.fname.toLowerCase().includes(searchText.toLowerCase());
+    return (
+        user.fname.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.lname.toLowerCase().includes(searchText.toLowerCase())
+    );
   });
 
   const renderedUsers = filteredUsers.map((user) => (
     <tr key={user.id}>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.id}</td>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
-        {user.fname} {user.mname}. {user.lname}
+      <td className="px-1 py-1 text-sm text-center border border-custom font-bold">{user.id}</td>
+      <td className="px-1 py-1 text-sm text-center border border-custom">
+      {`${user.lname.toUpperCase()}, ${user.fname} ${user.mname}.`}
       </td>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
-        {user.username.split("/").pop()}
+      <td className="px-1 py-1 text-sm text-center border border-custom">
+        <i>{user.username.split("/").pop()}</i>
       </td>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.division}</td>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.code_clearance}</td>
-      <td className="px-1 py-1 text-sm text-center border-2 border-custom">
+      <td className="px-1 py-1 text-sm text-center border border-custom">{user.position}</td>
+      <td className="px-1 py-1 text-sm text-center border border-custom">{user.division}</td>
+      <td className="px-1 py-1 text-sm text-center border border-custom">{user.code_clearance}</td>
+      <td className="px-1 py-1 text-sm text-center border border-custom">
         <div className="flex justify-center">
           <Link to={`/editaccount/${user.id}`}>
             <button
@@ -95,6 +99,7 @@ export default function Personnel(){
   const [gender, setGender] = useState('');
   const [username, setUsername] = useState('');
   const [division, setDivision] = useState('');
+  const [jobPosition, setJobPosition] = useState('');
   const [code_clearance, setCodeClearance] = useState('')
   const [password, setPassword] = useState('');
   const [passwordCorfirmation, setPasswordConfirmation] = useState('');
@@ -145,6 +150,7 @@ export default function Personnel(){
     formData.append("image", uploadEsignature);
     formData.append("username", username);
     formData.append("division", division);
+    formData.append("position", jobPosition);
     formData.append("code_clearance", code_clearance);
     formData.append("password", password);
     formData.append("password_confirmation", passwordCorfirmation);
@@ -324,11 +330,11 @@ export default function Personnel(){
       <h2 className="text-left text-sm font-bold leading-9 tracking-tight text-gray-900">
         Legends of Code Clearance
       </h2>
-      <td className="px-2 py-1 text-center border-r-2 border-custom">1 - Admin Division Manager</td>
-      <td className="px-2 py-1 text-center border-r-2 border-custom">2 - Supervisor</td>
-      <td className="px-2 py-1 text-center border-r-2 border-custom">3 - GSO and Authorize Person</td>
-      <td className="px-2 py-1 text-center border-r-2 border-custom">4 - Other Division Manager</td>
-      <td className="px-2 py-1 text-center border-r-2 border-custom">5 - Regular and COS Employee</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">1 - Admin Division Manager</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Supervisor</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO and Authorize Person</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Other Division Manager</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">5 - Regular and COS Employee</td>
       <td className="px-2 py-1 text-center">6 - IT Personnel</td>
       
       <div className="flex mt-6 mb-0">
@@ -360,18 +366,19 @@ export default function Personnel(){
       <table className="border-collapse w-full mb-10 mt-2">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-1 uppercase border-2 border-custom">User No.</th>
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Name</th>
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Username</th>
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Division</th>
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-1 uppercase border-2 border-custom">Code Clearance</th>  
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-1 uppercase border-2 border-custom">Action</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 w-1 uppercase border border-custom">User No.</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Name</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Username</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Plantilla Position Title</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Division</th>
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 w-1 uppercase border border-custom">Code Clearance</th>  
+            <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 w-1 uppercase border border-custom">Action</th>
           </tr>
         </thead>
         <tbody>
         {loading ? (
           <tr>
-            <td colSpan={6} className="px-2 py-2 text-center border-2 border-custom">
+            <td colSpan={7} className="px-2 py-2 text-center border border-custom">
               <div className="flex items-center justify-center">
                 <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
                 <span className="ml-2">Loading Userlist...</span>
@@ -470,18 +477,18 @@ export default function Personnel(){
           <h2 className="text-left text-sm font-bold leading-9 tracking-tight text-gray-900">
             List of Assign Personnels
           </h2>
-          <table className="border-collapse w-7/12 mb-10">
+          <table className="border-collapse w-full mb-10">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-2 py-2 text-center text-xs font-medium w-60 text-gray-600 uppercase border-2 border-custom">Name</th>
-                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Type of Personnel</th>
-                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border-2 border-custom">Action</th>
+                <th className="px-2 py-2 text-center text-xs font-medium w-4/12 text-gray-600 uppercase border border-custom">Name</th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Personnel</th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
               </tr>
             </thead>
             <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} className="px-2 py-2 text-center border-2 border-custom">
+                <td colSpan={3} className="px-2 py-2 text-center border border-custom">
                   <div className="flex items-center justify-center">
                     <img src={loadingAnimation} alt="Loading" className="h-10 w-10" />
                     <span className="ml-2">Loading Perosonnel...</span>
@@ -491,9 +498,9 @@ export default function Personnel(){
             ) : getPersonnel.length > 0 ? (
               getPersonnel.map((user) => (
                 <tr key={user.id}>
-                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.name}</td>
-                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">{user.type}</td>
-                  <td className="px-1 py-1 text-sm text-center border-2 border-custom">
+                  <td className="px-1 py-1 text-sm text-center border border-custom">{user.name}</td>
+                  <td className="px-1 py-1 text-sm text-center border border-custom">{user.type}</td>
+                  <td className="px-1 py-1 text-sm text-center border border-custom">
                     <div className="flex justify-center">
                       <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
@@ -508,7 +515,7 @@ export default function Personnel(){
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-2 py-2 text-center border-2 border-custom">
+                <td colSpan={3} className="px-2 py-2 text-center border border-custom">
                   No records
                 </td>
               </tr>
@@ -525,6 +532,7 @@ export default function Personnel(){
           <div className="fixed inset-0 bg-black opacity-40"></div>
           {/* Popup content with background blur */}
           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+          <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
             <p className="text-lg text-center">{popupMessage}</p>
             <div className="flex justify-center mt-4">
               <button
@@ -657,7 +665,7 @@ export default function Personnel(){
 
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           
           {/* Username */}
           <div className="col-span-1">
@@ -708,6 +716,27 @@ export default function Personnel(){
               </div>
               {inputErrors.division && (
                 <p className="text-red-500 text-xs mt-2">Division is Required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Plantilla Position Title */}
+          <div className="col-span-1">
+            <label htmlFor="position" className="block text-sm font-medium leading-6 text-gray-900">
+            Plantilla Position Title
+            </label>
+            <div className="mt-2">
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                value={jobPosition}
+                onChange={ev => setJobPosition(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              {inputErrors.position && (
+                <p className="text-red-500 text-xs mt-2">Position is Required</p>
               )}
             </div>
           </div>
@@ -863,6 +892,7 @@ export default function Personnel(){
           <div className="fixed inset-0 bg-black opacity-40"></div>
           {/* Popup content with background blur */}
           <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg">
+          <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
             <p className="text-lg text-center">{popupMessage}</p>
             <div className="flex justify-center mt-4">
               <button

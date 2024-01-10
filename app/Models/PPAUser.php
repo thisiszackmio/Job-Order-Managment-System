@@ -20,7 +20,8 @@ class PPAUser extends Authenticatable
         'lname',
         'gender', 
         'username', 
-        'division', 
+        'division',
+        'position',
         'code_clearance',
         'password',
         'image'

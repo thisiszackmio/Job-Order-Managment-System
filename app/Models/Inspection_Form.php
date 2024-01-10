@@ -24,7 +24,8 @@ class Inspection_Form extends Model
         'complain',
         'supervisor_name',
         'supervisor_approval',
-        'admin_approval'
+        'admin_approval',
+        'inspector_status',
     ];
 
     public function user()

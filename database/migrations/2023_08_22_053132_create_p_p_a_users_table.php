@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('gender');
             $table->string('username');
             $table->string('division');
+            $table->string('position');
             $table->integer('code_clearance');
             $table->string('password');
             $table->string('image');

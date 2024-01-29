@@ -2,6 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Emoji */
+.icon-center {
+  text-align: -webkit-center;
+}
+
+.face {
+  fill: #FFC10E;
+}
+
+.heart--eye {
+  fill: #CA2027;
+  transform: translate(-40px, 0px);
+  animation: heartEye 2s infinite;
+}
+
+.mouth_alt {
+  fill: #000;
+  transform: scale(0.8,0.8) translate(1rem, 5rem);
+}
+
+@keyframes heartEye {
+  0% {
+    -moz-transform: scale(0.9, 0.9) translate (0px, 0px);
+    -ms-transform: scale(0.9, 0.9) translate (0px, 0px);
+    -webkit-transform: scale(0.9, 0.9) translate (0px, 0px);
+    transform: scale(0.9, 0.9) translate (0px, 0px);
+  }
+  50% {
+    -moz-transform: scale(1.25, 1.25) translate(-70px, -20px);
+    -ms-transform: scale(1.25, 1.25) translate(-70px, -20px);
+    -webkit-transform: scale(1.25, 1.25) translate(-70px, -20px);
+    transform: scale(1.25, 1.25) translate(-70px, -20px);
+  }
+}
+
+/* Forbidden Style */
+.Forbidden-content {
+  display: flex;
+  height: 80vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.noentry {
+  margin: 45px;
+  width: 150px;
+  height: 150px;
+  background-color: #e23c40;
+  border: solid 3px #e23c40;
+  border-radius: 50%;
+ }
+
+.entry-p {
+  color: #fff;
+  font-size: 3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  display: block;
+  position: relative;
+  top: 30px;
+}
+
+.forbidden-message p {
+  font-size: 20px;
+  text-align: center;
+}
+
+.forbidden-message h1 {
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* PPA Theme Color */
+.bg-ppa-themecolor {
+  background-color: #4d4e4f;
+}
+
+.ppa-theme-active {
+  background-color: #051B37;
+}
+
 /* Style to show the submenu when the parent is hovered */
 .parent:hover .submenu {
   display: block;
@@ -172,3 +256,29 @@
   top: 5px !important;
 }
 
+/* Main CSS */
+.ppa-align {
+  align-items: center;
+  display: flex;
+}
+
+.underline-txt p {
+  display: block;
+  border-bottom: 1px solid;
+}
+
+/* For Eqiuipment Form Page */
+.table-ppa span {
+  position: absolute;
+  top: 9px;
+}
+
+.table-ppa-2 {
+  position: absolute;
+  top: 44px;
+}
+
+.underline-text {
+  text-decoration-line: underline;
+  text-underline-offset: 5px;
+}

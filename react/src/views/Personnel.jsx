@@ -61,7 +61,8 @@ export default function Personnel(){
   const filteredUsers = displayedUsers.filter((user) => {
     return (
         user.fname.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.lname.toLowerCase().includes(searchText.toLowerCase())
+        user.lname.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.position.toLowerCase().includes(searchText.toLowerCase())
     );
   });
 
@@ -282,7 +283,7 @@ export default function Personnel(){
 
   return(
   <PageComponent title="Personnel Page">
-  {currentUser.code_clearance === 6 ? (
+  {currentUser.code_clearance === 10 ? (
     <>
 
     <div className="flex">
@@ -331,11 +332,10 @@ export default function Personnel(){
         Legends of Code Clearance
       </h2>
       <td className="px-2 py-1 text-center text-sm border-r border-custom">1 - Admin Division Manager</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Supervisor</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO and Authorize Person</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Other Division Manager</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">5 - Regular and COS Employee</td>
-      <td className="px-2 py-1 text-center">6 - IT Personnel</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Port Manager</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Division Manager/Supervisor</td>
+      <td className="px-2 py-1 text-center text-sm border-r">5 - Regular and COS Employee</td>
       
       <div className="flex mt-6 mb-0">
         <div className="flex-1">
@@ -441,6 +441,13 @@ export default function Personnel(){
                 <option value="Electrical Works">Electrical Works</option>
                 <option value="Watering Services">Watering Services</option>
                 <option value="Engeneering Services">Engeneering Services</option>
+                <option value="Supervisor/Office of the Port Manager">Supervisor (Office of the Port Manager)</option>
+                <option value="Manager/Finance Division">Manager (Finance Division)</option>
+                <option value="Supervisor/Administrative Division">Supervisor (Administrative Division)</option>
+                <option value="Manager/Engineering Services Division">Manager (Engineering Services Division)</option>
+                <option value="Manager/Port Police Division">Manager (Port Police Division)</option>
+                <option value="Manager/Port Services Division">Manager (Port Services Division)</option>
+                <option value="Manager/TMO-TUBOD">Manager (TMO-TUBOD)</option>
               </select>
             </div>
           </div>
@@ -757,9 +764,9 @@ export default function Personnel(){
                 >
                   <option value="" disabled>Choose Code Clearance</option>
                   <option value="1">1 - Admin Division Manager</option>
-                  <option value="2">2 - Supervisor</option>
-                  <option value="3">3 - Authorize Person</option>
-                  <option value="4">4 - Other Division Manager</option>
+                  <option value="2">2 - Port Manager</option>
+                  <option value="3">3 - GSO</option>
+                  <option value="4">4 - Division Manager/Supervisor</option>
                   <option value="5">5 - Regular and COS Employee</option>
                   <option value="6">6 - IT People</option>
                 </select>

@@ -55,7 +55,7 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Show data.
+     * Show data on Part A.
      */
     public function show(Request $request, $id)
     {
@@ -113,6 +113,7 @@ class InspectionFormController extends Controller
         $respondData = [
             'view_request' => $viewRequest,
             'user_details' => [
+                'id' =>  $ppaUser->id,
                 'enduser' => $endUser,
                 'supervisor' => $supervisorName,
                 'requestor_signature' => $userSignature,
@@ -133,6 +134,40 @@ class InspectionFormController extends Controller
     }
 
     /**
+     * Show data on Part B.
+     */
+    public function viewAdmin(Request $request, $id)
+    {
+        $viewAdminRequest = Inspection_Form::find($id);
+
+        $formId = $viewAdminRequest->id;
+
+        $viewAdminRequestForm = AdminInspectionForm::where('inspection__form_id', $formId)->first();
+
+        $respondData = [
+            'partB' => $viewAdminRequestForm
+        ];
+
+        return response()->json($respondData);
+    }
+
+    /**
+     * Show Part C and D data's
+     */
+    public function InspectorSide(Request $request, $id)
+    {
+
+        $p1 = Inspector_Form::where('inspection__form_id', $id)->first();
+
+        $respondData = [
+            'part_c' => $p1
+        ];
+
+        return response()->json($respondData);
+
+    }
+
+    /**
      * Show My Request On Inspection.
      */
     public function myRequestInspec(Request $request, $id)
@@ -141,7 +176,9 @@ class InspectionFormController extends Controller
         $myRequest = PPAUser::find($id);
 
         //Get the request
-        $getInspectionForm = Inspection_Form::where('user_id', $id)->get(); 
+        $getInspectionForm = Inspection_Form::where('user_id', $id)
+        ->orderBy('id', 'desc')
+        ->get(); 
 
         //Display All the data
         $respondData = [
@@ -153,14 +190,13 @@ class InspectionFormController extends Controller
 
     }
 
-    /**
+   /**
      * Store a newly created resource in storage.
      * Part A
      */
     public function store(InspectionFormRequest $request)
     {
         $data = $request->validated();
-        // $notificationData = $notificationRequest->validated();
         $data['user_id'] = auth()->user()->id;
 
         // Get The sender name
@@ -172,11 +208,13 @@ class InspectionFormController extends Controller
         $deploymentData = Inspection_Form::create($data);
         $deploymentData->save();
 
+        
         if(!$deploymentData){
             return response()->json(['error' => 'Data Error'], 500);
         }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
+        
     }
 
     /**
@@ -205,6 +243,7 @@ class InspectionFormController extends Controller
 
         // After creating the related model, update the admin_approval to 2
         $findInspection->admin_approval = 3;
+        $findInspection->inspector_status = 3;
 
         if ($findInspection->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -215,7 +254,7 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Input the Details on the Inspector on Part C
+     * Store a Part C of the Form.
      */
     public function storeInspectorForm(Request $request, $id)
     {
@@ -232,7 +271,7 @@ class InspectionFormController extends Controller
             ]);
         }
 
-        $findInspection->inspector_status = 3;
+        $findInspection->inspector_status = 2;
 
         if ($findInspection->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -266,7 +305,7 @@ class InspectionFormController extends Controller
         $findInspection = Inspection_Form::find($inspR);
 
         if ($findInspection) {
-            $findInspection->inspector_status = 2;
+            $findInspection->inspector_status = 1;
             $findInspection->save();
             return response()->json(['message' => 'Update successful'], 200);
         } else {
@@ -275,38 +314,30 @@ class InspectionFormController extends Controller
 
     }
 
-     /**
-     * Update the specified resource in storage.
+    /**
      * For Supervisor Approval
      */
     public function updateApprove(Request $request, $id)
     {
         $approveRequest = Inspection_Form::find($id);
 
-        // if (!$approveRequest) {
-        //     return response()->json(['message' => 'Request not found'], 404);
-        // }
-
         $approveRequest->supervisor_approval = 1;
 
+        
         if ($approveRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
+        
     }
 
     /**
-     * Update the specified resource in storage.
      * For Supervisor Disapproval
      */
     public function updateDisapprove(Request $request, $id)
     {
         $disapproveRequest = Inspection_Form::find($id);
-
-        // if (!$disapproveRequest) {
-        //     return response()->json(['message' => 'Request not found'], 404);
-        // }
 
         $disapproveRequest->supervisor_approval = 2;
 
@@ -318,7 +349,6 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
      * For Admin Approval
      */
     public function updateAdminApprove(Request $request, $id)
@@ -328,10 +358,8 @@ class InspectionFormController extends Controller
 
         if ($approveAdminRequest) {
             $approveAdminRequest->admin_approval = 1;
-            $approveAdminRequest->inspector_status = 4;
 
             if ($approveAdminRequest->save()) {
-                // Successfully updated Inspection_Form, now update Inspector_Form
                 if ($getInspectorStat) {
                     $getInspectorStat->close = 4;
                     $getInspectorStat->save();
@@ -346,17 +374,12 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
      * For Admin Disapproval
      */
     public function updateAdminDisapprove(Request $request, $id)
     {
         $disapproveAdminRequest = Inspection_Form::find($id);
     
-        // if (!$disapproveAdminRequest) {
-        //     return response()->json(['message' => 'Request not found'], 404);
-        // }
-
         $disapproveAdminRequest->admin_approval = 2;
 
         if ($disapproveAdminRequest->save()) {
@@ -367,65 +390,15 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * View a Part B of the Form.
-     */
-    public function viewAdmin(Request $request, $id)
-    {
-        $viewAdminRequest = Inspection_Form::find($id);
-
-        $formId = $viewAdminRequest->id;
-
-        $viewAdminRequestForm = AdminInspectionForm::where('inspection__form_id', $formId)->get();
-
-        $respondData = [
-            'partB' => $viewAdminRequestForm
-        ];
-
-        return response()->json($respondData);
-    }
-
-    /**
-     * Show Part C and D data's
-     */
-    public function InspectorPartA(Request $request, $id)
-    {
-
-        $p1 = Inspector_Form::where('inspection__form_id', $id)->get();
-
-        // if($p1->isEmpty()) {
-        //     return response()->json(['message' => 'No data'], 404);
-        // }
-
-        $respondData = [
-            'part_c' => $p1
-        ];
-
-        return response()->json($respondData);
-
-    }
-
-    /**
      * Close the Request
      */
     public function closeRequest(Request $request, $id)
     {
         // Find the Inspector_Form records associated with the Inspection_Form
-        $inspectorForms = Inspector_Form::where('inspection__form_id', $id)->get();
-
-        // Update the close status for each Inspector_Form
-        foreach ($inspectorForms as $inspectorForm) {
-            $inspectorForm->close = 1;
-            $inspectorForm->save();
-        }
-
-        // Find the Inspection_Form
-        $findInspection = Inspection_Form::find($id);
-
-        // Update remarks for the Inspection_Form
-        $findInspection->inspector_status = 1;
-        $findInspection->save();
+        $inspectorForms = Inspector_Form::where('inspection__form_id', $id)->first();
+        $inspectorForms->close = 1;
+        $inspectorForms->save();
         
         return response()->json(['message' => 'Request closed successfully'], 200);
     }
-
 }

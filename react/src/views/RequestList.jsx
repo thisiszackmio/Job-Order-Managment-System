@@ -45,51 +45,9 @@ export default function RequestList()
   const [loading, setLoading] = useState(true);
 
   const { userRole } = useUserStateContext();
-  const [prePostRepair, setPrePostRepair] = useState([]);
   const [getFacilityDet, setFacilityDet] = useState([]);
   const [getVehicleSlip, setVehicleSlip] = useState([]);
 
-  const fetchTableData = () => {
-    setLoading(true); // Set loading state to true when fetching data
-    axiosClient
-      .get('/requestrepair')
-      .then((response) => {
-        const responseData = response.data;
-        const getRepair = Array.isArray(responseData) ? responseData : responseData.data;
-
-        // Map the data and set it to your state
-        const mappedData = getRepair.map((dataItem) => {
-          // Extract inspection form and user details from each dataItem
-          const { inspection_form, user_details } = dataItem;
-
-          // Extract user details properties
-          const { fname, mname, lname } = user_details;
-
-          // Create a mapped data object
-          return {
-            id: inspection_form.id,
-            date: formatDate(inspection_form.date_of_request),
-            property_number: inspection_form.property_number,
-            type_of_property: inspection_form.type_of_property,
-            property_other_specific: inspection_form.property_other_specific,
-            name: fname +' ' + mname+'. ' + lname,
-            complain: inspection_form.complain,
-            supervisorname: inspection_form.supervisor_name,
-            supervisor_aprroval: inspection_form.supervisor_approval,
-            admin_aprroval: inspection_form.admin_approval
-          };
-        });
-
-        // Set the mapped data to your state using setPrePostRepair
-        setPrePostRepair(mappedData);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 
   const fetchFacilityData = () => {
     setLoading(true);
@@ -382,17 +340,7 @@ export default function RequestList()
           </div>
           <table className="w-full border-collapse">
             <thead>
-            {currentRepair.length > 0 ? (
-              <tr className="bg-gray-100">
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">Ctrl No</th>
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-              </tr>
-            ):null}
+            
             </thead>
             <tbody className="table-body">
             {currentRepair.length > 0 ? (

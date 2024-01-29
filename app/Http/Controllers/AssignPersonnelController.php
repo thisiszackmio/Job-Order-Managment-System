@@ -17,10 +17,37 @@ class AssignPersonnelController extends Controller
     /**
      * Show Personnel List.
      */
-    public function index()
+    public function index(Request $request, $id)
     {
-        $assignPersonnels = AssignPersonnel::with('user')->get();
-        $assignPersonnels = AssignPersonnel::all();
+        $find = Inspection_Form::find($id);
+
+        if($find->type_of_property == "Vehicle Supplies & Materials"){
+            $PersonnelHehe = [
+                "Driver/Mechanic",
+                "Janitorial Service",
+                "Watering Services",
+            ];
+        } elseif($find->type_of_property == "IT Equipment & Related Materials"){
+            $PersonnelHehe = [
+                "IT Service",
+                "Electronics",
+                "Electrical Works",
+                "Engeneering Services",
+            ];
+        } else {
+            $PersonnelHehe = [
+                "Driver/Mechanic",
+                "IT Service",
+                "Janitorial Service",
+                "Electronics",
+                "Electrical Works",
+                "Watering Services",
+                "Engeneering Services",
+            ];
+        }
+
+        $assignPersonnels = AssignPersonnel::with('user')->whereIn("type_of_personnel", $PersonnelHehe)->get();
+        // $assignPersonnels = AssignPersonnel::all();
 
         // if ($assignPersonnels->isEmpty()) {
         //     return response()->json($assignPersonnels);
@@ -50,6 +77,8 @@ class AssignPersonnelController extends Controller
         }
 
 
+        // return response()->json($responseData);
+
         return response()->json($responseData);
         
     } 
@@ -74,6 +103,12 @@ class AssignPersonnelController extends Controller
 
         if (!$deploymentData) {
             return response()->json(['error' => 'Data Error'], 500);
+        } else {
+            $update = PPAUser::where('id', $data['user_id'])->first();
+            if ($update->code_clearance == 5) {
+                $update->code_clearance = 6;
+                $update->save(); // Save the changes to the database
+            }
         }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -148,26 +183,35 @@ class AssignPersonnelController extends Controller
      */
     public function getPersonnel(Request $request, $id)
     {
-        //Get the ID bassed on the Inspection form
-        $inspForm = AdminInspectionForm::where('inspection__form_id', $id)->get();
-
-        //Get Personnel ID
-        $pID = $inspForm->pluck('assign_personnel')->first();
-
-        //Get the Personnel Details
-        $pDet = PPAUser::where('id', $pID)->get();
-
+        // Get the ID based on the Inspection form
+        $inspForm = AdminInspectionForm::where('inspection__form_id', $id)->first();
+    
+        if (!$inspForm) {
+            // Handle case where no inspection form is found
+            return response()->json(['error' => 'Inspection form not found'], 404);
+        }
+    
+        // Get Personnel ID
+        $pID = $inspForm->assign_personnel;
+    
+        // Get the Personnel Details
+        $pDet = PPAUser::find($pID);
+    
+        if (!$pDet) {
+            // Handle case where no personnel is found
+            return response()->json(['error' => 'Personnel not found'], 404);
+        }
+    
+        $signature = URL::to('/storage/esignature/' . $pDet->image);
+    
         $respondData = [
-            'personnel_details' => $pDet->map(function ($PersonnelDetail) {
-                $signature = URL::to('/storage/esignature/' . $PersonnelDetail->image);
-                return[
-                    'p_id' => $PersonnelDetail->id,
-                    'p_name' => $PersonnelDetail->fname.' '.$PersonnelDetail->mname.'. '.$PersonnelDetail->lname,
-                    'p_signature' => $signature,
-                ];
-            })
+            'personnel_details' => [
+                'p_id' => $pDet->id,
+                'p_name' => $pDet->fname . ' ' . $pDet->mname . '. ' . $pDet->lname,
+                'p_signature' => $signature,
+            ],
         ];
-
+    
         return response()->json($respondData);
     }
 
@@ -177,12 +221,20 @@ class AssignPersonnelController extends Controller
     public function RemovePersonnel($id)
     {
         $user = AssignPersonnel::find($id);
-
+    
         if (!$user) {
             return response()->json(['message' => 'Personnel not found'], 404);
         }
-    
-        $user->delete(); 
+
+        $update = PPAUser::where('id', $user->user_id)->first();
+        $update->code_clearance;
+
+        if ($update->code_clearance == 6) {
+            $update->code_clearance = 5;
+            $update->save();
+        }
+
+        $user->delete();
     
         return response()->json(['message' => 'Personnel deleted successfully'], 200);
     }

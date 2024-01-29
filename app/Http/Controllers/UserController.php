@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PPAUser;
+use App\Models\AssignPersonnel;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,55 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+    /**
+     * Get The supervisor's names
+     */
+    public function supervisorNames(Request $request, $id) {
+        // Get User details
+        $myDet = PPAUser::find($id);
+        $department = $myDet->division;
+    
+        $supervisorTypeMapping = [
+            "Administrative Division" => "Supervisor/Administrative Division",
+            "Finance Division" => "Manager/Finance Division",
+            "Office of the Port Manager" => "Supervisor/Office of the Port Manager",
+            "Port Service Division" => "Manager/Port Services Division",
+            "Port Police Division" => "Manager/Port Police Division",
+            "Engineering Service Division" => "Manager/Engineering Services Division",
+            "Terminal Management Office - Tubod" => "Manager/TMO-TUBOD",
+        ];
+    
+        $supervisorType = $supervisorTypeMapping[$department] ?? null;
+    
+        if ($supervisorType) {
+            $supervisorPersonnel = AssignPersonnel::with('user')->where("type_of_personnel", $supervisorType)->first();
+    
+            if ($supervisorPersonnel) {
+                $ppaUser = $supervisorPersonnel->user;
+    
+                // Fullname
+                $userId = $ppaUser->id;
+                $userFname = $ppaUser->fname;
+                $userMname = $ppaUser->mname;
+                $userLname = $ppaUser->lname;
+                $fullName = "{$userFname} {$userMname}. {$userLname}";
+            }
+        }
+    
+        $responseData = [
+            'personnel_details' => [
+                'id' => $userId ?? null,
+                'name' => $fullName ?? null,
+            ],
+        ];
+    
+        return response()->json($responseData);
+    }
+
+
+
+
+
     /**
      * Display the Supervisor Users.
      */

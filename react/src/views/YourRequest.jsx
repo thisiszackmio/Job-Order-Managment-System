@@ -36,55 +36,14 @@ export default function MyRequest(){
   const[displayRequest, setDisplayRequest] = useState([]);
   const[displayRequestFacility, setDisplayRequestFacility] = useState([]);
   const[displayRequestVehicle, setDisplayRequestVehicle] = useState([]);
+  const[displayRequestEquipment, setDisplayRequestEquipment] = useState([]);
 
   const [activeTab, setActiveTab] = useState("tab1");
   
   library.add(faEye);
   const [loading, setLoading] = useState(true);
 
-  //Get all the Request on the Inspection
-  const fetchInspectForm = () => {
-    axiosClient
-    .get(`/myinspecreq/${id}`)
-    .then((response) => {
-        const responseData = response.data;
-        const viewRequestData = responseData.view_request;
-
-        const mappedData = viewRequestData.map((dataItem) => {
-          return{
-            id: dataItem.id,
-            date_of_request: dataItem.date_of_request,
-            property_number: dataItem.property_number,
-            acq_date: dataItem.acq_date,
-            acq_cost: dataItem.acq_cost,
-            brand_model: dataItem.brand_model,
-            serial_engine_no: dataItem.serial_engine_no,
-            type_of_property: dataItem.type_of_property,
-            property_other_specific: dataItem.property_other_specific,
-            property_description: dataItem.property_description,
-            location: dataItem.location,
-            complain: dataItem.complain,
-            supervisor_approval: dataItem.supervisor_approval,
-            admin_approval: dataItem.admin_approval,
-            inspector_status: dataItem.inspector_status,
-          }
-        });
-
-        setDisplayRequest({mappedData: mappedData});
-
-        console.log({
-          mappedData: mappedData,
-          inspectData: inspectData
-        });
-
-
-        setLoading(false);
-    })
-    .catch((error) => {
-      setLoading(false);
-        console.error('Error fetching data:', error);
-    });
-  }
+  
 
   //Get all the Request on the Facility
   const fetchFacilityForm = () => {
@@ -157,10 +116,43 @@ export default function MyRequest(){
     });
   }
 
+  //Get all the Request on the Equipment
+  const fetchEquipmentForm = () => {
+    axiosClient
+    .get(`/myequipmentformrequest/${id}`)
+    .then((response) => {
+      const responseData = response.data;
+      const viewEquipmentFormData = responseData.view_equipment;
+      
+      const mappedData = viewEquipmentFormData.map((dataItem) => {
+        return{
+          id: dataItem.id,
+          type: dataItem.type_of_equipment,
+          date_request: dataItem.date_request,
+          title: dataItem.title_of_activity,
+          date_activity: dataItem.date_of_activity,
+          time_start: dataItem.time_start,
+          time_end: dataItem.time_end,
+          dm_approvel: dataItem.division_manager_approval,
+          am_approvel: dataItem.admin_manager_approval,
+          hm_approvel: dataItem.harbor_master_approval,
+          mm_approvel: dataItem.port_manager_approval
+        }
+      });
+
+      setDisplayRequestEquipment({mappedData:mappedData});
+    })
+    .catch((error) => {
+      setLoading(false);
+        console.error('Error fetching data:', error);
+    });
+  }
+
   useEffect(()=>{
     fetchInspectForm();
     fetchFacilityForm();
     fetchVehicleSlipForm();
+    fetchEquipmentForm();
   },[id]);
 
   const handleTabClick = (tab) => {
@@ -242,76 +234,6 @@ export default function MyRequest(){
       <div className="mt-4">
 
         {/* Pre-Repair/Post Repair Inspection Form */}
-        {activeTab === "tab1" && (
-        <div>
-          <table className="border-collapse w-full">
-            <thead>
-            {displayRequest.mappedData.length > 0 ? (
-              <tr className="bg-gray-100">
-                <th className="px-2 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Ctrl No</th>
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th> 
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>  
-                <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-              </tr>
-            ):null}
-            </thead>
-            <tbody>
-            {displayRequest.mappedData.length > 0 ? (
-              displayRequest.mappedData.map((getData) => (
-                <tr key={getData.id}>
-                  <td className="px-2 py-1 w-3 text-center border border-custom font-bold">{getData.id}</td>
-                  <td className="px-2 py-1 text-center border border-custom">{formatDate(getData.date_of_request)}</td>
-                  <td className="px-2 py-1 text-center border border-custom">{getData.property_number}</td>
-                  {getData.type_of_property === "Others" ? (
-                    <td className="px-2 py-1 text-center border border-custom">Others: <i>{getData.property_other_specific}</i></td>
-                  ):(
-                    <td className="px-2 py-1 text-center border border-custom">{getData.type_of_property}</td>
-                  )}
-                  <td className="px-2 py-1 text-center border border-custom">{getData.complain}</td>
-                  <td className="px-1 py-1 text-center border w-1/4 border-custom leading-tight">
-                    {getData.supervisor_approval == 0 && getData.admin_approval == 0 && getData.inspector_status == 0 ? ('Waiting for Supervisor Approval'):null}
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 0 && getData.inspector_status == 0 ? ('Approve by your Supervisor'):null}
-                    {getData.supervisor_approval === 2 && getData.admin_approval == 0 && getData.inspector_status == 0 ? ('Disapprove by your Supervisor'):null} 
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 3 && getData.inspector_status == 0 ? ('Pending for Admin Division Manager approval'):null} 
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 2 && getData.inspector_status == 0 ? ('Admin Manager has disapproved your request'):null} 
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 4 ? ('Admin Manager has approved your request'):null}
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 3 ? ('The Inpector has working on your request'):null}
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 2 ? ('The Inpector has finished on your request'):null}
-                    {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 1 ? ('The Inpector has finished on your request'):null}
-                  </td>
-                  <td className="px-2 py-1 text-center border border-custom">
-                  {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 1 ? (
-                    <div className="flex justify-center">
-                    <Link to={`/repairinspectionform/${getData.id}`}>
-                      <button 
-                        className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
-                        title="View Request"
-                      >
-                        <FontAwesomeIcon icon="eye" className="mr-0" />
-                      </button>
-                    </Link>
-                  </div>
-                  ):null}
-                  </td>
-                </tr>
-              ))
-            ):(
-            <tr>
-              <td colSpan="7" className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for Repair Inspection</td>
-            </tr>
-            )}
-            </tbody>
-          </table>
-          <div className="text-right text-sm/[17px]">
-          {displayRequest.mappedData.length > 0 ? (
-          <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
-          ):null}
-          </div>
-        </div>
-        )}
 
         {/* Request For The Use Of Facility / Venue */}
         {activeTab === "tab2" && (
@@ -378,6 +300,7 @@ export default function MyRequest(){
           </div>
         )}
 
+        {/* Request For the Vehicle Slip */}
         {activeTab === "tab3" && (
           <div>
             <table className="border-collapse w-full">
@@ -435,13 +358,78 @@ export default function MyRequest(){
             </table>
             <div className="text-right text-sm/[17px]">
             {displayRequestVehicle.mappedData.length > 0 ? (
-            <i>Total of <b> {displayRequestVehicle.mappedData.length} </b> Pre/Post Repair Request</i>
+            <i>Total of <b> {displayRequestVehicle.mappedData.length} </b> Vehicle Slip Request</i>
             ):null}
             </div>
           </div>
         )}
 
-        {activeTab === "tab4" && <div className="text-center">Coming Soon</div>}
+        {/* Request For the Equipment Slip */}
+        {activeTab === "tab4" && (
+          <div>
+            <table className="border-collapse w-full">
+              <thead>
+                {displayRequestEquipment?.mappedData?.length > 0 ? (
+                <tr className="bg-gray-100">
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">Ctrl No</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Equipment</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose of Activity</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date of Activity</th>   
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Time of Activity (START and END)</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+                </tr>
+                ):null}
+              </thead>
+              <tbody>
+              {displayRequestEquipment?.mappedData?.length > 0 ? (
+                displayRequestEquipment?.mappedData?.map((getDataE) => (
+                  <tr key={getDataE.id}>
+                    <td className="px-1 py-1 text-center border border-custom w-1 font-bold">{getDataE.id}</td>
+                    <td className="px-1 py-1 text-center border border-custom">{formatDate(getDataE.date_request)}</td>
+                    <td className="px-1 py-1 text-center border border-custom">{getDataE.type}</td>
+                    <td className="px-1 py-1 text-center border border-custom">{getDataE.title}</td>
+                    <td className="px-1 py-1 text-center border border-custom">{formatDate(getDataE.date_activity)}</td>
+                    <td className="px-2 py-1 w-40 text-center border border-custom">{formatTime(getDataE.time_start)} - {formatTime(getDataE.time_end)}</td>
+                    <td className="px-1 py-1 text-center border border-custom">
+                    {getDataE.type != 'Rescue Boat' ? (
+                      getDataE.dm_approvel == 0 && getDataE.am_approvel == 0 ? ("Pending Approval"):
+                      getDataE.dm_approvel == 1 && getDataE.am_approvel == 0 ? ("Approved by your DM"):
+                      getDataE.dm_approvel == 1 && getDataE.am_approvel == 1 ? ("Approved by the Admin"):null
+                    ):("ako ni")}
+                    </td>
+                    <td className="px-1 py-1 text-center border border-custom">
+                      <div className="flex justify-center">
+                        <Link to={`/equipmentform/${getDataE.id}`}>
+                          <button 
+                            className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
+                            title="View Request"
+                          >
+                            <FontAwesomeIcon icon="eye" className="mr-0" />
+                          </button>
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ):(
+                <tr>
+                  <td colSpan="7" className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for yoou today</td>
+                </tr>
+              )}
+              </tbody>
+              
+            </table>
+            <div className="text-right text-sm/[17px]">
+            {displayRequestEquipment.mappedData.length > 0 ? (
+            <i>Total of <b> {displayRequestEquipment.mappedData.length} </b> Pre/Post Repair Request</i>
+            ):null}
+            </div>
+          </div>
+        )}
+
+
         {activeTab === "tab5" && <div className="text-center">Coming Soon</div>}
 
       </div>

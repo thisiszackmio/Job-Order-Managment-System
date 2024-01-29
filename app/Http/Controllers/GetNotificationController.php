@@ -18,8 +18,8 @@ class GetNotificationController extends Controller
      */
     public function SupervisorNoti($id)
     {
+        // For Inspection Form
         $supInspectNoti = Inspection_Form::where('supervisor_name', $id)->where('supervisor_approval', 0)->get();
-
         $iID = $supInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
 
@@ -33,7 +33,7 @@ class GetNotificationController extends Controller
         });
 
         $responseData = [
-            'supDet' => $supDet
+            'supInsDet' => $supDet
         ];
 
         return response()->json($responseData);
@@ -120,9 +120,9 @@ class GetNotificationController extends Controller
         $iID = $pID->pluck('inspection__form_id')->all();
         $apID = $pID->pluck('assign_personnel')->first();
 
-        if($pID->isEmpty()) {
-            return response()->json(['message' => 'No Assign Personnel Found'], 404);
-        }
+        // if($pID->isEmpty()) {
+        //     return response()->json(['message' => 'No Assign Personnel Found'], 404);
+        // }
 
         //Get Inspector Form
         $specForm = Inspector_Form::whereIn('inspection__form_id', $iID)->whereIn('close', [3,4])->get();

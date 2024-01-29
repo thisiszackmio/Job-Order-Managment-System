@@ -4,14 +4,23 @@ import Login from "./views/Login";
 import Logout from "./views/Logout";
 import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
-import RequestForm from "./views/RequestForm";
+
+import RequestRepairForm from "./views/RequestForRepairForm";
+
+import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
+
+import RepairRequestForm from "./views/RepairFormList"
+
+import PrepostRepairForm from "./views/PrePostRepairForm";
+
 import RequestList from "./views/RequestList";
 import MyRequest from "./views/YourRequest";
-import PrepostRepairForm from "./views/PrePostRepairForm";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
 import FacilityVenueForm from "./views/FacilityVenueForm";
 import VehicleSlipForm from "./views/VehicleSlipForm";
+import EquipmentForm from "./views/EquipmentForm";
+import RepairRequestList from "./views/RepairFormList";
 
 
 const routes = [
@@ -27,9 +36,21 @@ const routes = [
                 path: "/",
                 element: <Dashboard />
             },
+            //For Pre/Post Repair Inspection Form
             {
-                path: "/request_form",
-                element: <RequestForm />
+                path: "/repairrequestform/:id",
+                element: <RequestRepairForm />
+            },
+            //My Request Form
+            // For Pre/Post Repair Inspection Form
+            {
+                path: "/myrequestinpectionform/:id",
+                element: <MyRequestInspectionForm />
+            },
+            //Request List
+            {
+                path: "/repairrequestform",
+                element: <RepairRequestForm />
             },
             {
                 path: "/my_request/:id",
@@ -61,6 +82,11 @@ const routes = [
             {
                 path: "/vehicleslipform/:id",
                 element: <VehicleSlipForm />
+            },
+            //For Equipment Form
+            {
+                path: "/equipmentform/:id",
+                element: <EquipmentForm />
             }
         ]
     },

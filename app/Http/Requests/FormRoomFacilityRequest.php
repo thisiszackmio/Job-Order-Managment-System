@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FormMPHFacilityRequest extends FormRequest
+class FormRoomFacilityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class FormMPHFacilityRequest extends FormRequest
     public function rules()
     {
         return [
-            'facility_id' => 'exists:request__facility,facility_id',
+            'facility_form_id' => 'exists:facility_form',
             'table' => 'required|boolean',
             'no_table' => $this->input('table') ? 'required|numeric' : 'nullable|numeric',
             'chair' => 'required|boolean',

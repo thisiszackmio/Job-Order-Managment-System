@@ -29,6 +29,7 @@ export default function PrePostRepairForm(){
   const [showPopupHappy, setShowPopupHappy] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [popupContent, setPopupContent] = useState('');
 
   //Functions
   const [isLoading, setIsLoading] = useState(true);
@@ -106,7 +107,9 @@ export default function PrePostRepairForm(){
           gsoDetails: gsoDetails,
           manegerDetails: manegerDetails,
         });
+
         setIsLoading(false);
+
     })
     .catch((error) => {
         console.error('Error fetching data:', error);
@@ -122,6 +125,7 @@ export default function PrePostRepairForm(){
       const partBData = responseData.partB;
 
       setPartB({partBData});
+
       setIsLoading(false);
 
     })
@@ -129,6 +133,7 @@ export default function PrePostRepairForm(){
       console.error('Error fetching data:', error);
     });
   }
+
   // Part C and D display
   const fetchPartCD = () => {
     axiosClient
@@ -138,6 +143,7 @@ export default function PrePostRepairForm(){
       const viewPartC = responseData.part_c;
 
       setPartCD({viewPartC});
+
       setIsLoading(false);
     
     })
@@ -154,7 +160,7 @@ export default function PrePostRepairForm(){
     fetchPartCD();
   },[id]);
 
-   //Send the data on Part B
+  //Submit the data on Part B
   const SubmitInspectionFormTo = (event, id) => {
     event.preventDefault();
     setSubmitLoading(true);
@@ -166,14 +172,17 @@ export default function PrePostRepairForm(){
       assign_personnel: pointPersonnel
     })
     .then((response) => {
-      setPopupMessage('Submit successfully'); 
+      setPopupContent('success');
+      setPopupMessage(GSOMessageTest); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
     .catch((error) => {
       //console.error(error);
-      const responseErrors = error.response.data.errors;
-      setInputErrors(responseErrors);
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+      setSubmitLoading(false);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -193,8 +202,9 @@ export default function PrePostRepairForm(){
       recommendations: recommendation
     })
     .then((response) => { 
-      setShowPopup(true);
-      setPopupMessage("Submit successfully");    
+      setPopupContent('success');
+      setPopupMessage('Form submit successfully'); 
+      setShowPopup(true);   
       setSubmitLoading(false);
     })
     .catch((error) => {
@@ -220,8 +230,9 @@ export default function PrePostRepairForm(){
       remarks: remarks
     })
     .then((response) => { 
-      setShowPopup(true);
-      setPopupMessage("Submit successfully");    
+      setPopupContent('success');
+      setPopupMessage('Form submit successfully'); 
+      setShowPopup(true);   
       setSubmitLoading(false);
     })
     .catch((error) => {
@@ -233,122 +244,215 @@ export default function PrePostRepairForm(){
 
   };
 
-  //Supervisor approval 
-  function handleApproveClick(id){
+  //Popup Message
+  const DevErrorText = (
+    <div>
+      <p><strong>There is something wrong!</strong></p>
+      <p>Please contact to the developer</p>
+    </div>
+  );
 
-    //alert(id);
-    const confirmed = window.confirm('Do you want to approve the request?');
+  const GSOMessageTest = (
+    <div>
+      <p><strong>Done!</strong></p>
+      <p>Form submit successfully</p>
+    </div>
+  );
 
-    if(confirmed) {
+  const SupConfirmText = (
+    <div>
+      <p>Do you want to approve</p>
+      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+    </div>
+  );
+
+  const SupConfirmTextD = (
+    <div>
+      <p>Are you sure you</p>
+      <p>want to disapprove</p>
+      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+    </div>
+  );
+  
+  const SupApproval = (
+    <div>
+      <p className="text-xl"><strong>Thank You!</strong></p>
+      <p>For Approving my Request</p>
+    </div>
+  );
+
+  const SupDecline = (
+    <div>
+      <p className="text-xl"><strong>Done!</strong></p>
+      <p>You disapprove the request</p>
+    </div>
+  );
+
+  const AdminConfirmText = (
+    <div>
+      <p>Do you want to approve</p>
+      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+    </div>
+  );
+
+  const AdminConfirmTextD = (
+    <div>
+      <p>Are you sure you</p>
+      <p>want to disapprove</p>
+      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+    </div>
+  );
+
+  const AdminApproval = (
+    <div>
+      <p>Thank You {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</p>
+      <p>For Approving my Request</p>
+    </div>
+  );
+
+  const AdminDecline = (
+    <div>
+      <p className="text-xl"><strong>Done!</strong></p>
+      <p>You disapprove the request</p>
+    </div>
+  );
+
+  //Confirmation Request
+  function handleApprovalRequest(){
+
+    if(currentUser.code_clearance == 4){
+      //For Supervisor
+      setPopupContent("warning");
+      setShowPopup(true);
+      setPopupMessage(SupConfirmText);
+    }
+    else if(currentUser.code_clearance == 1){
+      //For Admin Manager
+      setPopupContent("warning");
+      setShowPopup(true);
+      setPopupMessage(AdminConfirmText);
+    }
+  }
+
+  //Decline Request
+  function handleDeclineRequest(){
+    
+    if(currentUser.code_clearance == 4){
+      // For Supervisor
+      setPopupContent("warningD");
+      setShowPopup(true);
+      setPopupMessage(SupConfirmTextD);
+    }
+    else if(currentUser.code_clearance == 1){
+      // For Admin Manager
+      setPopupContent("warningD");
+      setShowPopup(true);
+      setPopupMessage(AdminConfirmTextD);
+    }
+
+  }
+
+  //Approval Request
+  function handleGrantApprovalRequest(id){
+
+    if(currentUser.code_clearance == 4){
+      //For Supervisor
+      setSubmitLoading(true);
+
       axiosClient.put(`/approve/${id}`)
       .then((response) => {
+        setPopupContent("yehey");
         setPopupMessage(SupApproval);
-        setShowPopupHappy(true);
+        setShowPopup(true);
       })
       .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed to approve the form. Please try again later.');
-        setShowPopup(true);
+        //console.error(error);
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+        setSubmitLoading(false);
       });
-    }else{
-      setPopupMessage("Okay " + (currentUser.gender === 'Male' ? "Sir" : "Maam") + " " + currentUser.fname);
-      setShowPopup(true);
     }
+    else if(currentUser.code_clearance == 1){
+      // For Admin Manager
+      setSubmitLoading(true);
 
-  };
-
-  //Supervisor disapproval 
-  function handleDisapproveClick(id){
-
-    //alert(id);
-    const confirmed = window.confirm('Are you sure to disapprove the request?');
-
-    if(confirmed) {
-      axiosClient.put(`/disapprove/${id}`)
-    .then((response) => {
-        setPopupMessage(SupDecline);
-        setShowPopup(true);
-    })
-    .catch((error) => {
-      console.error(error);
-      setPopupMessage('Failed to approve the form. Please try again later.');
-      setShowPopup(true);
-    });
-    }
-    else{
-      setPopupMessage("Okay " + (currentUser.gender === 'Male' ? "Sir" : "Maam") + " " + currentUser.fname);
-      setShowPopup(true);
-    }
-  }
-
-  //Admin approval
-  function handleAdminApproveClick(id){
-
-    //alert(id);
-    const confirmed = window.confirm('Do you want to approve the request?');
-
-    if(confirmed) {
       axiosClient.put(`/admin_approve/${id}`)
       .then((response) => {
+        setPopupContent("yehey");
         setPopupMessage(AdminApproval);
-        setShowPopupHappy(true);
+        setShowPopup(true);
       })
       .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed to approve the form. Please try again later.');
-        setShowPopup(true);
+        //console.error(error);
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+        setSubmitLoading(false);
       });
-    }else{
-      setPopupMessage("Okay " + (currentUser.gender === 'Male' ? "Sir" : "Maam") + " " + currentUser.fname);
-      setShowPopup(true);
     }
-
   }
 
-  //Admin disapproval
-  function handleAdminDisapproveClick(id){
+  //Disapproval Request
+  function handleDeclineApprovalRequest(id){
 
-    //alert(id);
-    const confirmed = window.confirm('Are you sure to disapprove the request?');
+    if(currentUser.code_clearance == 4){
+      // For Supervisor
+      setSubmitLoading(true);
+  
+      axiosClient.put(`/disapprove/${id}`)
+      .then((response) => {
+        setPopupContent("success");
+        setPopupMessage(SupDecline);
+        setShowPopup(true);
+      })
+      .catch((error) => {
+        // console.error(error);
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+        setSubmitLoading(false);
+      });
+    }
+    else if(currentUser.code_clearance == 1){
+      // For Admin Manager
+      setSubmitLoading(true);
 
-    if(confirmed) {
       axiosClient.put(`/admin_disapprove/${id}`)
       .then((response) => {
+        setPopupContent("success");
         setPopupMessage(AdminDecline);
         setShowPopup(true);
       })
       .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed to approve the form. Please try again later.');
-        setShowPopup(true);
+        //console.error(error);
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+        setSubmitLoading(false);
       });
-    }
-    else{
-      setPopupMessage("Okay " + (currentUser.gender === 'Male' ? "Sir" : "Maam") + " " + currentUser.fname);
-      setShowPopup(true);
     }
   }
 
   //Close the request
   function handleCloseRequest(id){
 
-    //alert(id);
-    const confirmed = window.confirm('Do you want to close the request?');
-
-    if(confirmed) {
-      axiosClient.put(`/requestclose/${id}`)
-      .then((response) => {
-        setPopupMessage('Request Close');
-        setShowPopup(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed. Please try again later.');
-        setShowPopup(true);
-      });
-    }else{
-      alert('You change your mind');
-    }
+    setSubmitLoading(true);
+    
+    axiosClient.put(`/requestclose/${id}`)
+    .then((response) => {
+      setPopupContent("success");
+      setPopupMessage('Request close successfully');
+      setShowPopup(true);
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      //console.error(error);
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    });
 
   }
 
@@ -395,50 +499,6 @@ export default function PrePostRepairForm(){
     }
   }, [seconds]);
 
-  const SupApproval = (
-    <div>
-      {currentUser.id == displayRequest?.viewRequestData?.user_id  ? (
-      <>
-      <p>You Approving your own Request</p>
-      <p>Thanks</p>
-      </>
-      ):(
-      <>
-      <p>Thank You {currentUser.gender == 'Male' ? ("Sir"):("Maam")} {currentUser.fname}</p>
-      <p>For Approving my Request</p>
-      </>
-      )}
-    </div>
-  );
-  const SupDecline = (
-    <div>
-      {currentUser.id == displayRequest?.viewRequestData?.supervisor_name ? (
-      <>
-      <p>You Decline your own Request</p>
-      <p>Thanks</p>
-      </>
-      ):(
-      <>
-      <p>Form Request Decline</p>
-      <p>Thank You {currentUser.gender == 'Male' ? ("Sir"):("Maam")} {currentUser.fname}</p>
-      </>
-      )}
-      
-    </div>
-  );
-  const AdminApproval = (
-    <div>
-      <p>Thank You {currentUser.gender == 'Male' ? ("Sir"):("Maam")} {currentUser.fname}</p>
-      <p>For Approving my Request</p>
-    </div>
-  );
-  const AdminDecline = (
-    <div>
-      <p>Form Request Decline</p>
-      <p>Thank You {currentUser.gender == 'Male' ? ("Sir"):("Maam")} {currentUser.fname}</p>
-    </div>
-  );
-
   //Restrictions
   const requestlistClearance = [1, 2, 3, 10];
   const here = requestlistClearance.includes(currentUser.code_clearance);
@@ -458,7 +518,12 @@ export default function PrePostRepairForm(){
     setIsLoading(true)
     setShowPopupHappy(false);
     setShowPopup(false);
+    setSubmitLoading(false);
     window.location.reload();
+  };
+
+  const justclose = () => {
+    setShowPopup(false);
   };
 
   return Users ? (
@@ -655,423 +720,293 @@ export default function PrePostRepairForm(){
       </div>
 
     </div>
+    
+    {/* Supervisor Decision */}
+    {displayRequest?.viewRequestData?.supervisor_approval == 2 ? null:(
+    <>
 
-    {/* Part B */}
-    <div className="mt-4 border-b border-black pb-10">
-      
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Part B: To be filled-up by Administrative Division </h2>
-      </div>
-
-      {getPartB.partBData ? (
-      <>
-      
-      <div className="grid grid-cols-2 gap-4">
-
-        <div className="col-span-1">
-
-          {/* Date */}
-          <div className="flex items-center mt-6">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Date:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {formatDate(getPartB?.partBData?.date_of_filling)}
-            </div>
-          </div>
-
-          {/* Date of Last Repair */}
-          <div className="flex items-center mt-3">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Date of Last Repair:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {getPartB?.partBData?.date_of_last_repair ? (formatDate(getPartB?.partBData?.date_of_last_repair)):("N/A")}
-            </div>
-          </div>
-
-          {/* Nature of Repair */}
-          <div className="flex items-center mt-3">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Nature of Repair:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {getPartB?.partBData?.nature_of_last_repair ? (getPartB?.partBData?.nature_of_last_repair):("N/A")}
-            </div>
-          </div>
-
+      {/* Part B */}
+      <div className="mt-4 border-b border-black pb-10">
+        
+        <div>
+          <h2 className="text-base font-bold leading-7 text-gray-900"> Part B: To be filled-up by Administrative Division </h2>
         </div>
 
-        <div className="col-span-1">
+        {getPartB.partBData ? (
+        <>
+        
+        <div className="grid grid-cols-2 gap-4">
 
-          {/* Requested By */}
-          <div className="flex items-center mt-6">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Requested By:
-              </label> 
-            </div>
-            <div className="w-64 font-bold border-b border-black pl-1">
-            {displayRequest?.gsoDetails?.gso_name}
-            </div>
-          </div>
-
-          {/* Noted By */}
-          <div className="flex items-center mt-3">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Noted By:
-              </label> 
-            </div>
-            <div className="w-64 font-bold border-b border-black pl-1">
-            {displayRequest?.manegerDetails?.manager_name}
-            </div>
-          </div>
-
-          {/* Assigned Personnel: */}
-          <div className="flex items-center mt-3">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Assigned Personnel:
-              </label> 
-            </div>
-            <div className="w-64 font-bold border-b border-black pl-1">
-            {assignPersonnel?.personnel_details?.p_name}
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Status */}
-      <div className="flex items-center mt-8">
-        <div className="w-16">
-          <label className="block text-base font-bold leading-6 text-gray-900">
-          Status:
-          </label> 
-        </div>
-        <div className="w-24 font-bold">
-        {displayRequest?.viewRequestData?.admin_approval == 1 ? ("Approved")
-        :displayRequest?.viewRequestData?.admin_approval == 2 ? ("Disapproved"):("Pending")}
-        </div>
-      </div>
-
-      </>
-      ):(
-      <>
-      {currentUser.code_clearance == 3 ? (
-        (displayRequest?.viewRequestData?.supervisor_approval == 1 ? (
-          
-          <form id='partB' onSubmit={event => SubmitInspectionFormTo(event, displayRequest.viewRequestData.id)}>
+          <div className="col-span-1">
 
             {/* Date */}
             <div className="flex items-center mt-6">
-              <div className="w-36">
+              <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900">
-                  Date:
+                Date:
                 </label> 
               </div>
-              <div className="w-64 border-b border-black">
-                <input
-                  type="date"
-                  name="date_filled"
-                  id="date_filled"
-                  className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  defaultValue={today}
-                  readOnly
-                />
+              <div className="w-64 border-b border-black pl-1">
+              {formatDate(getPartB?.partBData?.date_of_filling)}
               </div>
             </div>
 
             {/* Date of Last Repair */}
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900">
                 Date of Last Repair:
                 </label> 
               </div>
-              <div className="w-64 border-b border-black">
-                <input
-                  type="date"
-                  name="last_date_filled"
-                  id="last_date_filled"
-                  value={lastfilledDate}
-                  onChange={ev => setLastFilledDate(ev.target.value)}
-                  max={currentDate}
-                  className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                />
+              <div className="w-64 border-b border-black pl-1">
+              {getPartB?.partBData?.date_of_last_repair ? (formatDate(getPartB?.partBData?.date_of_last_repair)):("N/A")}
               </div>
             </div>
-            <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
 
             {/* Nature of Repair */}
-            <div className="flex items-center mt-2">
-              <div className="w-44">
+            <div className="flex items-center mt-3">
+              <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900">
                 Nature of Repair:
                 </label> 
               </div>
-              <div className="w-full">
-                <textarea
-                  id="nature_repair"
-                  name="nature_repair"
-                  rows={3}
-                  value={natureRepair}
-                  onChange={ev => setNatureRepair(ev.target.value)}
-                  style={{ resize: "none" }}  
-                  className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+              <div className="w-64 border-b border-black pl-1">
+              {getPartB?.partBData?.nature_of_last_repair ? (getPartB?.partBData?.nature_of_last_repair):("N/A")}
               </div>
             </div>
-            <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
 
-            {/* Assign Personnel */}
-            <div className="flex items-center mt-2">
-              <div className="w-44">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Assign Personnel:
-                </label> 
-              </div>
-              <div className="w-full">
-              <select 
-                name="plate_number" 
-                id="plate_number" 
-                autoComplete="request-name"
-                value={pointPersonnel}
-                onChange={ev => setPointPersonnel(ev.target.value)}
-                className="block w-full rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-              > 
-                <option value="" disabled>Select an option</option>
-                {getPersonnel.mappedData.map(user => (
-                <option key={user.id} value={user.id}> {user.name} - {user.type} </option>
-                ))}
-              </select>
-              </div>
-            </div>
-            {inputErrors.assign_personnel && (
-              <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'160px' }}>Assign Personnel is required</p>
-            )}
+          </div>
 
-          </form>
+          <div className="col-span-1">
 
-        ):(
-          <div>Pending for Supervisor's Approval</div>
-        ))
-      ):(
-        <div>To be filled by the General Service Officer</div>
-      )}
-      </>
-      )}
-
-    </div>
-
-    {/* Part C */}
-    {displayRequest?.viewRequestData?.admin_approval != 2 ? (
-    <>
-    <div className="mt-4 border-b border-black pb-10">
-      
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
-      </div>
-
-      {getPartCD?.viewPartC?.findings && getPartCD?.viewPartC?.findings != "no data" ? (
-      <>
-
-      {/* Date Inspected */}
-      <div className="flex items-center mt-6">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Date Inspected:
-          </label> 
-        </div>
-        <div className="w-64 border-b border-black pl-1">
-        {formatDate(getPartCD?.viewPartC?.before_repair_date)}
-        </div>
-      </div>
-
-      {/* Findings */}
-      <div className="flex items-center mt-3">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Findings:
-          </label> 
-        </div>
-        <div className="w-64 border-b border-black pl-1">
-        {getPartCD?.viewPartC?.findings}
-        </div>
-      </div>
-
-      {/* Recomendations */}
-      <div className="flex items-center mt-3">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Recomendations:
-          </label> 
-        </div>
-        <div className="w-64 border-b border-black pl-1">
-        {getPartCD?.viewPartC?.recommendations}
-        </div>
-      </div>
-
-      {/* Noted By */}
-      <div className="flex items-center mt-3">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Noted By:
-          </label> 
-        </div>
-        <div className="w-64 font-bold border-b border-black pl-1">
-        {assignPersonnel?.personnel_details?.p_name}
-        </div>
-      </div>
-
-      </>
-      ):(
-      <>
-      {currentUser.id == getPartB?.partBData?.assign_personnel ? (
-        displayRequest?.viewRequestData?.admin_approval == 1 ? (
-          <form id="partC" onSubmit={SubmitPartC}>
-
-            {/* Date */}
+            {/* Requested By */}
             <div className="flex items-center mt-6">
-              <div className="w-36">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                  Date Inspected:
-                </label> 
-              </div>
-              <div className="w-64 border-b border-black">
-                <input
-                  type="date"
-                  name="date_filled"
-                  id="date_filled"
-                  className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  defaultValue={today}
-                  readOnly
-                />
-              </div>
-            </div>
-
-            {/* Findings */}
-            <div className="flex items-center mt-2">
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900">
-                Findings:
+                Requested By:
                 </label> 
               </div>
-              <div className="w-full">
-                <textarea
-                  id="findings"
-                  name="findings"
-                  rows={3}
-                  style={{ resize: "none" }}
-                  value= {finding}
-                  onChange={ev => setFinding(ev.target.value)}
-                  className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  required
-                />
+              <div className="w-64 font-bold border-b border-black pl-1">
+              {displayRequest?.gsoDetails?.gso_name}
               </div>
             </div>
 
-            {/* Recomendations */}
-            <div className="flex items-center mt-2">
+            {/* Noted By */}
+            <div className="flex items-center mt-3">
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900">
-                Recomendations:
+                Noted By:
                 </label> 
               </div>
-              <div className="w-full">
-                <textarea
-                  id="recomendations"
-                  name="recomendations"
-                  rows={3}
-                  style={{ resize: "none" }}
-                  value= {recommendation}
-                  onChange={ev => setRecommendation(ev.target.value)}
-                  className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  required
-                />
+              <div className="w-64 font-bold border-b border-black pl-1">
+              {displayRequest?.manegerDetails?.manager_name}
               </div>
             </div>
 
-          </form>
-        ):displayRequest?.viewRequestData?.admin_approval == 2 ? (
-          <div>This Form is Declined by the Admin Manager</div>
+            {/* Assigned Personnel: */}
+            <div className="flex items-center mt-3">
+              <div className="w-40">
+                <label className="block text-base font-medium leading-6 text-gray-900">
+                Assigned Personnel:
+                </label> 
+              </div>
+              <div className="w-64 font-bold border-b border-black pl-1">
+              {assignPersonnel?.personnel_details?.p_name}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Status */}
+        <div className="flex items-center mt-8">
+          <div className="w-16">
+            <label className="block text-base font-bold leading-6 text-gray-900">
+            Status:
+            </label> 
+          </div>
+          <div className="w-24 font-bold">
+          {displayRequest?.viewRequestData?.admin_approval == 1 ? ("Approved")
+          :displayRequest?.viewRequestData?.admin_approval == 2 ? ("Disapproved"):("Pending")}
+          </div>
+        </div>
+
+        </>
         ):(
-          <div>Pending</div>
-        )
-      ):(
-        <div>To be filled by Assigned Personnel</div>
-      )}
-      </>
-      )}
+        <>
+        {currentUser.code_clearance == 3 ? (
+          (displayRequest?.viewRequestData?.supervisor_approval == 1 ? (
+            
+            <form id='partB' onSubmit={event => SubmitInspectionFormTo(event, displayRequest.viewRequestData.id)}>
 
-    </div>
-    </>
-    ):null}
+              {/* Date */}
+              <div className="flex items-center mt-6">
+                <div className="w-36">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                    Date:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black">
+                  <input
+                    type="date"
+                    name="date_filled"
+                    id="date_filled"
+                    className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    defaultValue={today}
+                    readOnly
+                  />
+                </div>
+              </div>
 
-    {/* Part D */}
-    {displayRequest?.viewRequestData?.admin_approval != 2 ? (
-    <>
-    <div className="mt-4 border-b border-black pb-10">
+              {/* Date of Last Repair */}
+              <div className="flex items-center mt-2">
+                <div className="w-40">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Date of Last Repair:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black">
+                  <input
+                    type="date"
+                    name="last_date_filled"
+                    id="last_date_filled"
+                    value={lastfilledDate}
+                    onChange={ev => setLastFilledDate(ev.target.value)}
+                    max={currentDate}
+                    className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
 
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
+              {/* Nature of Repair */}
+              <div className="flex items-center mt-2">
+                <div className="w-44">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Nature of Repair:
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <textarea
+                    id="nature_repair"
+                    name="nature_repair"
+                    rows={3}
+                    value={natureRepair}
+                    onChange={ev => setNatureRepair(ev.target.value)}
+                    style={{ resize: "none" }}  
+                    className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
+
+              {/* Assign Personnel */}
+              <div className="flex items-center mt-2">
+                <div className="w-44">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Assign Personnel:
+                  </label> 
+                </div>
+                <div className="w-full">
+                <select 
+                  name="plate_number" 
+                  id="plate_number" 
+                  autoComplete="request-name"
+                  value={pointPersonnel}
+                  onChange={ev => setPointPersonnel(ev.target.value)}
+                  className="block w-full rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                > 
+                  <option value="" disabled>Select an option</option>
+                  {getPersonnel.mappedData.map(user => (
+                  <option key={user.id} value={user.id}> {user.name} - {user.type} </option>
+                  ))}
+                </select>
+                </div>
+              </div>
+              {inputErrors.assign_personnel && (
+                <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'160px' }}>Assign Personnel is required</p>
+              )}
+
+            </form>
+
+          ):(
+            <div>Pending for Supervisor's Approval</div>
+          ))
+        ):(
+          <div>To be filled by the General Service Officer</div>
+        )}
+        </>
+        )}
+
       </div>
 
-      {getPartCD?.viewPartC?.after_reapir_date || getPartCD?.viewPartC?.remarks ? (
+      {/* Part C */}
+      {displayRequest?.viewRequestData?.admin_approval != 2 ? (
       <>
+      <div className="mt-4 border-b border-black pb-10">
+        
+        <div>
+          <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
+        </div>
 
-      {/* Date Inspected */}
-      <div className="flex items-center mt-6">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Date Inspected:
-          </label> 
-        </div>
-        <div className="w-64 border-b border-black pl-1">
-        {formatDate(getPartCD?.viewPartC?.after_reapir_date)}
-        </div>
-      </div>
+        {getPartCD?.viewPartC?.findings && getPartCD?.viewPartC?.findings != "no data" ? (
+        <>
 
-      {/* Remarks */}
-      <div className="flex items-center mt-3">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Remarks:
-          </label> 
+        {/* Date Inspected */}
+        <div className="flex items-center mt-6">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Date Inspected:
+            </label> 
+          </div>
+          <div className="w-64 border-b border-black pl-1">
+          {formatDate(getPartCD?.viewPartC?.before_repair_date)}
+          </div>
         </div>
-        <div className="w-64 border-b border-black pl-1">
-        {getPartCD?.viewPartC?.remarks}
-        </div>
-      </div>
 
-      {/* Noted By */}
-      <div className="flex items-center mt-3">
-        <div className="w-36">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Noted By:
-          </label> 
+        {/* Findings */}
+        <div className="flex items-center mt-3">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Findings:
+            </label> 
+          </div>
+          <div className="w-64 border-b border-black pl-1">
+          {getPartCD?.viewPartC?.findings}
+          </div>
         </div>
-        <div className="w-64 font-bold border-b border-black pl-1">
-        {assignPersonnel?.personnel_details?.p_name}
-        </div>
-      </div>
 
-      </>
-      ):(
-      <>
-      {currentUser.id == getPartB?.partBData?.assign_personnel ? (
-        displayRequest?.viewRequestData?.admin_approval == 1 ? (
-          getPartCD?.viewPartC?.close == 3 ? (
-          <>
-            <form id="partD" onSubmit={SubmitPartD}>
+        {/* Recomendations */}
+        <div className="flex items-center mt-3">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Recomendations:
+            </label> 
+          </div>
+          <div className="w-64 border-b border-black pl-1">
+          {getPartCD?.viewPartC?.recommendations}
+          </div>
+        </div>
+
+        {/* Noted By */}
+        <div className="flex items-center mt-3">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Noted By:
+            </label> 
+          </div>
+          <div className="w-64 font-bold border-b border-black pl-1">
+          {assignPersonnel?.personnel_details?.p_name}
+          </div>
+        </div>
+
+        </>
+        ):(
+        <>
+        {currentUser.id == getPartB?.partBData?.assign_personnel ? (
+          displayRequest?.viewRequestData?.admin_approval == 1 ? (
+            <form id="partC" onSubmit={SubmitPartC}>
 
               {/* Date */}
               <div className="flex items-center mt-6">
@@ -1092,58 +1027,195 @@ export default function PrePostRepairForm(){
                 </div>
               </div>
 
-              {/* Remarks */}
+              {/* Findings */}
               <div className="flex items-center mt-2">
                 <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
-                  Remarks:
+                  Findings:
                   </label> 
                 </div>
                 <div className="w-full">
                   <textarea
-                    id="remarks"
-                    name="remarks"
+                    id="findings"
+                    name="findings"
                     rows={3}
                     style={{ resize: "none" }}
-                    value= {remarks}
-                    onChange={ev => setRemarks(ev.target.value)}
+                    value= {finding}
+                    onChange={ev => setFinding(ev.target.value)}
                     className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     required
-                />
+                  />
+                </div>
+              </div>
+
+              {/* Recomendations */}
+              <div className="flex items-center mt-2">
+                <div className="w-40">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Recomendations:
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <textarea
+                    id="recomendations"
+                    name="recomendations"
+                    rows={3}
+                    style={{ resize: "none" }}
+                    value= {recommendation}
+                    onChange={ev => setRecommendation(ev.target.value)}
+                    className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    required
+                  />
                 </div>
               </div>
 
             </form>
-          </>
+          ):displayRequest?.viewRequestData?.admin_approval == 2 ? (
+            <div>This Form is Declined by the Admin Manager</div>
           ):(
-            <div>Finish the PART C first</div>
+            <div>Pending</div>
           )
-        ):displayRequest?.viewRequestData?.admin_approval == 2 ? (
-          <div>This Form is Declined by the Admin Manager</div>
         ):(
-          <div>Pending</div>
-        )
-      ):(
-        <div>To be filled by Assigned Personnel</div>
-      )}
+          <div>To be filled by Assigned Personnel</div>
+        )}
+        </>
+        )}
+
+      </div>
       </>
-      )}
+      ):null} 
 
-    </div>
+      {/* Part D */}
+      {displayRequest?.viewRequestData?.admin_approval != 2 ? (
+      <>
+      <div className="mt-4 border-b border-black pb-10">
 
-    {/* Request Close */}
-    <div className="flex items-center mt-8">
-      <div className="w-32">
-        <label className="block text-base font-bold leading-6 text-gray-900">
-        Request Close:
-        </label> 
+        <div>
+          <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
+        </div>
+
+        {getPartCD?.viewPartC?.after_reapir_date || getPartCD?.viewPartC?.remarks ? (
+        <>
+
+        {/* Date Inspected */}
+        <div className="flex items-center mt-6">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Date Inspected:
+            </label> 
+          </div>
+          <div className="w-64 border-b border-black pl-1">
+          {formatDate(getPartCD?.viewPartC?.after_reapir_date)}
+          </div>
+        </div>
+
+        {/* Remarks */}
+        <div className="flex items-center mt-3">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Remarks:
+            </label> 
+          </div>
+          <div className="w-64 border-b border-black pl-1">
+          {getPartCD?.viewPartC?.remarks}
+          </div>
+        </div>
+
+        {/* Noted By */}
+        <div className="flex items-center mt-3">
+          <div className="w-36">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Noted By:
+            </label> 
+          </div>
+          <div className="w-64 font-bold border-b border-black pl-1">
+          {assignPersonnel?.personnel_details?.p_name}
+          </div>
+        </div>
+
+        </>
+        ):(
+        <>
+        {currentUser.id == getPartB?.partBData?.assign_personnel ? (
+          displayRequest?.viewRequestData?.admin_approval == 1 ? (
+            getPartCD?.viewPartC?.close == 3 ? (
+            <>
+              <form id="partD" onSubmit={SubmitPartD}>
+
+                {/* Date */}
+                <div className="flex items-center mt-6">
+                  <div className="w-36">
+                    <label className="block text-base font-medium leading-6 text-gray-900">
+                      Date Inspected:
+                    </label> 
+                  </div>
+                  <div className="w-64 border-b border-black">
+                    <input
+                      type="date"
+                      name="date_filled"
+                      id="date_filled"
+                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      defaultValue={today}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                {/* Remarks */}
+                <div className="flex items-center mt-2">
+                  <div className="w-40">
+                    <label className="block text-base font-medium leading-6 text-gray-900">
+                    Remarks:
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <textarea
+                      id="remarks"
+                      name="remarks"
+                      rows={3}
+                      style={{ resize: "none" }}
+                      value= {remarks}
+                      onChange={ev => setRemarks(ev.target.value)}
+                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      required
+                  />
+                  </div>
+                </div>
+
+              </form>
+            </>
+            ):(
+              <div>Finish the PART C first</div>
+            )
+          ):displayRequest?.viewRequestData?.admin_approval == 2 ? (
+            <div>This Form is Declined by the Admin Manager</div>
+          ):(
+            <div>Pending</div>
+          )
+        ):(
+          <div>To be filled by Assigned Personnel</div>
+        )}
+        </>
+        )}
+
       </div>
-      <div className="w-24 font-bold">
-      {getPartCD?.viewPartC?.close == 1 ? ("Yes"):("No")}
+
+      {/* Request Close */}
+      <div className="flex items-center mt-8">
+        <div className="w-32">
+          <label className="block text-base font-bold leading-6 text-gray-900">
+          Request Close:
+          </label> 
+        </div>
+        <div className="w-24 font-bold">
+        {getPartCD?.viewPartC?.close == 1 ? ("Yes"):("No")}
+        </div>
       </div>
-    </div>
+      </>
+      ):null}
+
     </>
-    ):null}
+    )}
 
     {/* Buttons */}
     <div className="flex mt-8">
@@ -1163,18 +1235,18 @@ export default function PrePostRepairForm(){
       {Supervisor ? (
       <>
         <button 
-          onClick={() => handleApproveClick(displayRequest?.viewRequestData?.id)}
+          onClick={() => handleApprovalRequest()}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
           title="Supervisor Approve"
         >
           Approve
         </button>
         <button 
-          onClick={() => handleDisapproveClick(displayRequest?.viewRequestData?.id)}
+          onClick={() => handleDeclineRequest()}
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
           title="Supervisor Decline"
         >
-          Decline
+          Disapprove
         </button>
       </>
       ):null}
@@ -1194,7 +1266,7 @@ export default function PrePostRepairForm(){
             {submitLoading ? (
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
+                <span className="ml-2">Submitting</span>
               </div>
             ) : (
               'Submit'
@@ -1208,18 +1280,18 @@ export default function PrePostRepairForm(){
         Admin ? (
           <>
           <button 
-            onClick={() => handleAdminApproveClick(displayRequest.viewRequestData.id)}
+            onClick={() => handleApprovalRequest()}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
             title="Admin Approve"
           >
             Approve
           </button>
           <button 
-            onClick={() => handleAdminDisapproveClick(displayRequest.viewRequestData.id)}
+            onClick={() => handleDeclineRequest()}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
             title="Admin Decline"
           >
-            Decline
+            Disapprove
           </button>
           </>
         ):null
@@ -1240,7 +1312,7 @@ export default function PrePostRepairForm(){
             {submitLoading ? (
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
+                <span className="ml-2">Submitting</span>
               </div>
             ) : (
               'Submit'
@@ -1258,7 +1330,7 @@ export default function PrePostRepairForm(){
           {submitLoading ? (
             <div className="flex items-center justify-center">
               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-              <span className="ml-2">Processing...</span>
+              <span className="ml-2">Submitting</span>
             </div>
           ) : (
             'Submit'
@@ -1293,10 +1365,20 @@ export default function PrePostRepairForm(){
       <>
       {getPartCD?.viewPartC?.close == 2 ? (
         <button 
-          className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded" 
           onClick={() => handleCloseRequest(displayRequest?.viewRequestData?.id)}
+          className={`rounded-md px-3 py-2 font-bold text-white text-sm shadow-sm focus:outline-none ${
+            submitLoading ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
+          }`}
+          disabled={submitLoading}
         >
-          Close Request
+          {submitLoading ? (
+            <div className="flex items-center justify-center">
+              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+              <span className="ml-2">Closing</span>
+            </div>
+          ) : (
+            'Close Request'
+          )}
         </button>
       ):null}
       </>
@@ -1802,42 +1884,7 @@ export default function PrePostRepairForm(){
     </div>
     )}
 
-    {/* Show Popup With Hearty Face */}
-    {showPopupHappy && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Semi-transparent black overlay */}
-      <div
-        className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-      ></div>
-      {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-      <div className="icon-center">
-        <svg className="w-44 h-44" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-          viewBox="-30 -30 473.9 473.9" style={{"enable-background":"new 0 0 473.9 473.9"}} xml:space="preserve">
-          <circle id="face" className="face" cx="200" cy="200" r="200"/>
-          <path id="mouth" className="mouth_alt" d="M81.4,237.1C81.4,323,151,392.7,237,392.7c85.9,0,155.6-69.6,155.6-155.6L81.4,237.1L81.4,237.1z"/>
-          <path className="heart--eye heart-eye-left" d="M182.1,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-            c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3s6-1.2,8.3-3.3c4.8-3.8,70.8-57.7,70.8-92.8
-            C224.2,127.7,206.5,110,182.1,110z"/>
-          <path className="heart--eye heart-eye-right" d="M366.7,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-            c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3c3.1,0,6-1.2,8.3-3.3c4.8-3.8,70.7-57.7,70.7-92.8
-            C408.7,127.7,391.1,110,366.7,110z"/>  
-        </svg>
-      </div>
-        <p className="text-lg text-center">{popupMessage}</p>
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={closePopup}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-      </div>
-    )}
-
-    {/* Show Normal Popup */}
+    {/* Show Popup */}
     {showPopup && (
       <div className="fixed inset-0 flex items-center justify-center z-50">
       {/* Semi-transparent black overlay */}
@@ -1846,16 +1893,362 @@ export default function PrePostRepairForm(){
       ></div>
       {/* Popup content with background blur */}
       <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-      <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
-        <p className="text-lg text-center">{popupMessage}</p>
-        <div className="flex justify-center mt-4">
+
+      {/* Notification Icons */}
+      <div class="f-modal-alert">
+
+        {/* Error */}
+        {popupContent == "error" && (
+        <>
+        <div className="f-modal-icon f-modal-error animate">
+          <span className="f-modal-x-mark">
+            <span className="f-modal-line f-modal-left animateXLeft"></span>
+            <span className="f-modal-line f-modal-right animateXRight"></span>
+          </span>
+        </div>
+        </>
+        )}
+
+        {/* Warning */}
+        {(popupContent == "warning" || popupContent == "warningD") && (
+        <>
+          <div class="f-modal-icon f-modal-warning scaleWarning">
+            <span class="f-modal-body pulseWarningIns"></span>
+            <span class="f-modal-dot pulseWarningIns"></span>
+          </div>
+        </> 
+        )}
+
+        {/* Success */}
+        {popupContent == "success" && (
+        <>
+        <div class="f-modal-icon f-modal-success animate">
+          <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+          <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+        </div>
+        </>
+        )}
+
+        {/* Heart */}
+        {popupContent == "yehey" && (
+        <>
+        <div className="icon-center">
+          <svg className="w-44 h-44" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="-40 -30 473.9 473.9" style={{"enable-background":"new 0 0 473.9 473.9"}} xml:space="preserve">
+            <circle id="face" className="face" cx="200" cy="200" r="200"/>
+            <path id="mouth" className="mouth_alt" d="M81.4,237.1C81.4,323,151,392.7,237,392.7c85.9,0,155.6-69.6,155.6-155.6L81.4,237.1L81.4,237.1z"/>
+            <path className="heart--eye heart-eye-left" d="M182.1,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
+              c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3s6-1.2,8.3-3.3c4.8-3.8,70.8-57.7,70.8-92.8
+              C224.2,127.7,206.5,110,182.1,110z"/>
+            <path className="heart--eye heart-eye-right" d="M366.7,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
+              c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3c3.1,0,6-1.2,8.3-3.3c4.8-3.8,70.7-57.7,70.7-92.8
+              C408.7,127.7,391.1,110,366.7,110z"/>  
+          </svg>
+        </div>
+        </>  
+        )}
+
+      </div>
+      
+      <p className="text-lg text-center">
+        {popupMessage}
+      </p>
+
+      <div className="flex justify-center mt-4">
+
+        {/* Warning */}
+        {popupContent == "warning" && (
+        <>
+          {/* For Supervisor */}
+          {currentUser.code_clearance == 4 && (
+          <>
+            {!submitLoading && (
+              <button
+                onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
+                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Yes
+              </button>
+            )}
+
+            {!submitLoading && (
+              <button
+                onClick={justclose}
+                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+              >
+                No
+              </button>
+            )}
+
+            {submitLoading && (
+              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Please Wait</span>
+                </div>
+              </button>
+            )}
+          </>
+          )}
+
+          {/* For Admin Manager */}
+          {currentUser.code_clearance == 1 && (
+          <>
+            {!submitLoading && (
+              <button
+                onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
+                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Yes
+              </button>
+            )}
+
+            {!submitLoading && (
+              <button
+                onClick={justclose}
+                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+              >
+                No
+              </button>
+            )}
+
+            {submitLoading && (
+              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Please Wait</span>
+                </div>
+              </button>
+            )}
+          </>
+          )}
+        </> 
+        )}
+
+        {popupContent == "warningD" && (
+        <>
+          {/* For Supervisor */}
+          {currentUser.code_clearance == 4 && (
+          <>
+            {!submitLoading && (
+              <button
+                onClick={() => handleDeclineApprovalRequest(displayRequest?.viewRequestData?.id)}
+                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Yes
+              </button>
+            )}
+
+            {!submitLoading && (
+              <button
+                onClick={justclose}
+                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+              >
+                No
+              </button>
+            )}
+
+            {submitLoading && (
+              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Please Wait</span>
+                </div>
+              </button>
+            )}
+          </>
+          )}
+
+          {/* For Admin Manager */}
+          {currentUser.code_clearance == 1 && (
+          <>
+            {!submitLoading && (
+              <button
+                onClick={() => handleDeclineApprovalRequest(displayRequest?.viewRequestData?.id)}
+                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Yes
+              </button>
+            )}
+
+            {!submitLoading && (
+              <button
+                onClick={justclose}
+                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+              >
+                No
+              </button>
+            )}
+
+            {submitLoading && (
+              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Please Wait</span>
+                </div>
+              </button>
+            )}
+          </>
+          )}
+        </> 
+        )}
+
+        {/* Success and Yehey */}
+        {(popupContent == "success" || popupContent == "yehey") && (
           <button
             onClick={closePopup}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Close
           </button>
-        </div>
+        )}
+
+        {/* Error */}
+        {popupContent == "error" && (
+          <button
+            onClick={justclose}
+            className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+          >
+            No
+          </button>
+        )}
+
+
+        {/* {popupContent == "Confirmation" && (
+        <>
+          {!submitLoading && (
+            <button
+              onClick={() => handleApproveClick(displayRequest?.viewRequestData?.id)}
+              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Yes
+            </button>
+          )}
+
+          {!submitLoading && (
+            <button
+              onClick={justclose}
+              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            >
+              No
+            </button>
+          )}
+
+          {submitLoading && (
+            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Loading</span>
+              </div>
+            </button>
+          )}
+        </>
+        )}
+
+        {popupContent == "AdminConfirmation" && (
+        <>
+          {!submitLoading && (
+            <button
+              onClick={() => handleAdminApproveClick(displayRequest?.viewRequestData?.id)}
+              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Yes
+            </button>
+          )}
+
+          {!submitLoading && (
+            <button
+              onClick={justclose}
+              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            >
+              No
+            </button>
+          )}
+
+          {submitLoading && (
+            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Loading</span>
+              </div>
+            </button>
+          )}
+        </>
+        )}
+
+        {popupContent == "ConfirmationD" && (
+        <>
+          {!submitLoading && (
+            <button
+              onClick={() => handleDisapproveClick(displayRequest?.viewRequestData?.id)}
+              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Yes
+            </button>
+          )}
+
+          {!submitLoading && (
+            <button
+              onClick={justclose}
+              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            >
+              No
+            </button>
+          )}
+
+          {submitLoading && (
+            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Loading</span>
+              </div>
+            </button>
+          )}
+        </>
+        )}
+
+        {popupContent == "AdminConfirmationD" && (
+        <>
+          {!submitLoading && (
+            <button
+              onClick={() => handleAdminDisapproveClick(displayRequest?.viewRequestData?.id)}
+              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Yes
+            </button>
+          )}
+
+          {!submitLoading && (
+            <button
+              onClick={justclose}
+              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            >
+              No
+            </button>
+          )}
+
+          {submitLoading && (
+            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Loading</span>
+              </div>
+            </button>
+          )}
+        </>
+        )}
+
+        {popupContent == "Success" && (
+          <button
+            onClick={closePopup}
+            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Close
+          </button>
+        )} */}
+        
+      </div>
+
       </div>
       </div>
     )}

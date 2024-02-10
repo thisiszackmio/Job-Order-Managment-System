@@ -9,11 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('facility_mph', function (Blueprint $table) {
+        Schema::create('facility', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('facility__form_id')->constrained('request__facility');
+            $table->foreignId('user_id')->constrained('p_p_a_users');
+            $table->date('date_requested');
+            $table->string('request_office');
+            $table->string('title_of_activity');
+            $table->date('date_start');
+            $table->time('time_start');
+            $table->date('date_end');
+            $table->time('time_end');
+            $table->boolean('mph')->default(false);
+            $table->boolean('conference')->default(false);
+            $table->boolean('dorm')->default(false);
+            $table->boolean('other')->default(false);
             $table->boolean('table')->default(false);
             $table->integer('no_table')->nullable();
             $table->boolean('chair')->default(false);
@@ -29,6 +40,14 @@ return new class extends Migration
             $table->boolean('television')->default(false);
             $table->boolean('sound_system')->default(false);
             $table->boolean('videoke')->default(false);
+            $table->string('name_male', 1000)->nullable();
+            $table->string('name_female', 1000)->nullable();
+            $table->string('other_details')->nullable();
+            $table->boolean('admin_approval')->default(false);
+            $table->date('date_approve')->nullable();
+            $table->string('obr_instruct')->nullable();
+            $table->string('obr_comment')->nullable();
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }
@@ -36,8 +55,8 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('facility_mph');
+        Schema::dropIfExists('facility');
     }
 };

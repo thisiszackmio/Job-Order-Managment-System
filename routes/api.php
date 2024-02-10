@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InspectionFormController;
-use App\Http\Controllers\FacilityFormController;
+use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\AssignPersonnelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GetNotificationController;
@@ -25,14 +25,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    //New Get Notifications
-    // Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']);
-    // Route::get('/gsonotification/{id}', [GetNotificationController::class, 'GSONoti']);
-    // Route::get('/adminnotification/{id}', [GetNotificationController::class, 'AdminNoti']);
-    // Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
-
-    //Get Notifications
 
     //Get User Details
     Route::get('/ppausers', [UserController::class, 'index']);
@@ -66,22 +58,33 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);
     Route::put('/requestclose/{id}', [InspectionFormController::class, 'closeRequest']);  
 
+    //Facility Form
+    Route::get('/facilityform/{id}', [FacilityController::class, 'show']);
+    Route::put('/facilityopr/{id}', [FacilityController::class, 'StoreOPRFormGSO']);
+    Route::put('/facilityopradmin/{id}', [FacilityController::class, 'StoreOPRFormAdmin']);
+    Route::put('/facilityapproval/{id}', [FacilityController::class, 'AdminApproval']);
+    Route::put('/facilitydisapproval/{id}', [FacilityController::class, 'AdminDispprove']);
+    Route::post('/facilityformrequest', [FacilityController::class, 'store']);
+
     //For Facility Form
-    Route::get('/facilityform', [FacilityFormController::class, 'index']);
-    Route::get('/myfacilityformrequest/{id}', [FacilityFormController::class, 'myRequest']);
-    Route::get('/facilityformrequest/{id}', [FacilityFormController::class, 'show']);
-    Route::get('/facilitymphrequest/{id}', [FacilityFormController::class, 'showMPH']);
-    Route::get('/getconferencefacilityform/{id}', [FacilityFormController::class, 'showConference']);
-    Route::get('/getdormfacilityform/{id}', [FacilityFormController::class, 'showDorm']);
-    Route::get('/facilityadmin', [FacilityFormController::class, 'AdminViewFacility']);
-    Route::post('/facilityformrequest', [FacilityFormController::class, 'store']);
-    Route::post('/mphfacilityform/{id}', [FacilityFormController::class, 'storeMPH']);
-    Route::post('/conferencefacilityform/{id}', [FacilityFormController::class, 'storeConference']);
-    Route::post('/dormfacilityform/{id}', [FacilityFormController::class, 'storeDorm']);
-    Route::put('/saveoprinstruction/{id}', [FacilityFormController::class, 'StoreOPRInstruction']);
-    Route::put('/saveopraction/{id}', [FacilityFormController::class, 'StoreOPRAction']);
-    Route::put('/facilityapproval/{id}', [FacilityFormController::class, 'AdminApproval']);
-    Route::put('/facilitydisapproval/{id}', [FacilityFormController::class, 'AdminDispprove']);
+    // Route::get('/facilityform', [FacilityFormController::class, 'index']);
+    // Route::get('/myfacilityformrequest/{id}', [FacilityFormController::class, 'myRequest']);
+    // Route::get('/facilityformrequest/{id}', [FacilityFormController::class, 'show']);
+    
+    // Route::post('/facilityroomform/{id}', [FacilityFormController::class, 'storeFacRoom']);
+    
+    // Route::get('/facilitymphrequest/{id}', [FacilityFormController::class, 'showMPH']);
+    // Route::get('/getconferencefacilityform/{id}', [FacilityFormController::class, 'showConference']);
+    // Route::get('/getdormfacilityform/{id}', [FacilityFormController::class, 'showDorm']);
+    // Route::get('/facilityadmin', [FacilityFormController::class, 'AdminViewFacility']);
+    
+    
+    // Route::post('/conferencefacilityform/{id}', [FacilityFormController::class, 'storeConference']);
+    // Route::post('/dormfacilityform/{id}', [FacilityFormController::class, 'storeDorm']);
+    // 
+    // Route::put('/saveopraction/{id}', [FacilityFormController::class, 'StoreOPRAction']);
+    
+    
 
     //For Vehicle Slip Form
     Route::get('/vehicleform', [VehicleFormController::class, 'index']);
@@ -107,16 +110,15 @@ Route::middleware('auth:sanctum')->group(function(){
 Route::middleware(['auth'])->group(function () {
     Route::get('/getuser', [DashboardController::class, 'getCurrentUser']);
 });
-// Get Notifications
-Route::get('/getnotification', [GetNotificationController::class, 'index']);
-Route::put('/setstatus/{id}', [GetNotificationController::class, 'changeStatus']);
+
+//New Get Notifications
+Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']); 
+Route::get('/gsonotification/{id}', [GetNotificationController::class, 'GSONoti']); 
+Route::get('/adminnotification/{id}', [GetNotificationController::class, 'AdminNoti']);
+Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
-Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']); 
-Route::get('/gsonotification/{id}', [GetNotificationController::class, 'GSONoti']); 
-Route::get('/adminnotification/{id}', [GetNotificationController::class, 'AdminNoti']);
-Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);

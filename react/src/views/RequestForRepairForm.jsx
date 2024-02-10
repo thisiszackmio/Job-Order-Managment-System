@@ -62,6 +62,15 @@ export default function RepairRequestForm(){
     });
   };
 
+  // Auto Approval for Supervisors and Manager
+  let output;
+
+  if (currentUser.code_clearance === 1 || currentUser.code_clearance === 2 || currentUser.code_clearance === 4) {
+    output = 1;
+  } else {
+    output = 0;
+  }
+
   useEffect(()=>{ fetchUsers(); },[]);
 
   const SubmitInspectionForm = (event) => {
@@ -86,7 +95,7 @@ export default function RepairRequestForm(){
         supervisor_name: 
         currentUser.id === 2 ? currentUser.id.toString() :
         currentUser.id === 7 ? currentUser.id.toString() : users.id.toString(),
-        supervisor_approval: 0,
+        supervisor_approval: output,
         admin_approval: 0,
         inspector_status: 0
       })
@@ -110,7 +119,7 @@ export default function RepairRequestForm(){
 
   return(
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
-  {id == currentUser.id ? (
+  {id == currentUser.id && (
   <>
   {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -134,12 +143,11 @@ export default function RepairRequestForm(){
       <div className="grid grid-cols-2 gap-4">
 
         <div className="col-span-1">
-
           {/* Date */}
           <div className="flex items-center mt-6">
             <div className="w-36">
               <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                Date:<span className="text-red-500">*</span>
+                Date:
               </label> 
             </div>
             <div className="w-64">
@@ -403,7 +411,6 @@ export default function RepairRequestForm(){
             </div>
           </div>
 
-
           {/* Submit Button */}
           <div className="mt-4">
             <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
@@ -456,8 +463,7 @@ export default function RepairRequestForm(){
   </div>
   )}
   </>
-  ):(navigate(`/repairrequestform/${currentUser.id}`))}
-
+  )}
   </PageComponent>
   );
 

@@ -8,7 +8,7 @@ use App\Models\Inspection_Form;
 use App\Models\PPAUser;
 use App\Models\AdminInspectionForm;
 use App\Models\Inspector_Form;
-use App\Models\Facility_Form;
+use App\Models\FacilityModel;
 use App\Models\VehicleForm;
 
 class GetNotificationController extends Controller
@@ -57,12 +57,25 @@ class GetNotificationController extends Controller
             ];
         });
         
-        //For Facility Form
-        $gsoFacilityNoti = Facility_Form::where('admin_approval', 4)->get();
+        // For Facility Form
+        $gsoFacilityNoti = FacilityModel::where('admin_approval', 2)->get();
+        $fID = $gsoFacilityNoti->pluck('user_id')->all(); // Fix: Changed from $iID to $fID
+        $getFacReq = PPAUser::whereIn('id', $fID)->get(); // Fix: Changed from $getReq to $getFacReq
+        $getAdminName = PPAUser::where('code_clearance', '1')->first();
+
+        $gsoDetFac = $gsoFacilityNoti->map(function ($facilityForm) use ($getFacReq) {
+            $user = $getFacReq->where('id', $facilityForm->user_id)->first();
+            return [
+                'facility_form' => $facilityForm,
+                'user' => $user,
+            ];
+        });
         
+        //Output
         $responseData = [
             'gsoDet' => $gsoDet,
-            'gsoFacDet' => $gsoFacilityNoti
+            'gsoFacDet' => $gsoDetFac,
+            'adminName' => $getAdminName
         ];
 
         return response()->json($responseData);
@@ -86,7 +99,17 @@ class GetNotificationController extends Controller
             ];
         });
 
-        $adminFacilityNoti = Facility_Form::where('admin_approval', 3)->get();
+        $adminFacilityNoti = FacilityModel::whereIn('admin_approval', [3, 4])->get();
+        $fID = $adminFacilityNoti->pluck('user_id')->all();
+        $getFReq = PPAUser::whereIn('id', $fID)->get();  // Use $fID instead of $iID
+
+        $adminFDet = $adminFacilityNoti->map(function ($facilityForm) use ($getFReq) {  // Use $getFReq instead of $getReq
+            $user = $getFReq->where('id', $facilityForm->user_id)->first();
+            return [
+                'facility_form' => $facilityForm,
+                'user' => $user,
+            ];
+        });
 
         //For Vehicle Slip
         $adminVehicleNoti = VehicleForm::where('admin_approval', 3)->get();
@@ -103,7 +126,7 @@ class GetNotificationController extends Controller
 
         $responseData = [
             'adminDet' => $adminDet,
-            'adminFacDet' => $adminFacilityNoti,
+            'adminFacDet' => $adminFDet,
             'adminVehDet' => $adminVehDet
         ];
 
@@ -120,14 +143,12 @@ class GetNotificationController extends Controller
         $iID = $pID->pluck('inspection__form_id')->all();
         $apID = $pID->pluck('assign_personnel')->first();
 
-        // if($pID->isEmpty()) {
-        //     return response()->json(['message' => 'No Assign Personnel Found'], 404);
-        // }
-
         //Get Inspector Form
         $specForm = Inspector_Form::whereIn('inspection__form_id', $iID)->whereIn('close', [3,4])->get();
+        $inspForm = Inspection_Form::whereIn('id', $iID)->whereIn('inspector_status', [3, 2])->get();
 
         $responseData = [
+            'inspectionDet' => $inspForm,
             'inspectorDet' => $specForm,
             'assignID' => $apID
         ];

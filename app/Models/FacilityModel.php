@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Facility_Form extends Model
+class FacilityModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'request__facility';
+    protected $table = 'facility';
 
     protected $fillable = [
         'user_id',
@@ -24,6 +24,24 @@ class Facility_Form extends Model
         'conference',
         'dorm',
         'other',
+        'table',
+        'no_table',
+        'chair',
+        'no_chair',
+        'microphone',
+        'no_microphone',
+        'others',
+        'specify',
+        'projector',
+        'projector_screen',
+        'document_camera',
+        'laptop',
+        'television',
+        'sound_system',
+        'videoke',
+        'name_male',
+        'name_female',
+        'other_details',
         'admin_approval',
         'date_approve',
         'obr_instruct',
@@ -35,20 +53,4 @@ class Facility_Form extends Model
     {
         return $this->belongsTo(PPAUser::class, 'user_id');
     }
-
-    public function relatedModels()
-    {
-        return $this->hasMany(Facility_Mph::class);
-    }
-
-    public function relatedModelsConference()
-    {
-        return $this->hasMany(Facility_Conference::class);
-    }
-
-    public function relatedModelsDorm()
-    {
-        return $this->hasMany(Facility_Dorm::class);
-    }
-    
 }

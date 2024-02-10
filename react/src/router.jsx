@@ -6,22 +6,22 @@ import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
 
 import RequestRepairForm from "./views/RequestForRepairForm";
+import RequestFormFacility from "./views/RequestForFacilityVenue";
 
 import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
+import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
 
 import RepairRequestForm from "./views/RepairFormList"
 
 import PrepostRepairForm from "./views/PrePostRepairForm";
+import FacilityVenueForm from "./views/FacilityVenueForm";
 
 import RequestList from "./views/RequestList";
 import MyRequest from "./views/YourRequest";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
-import FacilityVenueForm from "./views/FacilityVenueForm";
 import VehicleSlipForm from "./views/VehicleSlipForm";
 import EquipmentForm from "./views/EquipmentForm";
-import RepairRequestList from "./views/RepairFormList";
-
 
 const routes = [
     {
@@ -36,18 +36,33 @@ const routes = [
                 path: "/",
                 element: <Dashboard />
             },
+
+            //Form
             //For Pre/Post Repair Inspection Form
             {
                 path: "/repairrequestform/:id",
                 element: <RequestRepairForm />
             },
+            //For Facility / Venue Form
+            {
+                path: "/facilityrequestform/:id",
+                element: <RequestFormFacility />
+            },
+
             //My Request Form
-            // For Pre/Post Repair Inspection Form
+            // For Pre/Post Repair Inspection
             {
                 path: "/myrequestinpectionform/:id",
                 element: <MyRequestInspectionForm />
             },
+            // For Facility/Venue Form
+            {
+                path: "/myrequestfacilityvenueform/:id",
+                element: <MyRequestFacilityVenue />
+            },
+
             //Request List
+            //For Pre/Post Inspection Repair
             {
                 path: "/repairrequestform",
                 element: <RepairRequestForm />
@@ -68,12 +83,13 @@ const routes = [
                 path: "/editaccount/:id",
                 element: <AccountEdit />
             },
-            //For Inspection Form
+            //Request Details
+            //For Inspection Form Details
             {
                 path: "/repairinspectionform/:id",
                 element: <PrepostRepairForm />
             },
-            //For Facility / Venue Room
+            //For Facility / Venue Form Details
             {
                 path: "/facilityvenueform/:id",
                 element: <FacilityVenueForm />

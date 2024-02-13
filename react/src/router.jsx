@@ -11,7 +11,8 @@ import RequestFormFacility from "./views/RequestForFacilityVenue";
 import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
 import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
 
-import RepairRequestForm from "./views/RepairFormList"
+import RepairRequestForm from "./views/RepairFormList";
+import FacilityFormForm from "./views/FacilityVenueFormList";
 
 import PrepostRepairForm from "./views/PrePostRepairForm";
 import FacilityVenueForm from "./views/FacilityVenueForm";
@@ -61,12 +62,19 @@ const routes = [
                 element: <MyRequestFacilityVenue />
             },
 
-            //Request List
-            //For Pre/Post Inspection Repair
+            //Request List All
+            //For Pre/Post Inspection Repair Form
             {
                 path: "/repairrequestform",
                 element: <RepairRequestForm />
             },
+            //For Facility/Venue Form
+            {
+                path: "/facilityvenuerequestform",
+                element: <FacilityFormForm />
+            },
+            
+            // Others
             {
                 path: "/my_request/:id",
                 element: <MyRequest />
@@ -83,6 +91,7 @@ const routes = [
                 path: "/editaccount/:id",
                 element: <AccountEdit />
             },
+
             //Request Details
             //For Inspection Form Details
             {

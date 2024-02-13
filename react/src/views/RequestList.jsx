@@ -45,67 +45,7 @@ export default function RequestList()
   const [loading, setLoading] = useState(true);
 
   const { userRole } = useUserStateContext();
-  const [getFacilityDet, setFacilityDet] = useState([]);
   const [getVehicleSlip, setVehicleSlip] = useState([]);
-
-
-  const fetchFacilityData = () => {
-    setLoading(true);
-    axiosClient
-    .get('/facilityform')
-    .then((response) => {
-      const responseData = response.data;
-      const getFacility = Array.isArray(responseData) ? responseData : responseData.data;
-
-      const mappedData = getFacility.map((dataItem) => {
-
-        const { facility_form, user_details } = dataItem;
-
-        const { fname, mname, lname } = user_details;
-
-        const facilities = [];
-
-        if (facility_form.mph !== "0") {
-          facilities.push("MPH");
-        }
-    
-        if (facility_form.conference !== "0") {
-          facilities.push("Conference Room");
-        }
-    
-        if (facility_form.dorm !== "0") {
-          facilities.push("Dormitory");
-        }
-    
-        if (facility_form.other !== "0") {
-          facilities.push("Other");
-        }
-
-        const result = facilities.join(', ');
-
-        return {
-          id: facility_form.id,
-          date: formatDate(facility_form.date_requested),
-          tite_of_activity: facility_form.title_of_activity,
-          date_start: facility_form.date_start,
-          time_start: facility_form.time_start,
-          date_end: facility_form.date_end,
-          time_end: facility_form.time_end,
-          type_facility: result,
-          name: fname +' ' + mname+'. ' + lname,
-        };
-      });
-
-      setFacilityDet(mappedData);
-
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-  };
 
   const fetchVehicleData = () => {
     setLoading(true);
@@ -164,23 +104,6 @@ export default function RequestList()
     setCurrentPage(0); // Reset page when searching
   };
 
-  // Filter repairs based on search term
-  // For Inspection Repair
-  const filteredRepairs = prePostRepair.filter((repair) =>
-    repair.property_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    repair.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    repair.type_of_property.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    repair.date.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // For Facility/Venue Request
-  const filteredFacility = getFacilityDet.filter((facility) =>
-    facility.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    facility.tite_of_activity.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    facility.type_facility.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   // For Vehicle Slip Request
   const filteredVehicle = getVehicleSlip.filter((vehicle) =>
     vehicle.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -198,29 +121,17 @@ export default function RequestList()
   };
 
   // Paginate the filtered results
-  // For Inspection Repair
-  const currentRepair = filteredRepairs.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
 
-  // For Facility/Venue Rquest
-  const currentFacility = filteredFacility.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
 
   const currentVehicleSlip = filteredVehicle.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
 
-  const pageCountRepair = Math.ceil(filteredRepairs.length / itemsPerPage);
-  const pageCountFacility = Math.ceil(filteredFacility.length / itemsPerPage);
+
   const pageCountVehicleSlip = Math.ceil(filteredVehicle.length / itemsPerPage);
 
-  const displayPaginationRepair = pageCountRepair > 1;
-  const displayPaginationFacility = pageCountFacility > 1;
+
   const displayPaginationVehicle = pageCountVehicleSlip > 1;
 
   const handleTabClick = (tab) => {
@@ -301,181 +212,6 @@ export default function RequestList()
       </div>
 
       <div className="mt-4">
-
-      {/* Repair Inspection Request List */}
-      {activeTab === "tab1" && 
-        <div>
-          <div className="flex">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="mb-4 p-2 border border-gray-300 rounded"
-              />
-            </div>
-            {displayPaginationRepair && (
-            <ReactPaginate
-              previousLabel="Previous"
-              nextLabel="Next"
-              breakLabel="..."
-              pageCount={pageCountRepair}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageChange}
-              containerClassName="pagination"
-              subContainerClassName="pages pagination"
-              activeClassName="active"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-            />
-            )}
-          </div>
-          <table className="w-full border-collapse">
-            <thead>
-            
-            </thead>
-            <tbody className="table-body">
-            {currentRepair.length > 0 ? (
-              currentRepair.map((repair) => (
-                <tr key={repair.id}>
-                  <td className="px-2 py-1 text-center border border-custom font-bold">{repair.id}</td>
-                  <td className="px-2 py-1 text-center border border-custom">{formatDate(repair.date)}</td>
-                  <td className="px-2 py-1 text-center border border-custom">{repair.property_number}</td>
-                  {repair.type_of_property === "Others" ? (
-                    <td className="px-2 py-1 text-center border border-custom">Others: <i>{repair.property_other_specific}</i></td>
-                  ):(
-                    <td className="px-2 py-1 text-center border border-custom">{repair.type_of_property}</td>
-                  )}
-                  <td className="px-2 py-1 text-center border border-custom">{repair.complain}</td>
-                  <td className="px-2 py-1 text-center border border-custom">{repair.name}</td>
-                  <td className="px-2 py-1 text-center border border-custom">
-                    <div className="flex justify-center">
-                      <Link to={`/repairinspectionform/${repair.id}`}>
-                        <button 
-                          className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
-                          title="View Request"
-                        >
-                          <FontAwesomeIcon icon="eye" className="mr-0" />
-                        </button>
-                      </Link>
-                    </div>
-                  </td>
-                  
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={8} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
-              </tr>
-            )}
-            </tbody>
-          </table>
-          <div className="text-right text-sm/[17px]">
-          {prePostRepair.length > 0 ? (
-          <i>Total of <b> {prePostRepair.length} </b> Pre/Post Repair Request</i>
-          ):null}
-          </div>
-        </div>
-      }
-
-      {/* Facility Request List */}
-      {activeTab === "tab2" && 
-        <div>
-          <div className="flex">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="mb-4 p-2 border border-gray-300 rounded"
-              />
-            </div>
-            {displayPaginationFacility && (
-              <ReactPaginate
-                previousLabel="Previous"
-                nextLabel="Next"
-                breakLabel="..."
-                pageCount={pageCountFacility}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={handlePageChange}
-                containerClassName="pagination"
-                subContainerClassName="pages pagination"
-                activeClassName="active"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-              />
-            )}
-          </div>
-          <table className="w-full border-collapse">
-            <thead>
-            {currentFacility.length > 0 ? (
-              <tr className="bg-gray-100">
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom w-1">Ctrl No</th>
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start)</th>
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (End)</th> 
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-                <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-              </tr>
-            ):null}    
-            </thead>
-            <tbody>
-            {currentFacility.length > 0 ? (
-              currentFacility.map((FacDet) => (
-                <tr key={FacDet.id}>
-                  <td className="px-1 py-1 text-center border border-custom w-1 font-bold">{FacDet.id}</td>
-                  <td className="px-1 py-1 text-center border border-custom">{formatDate(FacDet.date)}</td>
-                  <td className="px-1 py-1 text-center border border-custom w-40">{FacDet.tite_of_activity}</td>
-                  <td className="px-1 py-1 text-center border border-custom w-40">{formatDateAct(FacDet.date_start)} @ {formatTimeAct(FacDet.time_start)}</td>
-                  <td className="px-1 py-1 text-center border border-custom w-40">{formatDateAct(FacDet.date_end)} @ {formatTimeAct(FacDet.time_end)}</td>
-                  <td className="px-1 py-1 text-center border border-custom"> {FacDet.type_facility} </td>
-                  <td className="px-1 py-1 text-center border border-custom">{FacDet.name}</td>
-                  <td className="px-1 py-1 text-center border border-custom">
-                    <div className="flex justify-center">
-                      <Link to={`/facilityvenueform/${FacDet.id}`}>
-                        <button 
-                          className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
-                          title="View Request"
-                        >
-                          <FontAwesomeIcon icon="eye" className="mr-0" />
-                        </button>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ):(
-              <tr>
-                <td colSpan={8} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
-              </tr>
-            )}
-            </tbody>
-          </table>
-          <div className="text-right text-sm/[17px]">
-           {getFacilityDet.length > 0 ? (
-           <i>Total of <b> {getFacilityDet.length} </b> Facility/Venue Request </i>
-           ):null}
-          </div>
-        </div>
-      }
 
       {/* Vehicle Slip Request List */}
       {activeTab === "tab3" && 

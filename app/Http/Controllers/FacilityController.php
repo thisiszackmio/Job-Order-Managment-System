@@ -10,6 +10,39 @@ use Illuminate\Support\Facades\URL;
 
 class FacilityController extends Controller
 {
+    /**
+     * Display the information
+     */
+    public function index()
+    {
+        $facilityForms = FacilityModel::with('user')->orderBy('date_requested', 'desc')->get();
+
+        $responseData = [];
+
+        foreach ($facilityForms as $facilityForm){
+            // Access the related PPAUser data
+            $ppaUser = $facilityForm->user;
+
+            // You can now access PPAUser properties like fname, lname, etc.
+            $userName = $ppaUser->fname;
+            $userMiddleInitial = $ppaUser->mname;
+            $userLastName = $ppaUser->lname;
+            $userclearance = $ppaUser->code_clearance;
+
+            $responseData[] = [
+                'facility_form' => $facilityForm,
+                'user_details' => [
+                    'fname' => $userName,
+                    'mname' => $userMiddleInitial,
+                    'lname' => $userLastName,
+                    'code_clearance' => $userclearance,
+                ]
+            ];
+        }
+
+        return response()->json($responseData);
+    }
+
      /**
      * Show data on Facility Form page
      */
@@ -39,6 +72,23 @@ class FacilityController extends Controller
                 'name' => $ManagerName,
                 'signature' => $ManagerSignature,
             ]
+        ];
+
+        return response()->json($respondData);
+    }
+
+    /**
+     * Display the information on myRequest
+     */
+    public function myRequest(Request $request, $id)
+    {
+        $myRequest = PPAUser::find($id);
+
+        $getfacilityForm = FacilityModel::where('user_id', $id)->get(); 
+
+        $respondData = [
+            'my_user' => $myRequest,
+            'view_facility' => $getfacilityForm
         ];
 
         return response()->json($respondData);
@@ -137,9 +187,8 @@ class FacilityController extends Controller
         $facility->update([
             'admin_approval' => 2,
             'date_approve' => today(),
+            'remarks' => "Approved"
         ]);
-
-        $facility->remarks = "The Admin Manager has approve your request";
 
         if ($facility->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -168,6 +217,7 @@ class FacilityController extends Controller
         $facility->update([
             'admin_approval' => 3,
             'date_approve' => today(),
+            'remarks' => "Disapproved"
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);

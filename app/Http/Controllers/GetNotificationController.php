@@ -45,7 +45,7 @@ class GetNotificationController extends Controller
     public function GSONoti()
     {
         //For Inspection Form
-        $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 0)->get();
+        $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 4)->get();
         $iID = $gsoInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
 
@@ -99,7 +99,7 @@ class GetNotificationController extends Controller
             ];
         });
 
-        $adminFacilityNoti = FacilityModel::whereIn('admin_approval', [3, 4])->get();
+        $adminFacilityNoti = FacilityModel::where('admin_approval', 4)->get();
         $fID = $adminFacilityNoti->pluck('user_id')->all();
         $getFReq = PPAUser::whereIn('id', $fID)->get();  // Use $fID instead of $iID
 

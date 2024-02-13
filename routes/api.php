@@ -59,7 +59,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/requestclose/{id}', [InspectionFormController::class, 'closeRequest']);  
 
     //Facility Form
+    Route::get('/facilityform', [FacilityController::class, 'index']);
     Route::get('/facilityform/{id}', [FacilityController::class, 'show']);
+    Route::get('/myfacilityformrequest/{id}', [FacilityController::class, 'myRequest']);
     Route::put('/facilityopr/{id}', [FacilityController::class, 'StoreOPRFormGSO']);
     Route::put('/facilityopradmin/{id}', [FacilityController::class, 'StoreOPRFormAdmin']);
     Route::put('/facilityapproval/{id}', [FacilityController::class, 'AdminApproval']);
@@ -67,8 +69,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/facilityformrequest', [FacilityController::class, 'store']);
 
     //For Facility Form
-    // Route::get('/facilityform', [FacilityFormController::class, 'index']);
-    // Route::get('/myfacilityformrequest/{id}', [FacilityFormController::class, 'myRequest']);
+    
+    
     // Route::get('/facilityformrequest/{id}', [FacilityFormController::class, 'show']);
     
     // Route::post('/facilityroomform/{id}', [FacilityFormController::class, 'storeFacRoom']);

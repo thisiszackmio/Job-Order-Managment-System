@@ -83,6 +83,7 @@ export default function DefaultLayout() {
             name: 'Request List',
             submenu: [
               { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
+              { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
             ],
           },
         ]
@@ -184,6 +185,7 @@ export default function DefaultLayout() {
         return {
           type: 'Facility/Venue Form',
           id: facilityForm.id,
+          user_id: fuser.id,
           date_request: facilityForm.date_requested,
           requestor: `${fuser.fname} ${fuser.mname}. ${fuser.lname}`,
           code: fuser.code_clearance,
@@ -240,6 +242,7 @@ export default function DefaultLayout() {
           requestor: `${auser.fname} ${auser.mname}. ${auser.lname}`,
           fgender: auser.gender,
           code: auser.code_clearance,
+          obr: facilityForm.obr_instruct,
           dateapprove: facilityForm.updated_at
         };
       });
@@ -571,6 +574,16 @@ export default function DefaultLayout() {
                         <>
                         <div key={GSOItem.id}>
 
+                          {/* If you receive your own request */}
+                          {GSOItem.code === 3 && (
+                            <Link to={`/repairinspectionform/${GSOItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                              <h4 className="text-sm text-gray-400"> {GSOItem.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, your request is already approved by your supervisor.
+                              </h3>
+                            </Link>
+                          )}
+
                           {/* If the OPM, Supervisor , Division and Admin Manager was the requestor */}
                           {(GSOItem.code === 1 || GSOItem.code === 4 || GSOItem.code === 2) && (
                             <Link to={`/repairinspectionform/${GSOItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
@@ -585,7 +598,7 @@ export default function DefaultLayout() {
                           )}
 
                           {/* For COS and Regular Personnels */}
-                          {(GSOItem.code === 3 || GSOItem.code === 5 || GSOItem.code === 6 || GSOItem.code === 10) && (
+                          {(GSOItem.code === 5 || GSOItem.code === 6 || GSOItem.code === 10) && (
                             <Link to={`/repairinspectionform/${GSOItem.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
                               <h4 className="text-sm text-gray-400">
                                 {GSOItem.type} 
@@ -635,7 +648,11 @@ export default function DefaultLayout() {
                                 {GSOFac.type} 
                               </h4>
                               <h3 className="text-l font-normal leading-6 text-gray-900">
-                                Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, here's the request for <strong>{GSOFac.rgender == "Male" ? ("Sir"):("Maam")} {GSOFac.requestor}</strong> and it has already approved by <strong>{getGSONoti?.adminName?.gender == "Male" ? ("Sir"):("Maam")} {getGSONoti?.adminName?.fname}</strong>.
+                                {(currentUser.id == GSOFac.user_id) && currentUser.code_clearance == 3 ? (
+                                  <span>Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, Your request has been approved.</span>
+                                ):(
+                                  <span>Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, here's the request for <strong>{GSOFac.rgender == "Male" ? ("Sir"):("Maam")} {GSOFac.requestor}</strong> and it has already approved by <strong>{getGSONoti?.adminName?.gender == "Male" ? ("Sir"):("Maam")} {getGSONoti?.adminName?.fname}</strong>.</span>
+                                )}
                               </h3>
                               <h4 className="text-sm text-blue-500 font-bold">
                                 {formatTimeDifference(GSOFac.dateapprove)}
@@ -710,19 +727,42 @@ export default function DefaultLayout() {
                         <>
                           <div key={AdminFac.id}>
 
-                            {AdminFac.code != 1 && (
-                              <Link to={`/facilityvenueform/${AdminFac.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
-                                <h4 className="text-sm text-gray-400">
-                                  {AdminFac.type}
-                                </h4>
-                                <h3 className="text-l font-normal leading-6 text-gray-900">
-                                  Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, there is the request for <strong>{AdminFac.fgender === 'Male' ? 'Sir' : 'Maam'} {AdminFac.requestor}</strong>.
-                                </h3>
-                                <h4 className="text-sm text-blue-500 font-bold">
-                                  {formatTimeDifference(AdminFac.dateapprove)}
-                                </h4>
-                              </Link>
+                            {AdminFac.obr ? (
+                            <>
+                              {/* For Approval */}
+                              {AdminFac.code != 1 && (
+                                <Link to={`/facilityvenueform/${AdminFac.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                                  <h4 className="text-sm text-gray-400">
+                                    {AdminFac.type}
+                                  </h4>
+                                  <h3 className="text-l font-normal leading-6 text-gray-900">
+                                    Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>! <strong>{AdminFac.fgender === 'Male' ? 'Sir' : 'Maam'} {AdminFac.requestor}</strong> is waiting for your approval.
+                                  </h3>
+                                  <h4 className="text-sm text-blue-500 font-bold">
+                                    {formatTimeDifference(AdminFac.dateapprove)}
+                                  </h4>
+                                </Link>
+                              )}
+                            </>
+                            ):(
+                            <>
+                              {AdminFac.code != 1 && (
+                                <Link to={`/facilityvenueform/${AdminFac.id}`} className="hover:bg-gray-100 block p-4 border-b border-gray-300 transition duration-300">
+                                  <h4 className="text-sm text-gray-400">
+                                    {AdminFac.type}
+                                  </h4>
+                                  <h3 className="text-l font-normal leading-6 text-gray-900">
+                                    Hello <strong>{currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</strong>, there is the request for <strong>{AdminFac.fgender === 'Male' ? 'Sir' : 'Maam'} {AdminFac.requestor}</strong>.
+                                  </h3>
+                                  <h4 className="text-sm text-blue-500 font-bold">
+                                    {formatTimeDifference(AdminFac.dateapprove)}
+                                  </h4>
+                                </Link>
+                              )}
+                            </>
                             )}
+
+                            
 
                           </div>
                         </>

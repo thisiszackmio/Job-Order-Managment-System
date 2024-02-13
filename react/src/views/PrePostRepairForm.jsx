@@ -26,7 +26,6 @@ export default function PrePostRepairForm(){
   const {id} = useParams();
 
   //Popup
-  const [showPopupHappy, setShowPopupHappy] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [popupContent, setPopupContent] = useState('');
@@ -65,13 +64,12 @@ export default function PrePostRepairForm(){
           };
         });
         setGetPersonnel({ mappedData });
+
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching personnel data:', error);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
   };
 
   //Assign Personnel
@@ -179,10 +177,8 @@ export default function PrePostRepairForm(){
     })
     .catch((error) => {
       //console.error(error);
-      setPopupContent("error");
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);   
-      setSubmitLoading(false);
+      const responseErrors = error.response.data.errors;
+      setInputErrors(responseErrors);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -305,8 +301,14 @@ export default function PrePostRepairForm(){
 
   const AdminApproval = (
     <div>
-      <p>Thank You {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</p>
-      <p>For Approving my Request</p>
+      {displayRequest?.viewRequestData?.user_id === currentUser.id ? (
+        <p><strong>Done!</strong></p>
+      ) : (
+        <>
+          <p>Thank You {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</p>
+          <p>For Approving my Request</p>
+        </>
+      )}
     </div>
   );
 
@@ -361,6 +363,7 @@ export default function PrePostRepairForm(){
 
       axiosClient.put(`/approve/${id}`)
       .then((response) => {
+        setSubmitLoading(false);
         setPopupContent("yehey");
         setPopupMessage(SupApproval);
         setShowPopup(true);
@@ -379,6 +382,7 @@ export default function PrePostRepairForm(){
 
       axiosClient.put(`/admin_approve/${id}`)
       .then((response) => {
+        setSubmitLoading(false);
         setPopupContent("yehey");
         setPopupMessage(AdminApproval);
         setShowPopup(true);
@@ -516,7 +520,6 @@ export default function PrePostRepairForm(){
     fetchPartB();
     fetchPartCD();
     setIsLoading(true)
-    setShowPopupHappy(false);
     setShowPopup(false);
     setSubmitLoading(false);
     window.location.reload();
@@ -541,6 +544,18 @@ export default function PrePostRepairForm(){
   <>
     {/* Part A */}
     <div className="border-b border-black pb-10">
+
+      {/* Control No */}
+      <div className="flex items-center mt-6 mb-10">
+        <div className="w-24">
+          <label className="block text-base font-medium leading-6 text-gray-900">
+          Control No:
+          </label> 
+        </div>
+        <div className="w-auto px-5 border-b border-black text-center font-bold">
+        {displayRequest?.viewRequestData?.id}
+        </div>
+      </div>
 
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
@@ -1279,20 +1294,43 @@ export default function PrePostRepairForm(){
       {getPartB.partBData ? (
         Admin ? (
           <>
-          <button 
-            onClick={() => handleApprovalRequest()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
-            title="Admin Approve"
-          >
-            Approve
-          </button>
-          <button 
-            onClick={() => handleDeclineRequest()}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
-            title="Admin Decline"
-          >
-            Disapprove
-          </button>
+          {displayRequest?.viewRequestData?.user_id == currentUser.id ? (
+          <>
+            <button
+              onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
+              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing</span>
+                </div>
+              ) : (
+                'Approve'
+              )}
+            </button>
+          </>
+          ):(
+          <>
+            <button 
+              onClick={() => handleApprovalRequest()}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+              title="Admin Approve"
+            >
+              Approve
+            </button>
+            <button 
+              onClick={() => handleDeclineRequest()}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
+              title="Admin Decline"
+            >
+              Disapprove
+            </button>
+          </>
+          )}
           </>
         ):null
       ):null}
@@ -1962,6 +2000,7 @@ export default function PrePostRepairForm(){
           {/* For Supervisor */}
           {currentUser.code_clearance == 4 && (
           <>
+
             {!submitLoading && (
               <button
                 onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
@@ -2112,140 +2151,6 @@ export default function PrePostRepairForm(){
             No
           </button>
         )}
-
-
-        {/* {popupContent == "Confirmation" && (
-        <>
-          {!submitLoading && (
-            <button
-              onClick={() => handleApproveClick(displayRequest?.viewRequestData?.id)}
-              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Yes
-            </button>
-          )}
-
-          {!submitLoading && (
-            <button
-              onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-            >
-              No
-            </button>
-          )}
-
-          {submitLoading && (
-            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
-              </div>
-            </button>
-          )}
-        </>
-        )}
-
-        {popupContent == "AdminConfirmation" && (
-        <>
-          {!submitLoading && (
-            <button
-              onClick={() => handleAdminApproveClick(displayRequest?.viewRequestData?.id)}
-              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Yes
-            </button>
-          )}
-
-          {!submitLoading && (
-            <button
-              onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-            >
-              No
-            </button>
-          )}
-
-          {submitLoading && (
-            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
-              </div>
-            </button>
-          )}
-        </>
-        )}
-
-        {popupContent == "ConfirmationD" && (
-        <>
-          {!submitLoading && (
-            <button
-              onClick={() => handleDisapproveClick(displayRequest?.viewRequestData?.id)}
-              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Yes
-            </button>
-          )}
-
-          {!submitLoading && (
-            <button
-              onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-            >
-              No
-            </button>
-          )}
-
-          {submitLoading && (
-            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
-              </div>
-            </button>
-          )}
-        </>
-        )}
-
-        {popupContent == "AdminConfirmationD" && (
-        <>
-          {!submitLoading && (
-            <button
-              onClick={() => handleAdminDisapproveClick(displayRequest?.viewRequestData?.id)}
-              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Yes
-            </button>
-          )}
-
-          {!submitLoading && (
-            <button
-              onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-            >
-              No
-            </button>
-          )}
-
-          {submitLoading && (
-            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
-              </div>
-            </button>
-          )}
-        </>
-        )}
-
-        {popupContent == "Success" && (
-          <button
-            onClick={closePopup}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
-        )} */}
         
       </div>
 

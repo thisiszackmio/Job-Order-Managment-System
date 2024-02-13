@@ -445,7 +445,13 @@ export default function RepairRequestForm(){
       <div className="fixed inset-0 bg-black opacity-40"></div>
       {/* Popup content with background blur */}
       <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-      <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
+      {/* Notification Icons */}
+      <div class="f-modal-alert">
+        <div class="f-modal-icon f-modal-success animate">
+          <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+          <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+        </div>
+      </div>
         <p className="text-lg">{popupMessage}</p>
         <div className="flex justify-center mt-4">
         <button

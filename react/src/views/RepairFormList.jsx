@@ -4,9 +4,6 @@ import PageComponent from "../components/PageComponent";
 import ForbiddenComponent from "../components/403";
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faTimes, faEye, faStickyNote  } from '@fortawesome/free-solid-svg-icons';
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import ReactPaginate from "react-paginate";
 
@@ -16,8 +13,6 @@ export default function RepairRequestList(){
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
-
-  library.add(faEye);
 
   const { userRole } = useUserStateContext();
 
@@ -51,8 +46,9 @@ export default function RepairRequestList(){
             name: fname +' ' + mname+'. ' + lname,
             complain: inspection_form.complain,
             supervisorname: inspection_form.supervisor_name,
-            supervisor_aprroval: inspection_form.supervisor_approval,
-            admin_aprroval: inspection_form.admin_approval
+            supervisor_approval: inspection_form.supervisor_approval,
+            admin_approval: inspection_form.admin_approval,
+            inspector_status: inspection_form.inspector_status
           };
         });
 
@@ -72,7 +68,7 @@ export default function RepairRequestList(){
   }, []);
 
   //Search Filter and Pagination
-  const itemsPerPage = 100;
+  const itemsPerPage = 50;
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -118,17 +114,88 @@ export default function RepairRequestList(){
   ):(
   <div>
 
-    <div className="flex">
-      <div className="flex-1">
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="mb-4 p-2 border border-gray-300 rounded"
-        />
+      <div className="flex justify-end">
+        <div className="align-right">
+          {/* For Search Field */}
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="mb-4 p-2 border border-gray-300 rounded"
+          />
+          {/* Count for List */}
+          <div className="text-right text-sm/[17px]">
+           {prePostRepair.length > 0 ? (
+           <i>Total of <b> {prePostRepair.length} </b> Facility/Venue Request </i>
+           ):null}
+          </div>
+        </div>
       </div>
-      {displayPaginationRepair && (
+
+    <div className="overflow-x-auto">
+      <table className="border-collapse" style={{ width: '1450px' }}>
+        <thead>
+          {currentRepair.length > 0 ? (
+            <tr className="bg-gray-100">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+            </tr>
+            ):null}
+        </thead>
+        <thead>
+        {currentRepair.length > 0 ? (
+        currentRepair.map((repair) => (
+        <tr key={repair.id}>
+          <td className="px-2 text-center border border-custom w-1 font-bold">{repair.id}</td>
+          <td className="px-2 py-1 text-center border border-custom w-40">{repair.date}</td>
+          <td className="px-2 py-1 text-center border border-custom w-80">{repair.property_number}</td>
+          {repair.type_of_property === "Others" ? (
+          <td className="px-2 py-1 text-center border border-custom w-80">Others: <i>{repair.property_other_specific}</i></td>
+          ):(
+          <td className="px-2 py-1 text-center border border-custom w-80">{repair.type_of_property}</td>
+          )}
+          <td className="px-2 py-1 text-center border border-custom w-56">{repair.complain}</td>
+          <td className="px-2 py-1 text-center border border-custom w-56">{repair.name}</td>
+          <td className="px-1 py-4 text-center border border-custom w-24">
+          {repair.supervisor_aprroval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
+          {repair.supervisor_approval == 1 && repair.admin_approval == 4 && (<span className="approved-status-sup">Approved</span>)}
+          {repair.supervisor_approval == 2 && repair.admin_approval == 0 && (<span className="disapproved-status">Disapproved</span>)} 
+          {repair.supervisor_approval == 1 && repair.admin_approval == 3 && (<span className="pending-status-ad">Pending</span>)} 
+          {repair.supervisor_approval == 1 && repair.admin_approval == 1 && repair.inspector_status == 3 && (<span className="approved-status">Approved</span>)}
+          {repair.supervisor_approval == 1 && repair.admin_approval == 2 && (<span className="disapproved-status">Disapproved</span>)}  
+          {repair.admin_approval == 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
+          {repair.admin_approval == 1 && repair.inspector_status == 1 && (<span className="done-status">Done</span>)}
+          </td>
+          <td className="px-2 py-1 text-center border border-custom">
+            <div className="flex justify-center">
+              <Link to={`/repairinspectionform/${repair.id}`}>
+                <button 
+                  className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
+                  title="View Request"
+                >
+                  View
+                </button>
+              </Link>
+            </div>
+          </td>
+        </tr>
+        ))
+        ):(
+        <tr>
+          <td colSpan={6} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
+        </tr>
+        )}
+        </thead>
+      </table>
+    </div>
+    {displayPaginationRepair && (
       <ReactPaginate
         previousLabel="Previous"
         nextLabel="Next"
@@ -149,56 +216,8 @@ export default function RepairRequestList(){
         nextClassName="page-item"
         nextLinkClassName="page-link"
       />
-      )}
-    </div>
-
-    <table className="w-full border-collapse">
-      <thead>
-        {currentRepair.length > 0 ? (
-          <tr className="bg-gray-100">
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-          </tr>
-          ):null}
-      </thead>
-      <thead>
-      {currentRepair.length > 0 ? (
-      currentRepair.map((repair) => (
-      <tr key={repair.id}>
-        <td className="px-2 py-1 text-center border border-custom w-40">{repair.date}</td>
-        <td className="px-2 py-1 text-center border border-custom">{repair.property_number}</td>
-        {repair.type_of_property === "Others" ? (
-        <td className="px-2 py-1 text-center border border-custom">Others: <i>{repair.property_other_specific}</i></td>
-        ):(
-        <td className="px-2 py-1 text-center border border-custom">{repair.type_of_property}</td>
-        )}
-        <td className="px-2 py-1 text-center border border-custom">{repair.complain}</td>
-        <td className="px-2 py-1 text-center border border-custom">{repair.name}</td>
-        <td className="px-2 py-1 text-center border border-custom">
-          <div className="flex justify-center">
-            <Link to={`/repairinspectionform/${repair.id}`}>
-              <button 
-                className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
-                title="View Request"
-              >
-                <FontAwesomeIcon icon="eye" className="mr-0" />
-              </button>
-            </Link>
-          </div>
-        </td>
-      </tr>
-      ))
-      ):(
-      <tr>
-        <td colSpan={6} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
-      </tr>
-      )}
-      </thead>
-    </table>
+    )}
+      
 
   </div>
   )}  

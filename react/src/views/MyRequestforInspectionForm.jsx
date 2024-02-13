@@ -106,7 +106,7 @@ export default function MyRequestForRepairInspection(){
       <span style={{ backgroundColor: '#f2f2f2', padding: '10px', fontFamily: 'Rockwell, serif' }}>
         {(() => {
           switch (true) {
-            case currentUser.id === 2 || currentUser.id === 7:
+            case currentUser.code_clearance === 1 || currentUser.code_clearance === 2 || currentUser.code_clearance === 4:
               return `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname}`;
             case currentUser.division === 'Administrative Division' || currentUser.division === 'Finance Division' || currentUser.division === 'Office of the Port Manager' || currentUser.division === 'Port Service Division' || currentUser.division === 'Port Police Division' || currentUser.division === 'Engineering Service Division' || currentUser.division === 'Terminal Management Office - Tubod':
               return supervisor.name;
@@ -118,9 +118,9 @@ export default function MyRequestForRepairInspection(){
     </div>
 
     {/* Display Table */}
-    <div className="mt-4 max-w-full">
+    <div className="mt-4 overflow-x-auto">
       {displayRequest.mappedData.length > 0 ? (
-        <table className="border-collapse w-full">
+        <table className="border-collapse" style={{ width: '2200px' }}>
           <thead>
             <tr className="bg-gray-100">
               <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
@@ -139,44 +139,42 @@ export default function MyRequestForRepairInspection(){
           <tbody>
             {displayRequest.mappedData.map((getData) => (
               <tr key={getData.id}>
-                <td className="px-2 py-1 text-center border border-custom w-60">{formatDate(getData.date_of_request)}</td>
-                <td className="px-2 py-1 text-center border border-custom w-1/3">{getData.property_number}</td>
-                <td className="px-2 py-1 text-center border border-custom w-60">{formatDate(getData.acq_date)}</td>
-                <td className="px-2 py-1 text-center border border-custom w-1/3">₱{getData.acq_cost}</td>
-                <td className="px-2 py-1 text-center border border-custom w-1/3">{getData.brand_model}</td>
-                <td className="px-2 py-1 text-center border border-custom w-1/3">{getData.serial_engine_no}</td>
+                <td className="px-2 py-1 text-center border border-custom w-40">{formatDate(getData.date_of_request)}</td>
+                <td className="px-2 py-1 text-center border border-custom w-80">{getData.property_number}</td>
+                <td className="px-2 py-1 text-center border border-custom w-40">{formatDate(getData.acq_date)}</td>
+                <td className="px-2 py-1 text-center border border-custom w-40">₱{getData.acq_cost}</td>
+                <td className="px-2 py-1 text-center border border-custom w-56">{getData.brand_model}</td>
+                <td className="px-2 py-1 text-center border border-custom w-56">{getData.serial_engine_no}</td>
                 {getData.type_of_property === "Others" ? (
-                <td className="px-2 py-1 text-center border border-custom w-1/3">Others: <i>{getData.property_other_specific}</i></td>
+                <td className="px-2 py-1 text-center border border-custom w-80">Others: <i>{getData.property_other_specific}</i></td>
                 ):(
-                <td className="px-2 py-1 text-center border border-custom w-1/3">{getData.type_of_property}</td>
+                <td className="px-2 py-1 text-center border border-custom w-80">{getData.type_of_property}</td>
                 )}
-                <td className="px-1 py-1 text-center border border-custom w-1/3">{getData.property_description}</td>
-                <td className="px-1 py-1 text-center border border-custom w-1/3">{getData.location}</td>
-                <td className="px-1 py-1 text-center border border-custom w-1/3">{getData.complain}</td>
-                <td className="px-1 py-1 text-center border border-custom w-1/3">
-                  
-                  {getData.supervisor_approval == 0 && getData.admin_approval == 0 ? ('Pending'):null}
-                  {getData.supervisor_approval === 1 && getData.admin_approval == 0 ? ('Approved (Supervisor)'):null}
-                  {getData.supervisor_approval === 2 && getData.admin_approval == 0 ? ('Declined (Supervisor)'):null} 
-                  {getData.supervisor_approval === 1 && getData.admin_approval == 3 ? ('Pending (Admin Manager)'):null} 
-                  {getData.supervisor_approval === 1 && getData.admin_approval == 2 ? ('Declined (Admin Manager)'):null} 
-                  {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status === 3 ? ('Approved (Admin Manager)'):null}
-                  {getData.admin_approval === 1 && getData.inspector_status == 2 ? ('The Inspector has checking your request'):null}
-                  {getData.admin_approval === 1 && getData.inspector_status == 1 ? ('The Inspector has finish your request'):null} 
-                  
+                <td className="px-1 py-1 text-center border border-custom w-56">{getData.property_description}</td>
+                <td className="px-1 py-1 text-center border border-custom">{getData.location}</td>
+                <td className="px-1 py-1 text-center border border-custom w-96">{getData.complain}</td>
+                <td className="px-1 py-4 text-center border border-custom w-24">
+                {getData.supervisor_approval == 0 && getData.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
+                {getData.supervisor_approval === 1 && getData.admin_approval == 4 && (<span className="approved-status-sup">Approved</span>)}
+                {getData.supervisor_approval === 2 && getData.admin_approval == 0 && (<span className="disapproved-status">Disapproved</span>)} 
+                {getData.supervisor_approval === 1 && getData.admin_approval == 3 && (<span className="pending-status-ad">Pending</span>)} 
+                {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 3 && (<span className="approved-status">Approved</span>)}
+                {getData.supervisor_approval === 1 && getData.admin_approval == 2 && (<span className="disapproved-status">Disapproved</span>)}  
+                {getData.admin_approval === 1 && getData.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
+                {getData.admin_approval === 1 && getData.inspector_status == 1 && (<span className="done-status">Done</span>)}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for Repair Inspection</div>
+        <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for you Yet</div>
       )}
-      <div className="text-right text-sm/[17px]">
-        {displayRequest.mappedData.length > 0 ? (
-          <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
-        ) : null}
-      </div>
+    </div>
+    <div className="text-right text-sm/[17px]">
+      {displayRequest.mappedData.length > 0 ? (
+        <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
+      ) : null}
     </div>
   </>
   )}

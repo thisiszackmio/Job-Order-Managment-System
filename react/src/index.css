@@ -2,6 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Status Style */
+.approved-status {
+  /* Green */
+  background-color: #228B22;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+}
+
+.disapproved-status {
+  /* Red */
+  background-color: #FF0000;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+}
+
+.pending-status {
+  /* Yellow */
+  background-color: #E4D00A;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.approved-status-sup {
+  /* Blue */
+  background-color: #1F51FF;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+}
+
+.pending-status-ad {
+  /* Yellow */
+  background-color: #FFC000;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+span.checking-status {
+  /* Orange */
+  background-color: #FFA500; 
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.done-status {
+  /* Grey */
+  background-color: #3c404c;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+}
+
 /* Notification Style */
 .notifications {
   color: #ffff;

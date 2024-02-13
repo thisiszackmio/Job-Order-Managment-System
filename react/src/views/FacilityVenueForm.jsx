@@ -150,8 +150,15 @@ export default function FacilityFormForm(){
     </div>
   );
 
+  const Confirmation = (
+    <div>
+      <p>Are you sure want to continue?</p>
+      <p>You don't fill up the OPR Instruction</p>
+    </div>
+  );
+
   //Submit OPR Instruction
-  const SubmitOPRInstruct = (event) => {
+  const SubmitOPRInstruct = () => {
     event.preventDefault();
 
     setSubmitLoading(true);
@@ -233,13 +240,20 @@ export default function FacilityFormForm(){
     });
   };
 
+  //For OPR Instruction
+  function handleOPRInstructionClick(){
+    setPopupContent("warning");
+    setShowPopup(true);
+    setPopupMessage(Confirmation);
+  }
+
   //Admin Disapproval
   function handleDisapproveConfirmation(){
     setPopupContent("warningD");
     setShowPopup(true);
     setPopupMessage(AdminDeclineText);
   };
-  
+
   function handleDisapproveClick(id){
 
     setSubmitLoading(true);
@@ -332,6 +346,18 @@ export default function FacilityFormForm(){
   </div>
   ):(
   <>
+    {/* Control Number */}
+    <div className="flex items-center mb-6">
+      <div className="w-24">
+        <label className="block text-base font-medium leading-6 text-gray-900">
+        Control No:
+        </label> 
+      </div>
+      <div className="w-auto px-4 border-b border-black text-center font-bold">
+      {displayRequestFacility?.viewFacilityData?.id}
+      </div>
+    </div>
+
     {/* Main Form */}
     <div className="border-b border-black pb-10">
 
@@ -746,6 +772,18 @@ export default function FacilityFormForm(){
 
       </div>
 
+      {/* Other Details */}
+      <div className="mt-4">
+        <div className="flex">
+          <div className="w-28">
+            <span>Other Details:</span>
+          </div>
+          <div className="w-3/4 border-b border-black text-left pl-2">
+          {displayRequestFacility?.viewFacilityData?.other_details}
+          </div>
+        </div>
+      </div>
+
     </div>
     ):null}
 
@@ -887,8 +925,7 @@ export default function FacilityFormForm(){
                   {displayRequestFacility?.viewFacilityData?.obr_comment}
                 </div>
               </>
-              )}
-              
+              )} 
             </>
             )}
           </div>
@@ -935,7 +972,7 @@ export default function FacilityFormForm(){
     <>
       {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
       <>
-        {displayRequestFacility?.viewFacilityData?.admin_approval != 2 ? (
+        {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
         <>
           {/* Approve */}
           <button 
@@ -959,51 +996,45 @@ export default function FacilityFormForm(){
       </>
       ):(
       <>
-        <button
-          form='opr-form-admin'
-          type="submit"
-          className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
-            submitLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-          }`}
-          style={{ position: 'relative', top: '0px' }}
-          disabled={submitLoading}
-        >
-          {submitLoading ? (
-            <div className="flex items-center justify-center">
-              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-              <span className="ml-2">Processing...</span>
-            </div>
-          ) : (
-            'Submit'
-          )}
-        </button>
+        {OprInstruct ? (
+          <button
+            form='opr-form-admin'
+            type="submit"
+            className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
+              submitLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+            }`}
+            style={{ position: 'relative', top: '0px' }}
+            disabled={submitLoading}
+          >
+            {submitLoading ? (
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Processing...</span>
+              </div>
+            ) : (
+              'Submit'
+            )}
+          </button>
+        ):(
+          <button 
+            onClick={() => handleOPRInstructionClick()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+            title="Admin Approve"
+          >
+            Submit
+          </button>
+        )}
+        
       </>
       )}
     
     </>
-      // <button
-      //   form='opr-form-admin'
-      //   type="submit"
-      //   className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
-      //     submitLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-      //   }`}
-      //   style={{ position: 'relative', top: '0px' }}
-      //   disabled={submitLoading}
-      // >
-      //   {submitLoading ? (
-      //     <div className="flex items-center justify-center">
-      //       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-      //       <span className="ml-2">Processing...</span>
-      //     </div>
-      //   ) : (
-      //     'Submit'
-      //   )}
-      // </button>
     )}
     
     {/* For GSO */}
     {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
     currentUser.code_clearance == 3 && (
+
       <button
         form='opr-form-gso'
         type="submit"
@@ -1099,44 +1130,78 @@ export default function FacilityFormForm(){
 
         {/* Popup Buttons */}
         <div className="flex justify-center mt-4">
-
-        {/* Approve Button */}
+        
+        {/* Warning */}
         {popupContent == "warning" && (
         <>
           {currentUser.code_clearance == 1 && (
           <>
-            {!submitLoading && (
-              <button
-                onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Yes
-              </button>
+            {displayRequestFacility?.viewFacilityData?.obr_instruct == null ? (
+            <>
+              {!submitLoading && (
+                <button
+                  onClick={SubmitOPRInstruct}
+                  className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Yes
+                </button>
+              )}
+
+              {!submitLoading && (
+                <button
+                  onClick={justclose}
+                  className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                >
+                  No
+                </button>
+              )}
+
+              {submitLoading && (
+                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Loading</span>
+                  </div>
+                </button>
+              )}
+            </>
+            ):(
+            <>
+              {!submitLoading && (
+                <button
+                  onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)}
+                  className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Yes
+                </button>
+              )}
+
+              {!submitLoading && (
+                <button
+                  onClick={justclose}
+                  className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                >
+                  No
+                </button>
+              )}
+
+              {submitLoading && (
+                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Loading</span>
+                  </div>
+                </button>
+              )}
+            </> 
             )}
 
-            {!submitLoading && (
-              <button
-                onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-              >
-                No
-              </button>
-            )}
-
-            {submitLoading && (
-              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Loading</span>
-                </div>
-              </button>
-            )}
-          </> 
+          </>
           )}
         </>
         )}
 
-        {/* Disapprove Button */}
+        {/* Warning Decline */}
         {popupContent == "warningD" && (
         <>
         {currentUser.code_clearance == 1 && (
@@ -1168,7 +1233,7 @@ export default function FacilityFormForm(){
               </button>
             )}
           </> 
-          )}
+        )}
         </>
         )}
 
@@ -1657,7 +1722,7 @@ export default function FacilityFormForm(){
                         <span>Other Details:</span>
                       </div>
                       <div className="w-3/4 border-b border-black font-regular text-sm text-left pl-2">
-                      {displayRequestFacility?.viewDormFacilityData?.other_details}
+                      {displayRequestFacility?.viewFacilityData?.other_details}
                       </div>
                     </div>
                   </div>
@@ -1677,7 +1742,7 @@ export default function FacilityFormForm(){
                     <div className="relative">
                       <img
                         src={displayRequestFacility?.requestor?.signature}
-                        style={{ position: 'absolute', width: '180px', top: '-10px', left: '98px' }}
+                        style={{ position: 'absolute', width: '180px', top: '-16px', left: '90px' }}
                         alt="Signature"
                       />
                     </div>
@@ -1698,7 +1763,7 @@ export default function FacilityFormForm(){
                       <div className="relative">
                         <img
                           src={displayRequestFacility?.manager?.signature}
-                          style={{ position: 'absolute', width: '180px', top: '-10px', left: '98px' }}
+                          style={{ position: 'absolute', width: '180px', top: '-16px', left: '98px' }}
                           alt="Signature"
                         />
                       </div>

@@ -21,7 +21,7 @@ class InspectionFormController extends Controller
      */
     public function index()
     {
-        $inspectionForms = Inspection_Form::with('user')->orderBy('id', 'desc')->get();
+        $inspectionForms = Inspection_Form::with('user')->get();
 
         // if ($inspectionForms->isEmpty()) {
         //     return response()->json(['message' => 'No data found'], 404);
@@ -322,6 +322,7 @@ class InspectionFormController extends Controller
         $approveRequest = Inspection_Form::find($id);
 
         $approveRequest->supervisor_approval = 1;
+        $approveRequest->admin_approval = 4;
 
         
         if ($approveRequest->save()) {

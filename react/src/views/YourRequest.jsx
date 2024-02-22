@@ -10,46 +10,12 @@ import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 export default function MyRequest(){
   const {id} = useParams();
 
-  const[displayRequestVehicle, setDisplayRequestVehicle] = useState([]);
   const[displayRequestEquipment, setDisplayRequestEquipment] = useState([]);
 
   const [activeTab, setActiveTab] = useState("tab1");
   
   library.add(faEye);
   const [loading, setLoading] = useState(true);
-
-
-  //Get all the Request on the Vehicle Slip
-  const fetchVehicleSlipForm = () => {
-    axiosClient
-    .get(`/myvehicleformrequest/${id}`)
-    .then((response) => {
-      const responseData = response.data;
-      const viewVehicleSlipData = responseData.view_vehicle;
-      const countPassengers = responseData.passenger_count;
-
-      const mappedData = viewVehicleSlipData.map((dataItem, index) => {
-        return{
-          id: dataItem.id,
-          date_requested: dataItem.date_of_request,
-          purpose: dataItem.purpose,
-          passengerCount: countPassengers[index].passengers_count,
-          place_visit: dataItem.place_visited,
-          date_arrival: dataItem.date_arrival,
-          time_arrival: dataItem.time_arrival,
-          vehicle_type: dataItem.vehicle_type,
-          driver: dataItem.driver,
-          remarks: dataItem.admin_approval
-        }
-      });
-
-      setDisplayRequestVehicle({mappedData:mappedData});
-    })
-    .catch((error) => {
-      setLoading(false);
-        console.error('Error fetching data:', error);
-    });
-  }
 
   //Get all the Request on the Equipment
   const fetchEquipmentForm = () => {
@@ -84,7 +50,6 @@ export default function MyRequest(){
   }
 
   useEffect(()=>{
-    fetchVehicleSlipForm();
     fetchEquipmentForm();
   },[id]);
 
@@ -105,132 +70,9 @@ export default function MyRequest(){
     </div>
     ):(
     <>
-      {/* Button Tabs */}
-      <div className="flex">
-        {/* Tab 1 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab1"
-              ? "bg-gray-200 border-b-4 border-gray-800"
-              : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab1")}
-        >
-          Request for Repair/Inspection
-        </button>
-        {/* Tab 2 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab2"
-            ? "bg-gray-200 border-b-4 border-gray-800"
-            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab2")}
-        >
-          Request for Facility/Venue
-        </button>
-        {/* Tab 3 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab3"
-            ? "bg-gray-200 border-b-4 border-gray-800"
-            : "bg-gray-200 bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab3")}
-        >
-          Request for Vehicle
-        </button>
-        {/* Tab 4 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab4"
-            ? "bg-gray-200 border-b-4 border-gray-800"
-            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab4")}
-        >
-          Request for Equipment
-        </button>
-        {/* Tab 5 */}
-        <button
-          className={`w-full px-4 py-2 m-0 ${
-            activeTab === "tab5"
-            ? "bg-gray-200 border-b-4 border-gray-800"
-            : "bg-gray-200 border-b-4 border-transparent hover:border-gray-500"
-          }`}
-          onClick={() => handleTabClick("tab5")}
-        >
-          Other Request
-        </button>
-      </div>
+
 
       <div className="mt-4">
-
-        {/* Pre-Repair/Post Repair Inspection Form */}
-
-        {/* Request For the Vehicle Slip */}
-        {activeTab === "tab3" && (
-          <div>
-            <table className="border-collapse w-full">
-              <thead>
-                {displayRequestVehicle.mappedData.length > 0 ? (
-                <tr className="bg-gray-100">
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">Slip No</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Visited Place</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date/Time of Arrival</th>   
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
-                  <th className="px-1 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-                </tr>
-                ):null}
-              </thead>
-              <tbody>
-              {displayRequestVehicle.mappedData.length > 0 ? (
-                displayRequestVehicle.mappedData.map((getData) => (
-                  <tr key={getData.id}>
-                    <td className="px-1 py-1 text-center border border-custom w-1 font-bold">{getData.id}</td>
-                    <td className="px-1 py-1 text-center border border-custom w-24">{formatDate(getData.date_requested)}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.purpose}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.place_visit}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.vehicle_type.split('=')?.[0]}({getData.vehicle_type.split('=')?.[1]} )</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.driver}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.passengerCount}</td>
-                    <td className="px-1 py-1 text-center border border-custom">{getData.remarks == 1 ? ("Approve"):getData.remarks == 2 ? ("Disapprove"):("Pending")}</td>
-                    <td className="px-1 py-1 text-center border border-custom">
-                    {getData.remarks == 1 || getData.remarks == 2 ?(
-                      <div className="flex justify-center">
-                        <Link to={`/vehicleslipform/${getData.id}`}>
-                          <button 
-                            className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
-                            title="View Request"
-                          >
-                            <FontAwesomeIcon icon="eye" className="mr-0" />
-                          </button>
-                        </Link>
-                      </div>
-                    ):null}
-                    </td>
-                  </tr>
-                ))
-              ):(
-                <tr>
-                  <td colSpan="7" className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for yoou today</td>
-                </tr>
-              )}
-              </tbody>
-            </table>
-            <div className="text-right text-sm/[17px]">
-            {displayRequestVehicle.mappedData.length > 0 ? (
-            <i>Total of <b> {displayRequestVehicle.mappedData.length} </b> Vehicle Slip Request</i>
-            ):null}
-            </div>
-          </div>
-        )}
 
         {/* Request For the Equipment Slip */}
         {activeTab === "tab4" && (

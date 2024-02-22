@@ -335,7 +335,9 @@ export default function Personnel(){
       <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Port Manager</td>
       <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO</td>
       <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Division Manager/Supervisor</td>
-      <td className="px-2 py-1 text-center text-sm border-r">5 - Regular and COS Employee</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">5 - Regular and COS Employee</td>
+      <td className="px-2 py-1 text-center text-sm border-r border-custom">6 - Assign Personnel</td>
+      <td className="px-2 py-1 text-center text-sm border-r">10 - Assign Personnel</td>
       
       <div className="flex mt-6 mb-0">
         <div className="flex-1">

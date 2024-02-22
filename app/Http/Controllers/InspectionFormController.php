@@ -10,7 +10,7 @@ use App\Models\Inspection_Form;
 use App\Models\PPAUser;
 use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
-use App\Models\GetNotification;
+use App\Models\NotificationModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -177,7 +177,7 @@ class InspectionFormController extends Controller
 
         //Get the request
         $getInspectionForm = Inspection_Form::where('user_id', $id)
-        ->orderBy('id', 'desc')
+        ->orderBy('id', 'asc')
         ->get(); 
 
         //Display All the data
@@ -199,15 +199,9 @@ class InspectionFormController extends Controller
         $data = $request->validated();
         $data['user_id'] = auth()->user()->id;
 
-        // Get The sender name
-        $userId = PPAUser::find($data['user_id']);
-        $userSender = $userId->fname . ' ' . $userId->lname;
-
-        
         // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
         $deploymentData->save();
-
         
         if(!$deploymentData){
             return response()->json(['error' => 'Data Error'], 500);

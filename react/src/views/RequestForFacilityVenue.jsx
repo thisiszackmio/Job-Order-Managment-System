@@ -3,7 +3,7 @@ import PageComponent from "../components/PageComponent";
 import React, { useEffect, useState } from "react";
 import { useUserStateContext } from "../context/ContextProvider";
 import submitAnimation from '../assets/loading_nobg.gif';
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 
 export default function RequestFormFacility(){
@@ -244,28 +244,6 @@ export default function RequestFormFacility(){
 
   const none = 'N/A';
 
-  //Notifications
-  const Confirmation = (
-    <div>
-      <p>Form Submit Successfully!</p>
-    </div>
-  ); 
-
-  const Clarification = (
-    <div>
-      <p>Do you want to proceed</p>
-      <p>if there is no OPR instruction?</p>
-    </div>
-  );
-
-  const DateTimeError = (
-    <div>
-      <p><strong>Form cannot submit!</strong></p>
-      <p>The end time of activity must not be</p>
-      <p>before the start time of activity.</p>
-    </div>
-  ); 
-
   // Auto Approval for Supervisors and Manager
   let output;
 
@@ -275,6 +253,7 @@ export default function RequestFormFacility(){
     output = 4;
   }
 
+  // Popup Clarification
   function handleClarification(){
 
     setSubmitLoading(true);
@@ -282,26 +261,46 @@ export default function RequestFormFacility(){
     if(dormCheck == true && currentUser.code_clearance == 1){
       if(!maleList && !femaleList){
         setShowPopup(true);
-        setPopupMessage("Fillup the Dormitory form please!");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Warning</p>
+            <p>Fillup the Dormitory form please!</p>
+          </div>
+        );
         setNototifications("warningnull"); 
         setSubmitLoading(false);
       }else if(oprInstrucValue == "None"){
         setShowPopup(true);
-        setPopupMessage(Clarification);
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Warning</p>
+            <p>Do you want to proceed if there is no OPR instruction?</p>
+          </div>
+        );
         setNototifications("warning"); 
         setSubmitLoading(false);
       }
     }else if(dormCheck == true && currentUser.code_clearance != 1){
       if(!maleList && !femaleList){
         setShowPopup(true);
-        setPopupMessage("Fillup the Dormitory form please!");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Warning</p>
+            <p>Fillup the Dormitory form please!</p>
+          </div>
+        );
         setNototifications("warningnull"); 
         setSubmitLoading(false);
       }
     }
     else{
       setShowPopup(true);
-      setPopupMessage(Clarification);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Warning</p>
+          <p>Do you want to proceed if there is no OPR instruction?</p>
+        </div>
+      );
       setNototifications("warning"); 
       setSubmitLoading(false);
     }
@@ -351,7 +350,12 @@ export default function RequestFormFacility(){
 
     if(timestampstart > timestampend){
       setShowPopup(true);
-      setPopupMessage(DateTimeError);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Error</p>
+          <p>Please check the Date and Time of Activity</p>
+        </div>
+      );
       setNototifications("error");
       setSubmitLoading(false);
       return;
@@ -367,7 +371,12 @@ export default function RequestFormFacility(){
     .post("facilityformrequest", requestData)
     .then((response) => {
       setShowPopup(true);
-      setPopupMessage(Confirmation);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>Form submit successfully</p>
+        </div>
+      );
       setNototifications("success");
       setSubmitLoading(false);
       setCheckValidation(null);
@@ -398,23 +407,14 @@ export default function RequestFormFacility(){
   <PageComponent title="Request for use of Facility / Venue Form">
   {currentUser.id == id && (
   <>
-    {isLoading ? (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-        <img
-          className="mx-auto h-44 w-auto"
-          src={loadingAnimation}
-          alt="Your Company"
-        />
-        <span className="ml-2 animate-heartbeat">Loading Form</span>
-      </div>
-    ):(
-    <>
+    
       <form id="fac-submit" onSubmit={SubmitFacilityForm}>
 
         {/* Title */}
         <div>
           <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-          <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
+          <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+          <p className="text-xs font-bold text-red-500">Click <Link to={`/facilityvenuerequestform`} className="text-blue-500">here</Link> to check the schedule to avoid facility conflicts</p>
         </div>
 
         {/* Main form */}
@@ -458,7 +458,7 @@ export default function RequestFormFacility(){
                   onChange={ev => setRegOffice(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.request_office && (
+                {!reqOffice && inputFacErrors?.request_office && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -481,7 +481,7 @@ export default function RequestFormFacility(){
                   onChange={ev => setTitleReq(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.title_of_activity && (
+                {!titleReq && inputFacErrors?.title_of_activity && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -507,7 +507,7 @@ export default function RequestFormFacility(){
                   min={today}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.date_start && (
+                {!DateStart && inputFacErrors?.date_start && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -529,7 +529,7 @@ export default function RequestFormFacility(){
                   onChange={ev => setTimeStart(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.time_start && (
+                {!timeStart && inputFacErrors?.time_start && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -558,7 +558,7 @@ export default function RequestFormFacility(){
                   min={DateEndMin}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.date_end && (
+                {!DateEnd && inputFacErrors?.date_end && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -580,7 +580,7 @@ export default function RequestFormFacility(){
                   onChange={ev => setTimeEnd(ev.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 />
-                {inputFacErrors?.time_end && (
+                {!timeEnd && inputFacErrors?.time_end && (
                   <p className="text-red-500 text-xs italic">This field must be required</p>
                 )}
               </div>
@@ -728,7 +728,7 @@ export default function RequestFormFacility(){
                   </div>
                 )}
               </div>
-              {inputFacErrors?.no_table && (
+              {!NoOfTable && inputFacErrors?.no_table && (
                 <p className="text-red-500 text-xs">No. of table is required</p>
               )}
 
@@ -742,7 +742,7 @@ export default function RequestFormFacility(){
                     checked={checkChairs}
                     onChange={() => {
                       setCheckChairs(!checkChairs);
-                      setinputFacErrors(null);
+                      setInputFacErrors(null);
                     }}
                     class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                   />
@@ -771,7 +771,7 @@ export default function RequestFormFacility(){
                   </div>
                 )}
               </div>
-              {inputFacErrors?.no_chair && (
+              {!NoOfChairs && inputFacErrors?.no_chair && (
                 <p className="text-red-500 text-xs">No. of chair is required</p>
               )}
 
@@ -915,7 +915,7 @@ export default function RequestFormFacility(){
                     checked={checkMicrphone}
                     onChange={() => {
                       setCheckMicrphone(!checkMicrphone);
-                      setinputFacErrors(null);
+                      setInputFacErrors(null);
                     }}
                     class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                   />
@@ -944,7 +944,7 @@ export default function RequestFormFacility(){
                   </div>
                 )}
               </div>
-              {inputFacErrors?.no_microphone && (
+              {!NoOfMicrophone && inputFacErrors?.no_microphone && (
                 <p className="text-red-500 text-xs">No. of microphone is required</p>
               )}
 
@@ -962,7 +962,7 @@ export default function RequestFormFacility(){
                 checked={checkOther}
                 onChange={() => {
                   setCheckOther(!checkOther);
-                  setinputFacErrors(null);
+                  setInputFacErrors(null);
                 }}
                 class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
               />
@@ -988,7 +988,7 @@ export default function RequestFormFacility(){
               </div>
             )}
           </div>
-          {inputFacErrors?.specify && (
+          {!OtherField && inputFacErrors?.specify && (
             <p className="text-red-500 text-xs">This form is required</p>
           )}
 
@@ -1215,8 +1215,8 @@ export default function RequestFormFacility(){
               (!maleList && !femaleList) || oprInstrucValue === "None" ? (
                 <button
                   onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1237,8 +1237,8 @@ export default function RequestFormFacility(){
               (!maleList && !femaleList) || oprInstrucValue === "None" ? (
                 <button
                   onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1253,8 +1253,8 @@ export default function RequestFormFacility(){
                 <button
                   form="fac-submit"
                   type="submit"
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1271,8 +1271,8 @@ export default function RequestFormFacility(){
                 oprInstrucValue === "None" ? (
                   <button
                     onClick={() => handleClarification()}
-                    className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                      sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                    className={`rounded-md px-2 py-2 text-vase text-white shadow-sm focus:outline-none ${
+                      sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                     }`}
                     disabled={sumbitLoading}
                   >
@@ -1287,8 +1287,8 @@ export default function RequestFormFacility(){
                   <button
                     form="fac-submit"
                     type="submit"
-                    className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                      sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                    className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                      sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                     }`}
                     disabled={sumbitLoading}
                   >
@@ -1317,8 +1317,8 @@ export default function RequestFormFacility(){
               (!maleList && !femaleList) ? (
                 <button
                   onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1333,8 +1333,8 @@ export default function RequestFormFacility(){
                 <button
                   form="fac-submit"
                   type="submit"
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1352,8 +1352,8 @@ export default function RequestFormFacility(){
               (!maleList && !femaleList) ? (
                 <button
                   onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1368,8 +1368,8 @@ export default function RequestFormFacility(){
                 <button
                   form="fac-submit"
                   type="submit"
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1386,8 +1386,8 @@ export default function RequestFormFacility(){
                 <button
                   form="fac-submit"
                   type="submit"
-                  className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
                 >
@@ -1410,123 +1410,119 @@ export default function RequestFormFacility(){
       {/* Popup */}
       {showPopup && (
       <>
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
 
-      {/* Semi-transparent black overlay */}
-      <div
-        className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-      ></div>
+        {/* Semi-transparent black overlay */}
+        <div className="fixed inset-0 bg-black opacity-40"></div>
 
-      {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+        {/* Popup content with background blur */}
+        <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
 
-      {/* Notification Icons */}
-      <div class="f-modal-alert">
+          {/* Notification Icons */}
+          <div class="f-modal-alert">
 
-        {/* Error */}
-        {notifications == "error" && (
-        <>
-        <div className="f-modal-icon f-modal-error animate">
-          <span className="f-modal-x-mark">
-            <span className="f-modal-line f-modal-left animateXLeft"></span>
-            <span className="f-modal-line f-modal-right animateXRight"></span>
-          </span>
-        </div>
-        </>
-        )}
+            {/* Error */}
+            {notifications == "error" && (
+            <>
+            <div className="f-modal-icon f-modal-error animate">
+              <span className="f-modal-x-mark">
+                <span className="f-modal-line f-modal-left animateXLeft"></span>
+                <span className="f-modal-line f-modal-right animateXRight"></span>
+              </span>
+            </div>
+            </>
+            )}
 
-        {/* Warning */} 
-        {(notifications == "warning" || 
-        notifications == "warningnull") && (
-        <>
-          <div class="f-modal-icon f-modal-warning scaleWarning">
-            <span class="f-modal-body pulseWarningIns"></span>
-            <span class="f-modal-dot pulseWarningIns"></span>
-          </div>
-        </> 
-        )}
-
-        {/* Success */}
-        {notifications == "success" && (
-        <>
-        <div class="f-modal-icon f-modal-success animate">
-          <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-          <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-        </div>
-        </>
-        )}
-
-      </div>
-      
-        <p className="text-lg text-center">{popupMessage}</p>
-
-        <div className="flex justify-center mt-4">
-
-        {/* Notice / Warning */}
-        {notifications == "warning" && (
-        <>
-        {!sumbitLoading && (
-            <button
-              form="fac-submit"
-              type="submit"
-              className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Yes
-            </button>
-          )}
-
-          {!sumbitLoading && (
-            <button
-              onClick={closeError}
-              className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-            >
-              No
-            </button>
-          )}
-
-          {sumbitLoading && (
-            <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
+            {/* Warning */} 
+            {(notifications == "warning" || 
+            notifications == "warningnull") && (
+            <>
+              <div class="f-modal-icon f-modal-warning scaleWarning">
+                <span class="f-modal-body pulseWarningIns"></span>
+                <span class="f-modal-dot pulseWarningIns"></span>
               </div>
+            </> 
+            )}
+
+            {/* Success */}
+            {notifications == "success" && (
+            <>
+            <div class="f-modal-icon f-modal-success animate">
+              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+            </div>
+            </>
+            )}
+
+          </div>
+        
+          <p className="text-lg text-center">{popupMessage}</p>
+
+          <div className="flex justify-center mt-4">
+
+          {/* Notice / Warning */}
+          {notifications == "warning" && (
+          <>
+            {!sumbitLoading && (
+              <button
+                form="fac-submit"
+                type="submit"
+                className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+              >
+                Yes
+              </button>
+            )}
+
+            {!sumbitLoading && (
+              <button
+                onClick={closeError}
+                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+              >
+                No
+              </button>
+            )}
+
+            {sumbitLoading && (
+              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Loading</span>
+                </div>
+              </button>
+            )}
+          </>
+          )}
+
+          {/* Error / Warning*/}
+          {(notifications == "warningnull" || 
+          notifications == "error") && (
+          <>
+            <button
+              onClick={() => (closeError())}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+            >
+              Close
+            </button>
+          </>
+          )}
+
+          {/* Success */}
+          {notifications == "success" && (
+            <button
+              onClick={() => (closePopup())}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+            >
+              View my request
             </button>
           )}
-        </>
-        )}
 
-        {/* Error / Warning*/}
-        {(notifications == "warningnull" || 
-        notifications == "error") && (
-        <>
-          <button
-            onClick={() => (closeError())}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
-        </>
-        )}
-
-        {/* Success */}
-        {notifications == "success" && (
-          <button
-            onClick={() => (closePopup())}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            View My Request
-          </button>
-        )}
+          </div>
 
         </div>
 
-      </div>
-
-      </div>
+        </div>
       </>  
       )}
-    </>
-    )}
   </>
   )}
   </PageComponent>

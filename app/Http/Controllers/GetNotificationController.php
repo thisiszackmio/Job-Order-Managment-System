@@ -16,10 +16,10 @@ class GetNotificationController extends Controller
     /** 
      * Receive Notification by the Supervisor
      */
-    public function SupervisorNoti($id)
+    public function SupervisorNoti()
     {
         // For Inspection Form
-        $supInspectNoti = Inspection_Form::where('supervisor_name', $id)->where('supervisor_approval', 0)->get();
+        $supInspectNoti = Inspection_Form::where('supervisor_approval', 0)->get();
         $iID = $supInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
 
@@ -48,7 +48,6 @@ class GetNotificationController extends Controller
         $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 4)->get();
         $iID = $gsoInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
-
         $gsoDet = $gsoInspectNoti->map(function ($inspectionForm) use ($getReq) {
             $user = $getReq->where('id', $inspectionForm->user_id)->first();
             return [
@@ -59,8 +58,8 @@ class GetNotificationController extends Controller
         
         // For Facility Form
         $gsoFacilityNoti = FacilityModel::where('admin_approval', 2)->get();
-        $fID = $gsoFacilityNoti->pluck('user_id')->all(); // Fix: Changed from $iID to $fID
-        $getFacReq = PPAUser::whereIn('id', $fID)->get(); // Fix: Changed from $getReq to $getFacReq
+        $fID = $gsoFacilityNoti->pluck('user_id')->all();
+        $getFacReq = PPAUser::whereIn('id', $fID)->get();
         $getAdminName = PPAUser::where('code_clearance', '1')->first();
 
         $gsoDetFac = $gsoFacilityNoti->map(function ($facilityForm) use ($getFacReq) {
@@ -70,12 +69,26 @@ class GetNotificationController extends Controller
                 'user' => $user,
             ];
         });
+
+        // For Vehicle Slip Form
+        $gsoFacilityNoti = VehicleForm::whereIn('admin_approval', [5, 2])->get();
+        $vID = $gsoFacilityNoti->pluck('user_id')->all();
+        $getVeHReq = PPAUser::whereIn('id', $vID)->get();
+
+        $gsoDetVeh = $gsoFacilityNoti->map(function ($VehicleForm) use ($getVeHReq) {
+            $user = $getVeHReq->where('id', $VehicleForm->user_id)->first();
+            return [
+                'vehicle_form' => $VehicleForm,
+                'user' => $user,
+            ];
+        });
         
         //Output
         $responseData = [
+            'adminName' => $getAdminName,
             'gsoDet' => $gsoDet,
             'gsoFacDet' => $gsoDetFac,
-            'adminName' => $getAdminName
+            'gsoVehDet' => $gsoDetVeh
         ];
 
         return response()->json($responseData);
@@ -112,7 +125,7 @@ class GetNotificationController extends Controller
         });
 
         //For Vehicle Slip
-        $adminVehicleNoti = VehicleForm::where('admin_approval', 3)->get();
+        $adminVehicleNoti = VehicleForm::where('admin_approval', 4)->get();
         $vID = $adminVehicleNoti->pluck('user_id')->all();
         $getVReq = PPAUser::whereIn('id', $vID)->get();
 
@@ -136,21 +149,15 @@ class GetNotificationController extends Controller
     /** 
      * Receive Notification by the Assign Personnel
      */
-    public function PersonnelNoti($id)
+    public function PersonnelNoti()
     {
         //Get Form Admin (Part B)
-        $pID = AdminInspectionForm::where('assign_personnel', $id)->get();
-        $iID = $pID->pluck('inspection__form_id')->all();
-        $apID = $pID->pluck('assign_personnel')->first();
-
-        //Get Inspector Form
-        $specForm = Inspector_Form::whereIn('inspection__form_id', $iID)->whereIn('close', [3,4])->get();
-        $inspForm = Inspection_Form::whereIn('id', $iID)->whereIn('inspector_status', [3, 2])->get();
+        $pID = AdminInspectionForm::get();
+        $specForm = Inspector_Form::whereIn('close', [3,4])->get();
 
         $responseData = [
-            'inspectionDet' => $inspForm,
-            'inspectorDet' => $specForm,
-            'assignID' => $apID
+            'inspectionDet' => $pID,
+            'inspectorDet' => $specForm
         ];
 
         return response()->json($responseData);

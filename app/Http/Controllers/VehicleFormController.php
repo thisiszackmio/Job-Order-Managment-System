@@ -16,7 +16,7 @@ class VehicleFormController extends Controller
      */
     public function index()
     {
-        $vehicleForms = VehicleForm::with('user')->orderBy('id', 'desc')->get();
+        $vehicleForms = VehicleForm::with('user')->orderBy('id', 'asc')->get();
 
         $responseData = [];
 
@@ -135,13 +135,29 @@ class VehicleFormController extends Controller
     }
 
     /**
+     * Submit a Vehicle Form
+     */
+    public function submitVehicle (Request $request, $id)
+    {
+        $v2 = VehicleForm::find($id);
+
+        if ($v2) {
+            $v2->update([
+                'vehicle_type' => $request->input('vehicle_type'),
+                'driver' => $request->input('driver'),
+                'admin_approval' => 4,
+            ]);
+        }
+    }
+
+    /**
      * Approve by the Division Manager
      */
     public function adminApprove(Request $request, $id)
     {
         $approveRequest = VehicleForm::find($id);
 
-        $approveRequest->admin_approval = 1;
+        $approveRequest->admin_approval = 2;
 
         if ($approveRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -157,7 +173,23 @@ class VehicleFormController extends Controller
     {
         $approveRequest = VehicleForm::find($id);
 
-        $approveRequest->admin_approval = 2;
+        $approveRequest->admin_approval = 3;
+
+        if ($approveRequest->save()) {
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+    }
+
+    /**
+     * Close Request
+     */
+    public function closeRequest(Request $request, $id)
+    {
+        $approveRequest = VehicleForm::find($id);
+
+        $approveRequest->admin_approval = 1;
 
         if ($approveRequest->save()) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);

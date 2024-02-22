@@ -7,7 +7,6 @@ import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../assets/loading_nobg.gif';
-import Forbidden from "../components/403";
 
 export default function FacilityFormForm(){
 
@@ -104,87 +103,6 @@ export default function FacilityFormForm(){
     </div>
   );
 
-  const OPRInstructSuccessMessage = (
-    <div>
-      <p>Form submit successfully!</p>
-      <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
-    </div>
-  );
-
-  const OPRActionSuccessMessage = (
-    <div>
-      <p>Form submit successfully!</p>
-      <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
-    </div>
-  );
-
-  const AdminConfirmText = (
-    <div>
-      <p>Do you want to approve</p>
-      {displayRequestFacility?.viewRequestData?.user_id == currentUser.id ? null:(
-        <p><strong>{displayRequestFacility?.requestor?.name}'s</strong> request?</p>
-      )}
-    </div>
-  );
-
-  const AdminApproveText = (
-    <div>
-      <p>Form Request Approved!</p>
-      <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
-    </div>
-  );
-
-  const AdminDeclineText = (
-    <div>
-      <p>Do you want to disapprove</p>
-      {displayRequestFacility?.viewRequestData?.user_id == currentUser.id ? null:(
-        <p><strong>{displayRequestFacility?.requestor?.name}'s</strong> request?</p>
-      )}
-    </div>
-  );
-
-  const AdminDisapproveText = (
-    <div>
-      <p>Form Request Disapproved!</p>
-      <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
-    </div>
-  );
-
-  const Confirmation = (
-    <div>
-      <p>Are you sure want to continue?</p>
-      <p>You don't fill up the OPR Instruction</p>
-    </div>
-  );
-
-  //Submit OPR Instruction
-  const SubmitOPRInstruct = () => {
-    event.preventDefault();
-
-    setSubmitLoading(true);
-
-    axiosClient
-    .put(`facilityopradmin/${id}`,{
-      obr_instruct: oprInstrucValue
-    })
-    .then((response) => {
-      setPopupContent("success");
-      setPopupMessage(OPRInstructSuccessMessage); 
-      setShowPopup(true);   
-      setSubmitLoading(false);
-    })
-    .catch((error) => {
-      console.error(error);
-      setPopupContent("error");
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);   
-      setSubmitLoading(false);
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-  }
-
   //Submit OPR Action Comment
   const SubmitOPRAction = (event) => {
     event.preventDefault();
@@ -197,7 +115,13 @@ export default function FacilityFormForm(){
     })
     .then((response) => {
       setPopupContent("success");
-      setPopupMessage(OPRActionSuccessMessage); 
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>Form submit successfully!</p>
+          <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
+        </div>
+      ); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
@@ -214,21 +138,80 @@ export default function FacilityFormForm(){
 
   }
 
-  //Admin Approval
+  //For OPR Instruction confirmation
+  function handleOPRInstructionClick(){
+    setPopupContent("warning");
+    setShowPopup(true);
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Warning</p>
+        <p>Would you like to continue even if there's no OPR instruction?</p>
+      </div>
+    );
+  }
+
+  //Submit OPR Instruction
+  const SubmitOPRInstruct = (event) => {
+    event.preventDefault();
+
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`facilityopradmin/${id}`,{
+      obr_instruct: oprInstrucValue
+    })
+    .then((response) => {
+      setPopupContent("success");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>Form submit successfully!</p>
+        </div>
+      ); 
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      console.error(error);
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
+  //Admin Approval confirmation
   function handleAdminApproveConfirmation(){
     setPopupContent("warning");
     setShowPopup(true);
-    setPopupMessage(AdminConfirmText);
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Approval Request</p>
+        <p>
+          Do you want to approve {displayRequestFacility?.viewRequestData?.user_id == currentUser.id ? null : (<b>{displayRequestFacility?.requestor?.name + "'s"}</b>)} request?
+        </p>
+      </div>
+    );
   };
 
+  //Admin approval function
   function handleApproveClick(id){
 
     setSubmitLoading(true);
 
     axiosClient.put(`/facilityapproval/${id}`)
     .then((response) => {
-      setPopupContent("yehey");
-      setPopupMessage(AdminApproveText);
+      setPopupContent("success");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>Form Request Approved!</p>
+          <p>Thank You {currentUser.gender == "Male" ? "Sir":"Maam"} {currentUser.fname}!</p>
+        </div>
+      );
       setShowPopup(true);
     })
     .catch((error) => {
@@ -240,20 +223,19 @@ export default function FacilityFormForm(){
     });
   };
 
-  //For OPR Instruction
-  function handleOPRInstructionClick(){
-    setPopupContent("warning");
-    setShowPopup(true);
-    setPopupMessage(Confirmation);
-  }
-
-  //Admin Disapproval
+  //Admin Disapproval Confirmation
   function handleDisapproveConfirmation(){
     setPopupContent("warningD");
     setShowPopup(true);
-    setPopupMessage(AdminDeclineText);
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Disapproval Request</p>
+        <p>Do you want to disapprove?</p>
+      </div>
+    );
   };
 
+  //Admin Decline function
   function handleDisapproveClick(id){
 
     setSubmitLoading(true);
@@ -261,7 +243,12 @@ export default function FacilityFormForm(){
     axiosClient.put(`/facilitydisapproval/${id}`)
     .then((response) => {
       setPopupContent("success");
-      setPopupMessage(AdminDisapproveText);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>Form Request Disapproved!</p>
+        </div>
+      );
       setShowPopup(true);
     })
     .catch((error) => {
@@ -273,6 +260,33 @@ export default function FacilityFormForm(){
     });
 
   };
+
+  //Close the request
+  function handleCloseRequest(id){
+
+    setSubmitLoading(true);
+    
+    axiosClient.put(`/requestclose/${id}`)
+    .then((response) => {
+      setPopupContent("success");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>You close the request</p>
+        </div>
+      );
+      setShowPopup(true);
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      //console.error(error);
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    });
+
+  }
 
   const justclose = () => {
     setShowPopup(false);
@@ -329,7 +343,9 @@ export default function FacilityFormForm(){
   }, [seconds]);
 
   //Restrictions
-  const Users = userRole == 'hackers' || userRole == 'admin';
+  const requestlistClearance = [1, 2, 3, 10];
+  const here = requestlistClearance.includes(currentUser.code_clearance);
+  const Users = here;
   const Facility_Room = displayRequestFacility?.viewFacilityData?.mph || displayRequestFacility?.viewFacilityData?.conference || displayRequestFacility?.viewFacilityData?.other;
   const Facility_Dorm = displayRequestFacility?.viewFacilityData?.dorm;
   
@@ -346,8 +362,19 @@ export default function FacilityFormForm(){
   </div>
   ):(
   <>
+    {/* Main Button */}
+    {here ? (
+      <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
+        <Link to="/facilityvenuerequestform">Back to Request List</Link>
+      </button>
+    ):(
+      <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 mr-1 rounded text-sm">
+        <Link to="/">Back to Dashboard</Link>
+      </button>
+    )}
+
     {/* Control Number */}
-    <div className="flex items-center mb-6">
+    <div className="flex items-center mb-6 mt-6">
       <div className="w-24">
         <label className="block text-base font-medium leading-6 text-gray-900">
         Control No:
@@ -826,11 +853,10 @@ export default function FacilityFormForm(){
               </label> 
             </div>
             <div className="w-72 font-bold">
-              {displayRequestFacility?.viewFacilityData?.admin_approval == 1 || displayRequestFacility?.viewFacilityData?.admin_approval == 2
-                ? "Approved"
-                : displayRequestFacility?.viewFacilityData?.admin_approval == 3
-                ? "Disapproved"
-                : "Pending"}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && ("Disapproved")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
             </div>
           </div> 
 
@@ -939,19 +965,14 @@ export default function FacilityFormForm(){
     {/* Buttons */}
     <div className="flex mt-4">
 
-    {/* Main Button */}
-    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
-      <Link to="/">Back to Dashboard</Link>
-    </button>
-
     {/* Generate PDF */}
     {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
     <>
       <button
         type="button"
         onClick={handleButtonClick}
-        className={`rounded-md px-3 py-2 font-bold text-white shadow-sm focus:outline-none ${
-          submitLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+        className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+          submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
         }`}
         disabled={submitLoading}
       >
@@ -961,7 +982,7 @@ export default function FacilityFormForm(){
             <span className="ml-2">Generating</span>
           </div>
         ) : (
-          'Generate PDF'
+          'Get PDF'
         )}
       </button>
     </>
@@ -977,16 +998,16 @@ export default function FacilityFormForm(){
           {/* Approve */}
           <button 
             onClick={() => handleAdminApproveConfirmation()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-2 rounded text-base"
             title="Admin Approve"
           >
             Approve
           </button>
 
-          {/* Disapprove */}
+          {/* Decline */}
           <button 
             onClick={() => handleDisapproveConfirmation()}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
+            className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 rounded ml-1 text-base"
             title="Admin Decline"
           >
             Decline
@@ -1000,8 +1021,8 @@ export default function FacilityFormForm(){
           <button
             form='opr-form-admin'
             type="submit"
-            className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
-              submitLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+            className={`text-white py-2 px-2 rounded text-base focus:outline-none ${
+              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             style={{ position: 'relative', top: '0px' }}
             disabled={submitLoading}
@@ -1018,7 +1039,7 @@ export default function FacilityFormForm(){
         ):(
           <button 
             onClick={() => handleOPRInstructionClick()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded text-base"
             title="Admin Approve"
           >
             Submit
@@ -1034,12 +1055,12 @@ export default function FacilityFormForm(){
     {/* For GSO */}
     {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
     currentUser.code_clearance == 3 && (
-
+    <>
       <button
         form='opr-form-gso'
         type="submit"
-        className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
-          submitLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+        className={`text-white py-2 px-2 rounded text-base focus:outline-none ${
+          submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
         }`}
         style={{ position: 'relative', top: '0px' }}
         disabled={submitLoading}
@@ -1053,7 +1074,27 @@ export default function FacilityFormForm(){
           'Submit'
         )}
       </button>
+    </>
     )}
+
+    {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
+      <button 
+        onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
+        className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+          submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
+        }`}
+        disabled={submitLoading}
+      >
+        {submitLoading ? (
+          <div className="flex items-center justify-center">
+            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+            <span className="ml-2">Closing</span>
+          </div>
+        ) : (
+          'Close Request'
+        )}
+      </button>
+    ):null}
 
     </div>
     
@@ -1065,7 +1106,7 @@ export default function FacilityFormForm(){
         className="fixed inset-0 bg-black opacity-40" // Close on overlay click
       ></div>
       {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
         
         {/* Notification Icons */}
         <div class="f-modal-alert">
@@ -1102,25 +1143,6 @@ export default function FacilityFormForm(){
           </>
           )}
 
-          {/* Heart */}
-          {popupContent == "yehey" && (
-          <>
-          <div className="icon-center">
-            <svg className="w-44 h-44" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-              viewBox="-40 -30 473.9 473.9" style={{"enable-background":"new 0 0 473.9 473.9"}} xml:space="preserve">
-              <circle id="face" className="face" cx="200" cy="200" r="200"/>
-              <path id="mouth" className="mouth_alt" d="M81.4,237.1C81.4,323,151,392.7,237,392.7c85.9,0,155.6-69.6,155.6-155.6L81.4,237.1L81.4,237.1z"/>
-              <path className="heart--eye heart-eye-left" d="M182.1,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-                c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3s6-1.2,8.3-3.3c4.8-3.8,70.8-57.7,70.8-92.8
-                C224.2,127.7,206.5,110,182.1,110z"/>
-              <path className="heart--eye heart-eye-right" d="M366.7,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-                c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3c3.1,0,6-1.2,8.3-3.3c4.8-3.8,70.7-57.7,70.7-92.8
-                C408.7,127.7,391.1,110,366.7,110z"/>  
-            </svg>
-          </div>
-          </>  
-          )}
-
         </div>
         
         {/* Popup Message */}
@@ -1141,7 +1163,7 @@ export default function FacilityFormForm(){
               {!submitLoading && (
                 <button
                   onClick={SubmitOPRInstruct}
-                  className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="w-1/2 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
                 >
                   Yes
                 </button>
@@ -1157,7 +1179,7 @@ export default function FacilityFormForm(){
               )}
 
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Loading</span>
@@ -1170,7 +1192,7 @@ export default function FacilityFormForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                  className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
                 >
                   Yes
                 </button>
@@ -1179,14 +1201,14 @@ export default function FacilityFormForm(){
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                  className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
                 >
                   No
                 </button>
               )}
 
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Loading</span>
@@ -1209,7 +1231,7 @@ export default function FacilityFormForm(){
             {!submitLoading && (
               <button
               onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
               >
                 Yes
               </button>
@@ -1218,14 +1240,14 @@ export default function FacilityFormForm(){
             {!submitLoading && (
               <button
                 onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
               >
                 No
               </button>
             )}
 
             {submitLoading && (
-              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                   <span className="ml-2">Loading</span>
@@ -1238,12 +1260,11 @@ export default function FacilityFormForm(){
         )}
 
         {/* Success Button */}
-        {(popupContent == "yehey" || 
-        popupContent == "success" ) && (
+        {popupContent == "success" && (
         <>
           <button
             onClick={closePopup}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
           >
             Close
           </button>
@@ -1255,7 +1276,7 @@ export default function FacilityFormForm(){
         <>
           <button
             onClick={justclose}
-            className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
           >
             Close
           </button>
@@ -1839,6 +1860,9 @@ export default function FacilityFormForm(){
   )}
   </PageComponent>
   ):(
-    <Forbidden />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

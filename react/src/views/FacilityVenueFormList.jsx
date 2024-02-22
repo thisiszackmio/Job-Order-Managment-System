@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faTimes, faEye, faStickyNote  } from '@fortawesome/free-solid-svg-icons';
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import ReactPaginate from "react-paginate";
 import Forbidden from "../components/403";
@@ -41,7 +38,7 @@ export default function FacilityVenueRequestList() {
 
   const [loading, setLoading] = useState(true);
 
-  const { userRole } = useUserStateContext();
+  const { currentUser } = useUserStateContext();
   const [getFacilityDet, setFacilityDet] = useState([]);
 
   const fetchFacilityData = () => {
@@ -141,7 +138,9 @@ export default function FacilityVenueRequestList() {
   const displayPaginationFacility = pageCountFacility > 1;
 
   //Restrictions
-  const User = userRole == "admin" || userRole == "hackers";
+  const requestlistClearance = [1, 2, 3, 4, 6, 10];
+  const here = requestlistClearance.includes(currentUser.code_clearance);
+  const User = here;
 
   return User ? (
   <PageComponent title="Facility / Venue Form Request List">
@@ -184,14 +183,14 @@ export default function FacilityVenueRequestList() {
           <thead>
           {currentFacility.length > 0 ? (
             <tr className="bg-gray-100">
-              <th className="px-4 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start and End)</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
-              <th className="px-6 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start and End)</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
             </tr>
           ):null}    
           </thead>
@@ -215,12 +214,20 @@ export default function FacilityVenueRequestList() {
                   {FacDet.remarks == "Approved" && (<span className="approved-status">{FacDet.remarks}</span>)}
                   {FacDet.remarks == "Disapproved" && (<span className="disapproved-status">{FacDet.remarks}</span>)}
                   {FacDet.remarks == "Pending" && (<span className="pending-status">{FacDet.remarks}</span>)}
+                  {FacDet.remarks == "Closed" && (
+                    <>
+                    <div className="flex justify-center">
+                      <span className="approved-status">Approved</span> 
+                      <span className="done-status ml-1">{FacDet.remarks}</span>
+                    </div>
+                    </>
+                  )}
                 </td>
                 <td className="px-1 py-4 text-center border border-custom">
                   <div className="flex justify-center">
                   <Link to={`/facilityvenueform/${FacDet.id}`}>
                     <button 
-                      className="bg-green-500 hover-bg-green-700 text-white py-1 px-2 rounded"
+                      className="bg-green-600 hover:bg-green-500 text-white py-1 px-2 rounded"
                       title="View Request"
                     >
                       View
@@ -268,7 +275,10 @@ export default function FacilityVenueRequestList() {
   )}
   </PageComponent>
   ):(
-    <Forbidden />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
   
 }

@@ -8,7 +8,6 @@ import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../assets/loading_nobg.gif';
-import Forbidden from "../components/403";
 
 export default function PrePostRepairForm(){
 
@@ -171,7 +170,12 @@ export default function PrePostRepairForm(){
     })
     .then((response) => {
       setPopupContent('success');
-      setPopupMessage(GSOMessageTest); 
+      setPopupMessage(
+        <div>
+          <p className="popup-title"><strong>Success</strong></p>
+          <p>Part B Form submit successfully</p>
+        </div>
+      ); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
@@ -199,7 +203,12 @@ export default function PrePostRepairForm(){
     })
     .then((response) => { 
       setPopupContent('success');
-      setPopupMessage('Form submit successfully'); 
+      setPopupMessage(
+        <div>
+          <p className="popup-title"><strong>Success</strong></p>
+          <p>Part C Form submit successfully</p>
+        </div>
+      ); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
@@ -227,7 +236,12 @@ export default function PrePostRepairForm(){
     })
     .then((response) => { 
       setPopupContent('success');
-      setPopupMessage('Form submit successfully'); 
+      setPopupMessage(
+        <div>
+          <p className="popup-title"><strong>Success</strong></p>
+          <p>Part D Form submit successfully</p>
+        </div>
+      ); 
       setShowPopup(true);   
       setSubmitLoading(false);
     })
@@ -248,77 +262,6 @@ export default function PrePostRepairForm(){
     </div>
   );
 
-  const GSOMessageTest = (
-    <div>
-      <p><strong>Done!</strong></p>
-      <p>Form submit successfully</p>
-    </div>
-  );
-
-  const SupConfirmText = (
-    <div>
-      <p>Do you want to approve</p>
-      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
-    </div>
-  );
-
-  const SupConfirmTextD = (
-    <div>
-      <p>Are you sure you</p>
-      <p>want to disapprove</p>
-      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
-    </div>
-  );
-  
-  const SupApproval = (
-    <div>
-      <p className="text-xl"><strong>Thank You!</strong></p>
-      <p>For Approving my Request</p>
-    </div>
-  );
-
-  const SupDecline = (
-    <div>
-      <p className="text-xl"><strong>Done!</strong></p>
-      <p>You disapprove the request</p>
-    </div>
-  );
-
-  const AdminConfirmText = (
-    <div>
-      <p>Do you want to approve</p>
-      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
-    </div>
-  );
-
-  const AdminConfirmTextD = (
-    <div>
-      <p>Are you sure you</p>
-      <p>want to disapprove</p>
-      <p><strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
-    </div>
-  );
-
-  const AdminApproval = (
-    <div>
-      {displayRequest?.viewRequestData?.user_id === currentUser.id ? (
-        <p><strong>Done!</strong></p>
-      ) : (
-        <>
-          <p>Thank You {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}</p>
-          <p>For Approving my Request</p>
-        </>
-      )}
-    </div>
-  );
-
-  const AdminDecline = (
-    <div>
-      <p className="text-xl"><strong>Done!</strong></p>
-      <p>You disapprove the request</p>
-    </div>
-  );
-
   //Confirmation Request
   function handleApprovalRequest(){
 
@@ -326,13 +269,23 @@ export default function PrePostRepairForm(){
       //For Supervisor
       setPopupContent("warning");
       setShowPopup(true);
-      setPopupMessage(SupConfirmText);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Approval Request</p>
+          <p>Do you want to approve <strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+        </div>
+      );
     }
     else if(currentUser.code_clearance == 1){
       //For Admin Manager
       setPopupContent("warning");
       setShowPopup(true);
-      setPopupMessage(AdminConfirmText);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Approval Request</p>
+          <p>Do you want to approve <strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+        </div>
+      );
     }
   }
 
@@ -343,13 +296,23 @@ export default function PrePostRepairForm(){
       // For Supervisor
       setPopupContent("warningD");
       setShowPopup(true);
-      setPopupMessage(SupConfirmTextD);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Dispproval Request</p>
+          <p>Are you sure do you want to disapprove <strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+        </div>
+      );
     }
     else if(currentUser.code_clearance == 1){
       // For Admin Manager
       setPopupContent("warningD");
       setShowPopup(true);
-      setPopupMessage(AdminConfirmTextD);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Dispproval Request</p>
+          <p>Are you sure do you want to disapprove <strong>{displayRequest?.userDetails?.enduser}'s</strong> request?</p>
+        </div>
+      );
     }
 
   }
@@ -364,8 +327,13 @@ export default function PrePostRepairForm(){
       axiosClient.put(`/approve/${id}`)
       .then((response) => {
         setSubmitLoading(false);
-        setPopupContent("yehey");
-        setPopupMessage(SupApproval);
+        setPopupContent("success");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p>Thank you for approving the request</p>
+          </div>
+        );
         setShowPopup(true);
       })
       .catch((error) => {
@@ -383,8 +351,13 @@ export default function PrePostRepairForm(){
       axiosClient.put(`/admin_approve/${id}`)
       .then((response) => {
         setSubmitLoading(false);
-        setPopupContent("yehey");
-        setPopupMessage(AdminApproval);
+        setPopupContent("success");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p>Thank you for approving the request</p>
+          </div>
+        );
         setShowPopup(true);
       })
       .catch((error) => {
@@ -407,7 +380,12 @@ export default function PrePostRepairForm(){
       axiosClient.put(`/disapprove/${id}`)
       .then((response) => {
         setPopupContent("success");
-        setPopupMessage(SupDecline);
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p>You disapprove <strong>{displayRequest?.userDetails?.enduser}'s</strong> request</p>
+          </div>
+        );
         setShowPopup(true);
       })
       .catch((error) => {
@@ -425,7 +403,12 @@ export default function PrePostRepairForm(){
       axiosClient.put(`/admin_disapprove/${id}`)
       .then((response) => {
         setPopupContent("success");
-        setPopupMessage(AdminDecline);
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p>You disapprove <strong>{displayRequest?.userDetails?.enduser}'s</strong> request</p>
+          </div>
+        );
         setShowPopup(true);
       })
       .catch((error) => {
@@ -446,7 +429,12 @@ export default function PrePostRepairForm(){
     axiosClient.put(`/requestclose/${id}`)
     .then((response) => {
       setPopupContent("success");
-      setPopupMessage('Request close successfully');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p>You close the request</p>
+        </div>
+      );
       setShowPopup(true);
       setSubmitLoading(false);
     })
@@ -504,13 +492,13 @@ export default function PrePostRepairForm(){
   }, [seconds]);
 
   //Restrictions
-  const requestlistClearance = [1, 2, 3, 10];
+  const requestlistClearance = [1, 2, 3, 4, 6, 10];
   const here = requestlistClearance.includes(currentUser.code_clearance);
-  const Users = userRole == 'hackers' || userRole == 'admin' || userRole == 'personnels';
+  const Users = here;
   const Supervisor = currentUser.id == displayRequest?.viewRequestData?.supervisor_name && displayRequest?.viewRequestData?.supervisor_approval == 0;
   const GSo = currentUser.code_clearance == 3 && displayRequest?.viewRequestData?.supervisor_approval == 1;
   const Admin = currentUser.code_clearance == 1 && displayRequest?.viewRequestData?.admin_approval == 3; 
-  const Personnel = currentUser.code_clearance == 6 || assignPersonnel?.personnel_details?.p_id == currentUser.id || currentUser.code_clearance == 10;
+  const Personnel = (currentUser.code_clearance == 6 || currentUser.code_clearance == 10) && assignPersonnel?.personnel_details?.p_id == currentUser.id;
   const validCodeClearances = [6, 3, 10];
   const Close = validCodeClearances.includes(currentUser.code_clearance) || currentUser.id == getPartB?.partBData?.assign_personnel;
   
@@ -542,6 +530,18 @@ export default function PrePostRepairForm(){
   </div>
   ):(
   <>
+
+    {/* Back to Request List */}
+    {here ? (
+    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
+      <Link to="/repairrequestform">Back to Request List</Link>
+    </button>
+    ):(
+    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
+      <Link to="/">Back to Dashboard</Link>
+    </button>
+    )}
+    
     {/* Part A */}
     <div className="border-b border-black pb-10">
 
@@ -681,18 +681,6 @@ export default function PrePostRepairForm(){
             </div>
           </div>
 
-          {/* Complain */}
-          <div className="flex items-center mt-2">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Complain:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {displayRequest?.viewRequestData?.complain}
-            </div>
-          </div>
-
           {/* Requested By */}
           <div className="flex items-center mt-3">
             <div className="w-40">
@@ -719,6 +707,18 @@ export default function PrePostRepairForm(){
 
         </div>
 
+      </div>
+
+      {/* Complain */}
+      <div className="flex items-center mt-2">
+        <div className="w-40">
+          <label className="block text-base font-medium leading-6 text-gray-900">
+          Complain:
+          </label> 
+        </div>
+        <div className="w-3/4 border-b border-black pl-1">
+        {displayRequest?.viewRequestData?.complain}
+        </div>
       </div>
     
       {/* Status */}
@@ -933,7 +933,7 @@ export default function PrePostRepairForm(){
                   className="block w-full rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 > 
                   <option value="" disabled>Select an option</option>
-                  {getPersonnel.mappedData.map(user => (
+                  {getPersonnel?.mappedData?.map(user => (
                   <option key={user.id} value={user.id}> {user.name} - {user.type} </option>
                   ))}
                 </select>
@@ -987,7 +987,7 @@ export default function PrePostRepairForm(){
             Findings:
             </label> 
           </div>
-          <div className="w-64 border-b border-black pl-1">
+          <div className="w-3/4 border-b border-black pl-1">
           {getPartCD?.viewPartC?.findings}
           </div>
         </div>
@@ -999,7 +999,7 @@ export default function PrePostRepairForm(){
             Recomendations:
             </label> 
           </div>
-          <div className="w-64 border-b border-black pl-1">
+          <div className="w-3/4 border-b border-black pl-1">
           {getPartCD?.viewPartC?.recommendations}
           </div>
         </div>
@@ -1131,7 +1131,7 @@ export default function PrePostRepairForm(){
             Remarks:
             </label> 
           </div>
-          <div className="w-64 border-b border-black pl-1">
+          <div className="w-3/4 border-b border-black pl-1">
           {getPartCD?.viewPartC?.remarks}
           </div>
         </div>
@@ -1234,31 +1234,20 @@ export default function PrePostRepairForm(){
 
     {/* Buttons */}
     <div className="flex mt-8">
-
-      {/* Back to Request List */}
-      {here ? (
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded mr-2 text-sm">
-        <Link to="/repairrequestform">Back to Request List</Link>
-      </button>
-      ):(
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
-        <Link to="/">Back to Dashboard</Link>
-      </button>
-      )}
       
       {/* Supervisor Area Button */}
       {Supervisor ? (
       <>
         <button 
           onClick={() => handleApprovalRequest()}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-2 rounded text-base"
           title="Supervisor Approve"
         >
           Approve
         </button>
         <button 
           onClick={() => handleDeclineRequest()}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
+          className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 rounded ml-1 text-base"
           title="Supervisor Decline"
         >
           Disapprove
@@ -1272,8 +1261,8 @@ export default function PrePostRepairForm(){
           <button
             form='partB'
             type="submit"
-            className={`rbg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-2 rounded text-sm focus:outline-none ${
-              submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+            className={`text-white py-2 px-2 rounded text-base focus:outline-none ${
+              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             style={{ position: 'relative', top: '0px' }}
             disabled={submitLoading}
@@ -1298,8 +1287,8 @@ export default function PrePostRepairForm(){
           <>
             <button
               onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
-              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+              className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
               }`}
               disabled={submitLoading}
             >
@@ -1317,14 +1306,14 @@ export default function PrePostRepairForm(){
           <>
             <button 
               onClick={() => handleApprovalRequest()}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded text-sm"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-2 rounded text-base"
               title="Admin Approve"
             >
               Approve
             </button>
             <button 
               onClick={() => handleDeclineRequest()}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-1 text-sm"
+              className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 rounded ml-1 text-base"
               title="Admin Decline"
             >
               Disapprove
@@ -1342,8 +1331,8 @@ export default function PrePostRepairForm(){
         <button
             form='partC'
             type="submit"
-            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-              submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+            className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             disabled={submitLoading}
           >
@@ -1360,8 +1349,8 @@ export default function PrePostRepairForm(){
         <button
           form="partD"
           type="submit"
-          className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+          className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+            submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
           }`}
           disabled={submitLoading}
         >
@@ -1382,8 +1371,8 @@ export default function PrePostRepairForm(){
         <button
           type="button"
           onClick={handleButtonClick}
-          className={`rounded-md px-3 py-2 font-bold text-white text-sm shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+          className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+            submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
           }`}
           disabled={submitLoading}
         >
@@ -1393,7 +1382,7 @@ export default function PrePostRepairForm(){
               <span className="ml-2">Generating</span>
             </div>
           ) : (
-            'Generate PDF'
+            'Get PDF'
           )}
         </button>
       ):null}
@@ -1404,8 +1393,8 @@ export default function PrePostRepairForm(){
       {getPartCD?.viewPartC?.close == 2 ? (
         <button 
           onClick={() => handleCloseRequest(displayRequest?.viewRequestData?.id)}
-          className={`rounded-md px-3 py-2 font-bold text-white text-sm shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
+          className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+            submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
           }`}
           disabled={submitLoading}
         >
@@ -1930,7 +1919,7 @@ export default function PrePostRepairForm(){
         className="fixed inset-0 bg-black opacity-40" // Close on overlay click
       ></div>
       {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
+      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
 
       {/* Notification Icons */}
       <div class="f-modal-alert">
@@ -1967,25 +1956,6 @@ export default function PrePostRepairForm(){
         </>
         )}
 
-        {/* Heart */}
-        {popupContent == "yehey" && (
-        <>
-        <div className="icon-center">
-          <svg className="w-44 h-44" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="-40 -30 473.9 473.9" style={{"enable-background":"new 0 0 473.9 473.9"}} xml:space="preserve">
-            <circle id="face" className="face" cx="200" cy="200" r="200"/>
-            <path id="mouth" className="mouth_alt" d="M81.4,237.1C81.4,323,151,392.7,237,392.7c85.9,0,155.6-69.6,155.6-155.6L81.4,237.1L81.4,237.1z"/>
-            <path className="heart--eye heart-eye-left" d="M182.1,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-              c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3s6-1.2,8.3-3.3c4.8-3.8,70.8-57.7,70.8-92.8
-              C224.2,127.7,206.5,110,182.1,110z"/>
-            <path className="heart--eye heart-eye-right" d="M366.7,110c-14.1,0-27.3,6.9-35.2,18.4l-1.6,2.1l-1.1-1.4c-7.8-12-21-19.1-35.2-19.1
-              c-24.4,0-42,17.7-42,42c0,36,65.1,89,69.9,92.8c2.2,2.1,5.2,3.3,8.3,3.3c3.1,0,6-1.2,8.3-3.3c4.8-3.8,70.7-57.7,70.7-92.8
-              C408.7,127.7,391.1,110,366.7,110z"/>  
-          </svg>
-        </div>
-        </>  
-        )}
-
       </div>
       
       <p className="text-lg text-center">
@@ -2004,7 +1974,7 @@ export default function PrePostRepairForm(){
             {!submitLoading && (
               <button
                 onClick={() => handleGrantApprovalRequest(displayRequest?.viewRequestData?.id)}
-                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
               >
                 Yes
               </button>
@@ -2013,14 +1983,14 @@ export default function PrePostRepairForm(){
             {!submitLoading && (
               <button
                 onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
               >
                 No
               </button>
             )}
 
             {submitLoading && (
-              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                   <span className="ml-2">Please Wait</span>
@@ -2072,7 +2042,7 @@ export default function PrePostRepairForm(){
             {!submitLoading && (
               <button
                 onClick={() => handleDeclineApprovalRequest(displayRequest?.viewRequestData?.id)}
-                className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="w-1/2 px-4 py-2 text-white rounded bg-indigo-600 hover:bg-indigo-500"
               >
                 Yes
               </button>
@@ -2081,14 +2051,14 @@ export default function PrePostRepairForm(){
             {!submitLoading && (
               <button
                 onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
               >
                 No
               </button>
             )}
 
             {submitLoading && (
-              <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                   <span className="ml-2">Please Wait</span>
@@ -2132,11 +2102,11 @@ export default function PrePostRepairForm(){
         </> 
         )}
 
-        {/* Success and Yehey */}
-        {(popupContent == "success" || popupContent == "yehey") && (
+        {/* Success */}
+        {(popupContent == "success") && (
           <button
             onClick={closePopup}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="w-full px-4 py-2 bg-indigo-600 text-white rounded"
           >
             Close
           </button>
@@ -2146,7 +2116,7 @@ export default function PrePostRepairForm(){
         {popupContent == "error" && (
           <button
             onClick={justclose}
-            className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+            className="w-1/2 px-4 py-2 bg-red-600 text-white rounded ml-2"
           >
             No
           </button>
@@ -2162,6 +2132,9 @@ export default function PrePostRepairForm(){
 
   </PageComponent>
   ):(
-    <Forbidden />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

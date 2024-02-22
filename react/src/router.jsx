@@ -7,21 +7,26 @@ import DefaultLayout from "./components/DefaultLayout";
 
 import RequestRepairForm from "./views/RequestForRepairForm";
 import RequestFormFacility from "./views/RequestForFacilityVenue";
+import RequestVehicleSlipForm from "./views/RequestForVehicleSlipForm";
 
 import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
 import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
+import MyRequestVehicleSlip from "./views/MyVehicleSlipForm";
 
 import RepairRequestForm from "./views/RepairFormList";
 import FacilityFormForm from "./views/FacilityVenueFormList";
+import VehicleSlipFormList from "./views/VehicleSlipFormList";
 
 import PrepostRepairForm from "./views/PrePostRepairForm";
 import FacilityVenueForm from "./views/FacilityVenueForm";
+import VehicleSlipForm from "./views/VehicleSlipForm";
+
+import Forbidden from "./components/403";
 
 import RequestList from "./views/RequestList";
 import MyRequest from "./views/YourRequest";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
-import VehicleSlipForm from "./views/VehicleSlipForm";
 import EquipmentForm from "./views/EquipmentForm";
 
 const routes = [
@@ -38,7 +43,8 @@ const routes = [
                 element: <Dashboard />
             },
 
-            //Form
+            //Form-------
+
             //For Pre/Post Repair Inspection Form
             {
                 path: "/repairrequestform/:id",
@@ -49,8 +55,14 @@ const routes = [
                 path: "/facilityrequestform/:id",
                 element: <RequestFormFacility />
             },
+            //For Vehicle Slip Form
+            {
+                path: "/vehiclesliprequestform/:id",
+                element: <RequestVehicleSlipForm />
+            },
 
-            //My Request Form
+            //My Request Form--------
+
             // For Pre/Post Repair Inspection
             {
                 path: "/myrequestinpectionform/:id",
@@ -61,8 +73,14 @@ const routes = [
                 path: "/myrequestfacilityvenueform/:id",
                 element: <MyRequestFacilityVenue />
             },
+            // For Vehicle Slip Form
+            {
+                path: "/myrequestvehicleslipform/:id",
+                element: <MyRequestVehicleSlip />
+            },
 
-            //Request List All
+            //Request List All-------
+
             //For Pre/Post Inspection Repair Form
             {
                 path: "/repairrequestform",
@@ -72,6 +90,11 @@ const routes = [
             {
                 path: "/facilityvenuerequestform",
                 element: <FacilityFormForm />
+            },
+            //For Vehicle Slip
+            {
+                path: "/vehiclesliprequestform",
+                element: <VehicleSlipFormList />
             },
             
             // Others
@@ -92,7 +115,8 @@ const routes = [
                 element: <AccountEdit />
             },
 
-            //Request Details
+            //Request Details---------
+
             //For Inspection Form Details
             {
                 path: "/repairinspectionform/:id",
@@ -108,6 +132,8 @@ const routes = [
                 path: "/vehicleslipform/:id",
                 element: <VehicleSlipForm />
             },
+
+
             //For Equipment Form
             {
                 path: "/equipmentform/:id",
@@ -128,6 +154,10 @@ const routes = [
                 element: <Logout />
             }
         ]
+    },
+    {
+        path: '/forbidden',
+        element: <Forbidden />,
     }
 
 ];

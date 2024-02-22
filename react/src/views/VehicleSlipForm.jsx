@@ -52,8 +52,13 @@ export default function PrePostRepairForm(){
   
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
-
+  const [popupContent, setPopupContent] = useState('');
   const [sumbitLoading, setSubmitLoading] = useState(false);
+  const [inputErrors, setInputErrors] = useState({});
+
+  const [driverList, setDriverList] = useState([]);
+  const [VRVehicle, setVRVehicle] = useState('');
+  const [selectedDriver, setSelectedDriver] = useState('');
 
   //Show data
   const fetchVehicleForm = () => {
@@ -80,53 +85,210 @@ export default function PrePostRepairForm(){
     });
   }
 
+  // Get Driver List
+  const fetchDriver = () => {
+    axiosClient.get('/getdriver')
+    .then(response => {
+      const driversData = response.data;
+      setDriverList(driversData);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  }
+
   useEffect(()=>{
     fetchVehicleForm();
+    fetchDriver();
   },[id]);
 
+  //Popup Message
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">ATTENTION!</p>
+      <p>There were some issues with the system; please contact the developer</p>
+    </div>
+  );
+
+  // Show Vehicle Form
+  const handleAppearVehicleForm = () => {
+    setShowFormVehicle(true);
+  }
+
+  // Admin Confirmation Approval
+  function handleApprovalRequest(){
+
+    if(currentUser.code_clearance == 1){
+      //For Admin Manager
+      setPopupContent('warning');
+      setShowPopup(true);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Are you Sure?</p>
+          <p>Are you sure you want to approve {vehicleForms?.requestor?.name}'s request?</p>
+        </div>
+      );
+    }
+    
+  }
+  
+  // Admin Confirmation Disapproval
+  function handleDeclineRequest(){
+
+    if(currentUser.code_clearance == 1){
+      //For Admin Manager
+      setPopupContent('warningD');
+      setShowPopup(true);
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Are you Sure?</p>
+          <p>Are you sure you want to disapprove {vehicleForms?.requestor?.name}'s request?</p>
+        </div>
+      );
+    }
+
+  }
+
+  //Close Confirmation
+  function handleCloseRequest(){
+    setPopupContent('warning');
+    setShowPopup(true);
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you Sure?</p>
+        <p>Are you sure you want to close this request?</p>
+      </div>
+    );
+  };
+
+  // Approval Function
   function handleApproveClick(id){
-    const confirmed = window.confirm('Do you want to approve the request?');
 
-    if(confirmed) {
-      axiosClient.put(`/vehicleformapprove/${id}`)
-      .then((response) => {
-        setPopupMessage('Thank you for your Approval');
-        setShowPopup(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed to approve the form. Please try again later.');
-        setShowPopup(true);
-      });
-    }else{
-      alert('You change your mind');
-    }
+    //alert("Goods");
+
+    setSubmitLoading(true);
+
+    axiosClient.put(`/vehicleformapprove/${id}`)
+    .then((response) => {
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Done!</p>
+          <p>The form request approval was successful</p>
+        </div>
+      );
+      setShowPopup(true);
+    })
+    .catch((error) => {
+      console.error(error);
+      setPopupContent('error');
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);
+    });
+
   }
 
+  // Disapproval Function
   function handleDispproveClick(id){
-    const confirmed = window.confirm('Do you want to disapprove the request?');
 
-    if(confirmed) {
-      axiosClient.put(`/vehicleformdisapprove/${id}`)
-      .then((response) => {
-        setPopupMessage('You disapprove the request');
-        setShowPopup(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        setPopupMessage('Failed to approve the form. Please try again later.');
-        setShowPopup(true);
-      });
-    }else{
-      alert('You change your mind');
-    }
+    //alert("Goods!");
+
+    setSubmitLoading(true);
+
+    axiosClient.put(`/vehicleformdisapprove/${id}`)
+    .then((response) => {
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Done!</p>
+          <p>The form request disapproval was successful</p>
+        </div>
+      );
+      setShowPopup(true);
+    })
+    .catch((error) => {
+      setPopupContent('error');
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);
+    });
+
   }
 
-  const closePopup = () => {
+  // Closing Form Function
+  function handleCloseClick(id){
+
+    //alert("Goods!");
+
+    setSubmitLoading(true);
+
+    axiosClient.put(`/closevehicleslip/${id}`)
+    .then((response) => {
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Request Close!</p>
+          <p>The form request has been successfully closed.</p>
+        </div>
+      );
+      setShowPopup(true);
+    })
+    .catch((error) => {
+      setPopupContent('error');
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);
+    });
+
+  }
+
+  // Close the Popup on Approval
+  const closeSuccess = () => {
+    setIsLoading(true);
     fetchVehicleForm();
     setShowPopup(false);
-    setIsLoading(true);
+    setSubmitLoading(false);
+    window.location.reload();
   };
+
+  const handleVRVehicleChange = (event) => {
+    setVRVehicle(event.target.value);
+  };
+
+  const handleDriverName = (event) => {
+    setSelectedDriver(event.target.value);
+  };
+
+  // Submit the Form
+  const VehicleSlipForm = (event) => {
+    event.preventDefault();
+
+    //alert("Goods");
+
+    setSubmitLoading(true);
+    axiosClient
+    .put(`getvehicleslip/${id}`, {
+      vehicle_type: VRVehicle,
+      driver: selectedDriver
+    })
+    .then((response) => {
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title"><strong>Success</strong></p>
+          <p>Form submit successfully</p>
+        </div>
+      ); 
+      setShowPopup(true);   
+      setSubmitLoading(false);
+    })
+    .catch((error) => {
+      //console.error(error);
+      const responseErrors = error.response.data.errors;
+      setInputErrors(responseErrors);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
 
   //Generate PDF
   const componentRef= useRef();
@@ -172,10 +334,16 @@ export default function PrePostRepairForm(){
     }
   }, [seconds]);
 
-  return(
-    <PageComponent title="Request For Vehicle Slip">
+  //Close Popup 
+  const justclose = () => { setShowPopup(false); };
 
-    {/* Display View */}
+  // Restrictions
+  const requestlistClearance = [1, 2, 3, 4, 10];
+  const Codez = requestlistClearance.includes(currentUser.code_clearance);
+  const Users = Codez;
+
+  return Users ?(
+  <PageComponent title="Request For Vehicle Slip">
     {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
@@ -186,192 +354,361 @@ export default function PrePostRepairForm(){
       <span className="ml-2 animate-heartbeat">Loading Form</span>
     </div>
     ):(
-    <div className="px-64">   
-      
-      <div className="px-4 border border-black">
+    <>
+      {/* Back to List */}
+      <button className="bg-blue-600 hover:bg-blue-500 text-sm text-white font-bold py-2 px-4 rounded">
+        <Link to="/vehiclesliprequestform">Back to Request List</Link>
+      </button>
 
-        {/* Header */}
-        <table className="w-full mt-4 mb-10">
-          {/* Code */}
-          <tr>
-            <td colSpan={2} className="w-1/3 text-left text-base font-arial">
-              <span>Doc. Ref. Code:PM:VEC:LNI:WEN:FM:01</span>
-            </td>
-            <td className="w-1/3 text-right text-base font-arial">
-              <span>"Annex D"</span>
-            </td>
-          </tr>
+      {/* Slip No */}
+      <div className="flex items-center mb-6 mt-4">
+        <div className="w-24">
+          <label className="block text-base font-medium leading-6">
+          Slip No:
+          </label> 
+        </div>
+        <div className="w-auto px-5 border-b border-black text-center font-bold">
+        {vehicleForms?.vehicleForm?.id}
+        </div>
+      </div>
 
-          {/* Agency Name */}
-          <tr>
-            <td colSpan={3} className="text-center text-base font-arial pt-10">
-              <p>Republic of the Philippines</p>
-              <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
-              <p>PMO-<u>Lanao Del Norte/Iligan</u></p>
-            </td>
-          </tr>
+      <div className="grid grid-cols-2 gap-4">
+
+        <div className="col-span-1">
 
           {/* Date */}
-          <tr>
-            <td className="w-1/3"></td>
-            <td className="w-1/3"></td>
-            <td className="w-1/3 pt-12">
-              <p className="border-b border-black text-base text-center font-arial">{formatDate(vehicleForms?.vehicleForm?.date_of_request)}</p>
-              <p className="text-base text-center font-arial">Date</p>
-            </td>
-          </tr>
+          <div className="flex items-center mt-6">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Date:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {formatDate(vehicleForms?.vehicleForm?.date_of_request)}
+            </div>
+          </div>
 
-          {/* Main Content */}
-          <tr>
-            <td colSpan={3}>
+          {/* Purpose */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Purpose:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {vehicleForms?.vehicleForm?.purpose}
+            </div>
+          </div>
 
-              <div className="font-arial font-bold text-center pt-10">
-                <span>VEHICLE REQUEST SLIP</span>
-              </div>
+          {/* Place */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Place to be visited:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {vehicleForms?.vehicleForm?.place_visited}
+            </div>
+          </div>
 
-              <div className="font-arial text-base text-left pt-8">
-                <p>Provision of service vehicle/s for official use of personnel is requested with the following details:</p>
-              </div>
+          {/* Date Time */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Date/Time of Arrival:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {formatDate(vehicleForms?.vehicleForm?.date_arrival)} @ {formatTime(vehicleForms?.vehicleForm?.time_arrival)}
+            </div>
+          </div>
 
-              {/* Passenger */}
-              <div className="mt-8">
-                <div className="flex">
-                  <div className="w-44 font-arial">
-                    <span>PASSENGERS/s:</span>
-                  </div>
-                  <div className="w-full">
-                    <div style={{ columnCount: 2 }}>
-                      {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                        <span key={index} style={{ borderBottom: '1px solid black', display: 'block', padding: '2px' }}>
-                          {`${index + 1}. ${passenger}`}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Driver Details */}
+          {vehicleForms?.vehicleForm?.vehicle_type != 'None' && vehicleForms?.vehicleForm?.driver != 'None' ? (
+          <>
 
-              {/* Purpose */}
-              <div className="mt-3">
-                <div className="flex">
-                  <div className="w-44 font-arial">
-                    <span>PURPOSE:</span>
-                  </div>
-                  <div className="w-full border-b border-black pl-1">
-                    <span>{vehicleForms?.vehicleForm?.purpose}</span>
-                  </div>
-                </div>
-              </div>
+          {/* Vehicle */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Type of Vehicle:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[0]}
+            </div>
+          </div>
 
-              {/* Place */}
-              <div className="mt-3">
-                <div className="flex">
-                  <div className="w-72 font-arial">
-                    <span>PLACE/s TO BE VISITED:</span>
-                  </div>
-                  <div className="w-full border-b border-black pl-1">
-                    <span>{vehicleForms?.vehicleForm?.place_visited}</span>
-                  </div>
-                </div>
-              </div>
+          {/* Plate No. */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Plate No:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {vehicleForms?.vehicleForm?.vehicle_type == 'None' ? vehicleForms?.vehicleForm?.vehicle_type : vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[1]}
+            </div>
+          </div>
 
-              {/* Date Time */}
-              <div className="mt-3">
-                <div className="flex">
-                  <div className="w-72 font-arial">
-                    <span>DATE/TIME OF ARRIVAL:</span>
-                  </div>
-                  <div className="w-full border-b border-black pl-1">
-                    <span>{formatDate(vehicleForms?.vehicleForm?.date_arrival)} @ {formatTime(vehicleForms?.vehicleForm?.time_arrival)}</span>
-                  </div>
-                </div>
-              </div>
+          {/* Driver */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Driver:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1">
+            {vehicleForms?.vehicleForm?.driver}
+            </div>
+          </div>
 
-            </td>
-          </tr>
-          
-          {/* Driver Information */}
-          <tr>
-            <td className="w-1/3 pt-10">
-              <p className="border-b border-black text-base text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[0]}</p>
-              <p className="text-base text-center font-arial">Type of Vehicle</p>
-            </td>
-            <td className="w-1/3 pt-10 px-8">
-              <p className="border-b border-black text-base text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[1]}</p>
-              <p className="text-base text-center font-arial">Plate No.</p>
-            </td>
-            <td className="w-1/3 pt-10">
-              <p className="border-b border-black text-base text-center font-arial">{vehicleForms?.vehicleForm?.driver}</p>
-              <p className="text-base text-center font-arial">Driver</p>
-            </td>
-          </tr>
+          </>
+          ):null}
 
-          {/* Requestor */}
-          <tr>
-            <td colSpan={2} className="w-1/3 pt-10">
-              <div className="w-3/4 text-base font-arial font-bold">
-                Requested by:
-              </div>
-              <div className="relative pt-6">
-                <img
-                  src={vehicleForms?.requestor?.signature}
-                  style={{ position: 'absolute', width: '230px', top: '0px', left: '50px' }}
-                  alt="Signature"
-                />
-              </div>
-              <div className=" w-3/4 text-center font-bold border-b border-black text-base relative mt-5">
-                  {vehicleForms?.requestor?.name}
-              </div>   
-              <div className="w-3/4 text-center text-base relative">
-                  {vehicleForms?.requestor?.position}
-              </div>   
-            </td>
-          </tr>
+          {/* Requested by */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Requested by:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1 font-bold">
+            {vehicleForms?.requestor?.name}
+            </div>
+          </div>
 
-          {/* Admin Manager */}
-          <tr>
-            <td colSpan={2} className="pt-10">
-              <div className="w-3/4 text-base font-arial font-bold">
-                {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("Approved:"):
-                vehicleForms?.vehicleForm?.admin_approval == 2 ? ("Disapproved:"):"Approved:"}
-              </div>
-              <div className="relative pt-6">
-              {vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2 ? (
-                <img
-                  src={vehicleForms?.manager?.manager_signature}
-                  style={{ position: 'absolute', width: '230px', top: '0px', left: '50px' }}
-                  alt="Signature"
-                />
-              ):null
-              }
+          {/* Approved by */}
+          <div className="flex items-center mt-2">
+            <div className="w-40">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Approved by:
+              </label> 
+            </div>
+            <div className="w-64 border-b border-black pl-1 font-bold">
+            {vehicleForms?.manager?.manager_name}
+            </div>
+          </div>
+
+        </div>
+
+        <div className="col-span-1">
+
+          {/* Passengers */}
+          <div className="flex mt-4">
+            <div className="w-28">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Passenger/s:
+              </label> 
+            </div>
+            <div className="w-1/2">
+              <div>
+              {vehicleForms?.vehicleForm?.passengers == 'None' ? (
+                vehicleForms?.vehicleForm?.passengers
+              ):(
+              <>
+                {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
+                  <span key={index} style={{ borderBottom: '1px solid black', display: 'block', padding: '2px' }}>
+                    {`${index + 1}. ${passenger}`}
+                  </span>
+                ))}
+              </>
+              )}
                 
               </div>
-              <div className="w-3/4 text-center font-bold border-b border-black text-base relative mt-5">
-                {vehicleForms?.manager?.manager_name}
-              </div> 
-              <div className="w-3/4 text-center text-base relative">
-                Adminstrative Division Manager
-              </div>  
-            </td>
-          </tr>
-          
-        </table>
+            </div>
+          </div>
+
+        </div>
 
       </div>
 
+      {/* Status */}
+      <div className="flex items-center mt-8">
+        <div className="w-16">
+          <label className="block text-base font-bold leading-6 text-gray-900">
+          Status:
+          </label> 
+        </div>
+        <div className="w-96 font-bold">
+        {vehicleForms?.vehicleForm?.admin_approval == 5 && ("Waiting for vehicle and driver")}
+        {vehicleForms?.vehicleForm?.admin_approval == 4 && (currentUser.code_clearance == 1 ? "Waiting for your approval" : "Waiting for Admin Manager's approval")}
+        {vehicleForms?.vehicleForm?.admin_approval == 3 && ("Disapproved")}
+        {vehicleForms?.vehicleForm?.admin_approval == 2 && ("Approved")}
+        {vehicleForms?.vehicleForm?.admin_approval == 1 && ("Closed")}
+        </div>
+      </div>
+
+      {/* Show Form */}
+      {vehicleForms?.vehicleForm?.vehicle_type == 'None' && vehicleForms?.vehicleForm?.driver == 'None' && currentUser.code_clearance == 3 ? (
+      <>
+        <form id="VehicleSlip" onSubmit={VehicleSlipForm}>
+
+          {/* Type of Vehicle */}
+          <div className="flex items-center mt-4">
+            <div className="w-44">
+              <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
+                Type of Vehicle:<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            
+            <div className="w-full">
+              <select 
+                name="vr_vehicle" 
+                id="vr_vehicle" 
+                autoComplete="vr_vehicle"
+                value={VRVehicle}
+                onChange={handleVRVehicleChange}
+                className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                required
+              >
+                <option value="" disabled>Select a vehicle</option>
+                <option value="" disabled class="font-bold text-black"><b>Admin Vehicle</b></option>
+                <option value="Mitsubishi Adventure = SLF 432">Mitsubishi Adventure - SLF 432</option>
+                <option value="Toyota Hi-Ace = SAB 4362">Toyota Hi-Ace - SAB 4362</option>
+                <option value="Isuzu Van = SFT 545">Isuzu Van - SFT 545</option>
+                <option value="Toyota Hi-Lux = SFM 708">Toyota Hi-Lux - SFM 708</option>
+                <option value="Hyundai Sta Fe = Temp 101709">Hyundai Sta Fe - Temp 101709</option>
+                <option value="Toyota Hi-Lux/Fx CS = Temp SOF 880">Toyota Hi-Lux/Fx CS - Temp SOF 880</option>
+                <option value="" disabled class="font-bold text-black"><b>OPM Vehicle</b></option>
+                <option value="Toyota Hi-Lux = NBG 9724">Toyota Hi-Lux - NBG 9724</option>
+                <option value="Toyota Fortuner = D2S 454">Toyota Fortuner - D2S 454</option>
+                <option value="" disabled class="font-bold text-black"><b>Port Police Vehicle</b></option>
+                <option value="Mitsubishi Adventure = SLG 388">Mitsubishi Adventure - SLG 388</option>
+                <option value="Mitsubishi Adventure = SHL 594">Mitsubishi Adventure - SHL 594</option>
+                <option value="Toyota Hi-Lux Patrol = SAB 4394">Toyota Hi-Lux Patrol - SAB 4394</option>
+                <option value="Toyota Hi-Lux Patrol = S6 H167">Toyota Hi-Lux Patrol - S6 H167</option>
+                <option value="" disabled class="font-bold text-black"><b>TMO Tubod Vehicle</b></option>
+                <option value="Toyota Innova = SHX 195">Toyota Innova - SHX 195</option>
+              </select> 
+              {!VRVehicle && inputErrors.vehicle_type && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Driver */}
+          <div className="flex items-center mt-2">
+            <div className="w-44">
+              <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                Driver:<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-full">
+              <select
+                name="plate_number"
+                id="plate_number"
+                autoComplete="request-name"
+                value={selectedDriver}
+                onChange={handleDriverName}
+                className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                required
+              >
+                <option value="" disabled>Select a Driver</option>
+                {driverList.map(driver => (
+                  <option key={driver.driver_id} value={driver.driver_name}>{driver.driver_name}</option>
+                ))}
+              </select>
+              {!selectedDriver && inputErrors.driver && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+        </form>
+      </>
+      ):null}
+
       {/* Button */}
-      <div className="mt-4 flex">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          <Link to="/">Back to Dashboard</Link>
-        </button>
-        {vehicleForms?.vehicleForm?.admin_approval === 1 && 
-        currentUser.code_clearance == 6 || currentUser.code_clearance == 3
-        ? (
+      <div className="mt-8 flex">
+
+        {/* GSO Button  */}
+        {currentUser.code_clearance == 3 && (
+        <>
+          {/* Submit Button on Vehicle Slip*/}
+          {vehicleForms?.vehicleForm?.admin_approval == 5 && (
+          <div>
+            <button
+              type="submit"
+              form="VehicleSlip"
+              className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                sumbitLoading ? 'bg-indigo-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
+              disabled={sumbitLoading}
+            >
+              {sumbitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing...</span>
+                </div>
+              ) : (
+                'Submit'
+              )}
+            </button>
+          </div>
+          )}
+
+          {/* Close the Request */}
+          {vehicleForms?.vehicleForm?.admin_approval == 2 && (
+          <>
+            <button
+              onClick={() => handleCloseClick(vehicleForms?.vehicleForm?.id)}
+              className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                sumbitLoading ? 'bg-red-400 cursor-not-allowed arrange' : 'bg-red-600 hover:bg-red-500'
+              }`}
+              disabled={sumbitLoading}
+            >
+              {sumbitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Closing</span>
+                </div>
+              ) : (
+                'Close Request'
+              )}
+            </button>
+          </>
+          )}
+        </>
+        )}
+
+        {/* Admin Button */}
+        {currentUser.code_clearance == 1 && (
+        <> 
+          {/* Approval */}
+          {vehicleForms?.vehicleForm?.admin_approval == 4 && (
+          <div>
+            {/* Approve */}
+            <button
+              onClick={() => handleApprovalRequest()}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 text-base px-2 rounded"
+              title="Approve"
+            >
+              Approve
+            </button>
+
+            {/* Disapprove */}
+            <button
+              onClick={() => handleDeclineRequest()}
+              className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 text-base rounded ml-1"
+              title="Disapprove"
+            >
+              Disapprove
+            </button>
+          </div>
+          )}
+        </>  
+        )}
+
+        {/* Generate PDF */}
+        {vehicleForms?.vehicleForm?.admin_approval == 1 && (
+        <>
           <button
             type="button"
             onClick={handleButtonClick}
-            className={`rounded-md px-3 py-2 ml-2 font-bold text-white shadow-sm focus:outline-none ${
-              sumbitLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+            className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+              sumbitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
             }`}
             disabled={sumbitLoading}
           >
@@ -381,237 +718,365 @@ export default function PrePostRepairForm(){
                 <span className="ml-2">Generating</span>
               </div>
             ) : (
-              'Generate PDF'
+              'Get PDF'
             )}
           </button>
-        ) : vehicleForms?.vehicleForm?.admin_approval === 2 ? null : (
-          currentUser.code_clearance === 1 && vehicleForms?.vehicleForm?.admin_approval === 3 && (
-            <div className="flex ml-2">
-              <button
-                onClick={() => handleApproveClick(vehicleForms?.vehicleForm?.id)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                title="Approve"
-              >
-                Approve
-              </button>
-              <button
-                onClick={() => handleDispproveClick(vehicleForms?.vehicleForm?.id)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded ml-2"
-                title="Disapprove"
-              >
-                Disapprove
-              </button>
-            </div>
-          )
+        </>
         )}
+
       </div>
 
       {/* Show Popup */}
       {showPopup && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Semi-transparent black overlay */}
-      <div
-        className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-      ></div>
-      {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-      <svg class="checkmark success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle_success" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-linecap="round"/></svg>
-        <p className="text-lg text-center">{popupMessage}</p>
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={closePopup}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-      </div>
-      )} 
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Semi-transparent black overlay */}
+          <div className="fixed inset-0 bg-black opacity-40"></div>
 
-    </div>
-    )}
+          {/* Popup content with background blur */}
+          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
 
-    {/* Generate PDF */}
-    {isVisible && (
-    <div>
-      <div className="hidden md:none">
-        <div ref={componentRef}>
-          <div style={{ width: '145mm', height: 'auto', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '1px dotted' }}>
-            
-          <table className="w-full mt-4 mb-10">
+          {/* Notification Icons */}
+          <div class="f-modal-alert">
 
-            {/* Header */}
-            <tr>
-              <td colSpan={2} className="w-1/3 text-left text-sm font-arial">
-                <span>Doc. Ref. Code:PM:VEC:LNI:WEN:FM:01</span>
-              </td>
-              <td className="w-1/3 text-right text-sm font-arial">
-                <span>"Annex D"</span>
-              </td>
-            </tr>
+            {/* Error */}
+            {popupContent == "error" && (
+            <>
+            <div className="f-modal-icon f-modal-error animate">
+              <span className="f-modal-x-mark">
+                <span className="f-modal-line f-modal-left animateXLeft"></span>
+                <span className="f-modal-line f-modal-right animateXRight"></span>
+              </span>
+            </div>
+            </>
+            )}
 
-            {/* Agency Name */}
-            <tr>
-              <td colSpan={3} className="text-center text-sm font-arial pt-6">
-                <p>Republic of the Philippines</p>
-                <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
-                <p>PMO-<u>Lanao Del Norte/Iligan</u></p>
-              </td>
-            </tr>
+            {/* Success */}
+            {popupContent == "success" && (
+            <>
+            <div class="f-modal-icon f-modal-success animate">
+              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+            </div>
+            </>
+            )}
 
-            {/* Date */}
-            <tr>
-              <td className="w-1/3"></td>
-              <td className="w-1/3"></td>
-              <td className="w-1/3 pt-8">
-                <p className="border-b border-black text-sm text-center font-arial">{formatDate(vehicleForms?.vehicleForm?.date_of_request)}</p>
-                <p className="text-sm text-center font-arial">Date</p>
-              </td>
-            </tr>
-
-            {/* Main Content */}
-            <tr>
-              <td colSpan={3}>
-
-                <div className="font-arial font-bold text-center pt-4 text-sm">
-                  <span>VEHICLE REQUEST SLIP</span>
-                </div>
-
-                <div className="font-arial text-left pt-4 text-sm">
-                  <p>Provision of service vehicle/s for official use of personnel is requested with the following details:</p>
-                </div>
-
-                {/* Passenger */}
-                <div className="mt-4">
-                  <div className="flex">
-                    <div className="w-44 font-arial text-sm">
-                      <span>PASSENGERS/s:</span>
-                    </div>
-                    <div className="w-full">
-                      <div style={{ columnCount: 2 }}>
-                        {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                          <span key={index} className="text-xs" style={{ borderBottom: '1px solid black', display: 'block', padding: '2px' }}>
-                            {`${index + 1}. ${passenger}`}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Purpose */}
-                <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-44 font-arial text-sm">
-                      <span>PURPOSE:</span>
-                    </div>
-                    <div className="w-full border-b border-black pl-1 text-xs">
-                      <span>{vehicleForms?.vehicleForm?.purpose}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Place */}
-                <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-72 font-arial text-sm">
-                      <span>PLACE/s TO BE VISITED:</span>
-                    </div>
-                    <div className="w-full border-b border-black pl-1 text-xs">
-                      <span>{vehicleForms?.vehicleForm?.place_visited}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Date Time */}
-                <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-72 font-arial text-sm">
-                      <span>DATE/TIME OF ARRIVAL:</span>
-                    </div>
-                    <div className="w-full border-b border-black pl-1 text-xs">
-                      <span>{formatDate(vehicleForms?.vehicleForm?.date_arrival)} @ {formatTime(vehicleForms?.vehicleForm?.time_arrival)}</span>
-                    </div>
-                  </div>
-                </div>
-
-              </td>
-            </tr>
-
-            {/* Driver Information */}
-            <tr>
-              <td className="w-1/3 pt-7">
-                <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[0]}</p>
-                <p className="text-sm text-center font-arial">Type of Vehicle</p>
-              </td>
-              <td className="w-1/3 pt-7 px-8">
-                <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[1]}</p>
-                <p className="text-sm text-center font-arial">Plate No.</p>
-              </td>
-              <td className="w-1/3 pt-7">
-                <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.driver}</p>
-                <p className="text-sm text-center font-arial">Driver</p>
-              </td>
-            </tr>
-
-            {/* Requestor */}
-            <tr>
-              <td colSpan={2} className="w-1/3 pt-8">
-                <div className="w-3/4 text-sm font-arial font-bold">
-                  REQUESTED BY:
-                </div>
-                <div className="relative pt-3">
-                  <img
-                    src={vehicleForms?.requestor?.signature}
-                    style={{ position: 'absolute', width: '220px', top: '-10px', left: '10px' }}
-                    alt="Signature"
-                  />
-                </div>
-                <div className=" w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
-                    {vehicleForms?.requestor?.name}
-                </div>   
-                <div className="w-3/4 text-center text-sm relative">
-                    {vehicleForms?.requestor?.position}
-                </div>   
-              </td>
-            </tr>
-
-            {/* Admin Manager */}
-            <tr>
-              <td colSpan={2} className="pt-4">
-                <div className="w-3/4 text-sm font-arial font-bold">
-                  {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
-                  vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
-                </div>
-                <div className="relative pt-3">
-                {vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2 ? (
-                  <img
-                    src={vehicleForms?.manager?.manager_signature}
-                    style={{ position: 'absolute', width: '220px', top: '-10px', left: '20px' }}
-                    alt="Signature"
-                  />
-                ):null
-                }
-                  
-                </div>
-                <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
-                  {vehicleForms?.manager?.manager_name}
-                </div> 
-                <div className="w-3/4 text-center text-sm relative">
-                  Adminstrative Division Manager
-                </div>  
-              </td>
-            </tr>
-
-          </table>
+            {/* Warning */}
+            {(popupContent == "warning" || popupContent == "warningD") && (
+            <>
+              <div class="f-modal-icon f-modal-warning scaleWarning">
+                <span class="f-modal-body pulseWarningIns"></span>
+                <span class="f-modal-dot pulseWarningIns"></span>
+              </div>
+            </> 
+            )}
 
           </div>
-        </div>
-      </div>
-    </div>
-    )}
+          
+          {/* Popup Message */}
+          <p className="text-lg text-center">{popupMessage}</p>
 
-    </PageComponent>
+          {/* Popup Button */}
+          <div className="flex justify-center mt-4">
+
+            {/* Error */}
+            {popupContent == "error" && (
+            <>
+              <button
+                onClick={justclose}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded ml-2"
+              >
+                Close
+              </button>
+            </>  
+            )}
+
+            {/* Warning */}
+            {popupContent == "warning" && (
+            <>
+
+              {currentUser.code_clearance == 1 && (
+              <>
+                {!sumbitLoading && (
+                  <button
+                    onClick={() => handleApproveClick(vehicleForms?.vehicleForm?.id)}
+                    className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+                  >
+                    Yes, Do It!
+                  </button>
+                )}
+
+                {!sumbitLoading && (
+                  <button
+                    onClick={justclose}
+                    className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                  >
+                    No
+                  </button>
+                )}
+
+                {sumbitLoading && (
+                  <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Please Wait</span>
+                    </div>
+                  </button>
+                )}
+              </>  
+              )}
+
+            </>
+            )}
+
+            {popupContent == "warningD" && (
+            <>
+              {!sumbitLoading && (
+                <button
+                  onClick={() => handleDispproveClick(vehicleForms?.vehicleForm?.id)}
+                  className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+                >
+                  Yes, Do It!
+                </button>
+              )}
+
+              {!sumbitLoading && (
+                <button
+                  onClick={justclose}
+                  className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                >
+                  No
+                </button>
+              )}
+
+              {sumbitLoading && (
+                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Please Wait</span>
+                  </div>
+                </button>
+              )}
+            </>
+            )}
+
+            {/* Success */}
+            {popupContent == "success" && (
+            <>
+              <button
+                onClick={closeSuccess}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Close
+              </button>
+            </>
+            )}
+          </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* Generate PDF */}
+      {isVisible && (
+        <div>
+          <div className="hidden md:none">
+            <div ref={componentRef}>
+
+              <div style={{ width: '145mm', height: 'auto', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '1px dotted' }}>
+
+                <table className="w-full mt-4 mb-10">
+
+                  {/* Header */}
+                  <tr>
+                    <td colSpan={2} className="w-1/3 text-left text-sm font-arial">
+                      <span>Doc. Ref. Code:PM:VEC:LNI:WEN:FM:01</span>
+                    </td>
+                    <td className="w-1/3 text-right text-sm font-arial">
+                      <span>"Annex D"</span>
+                    </td>
+                  </tr>
+
+                  {/* Agency Name */}
+                  <tr>
+                    <td colSpan={3} className="text-center text-sm font-arial pt-6">
+                      <p>Republic of the Philippines</p>
+                      <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
+                      <p>PMO-<u className="underline-text">Lanao Del Norte/Iligan</u></p>
+                    </td>
+                  </tr>
+
+                  {/* Date */}
+                  <tr>
+                    <td className="w-1/3"></td>
+                    <td className="w-1/3"></td>
+                    <td className="w-1/3 pt-8">
+                      <p className="border-b border-black text-sm text-center font-arial">{formatDate(vehicleForms?.vehicleForm?.date_of_request)}</p>
+                      <p className="text-sm text-center font-arial">Date</p>
+                    </td>
+                  </tr>
+
+                  {/* Main Content */}
+                  <tr>
+                    <td colSpan={3}>
+
+                      <div className="font-arial font-bold text-center pt-4 text-sm">
+                        <span>VEHICLE REQUEST SLIP</span>
+                      </div>
+
+                      <div className="font-arial text-left pt-4 text-sm">
+                        <p>Provision of service vehicle/s for official use of personnel is requested with the following details:</p>
+                      </div>
+
+                      {/* Passenger */}
+                      <div className="mt-4">
+                        <div className="flex">
+                          <div className="w-44 font-arial text-sm">
+                            <span>PASSENGERS/s:</span>
+                          </div>
+                          <div className="w-full">
+                            <div style={{ columnCount: 2 }}>
+                              {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
+                                <span key={index} className="text-xs" style={{ borderBottom: '1px solid black', display: 'block', padding: '2px' }}>
+                                  {`${index + 1}. ${passenger}`}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Purpose */}
+                      <div className="mt-2">
+                        <div className="flex">
+                          <div className="w-44 font-arial text-sm">
+                            <span>PURPOSE:</span>
+                          </div>
+                          <div className="w-full border-b border-black pl-1 text-xs">
+                            <span>{vehicleForms?.vehicleForm?.purpose}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Place */}
+                      <div className="mt-2">
+                        <div className="flex">
+                          <div className="w-72 font-arial text-sm">
+                            <span>PLACE/s TO BE VISITED:</span>
+                          </div>
+                          <div className="w-full border-b border-black pl-1 text-xs">
+                            <span>{vehicleForms?.vehicleForm?.place_visited}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date Time */}
+                      <div className="mt-2">
+                        <div className="flex">
+                          <div className="w-72 font-arial text-sm">
+                            <span>DATE/TIME OF ARRIVAL:</span>
+                          </div>
+                          <div className="w-full border-b border-black pl-1 text-xs">
+                            <span>{formatDate(vehicleForms?.vehicleForm?.date_arrival)} @ {formatTime(vehicleForms?.vehicleForm?.time_arrival)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </td>
+                  </tr>
+
+                  {/* Driver Information */}
+                  <tr>
+
+                    {/* Vehicle Type */}
+                    <td className="w-1/3 pt-7">
+                      <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[0]}</p>
+                      <p className="text-sm text-center font-arial">Type of Vehicle</p>
+                    </td>
+
+                    {/* Plate No */}
+                    <td className="w-1/3 pt-7 px-8">
+                      <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[1]}</p>
+                      <p className="text-sm text-center font-arial">Plate No.</p>
+                    </td>
+
+                    {/* Driver */}
+                    <td className="w-1/3 pt-7">
+                      <p className="border-b border-black text-xs text-center font-arial">{vehicleForms?.vehicleForm?.driver}</p>
+                      <p className="text-sm text-center font-arial">Driver</p>
+                    </td>
+
+                  </tr>
+
+                  {/* Requestor */}
+                  <tr>
+                    <td colSpan={2} className="w-1/3 pt-8">
+
+                      <div className="w-3/4 text-sm font-arial font-bold">
+                        REQUESTED BY:
+                      </div>
+
+                      <div className="relative pt-3">
+                        <img
+                          src={vehicleForms?.requestor?.signature}
+                          style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                          alt="Signature"
+                        />
+                      </div>
+                      <div className=" w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
+                        {vehicleForms?.requestor?.name}
+                      </div>
+                      <div className="w-3/4 text-center text-sm relative">
+                        {vehicleForms?.requestor?.position}
+                      </div>   
+
+                    </td>
+                  </tr>
+
+                  {/* Admin Manager */}
+                  <tr>
+                    <td colSpan={2} className="pt-4">
+
+                      <div className="w-3/4 text-sm font-arial font-bold">
+                        {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
+                        vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
+                      </div>
+
+                      <div className="relative pt-3">
+                        {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
+                          <img
+                            src={vehicleForms?.manager?.manager_signature}
+                            style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                            alt="Signature"
+                          />
+                        )}
+                      </div>
+
+                      <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
+                        {vehicleForms?.manager?.manager_name}
+                      </div> 
+                      <div className="w-3/4 text-center text-sm relative">
+                        Adminstrative Division Manager
+                      </div>  
+
+                    </td>
+                  </tr>
+
+                </table>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+    )}
+  </PageComponent>
+  ):(
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

@@ -66,35 +66,18 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/facilityopradmin/{id}', [FacilityController::class, 'StoreOPRFormAdmin']);
     Route::put('/facilityapproval/{id}', [FacilityController::class, 'AdminApproval']);
     Route::put('/facilitydisapproval/{id}', [FacilityController::class, 'AdminDispprove']);
+    Route::put('/requestclose/{id}', [FacilityController::class, 'CloseRequest']);
     Route::post('/facilityformrequest', [FacilityController::class, 'store']);
 
-    //For Facility Form
-    
-    
-    // Route::get('/facilityformrequest/{id}', [FacilityFormController::class, 'show']);
-    
-    // Route::post('/facilityroomform/{id}', [FacilityFormController::class, 'storeFacRoom']);
-    
-    // Route::get('/facilitymphrequest/{id}', [FacilityFormController::class, 'showMPH']);
-    // Route::get('/getconferencefacilityform/{id}', [FacilityFormController::class, 'showConference']);
-    // Route::get('/getdormfacilityform/{id}', [FacilityFormController::class, 'showDorm']);
-    // Route::get('/facilityadmin', [FacilityFormController::class, 'AdminViewFacility']);
-    
-    
-    // Route::post('/conferencefacilityform/{id}', [FacilityFormController::class, 'storeConference']);
-    // Route::post('/dormfacilityform/{id}', [FacilityFormController::class, 'storeDorm']);
-    // 
-    // Route::put('/saveopraction/{id}', [FacilityFormController::class, 'StoreOPRAction']);
-    
-    
-
-    //For Vehicle Slip Form
+    //Vehicle Slip
     Route::get('/vehicleform', [VehicleFormController::class, 'index']);
-    Route::post('/vehicleformrequest', [VehicleFormController::class, 'store']);
     Route::get('/vehicleform/{id}', [VehicleFormController::class, 'show']);
     Route::get('/myvehicleformrequest/{id}', [VehicleFormController::class, 'myRequest']);
+    Route::put('/getvehicleslip/{id}', [VehicleFormController::class, 'submitVehicle']);
     Route::put('/vehicleformapprove/{id}', [VehicleFormController::class, 'adminApprove']);
     Route::put('/vehicleformdisapprove/{id}', [VehicleFormController::class, 'adminDisapprove']);
+    Route::put('/closevehicleslip/{id}', [VehicleFormController::class, 'closeRequest']);
+    Route::post('/vehicleformrequest', [VehicleFormController::class, 'store']);
 
     //For Equipment Form
     Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
@@ -114,10 +97,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //New Get Notifications
-Route::get('/supnotification/{id}', [GetNotificationController::class, 'SupervisorNoti']); 
-Route::get('/gsonotification/{id}', [GetNotificationController::class, 'GSONoti']); 
-Route::get('/adminnotification/{id}', [GetNotificationController::class, 'AdminNoti']);
-Route::get('/personnelnotification/{id}', [GetNotificationController::class, 'PersonnelNoti']);
+Route::get('/supnotification', [GetNotificationController::class, 'SupervisorNoti']); 
+Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']); 
+Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
+Route::get('/personnelnotification', [GetNotificationController::class, 'PersonnelNoti']);
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);

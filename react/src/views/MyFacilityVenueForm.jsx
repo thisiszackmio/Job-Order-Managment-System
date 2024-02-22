@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
-import ForbiddenComponent from "../components/403";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
-import Forbidden from "../components/403";
 
 export default function MyRequestForRepairInspection(){
 
-  const { currentUser, userRole } = useUserStateContext();
+  const { currentUser } = useUserStateContext();
   const {id} = useParams();
 
   //Date Format
@@ -82,7 +80,7 @@ export default function MyRequestForRepairInspection(){
   },[id]);
 
   //Restrict
-  const Users = currentUser.id == id || userRole == 'hackers';
+  const Users = currentUser.id == id || currentUser.code_clearance == 10;
 
   return Users ? (
   <PageComponent title="Facility / Venue Form">
@@ -103,11 +101,11 @@ export default function MyRequestForRepairInspection(){
         <thead>
         {displayRequestFacility.mappedData.length > 0 ? (
           <tr className="bg-gray-100">
-            <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-            <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-            <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start to End)</th>
-            <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-            <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start to End)</th>
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
           </tr>
         ):null}
         </thead>
@@ -134,6 +132,14 @@ export default function MyRequestForRepairInspection(){
                 {getData.remarks == "Approved" && (<span className="approved-status">{getData.remarks}</span>)}
                 {getData.remarks == "Disapproved" && (<span className="disapproved-status">{getData.remarks}</span>)}
                 {getData.remarks == "Pending" && (<span className="pending-status">{getData.remarks}</span>)}
+                {getData.remarks == "Closed" && (
+                  <>
+                  <div className="flex justify-center">
+                    <span className="approved-status">Approved</span> 
+                    <span className="done-status ml-1">{getData.remarks}</span>
+                  </div>
+                  </>
+                )}
               </td>
             </tr>
           ))
@@ -154,6 +160,9 @@ export default function MyRequestForRepairInspection(){
   )}
   </PageComponent>
   ):(
-    <Forbidden />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
 import ForbiddenComponent from "../components/403";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
 
@@ -29,7 +29,6 @@ export default function MyRequestForRepairInspection(){
       const supDet = responseData.personnel_details;
 
       setSupervisor(supDet);
-      //console.log(supDet);
 
       setLoading(false);
     })
@@ -85,19 +84,19 @@ export default function MyRequestForRepairInspection(){
   },[id]);
 
   //Restrict
-  const Users = currentUser.id == id || userRole == 'hackers';
+  const Users = currentUser.id == id || currentUser.code_clearance == 10;
 
   return Users ? (
   <PageComponent title="Pre/Post Repair Inspection Form">
   {loading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="ml-2 animate-heartbeat">Loading My Request List</span>
-    </div>
+  <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+    <img
+      className="mx-auto h-44 w-auto"
+      src={loadingAnimation}
+      alt="Your Company"
+    />
+    <span className="ml-2 animate-heartbeat">Loading My Request List</span>
+  </div>
   ):(
   <>
     {/* Supervisor */}
@@ -119,25 +118,25 @@ export default function MyRequestForRepairInspection(){
 
     {/* Display Table */}
     <div className="mt-4 overflow-x-auto">
-      {displayRequest.mappedData.length > 0 ? (
-        <table className="border-collapse" style={{ width: '2200px' }}>
+      {displayRequest?.mappedData?.length > 0 ? (
+        <table className="border-collapse" style={{ width: '2500px' }}>
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Date</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Cost</th> 
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Brand/Model</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Serial/Engine No</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Description </th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Location </th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain/Defect</th>
-              <th className="px-4 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Date</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Cost</th> 
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Brand/Model</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Serial/Engine No</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Description </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Location </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain/Defect</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
             </tr>
           </thead>
           <tbody>
-            {displayRequest.mappedData.map((getData) => (
+            {displayRequest?.mappedData?.map((getData) => (
               <tr key={getData.id}>
                 <td className="px-2 py-1 text-center border border-custom w-40">{formatDate(getData.date_of_request)}</td>
                 <td className="px-2 py-1 text-center border border-custom w-80">{getData.property_number}</td>
@@ -153,15 +152,15 @@ export default function MyRequestForRepairInspection(){
                 <td className="px-1 py-1 text-center border border-custom w-56">{getData.property_description}</td>
                 <td className="px-1 py-1 text-center border border-custom">{getData.location}</td>
                 <td className="px-1 py-1 text-center border border-custom w-96">{getData.complain}</td>
-                <td className="px-1 py-4 text-center border border-custom w-24">
+                <td className="px-1 py-4 text-center border border-custom w-60">
                 {getData.supervisor_approval == 0 && getData.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
-                {getData.supervisor_approval === 1 && getData.admin_approval == 4 && (<span className="approved-status-sup">Approved</span>)}
-                {getData.supervisor_approval === 2 && getData.admin_approval == 0 && (<span className="disapproved-status">Disapproved</span>)} 
-                {getData.supervisor_approval === 1 && getData.admin_approval == 3 && (<span className="pending-status-ad">Pending</span>)} 
-                {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 3 && (<span className="approved-status">Approved</span>)}
-                {getData.supervisor_approval === 1 && getData.admin_approval == 2 && (<span className="disapproved-status">Disapproved</span>)}  
+                {getData.supervisor_approval == 2 && getData.admin_approval == 0 && (<span className="disapproved-status">Disapproved by the Supervisor</span>)}
+                {getData.supervisor_approval == 1 && getData.admin_approval == 4 && (<span className="approved-status">Approved by the Supervisor</span>)}
+                {getData.supervisor_approval === 1 && getData.admin_approval == 3 && (<span className="pending-status">Pending on Admin's Approval</span>)} 
+                {getData.supervisor_approval === 1 && getData.admin_approval == 2 && getData.inspector_status == 3 && (<span className="disapproved-status">Disapproved by the Admin</span>)}
+                {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 3 && (<span className="approved-status">Approved by the Admin</span>)}
                 {getData.admin_approval === 1 && getData.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
-                {getData.admin_approval === 1 && getData.inspector_status == 1 && (<span className="done-status">Done</span>)}
+                {getData.admin_approval === 1 && getData.inspector_status == 1 && (<span className="finish-status">Done</span>)}
                 </td>
               </tr>
             ))}
@@ -172,7 +171,7 @@ export default function MyRequestForRepairInspection(){
       )}
     </div>
     <div className="text-right text-sm/[17px]">
-      {displayRequest.mappedData.length > 0 ? (
+      {displayRequest?.mappedData?.length > 0 ? (
         <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
       ) : null}
     </div>
@@ -180,6 +179,9 @@ export default function MyRequestForRepairInspection(){
   )}
   </PageComponent>
   ):(
-  <ForbiddenComponent />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

@@ -13,6 +13,7 @@ export default function RepairRequestForm(){
 
   const navigate = useNavigate ();
 
+  //Restriction for accessing another form
   useEffect(() => {
     // Check the condition and redirect if necessary
     if (id !== currentUser.id) {
@@ -64,15 +65,21 @@ export default function RepairRequestForm(){
 
   // Auto Approval for Supervisors and Manager
   let output;
+  let admin;
 
   if (currentUser.code_clearance === 1 || currentUser.code_clearance === 2 || currentUser.code_clearance === 4) {
     output = 1;
+    admin = 4;
   } else {
     output = 0;
+    admin = 0;
   }
 
-  useEffect(()=>{ fetchUsers(); },[]);
+  useEffect(()=>{ 
+    fetchUsers(); 
+  },[]);
 
+  // Submit Form
   const SubmitInspectionForm = (event) => {
     event.preventDefault();
 
@@ -93,15 +100,20 @@ export default function RepairRequestForm(){
         location: propertyLocation,
         complain: ComplainDefect,
         supervisor_name: 
-        currentUser.id === 2 ? currentUser.id.toString() :
-        currentUser.id === 7 ? currentUser.id.toString() : users.id.toString(),
+        currentUser.code_clearance === 1 ? currentUser.id.toString() :
+        currentUser.code_clearance === 2 ? currentUser.id.toString() : users.id.toString(),
         supervisor_approval: output,
-        admin_approval: 0,
+        admin_approval: admin,
         inspector_status: 0
       })
       .then((response) => { 
         setShowPopup(true);
-        setPopupMessage("Request form submitted successfully");    
+        setPopupMessage(
+          <div>
+            <p className="popup-title"><strong>Success</strong></p>
+            <p>Form submit successfully</p>
+          </div>
+        );    
         setSubmitLoading(false);
       })
       .catch((error) => {
@@ -110,7 +122,6 @@ export default function RepairRequestForm(){
           const responseErrors = error.response.data.errors;
           setInputErrors(responseErrors);
         }
-        console.error(error);
       })
       .finally(() => {
         setSubmitLoading(false);
@@ -132,17 +143,19 @@ export default function RepairRequestForm(){
     </div>
   ):(
   <div>
+    
     <form onSubmit={SubmitInspectionForm}>
 
       {/* Title */}
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-        <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
+        <p className="text-xs text-red-500">Please double check the form before submitting </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
 
         <div className="col-span-1">
+
           {/* Date */}
           <div className="flex items-center mt-6">
             <div className="w-36">
@@ -181,7 +194,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyNo(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.property_number && (
+              {!propertyNo && inputErrors.property_number && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -204,7 +217,7 @@ export default function RepairRequestForm(){
                 max={currentDate}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.acq_date && (
+              {!acquisitionDate && inputErrors.acq_date && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -239,7 +252,7 @@ export default function RepairRequestForm(){
                 className="pl-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
             </div>
-            {inputErrors.acq_cost && (
+            {!acquisitionCost && inputErrors.acq_cost && (
               <p className="text-red-500 text-xs italic">This field must be required</p>
             )}
             </div>
@@ -262,7 +275,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setBrandModel(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.brand_model && (
+              {!BrandModel && inputErrors.brand_model && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -285,7 +298,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setSerialEngineNo(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.serial_engine_no && (
+              {!SerialEngineNo && inputErrors.serial_engine_no && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -321,7 +334,7 @@ export default function RepairRequestForm(){
                 <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
                 <option value="Others">Others</option>
               </select>
-              {inputErrors.type_of_property && (
+              {!typeOfProperty && inputErrors.type_of_property && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
               {typeOfProperty === 'Others' && (
@@ -360,7 +373,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyDescription(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.property_description && (
+              {!propertyDescription && inputErrors.property_description && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -382,7 +395,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyLocation(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {inputErrors.location && (
+              {!propertyLocation && inputErrors.location && (
                 <p className="text-red-500 text-xs italic">This field must be required</p>
               )}
             </div>
@@ -405,67 +418,76 @@ export default function RepairRequestForm(){
               onChange={ev => setComplainDefect(ev.target.value)}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
             />
-            {inputErrors.complain && (
+            {!ComplainDefect && inputErrors.complain && (
               <p className="text-red-500 text-xs italic">This field must be required</p>
             )}
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="mt-4">
-            <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
-          <button
-            type="submit"
-            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-              sumbitLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-            }`}
-            disabled={sumbitLoading}
-          >
-            {sumbitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-          </div>
-
         </div>
 
-      </div>   
+      </div>  
+
+      {/* Submit Button */}
+      <div className="mt-6">
+        <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
+        <button
+          type="submit"
+          className={`rounded-md px-2 py-2 text-base font-medium text-white shadow-sm focus:outline-none ${
+            sumbitLoading ? 'bg-indigo-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+          }`}
+          disabled={sumbitLoading}
+        >
+          {sumbitLoading ? (
+            <div className="flex items-center justify-center">
+              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+              <span className="ml-2">Processing</span>
+            </div>
+          ) : (
+            'Submit'
+          )}
+        </button>
+      </div> 
 
     </form>
 
     {/* Show Popup */}
     {showPopup && (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Semi-transparent black overlay */}
-      <div className="fixed inset-0 bg-black opacity-40"></div>
-      {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down">
-      {/* Notification Icons */}
-      <div class="f-modal-alert">
-        <div class="f-modal-icon f-modal-success animate">
-          <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-          <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+
+        {/* Semi-transparent black overlay */}
+        <div className="fixed inset-0 bg-black opacity-40"></div>
+
+          {/* Popup content with background blur */}
+          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
+
+          {/* Notification Icons */}
+          <div class="f-modal-alert">
+            <div class="f-modal-icon f-modal-success animate">
+              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+            </div>
+          </div>
+
+          {/* Message */}
+          <p className="text-lg text-center">{popupMessage}</p>
+
+          {/* Button */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => {
+                window.location.href = `/myrequestinpectionform/${currentUser.id}`;
+              }}
+              className="w-full px-4 py-2 bg-indigo-500 text-white rounded"
+            >
+              View my request
+            </button>
+          </div>
+
         </div>
       </div>
-        <p className="text-lg">{popupMessage}</p>
-        <div className="flex justify-center mt-4">
-        <button
-          onClick={() => {
-            window.location.href = `/myrequestinpectionform/${currentUser.id}`;
-          }}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Close
-        </button>
-      </div>
-      </div>
-    </div>
     )}
+
   </div>
   )}
   </>

@@ -15,7 +15,7 @@ class FacilityController extends Controller
      */
     public function index()
     {
-        $facilityForms = FacilityModel::with('user')->orderBy('date_requested', 'desc')->get();
+        $facilityForms = FacilityModel::with('user')->orderBy('date_requested', 'asc')->get();
 
         $responseData = [];
 
@@ -115,7 +115,6 @@ class FacilityController extends Controller
         // Update the obr_instruct field
         $facilityOPR->update([
             'obr_comment' => $validatedData['obr_comment'],
-            'admin_approval' => 1
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
@@ -218,6 +217,29 @@ class FacilityController extends Controller
             'admin_approval' => 3,
             'date_approve' => today(),
             'remarks' => "Disapproved"
+        ]);
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+
+    }
+
+    /**
+     * Close Request
+     */
+    public function CloseRequest(Request $request, $id)
+    {
+        // Find the facility by ID
+        $facility = FacilityModel::find($id);
+
+        // Check if the facility exists
+        if (!$facility) {
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        // Update the obr_instruct field
+        $facility->update([
+            'admin_approval' => 1,
+            'remarks' => "Closed"
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);

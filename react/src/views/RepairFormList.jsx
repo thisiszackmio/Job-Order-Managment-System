@@ -14,12 +14,13 @@ export default function RepairRequestList(){
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
 
-  const { userRole } = useUserStateContext();
+  const { currentUser } = useUserStateContext();
 
   const [loading, setLoading] = useState(true);
 
   const [prePostRepair, setPrePostRepair] = useState([]);
 
+  // Get All the data
   const fetchTableData = () => {
     setLoading(true); // Set loading state to true when fetching data
     axiosClient
@@ -98,7 +99,9 @@ export default function RepairRequestList(){
   const displayPaginationRepair = pageCountRepair > 1;
 
   //Restrictions
-  const Users = userRole == 'admin' || userRole == 'hackers' || userRole == 'personnels';
+  const requestlistClearance = [1, 2, 3, 4, 6, 10];
+  const here = requestlistClearance.includes(currentUser.code_clearance);
+  const Users = here;
 
   return Users ? (
   <PageComponent title="Pre/Post Repair Inspection Form Request List">
@@ -114,27 +117,28 @@ export default function RepairRequestList(){
   ):(
   <div>
 
-      <div className="flex justify-end">
-        <div className="align-right">
-          {/* For Search Field */}
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="mb-4 p-2 border border-gray-300 rounded"
-          />
-          {/* Count for List */}
-          <div className="text-right text-sm/[17px]">
-           {prePostRepair.length > 0 ? (
-           <i>Total of <b> {prePostRepair.length} </b> Facility/Venue Request </i>
-           ):null}
-          </div>
+    {/* Top Layer */}
+    <div className="flex justify-end">
+      <div className="align-right">
+        {/* For Search Field */}
+        <input
+          type="text"
+          placeholder="Search"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="mb-4 p-2 border border-gray-300 rounded"
+        />
+        {/* Count for List */}
+        <div className="text-right text-sm/[17px]">
+          {prePostRepair.length > 0 ? (
+          <i>Total of <b> {prePostRepair.length} </b> Facility/Venue Request </i>
+          ):null}
         </div>
       </div>
+    </div>
 
     <div className="overflow-x-auto">
-      <table className="border-collapse" style={{ width: '1450px' }}>
+      <table className="border-collapse" style={{ width: '1650px' }}>
         <thead>
           {currentRepair.length > 0 ? (
             <tr className="bg-gray-100">
@@ -163,21 +167,21 @@ export default function RepairRequestList(){
           )}
           <td className="px-2 py-1 text-center border border-custom w-56">{repair.complain}</td>
           <td className="px-2 py-1 text-center border border-custom w-56">{repair.name}</td>
-          <td className="px-1 py-4 text-center border border-custom w-24">
-          {repair.supervisor_aprroval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
-          {repair.supervisor_approval == 1 && repair.admin_approval == 4 && (<span className="approved-status-sup">Approved</span>)}
-          {repair.supervisor_approval == 2 && repair.admin_approval == 0 && (<span className="disapproved-status">Disapproved</span>)} 
-          {repair.supervisor_approval == 1 && repair.admin_approval == 3 && (<span className="pending-status-ad">Pending</span>)} 
-          {repair.supervisor_approval == 1 && repair.admin_approval == 1 && repair.inspector_status == 3 && (<span className="approved-status">Approved</span>)}
-          {repair.supervisor_approval == 1 && repair.admin_approval == 2 && (<span className="disapproved-status">Disapproved</span>)}  
-          {repair.admin_approval == 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
-          {repair.admin_approval == 1 && repair.inspector_status == 1 && (<span className="done-status">Done</span>)}
+          <td className="px-1 py-4 text-center border border-custom w-60">
+          {repair.supervisor_approval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
+          {repair.supervisor_approval == 2 && repair.admin_approval == 0 && (<span className="disapproved-status">Disapproved by the Supervisor</span>)}
+          {repair.supervisor_approval == 1 && repair.admin_approval == 4 && (<span className="approved-status">Approved by the Supervisor</span>)}
+          {repair.supervisor_approval === 1 && repair.admin_approval == 3 && (<span className="pending-status">Pending on Admin's Approval</span>)}
+          {repair.supervisor_approval === 1 && repair.admin_approval == 2 && repair .inspector_status == 3 && (<span className="disapproved-status">Disapproved by the Admin</span>)}
+          {repair.supervisor_approval === 1 && repair.admin_approval == 1 && repair.inspector_status == 3 && (<span className="approved-status">Approved by the Admin</span>)}
+          {repair.admin_approval === 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
+          {repair.admin_approval === 1 && repair.inspector_status == 1 && (<span className="finish-status">Done</span>)}
           </td>
           <td className="px-2 py-1 text-center border border-custom">
             <div className="flex justify-center">
               <Link to={`/repairinspectionform/${repair.id}`}>
                 <button 
-                  className="bg-green-500 hover-bg-green-700 text-white font-bold py-1 px-2 rounded"
+                  className="bg-green-600 hover-bg-green-500 text-white py-1 px-2 rounded"
                   title="View Request"
                 >
                   View
@@ -223,6 +227,9 @@ export default function RepairRequestList(){
   )}  
   </PageComponent>
   ):(
-    <ForbiddenComponent />
+    (() => {
+      window.location = '/forbidden';
+      return null; // Return null to avoid any unexpected rendering
+    })()
   );
 }

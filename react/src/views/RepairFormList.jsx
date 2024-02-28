@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../components/PageComponent";
-import ForbiddenComponent from "../components/403";
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import ReactPaginate from "react-paginate";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function RepairRequestList(){
 
@@ -14,7 +15,7 @@ export default function RepairRequestList(){
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
 
-  const { currentUser } = useUserStateContext();
+  const { currentUser, userRole } = useUserStateContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -100,8 +101,9 @@ export default function RepairRequestList(){
 
   //Restrictions
   const requestlistClearance = [1, 2, 3, 4, 6, 10];
-  const here = requestlistClearance.includes(currentUser.code_clearance);
-  const Users = here;
+  const Codezz = requestlistClearance.includes(currentUser.code_clearance);
+  const authorize = userRole == 'admin' || userRole == 'personnels' || userRole == 'hackers'
+  const Users = Codezz || authorize;
 
   return Users ? (
   <PageComponent title="Pre/Post Repair Inspection Form Request List">
@@ -157,17 +159,17 @@ export default function RepairRequestList(){
         {currentRepair.length > 0 ? (
         currentRepair.map((repair) => (
         <tr key={repair.id}>
-          <td className="px-2 text-center border border-custom w-1 font-bold">{repair.id}</td>
-          <td className="px-2 py-1 text-center border border-custom w-40">{repair.date}</td>
-          <td className="px-2 py-1 text-center border border-custom w-80">{repair.property_number}</td>
+          <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold">{repair.id}</td>
+          <td className="px-1 py-2 align-top border border-custom w-40">{repair.date}</td>
+          <td className="px-1 py-2 align-top border border-custom w-80">{repair.property_number}</td>
           {repair.type_of_property === "Others" ? (
-          <td className="px-2 py-1 text-center border border-custom w-80">Others: <i>{repair.property_other_specific}</i></td>
+          <td className="px-1 py-2 align-top border border-custom w-80">Others: <i>{repair.property_other_specific}</i></td>
           ):(
-          <td className="px-2 py-1 text-center border border-custom w-80">{repair.type_of_property}</td>
+          <td className="px-1 py-2 align-top border border-custom w-80">{repair.type_of_property}</td>
           )}
-          <td className="px-2 py-1 text-center border border-custom w-56">{repair.complain}</td>
-          <td className="px-2 py-1 text-center border border-custom w-56">{repair.name}</td>
-          <td className="px-1 py-4 text-center border border-custom w-60">
+          <td className="px-1 py-2 align-top border border-custom w-56">{repair.complain}</td>
+          <td className="px-1 py-2 align-top border border-custom w-56">{repair.name}</td>
+          <td className="px-1 py-2 align-top border border-custom w-60">
           {repair.supervisor_approval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
           {repair.supervisor_approval == 2 && repair.admin_approval == 0 && (<span className="disapproved-status">Disapproved by the Supervisor</span>)}
           {repair.supervisor_approval == 1 && repair.admin_approval == 4 && (<span className="approved-status">Approved by the Supervisor</span>)}
@@ -177,14 +179,14 @@ export default function RepairRequestList(){
           {repair.admin_approval === 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
           {repair.admin_approval === 1 && repair.inspector_status == 1 && (<span className="finish-status">Done</span>)}
           </td>
-          <td className="px-2 py-1 text-center border border-custom">
+          <td className="px-1 py-1 text-center border border-custom">
             <div className="flex justify-center">
               <Link to={`/repairinspectionform/${repair.id}`}>
                 <button 
-                  className="bg-green-600 hover-bg-green-500 text-white py-1 px-2 rounded"
+                  className="text-green-600 font-bold py-1 px-2"
                   title="View Request"
                 >
-                  View
+                  <FontAwesomeIcon icon={faEye} />
                 </button>
               </Link>
             </div>

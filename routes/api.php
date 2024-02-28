@@ -27,36 +27,35 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //Get User Details
+    Route::get('/getsupervisor/{id}', [UserController::class, 'supervisorNames']);
     Route::get('/ppausers', [UserController::class, 'index']);
+
     Route::get('/users', [UserController::class, 'allUser']);
     Route::get('/users/{id}', [UserController::class, 'SpecificUser']);
     Route::put('/changecc/{id}', [UserController::class, 'UpdateCodeClearance']);
     Route::put('/changepwd/{id}', [UserController::class, 'updatePassword']);
     Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
-    Route::get('/getsupervisor/{id}', [UserController::class, 'supervisorNames']);
+    
 
     //Personnel (For the assignment task)
-    Route::get('/getpersonnel/{id}', [AssignPersonnelController::class, 'index']);
     Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);
     Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
     Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
     Route::get('/getdriver', [AssignPersonnelController::class, 'getDriver']);
 
     //Inspection Form
-    Route::get('/requestrepair', [InspectionFormController::class, 'index']);
-    Route::get('/requestrepair/{id}', [InspectionFormController::class, 'show']);
-    Route::get('/requestrepairtwo/{id}', [InspectionFormController::class, 'viewAdmin']);
-    Route::get('/requestpairthree/{id}', [InspectionFormController::class, 'InspectorSide']);
-    Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']); // View My Request Page
-    Route::post('/submitrepairformrequest', [InspectionFormController::class, 'store']); // Submit Form on Request Form
-    Route::post('/inspectionformrequesttwo/{id}', [InspectionFormController::class, 'storeAdmin']);
+    Route::get('/inspectionform/{id}', [InspectionFormController::class, 'getInspectionForm']);
+    Route::get('/requestrepair', [InspectionFormController::class, 'index']); 
+    Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
+    Route::put('/inspector/{id}', [InspectionFormController::class, 'storeInspectorForm']);
+    Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);
     Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
     Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
     Route::put('/admin_approve/{id}', [InspectionFormController::class, 'updateAdminApprove']);
     Route::put('/admin_disapprove/{id}', [InspectionFormController::class, 'updateAdminDisapprove']);
-    Route::put('/inspector/{id}', [InspectionFormController::class, 'storeInspectorForm']);
-    Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);
-    Route::put('/requestclose/{id}', [InspectionFormController::class, 'closeRequest']);  
+    Route::put('/insprequestclose/{id}', [InspectionFormController::class, 'closeRequest']); 
+    Route::post('/submitrepairformrequest', [InspectionFormController::class, 'store']);
+    Route::post('/inspectionformrequesttwo/{id}', [InspectionFormController::class, 'storeAdmin']);
 
     //Facility Form
     Route::get('/facilityform', [FacilityController::class, 'index']);
@@ -97,10 +96,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //New Get Notifications
-Route::get('/supnotification', [GetNotificationController::class, 'SupervisorNoti']); 
-Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']); 
-Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
-Route::get('/personnelnotification', [GetNotificationController::class, 'PersonnelNoti']);
+Route::get('/notification/{id}', [GetNotificationController::class, 'GetNotification']); 
+// Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']); 
+// Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
+// Route::get('/personnelnotification', [GetNotificationController::class, 'PersonnelNoti']);
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);

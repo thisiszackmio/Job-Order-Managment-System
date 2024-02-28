@@ -98,13 +98,13 @@ class AuthController extends Controller
         // 6 = AssignPersonnels
         // 10 = Hackers
 
-        if ($codeClearance === 1 || $codeClearance === 2 || $codeClearance === 3 || $codeClearance === 4 ){
+        if ($codeClearance === 1 || $codeClearance === 3 || $codeClearance === 4 ){
             $userRole = 'admin';
         }elseif ($codeClearance === 10) {
             $userRole = 'hackers';
         }elseif ($codeClearance === 6) {
             $userRole = 'personnels';
-        }elseif ($codeClearance === 5) {
+        }elseif ($codeClearance === 5 || $codeClearance === 2) {
             $userRole = 'users';
         }
 

@@ -6,40 +6,40 @@
 .approved-status {
   /* Emerald Green */
   background-color: #50C878;
-  padding: 0px 5px;
+  padding: 5px;
   color: white;
 }
 
 .disapproved-status {
   /* Neon Red */
   background-color: #FF3131;
-  padding: 0px 5px;
+  padding: 5px;
   color: white;
 }
 
 .pending-status {
   /* Lemon Yellow */
   background-color: #FAFA33;
-  padding: 0px 5px;
+  padding: 5px;
 }
 
 .done-status {
   /* Silver */
   background-color: #C0C0C0;
-  padding: 0px 5px;
+  padding: 5px;
   color: white;
 }
 
 span.checking-status {
   /* Orange */
   background-color: #FFA500; 
-  padding: 0px 5px;
+  padding: 5px;
 }
 
 .finish-status {
   /* Blue */
   background-color: #1F51FF;
-  padding: 0px 5px;
+  padding: 5px;
   color: white;
 }
 

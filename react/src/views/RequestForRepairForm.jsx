@@ -26,7 +26,6 @@ export default function RepairRequestForm(){
   const [inputErrors, setInputErrors] = useState({});
   const [users, setUsers] = useState([]);
   const [sumbitLoading, setSubmitLoading] = useState(false);
-  const [isLoading , setLoading] = useState(true);
 
   //Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -53,15 +52,16 @@ export default function RepairRequestForm(){
       const supDet = responseData.personnel_details;
 
       setUsers(supDet);
-      //console.log(supDet);
-
-      setLoading(false);
     })
     .catch((error) => {
       setLoading(false);
         console.error('Error fetching data:', error);
     });
   };
+
+  useEffect(()=>{ 
+    fetchUsers(); 
+  },[]);
 
   // Auto Approval for Supervisors and Manager
   let output;
@@ -74,10 +74,6 @@ export default function RepairRequestForm(){
     output = 0;
     admin = 0;
   }
-
-  useEffect(()=>{ 
-    fetchUsers(); 
-  },[]);
 
   // Submit Form
   const SubmitInspectionForm = (event) => {
@@ -106,11 +102,11 @@ export default function RepairRequestForm(){
         admin_approval: admin,
         inspector_status: 0
       })
-      .then((response) => { 
+      .then(() => { 
         setShowPopup(true);
         setPopupMessage(
           <div>
-            <p className="popup-title"><strong>Success</strong></p>
+            <p className="popup-title">Success</p>
             <p>Form submit successfully</p>
           </div>
         );    
@@ -131,17 +127,6 @@ export default function RepairRequestForm(){
   return(
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
   {id == currentUser.id && (
-  <>
-  {isLoading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="ml-2 animate-heartbeat">Loading Form</span>
-    </div>
-  ):(
   <div>
     
     <form onSubmit={SubmitInspectionForm}>
@@ -453,44 +438,42 @@ export default function RepairRequestForm(){
 
     {/* Show Popup */}
     {showPopup && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50">
 
-        {/* Semi-transparent black overlay */}
-        <div className="fixed inset-0 bg-black opacity-40"></div>
+      {/* Semi-transparent black overlay */}
+      <div className="fixed inset-0 bg-black opacity-40"></div>
 
-          {/* Popup content with background blur */}
-          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
+        {/* Popup content with background blur */}
+        <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '350px' }}>
 
-          {/* Notification Icons */}
-          <div class="f-modal-alert">
-            <div class="f-modal-icon f-modal-success animate">
-              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-            </div>
+        {/* Notification Icons */}
+        <div class="f-modal-alert">
+          <div class="f-modal-icon f-modal-success animate">
+            <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+            <span class="f-modal-line f-modal-long animateSuccessLong"></span>
           </div>
-
-          {/* Message */}
-          <p className="text-lg text-center">{popupMessage}</p>
-
-          {/* Button */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => {
-                window.location.href = `/myrequestinpectionform/${currentUser.id}`;
-              }}
-              className="w-full px-4 py-2 bg-indigo-500 text-white rounded"
-            >
-              View my request
-            </button>
-          </div>
-
         </div>
+
+        {/* Message */}
+        <p className="text-lg text-center">{popupMessage}</p>
+
+        {/* Button */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => {
+              window.location.href = `/myrequestinpectionform/${currentUser.id}`;
+            }}
+            className="w-full px-4 py-2 bg-indigo-500 text-white rounded"
+          >
+            View my request
+          </button>
+        </div>
+
       </div>
+    </div>
     )}
 
   </div>
-  )}
-  </>
   )}
   </PageComponent>
   );

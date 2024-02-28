@@ -16,151 +16,120 @@ class GetNotificationController extends Controller
     /** 
      * Receive Notification by the Supervisor
      */
-    public function SupervisorNoti()
+    public function GetNotification($id)
     {
+        // ------------------------------- Is FOR SUPERVISOR ----------------------------------------------
         // For Inspection Form
-        $supInspectNoti = Inspection_Form::where('supervisor_approval', 0)->get();
+        $supInspectNoti = Inspection_Form::where('supervisor_approval', 0)->where('supervisor_name', $id)->orderBy('updated_at', 'desc')->get();
         $iID = $supInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
-
-        // Combine Inspection_Form data with PPAUser data
-        $supDet = $supInspectNoti->map(function ($inspectionForm) use ($getReq) {
+        $supInsDet = $supInspectNoti->map(function ($inspectionForm) use ($getReq) {
             $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->lname;
             return [
-                'inspection_form' => $inspectionForm,
-                'user' => $user,
+                'sup_insp_form' => $inspectionForm,
+                'insp_user' => $userName,
             ];
         });
 
-        $responseData = [
-            'supInsDet' => $supDet
-        ];
+        // Calculate the count after mapping
+        $inspSupCount = $supInsDet->count();
 
-        return response()->json($responseData);
-    }
+        // Add count to each item
+        $supInsDet = $supInsDet->map(function ($item) use ($inspSupCount) {
+            $item['insp_sup_count'] = $inspSupCount;
+            return $item;
+        });
 
-    /** 
-     * Receive Notification by the GSO
-     */
-    public function GSONoti()
-    {
+        // ------------------------------- Is FOR GSO ----------------------------------------------
         //For Inspection Form
-        $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 4)->get();
+        $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 4)->orderBy('updated_at', 'desc')->get();
         $iID = $gsoInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
-        $gsoDet = $gsoInspectNoti->map(function ($inspectionForm) use ($getReq) {
+        $gsoInsDet = $gsoInspectNoti->map(function ($inspectionForm) use ($getReq) {
             $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->lname;
+            $code = $user->code_clearance;
             return [
-                'inspection_form' => $inspectionForm,
-                'user' => $user,
-            ];
-        });
-        
-        // For Facility Form
-        $gsoFacilityNoti = FacilityModel::where('admin_approval', 2)->get();
-        $fID = $gsoFacilityNoti->pluck('user_id')->all();
-        $getFacReq = PPAUser::whereIn('id', $fID)->get();
-        $getAdminName = PPAUser::where('code_clearance', '1')->first();
-
-        $gsoDetFac = $gsoFacilityNoti->map(function ($facilityForm) use ($getFacReq) {
-            $user = $getFacReq->where('id', $facilityForm->user_id)->first();
-            return [
-                'facility_form' => $facilityForm,
-                'user' => $user,
+                'gso_insp_form' => $inspectionForm,
+                'insp_user' => $userName,
+                'code' => $code
             ];
         });
 
-        // For Vehicle Slip Form
-        $gsoFacilityNoti = VehicleForm::whereIn('admin_approval', [5, 2])->get();
-        $vID = $gsoFacilityNoti->pluck('user_id')->all();
-        $getVeHReq = PPAUser::whereIn('id', $vID)->get();
+        // Calculate the count after mapping
+        $inspGSOCount = $gsoInsDet->count();
 
-        $gsoDetVeh = $gsoFacilityNoti->map(function ($VehicleForm) use ($getVeHReq) {
-            $user = $getVeHReq->where('id', $VehicleForm->user_id)->first();
-            return [
-                'vehicle_form' => $VehicleForm,
-                'user' => $user,
-            ];
+        // Add count to each item
+        $gsoInsDet = $gsoInsDet->map(function ($item) use ($inspGSOCount) {
+            $item['insp_count'] = $inspGSOCount;
+            return $item;
         });
-        
-        //Output
-        $responseData = [
-            'adminName' => $getAdminName,
-            'gsoDet' => $gsoDet,
-            'gsoFacDet' => $gsoDetFac,
-            'gsoVehDet' => $gsoDetVeh
-        ];
 
-        return response()->json($responseData);
-    }
-
-    /** 
-     * Receive Notification by the Admin
-     */
-    public function AdminNoti()
-    {
-        //For Inspection Form
-        $adminInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 3)->get();
+        // ------------------------------- Is FOR Admin ----------------------------------------------
+        // For Inspection Form
+        $adminInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 3)->orderBy('updated_at', 'desc')->get();
         $iID = $adminInspectNoti->pluck('user_id')->all();
         $getReq = PPAUser::whereIn('id', $iID)->get();
-
-        $adminDet = $adminInspectNoti->map(function ($inspectionForm) use ($getReq) {
+        $adminInsDet = $adminInspectNoti->map(function ($inspectionForm) use ($getReq) {
             $user = $getReq->where('id', $inspectionForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->lname;
             return [
-                'inspection_form' => $inspectionForm,
-                'user' => $user,
+                'admin_insp_form' => $inspectionForm,
+                'insp_user' => $userName,
             ];
         });
 
-        $adminFacilityNoti = FacilityModel::where('admin_approval', 4)->get();
-        $fID = $adminFacilityNoti->pluck('user_id')->all();
-        $getFReq = PPAUser::whereIn('id', $fID)->get();  // Use $fID instead of $iID
+        // Calculate the count after mapping
+        $inspAdminCount = $adminInsDet->count();
 
-        $adminFDet = $adminFacilityNoti->map(function ($facilityForm) use ($getFReq) {  // Use $getFReq instead of $getReq
-            $user = $getFReq->where('id', $facilityForm->user_id)->first();
-            return [
-                'facility_form' => $facilityForm,
-                'user' => $user,
-            ];
+        // Add count to each item
+        $adminInsDet = $adminInsDet->map(function ($item) use ($inspAdminCount) {
+            $item['insp_count'] = $inspAdminCount;
+            return $item;
         });
 
-        //For Vehicle Slip
-        $adminVehicleNoti = VehicleForm::where('admin_approval', 4)->get();
-        $vID = $adminVehicleNoti->pluck('user_id')->all();
-        $getVReq = PPAUser::whereIn('id', $vID)->get();
+        // ------------------------------- Is FOR Personnel ----------------------------------------------
+        //For Inspection Form
+        $getInspector = Inspector_Form::whereIn('close', [3,4])->orderBy('updated_at', 'desc')->get();
+        $pluckInsId = $getInspector->pluck('inspection__form_id')->all();
+        $getPersonnel = AdminInspectionForm::whereIn('inspection__form_id', $pluckInsId)->where('assign_personnel', $id)->get();
+        $stats = $getInspector->pluck('close')->all();
 
-        $adminVehDet = $adminVehicleNoti->map(function ($vehicleForm) use ($getVReq) {
-            $user = $getVReq->where('id', $vehicleForm->user_id)->first();
-            return [
-                'vehicle_form' => $vehicleForm,
-                'user' => $user,
-            ];
+        // Calculate the count after mapping
+        $inspPersonnelCount = $getPersonnel->count();
+
+        // Add count to each item
+        $getPersonnel = $getPersonnel->map(function ($item) use ($inspPersonnelCount) {
+            $item['insp_count'] = $inspPersonnelCount;
+            return $item;
         });
+        
 
+        // ------------------------------- Is FOR OUTPUT ----------------------------------------------
         $responseData = [
-            'adminDet' => $adminDet,
-            'adminFacDet' => $adminFDet,
-            'adminVehDet' => $adminVehDet
+            'Sup_Not' => [
+                    'supInsDet' => $supInsDet->isEmpty() ? null : $supInsDet,
+                    'supInsCount' => $inspSupCount,
+                ],
+            'GSO_Not' => [
+                    'gsoInsDet' => $gsoInsDet->isEmpty() ? null : $gsoInsDet,
+                    'gsoInsCount' => $inspGSOCount,
+                ],
+            'Admin_Not' => [
+                    'adminInsDet' => $adminInsDet->isEmpty() ? null : $adminInsDet,
+                    'adminInsCount' => $inspAdminCount,
+                ],
+            'Personnel_Not' => [
+                    'personnelInsDet' => $getPersonnel,
+                    'personnelInspector' => $getInspector,
+                    'personnelCount' => $inspPersonnelCount
+                ]
         ];
 
         return response()->json($responseData);
     }
 
-    /** 
-     * Receive Notification by the Assign Personnel
-     */
-    public function PersonnelNoti()
-    {
-        //Get Form Admin (Part B)
-        $pID = AdminInspectionForm::get();
-        $specForm = Inspector_Form::whereIn('close', [3,4])->get();
-
-        $responseData = [
-            'inspectionDet' => $pID,
-            'inspectorDet' => $specForm
-        ];
-
-        return response()->json($responseData);
-    }
+    
 
 }

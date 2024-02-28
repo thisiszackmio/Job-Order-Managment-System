@@ -8,6 +8,7 @@ use App\Http\Requests\StoreAdminInspectionRequest;
 use App\Http\Requests\Inspector_Form_Request;
 use App\Models\Inspection_Form;
 use App\Models\PPAUser;
+use App\Models\AssignPersonnel;
 use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\NotificationModel;
@@ -22,10 +23,6 @@ class InspectionFormController extends Controller
     public function index()
     {
         $inspectionForms = Inspection_Form::with('user')->get();
-
-        // if ($inspectionForms->isEmpty()) {
-        //     return response()->json(['message' => 'No data found'], 404);
-        // }
 
         $responseData = [];
 
@@ -55,116 +52,115 @@ class InspectionFormController extends Controller
     }
 
     /**
-     * Show data on Part A.
+     * Show data on Pre-Repair/Post Repair Inspection Form Page.
      */
-    public function show(Request $request, $id)
+    public function getInspectionForm(Request $request, $id)
     {
+        $InspectionRequest = Inspection_Form::find($id);
+        $AdminInspectionRequest = AdminInspectionForm::where('inspection__form_id', $id)->first();
+        $InspectorRequest = Inspector_Form::where('inspection__form_id', $id)->first();
 
-        $viewRequest = Inspection_Form::find($id);
+        //Get the requestor data
+        $ppaUser = $InspectionRequest->user;
+        $reqUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
+        $reqSignature = URL::to('/storage/esignature/' . $ppaUser->image);
 
-        // Access the related PPAUser data
-        $ppaUser = $viewRequest->user;
+        //Get the Supervisor data
+        $supervisor = PPAUser::find($InspectionRequest->supervisor_name);
+        $supervisorName = $supervisor->fname . ' ' . $supervisor->mname. '. ' . $supervisor->lname;
+        $supervisorSignature = URL::to('/storage/esignature/' . $supervisor->image);
 
-        // You can now access PPAUser properties like fname, lname, etc.
-        $endUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
-        $userSignature = URL::to('/storage/esignature/' . $ppaUser->image);
-        //$userSignature = $ppaUser->image;
-
-        // On supervisor Detetails
-        // Access supervisor details
-        $supervisorId = $viewRequest->supervisor_name;
-
-        if ($supervisorId) {
-            $supervisor = PPAUser::find($supervisorId);
-
-            if ($supervisor) {
-                $supervisorName = $supervisor->fname . ' ' . $supervisor->mname. '. ' . $supervisor->lname;
-                $supervisorSignature = URL::to('/storage/esignature/' . $supervisor->image);
-            } else {
-                $supervisorName = 'Supervisor Not Found'; // Handle the case where supervisor not found
-            }
-        } else {
-            $supervisorName = 'No Supervisor Assigned'; // Handle the case where supervisor_id is empty
-        }
-
-        //Get GSO ID on the database
-        $gsoUser = PPAUser::where('code_clearance', 3)->where('lname', 'Sade')->first(); // ID number of Maam Sue
-
-        if (!$gsoUser) {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
-
+        //Get the GSO data
+        $gsoUser =  PPAUser::where('code_clearance', 3)->first();
         $gsoName = $gsoUser->fname . ' ' . $gsoUser->mname. '. ' . $gsoUser->lname;
         $gsoSignature = URL::to('/storage/esignature/' . $gsoUser->image);
 
+        //Get Admin Manager data
+        $managerUser = PPAUser::where('code_clearance', 1)->first();
+        $managerName = $managerUser->fname . ' ' . $managerUser->mname. '. ' . $managerUser->lname;
+        $managerSignature = URL::to('/storage/esignature/' . $managerUser->image);
 
-        //Get Admin Division Manager on the Database
-        $ManagerUser = PPAUser::where('code_clearance', 1)->first(); // ID Number of Maam Daisy
-
-        if (!$ManagerUser) {
-            return response()->json(['message' => 'Data not found'], 404);
+        //Get Personnel data
+        if ($AdminInspectionRequest !== null || $InspectorRequest !== null){
+            $personnelfetch = $AdminInspectionRequest->where('inspection__form_id', $id)->pluck('assign_personnel')->first();
+            $personnelUser =  PPAUser::where('id', $personnelfetch)->first();
+            $personnelName = $personnelUser->fname . ' ' . $personnelUser->mname. '. ' . $personnelUser->lname;
+            $personnelSignature = URL::to('/storage/esignature/' . $personnelUser->image);
+        } else {
+            $personnelfetch = null;
+            $personnelUser =  null;
+            $personnelName = null;
+            $personnelSignature = null;
+            $$AdminInspectionRequest = null;
         }
 
-        $ManagerName = $ManagerUser->fname . ' ' . $ManagerUser->mname. '. ' . $ManagerUser->lname;
-        $ManagerSignature = URL::to('/storage/esignature/' . $ManagerUser->image);
+        //For Assign Personnel
+        $pro = $InspectionRequest->type_of_property;
+        if ($pro == "Vehicle Supplies & Materials") {
+            $PersonnelHehe = [
+                "Driver/Mechanic",
+                "Janitorial Service",
+                "Watering Services",
+            ];
+        } elseif ($pro == "IT Equipment & Related Materials") {
+            $PersonnelHehe = [
+                "IT Service",
+                "Electronics",
+                "Electrical Works",
+                "Engineering Services",
+            ];
+        } else {
+            $PersonnelHehe = [
+                "Driver/Mechanic",
+                "IT Service",
+                "Janitorial Service",
+                "Electronics",
+                "Electrical Works",
+                "Watering Services",
+                "Engineering Services",
+            ];
+        }
+        $assignPersonnels = AssignPersonnel::with('user')->whereIn("type_of_personnel", $PersonnelHehe)->get();
 
-
-        // Create the response data
-        $respondData = [
-            'view_request' => $viewRequest,
-            'user_details' => [
-                'id' =>  $ppaUser->id,
-                'enduser' => $endUser,
-                'supervisor' => $supervisorName,
-                'requestor_signature' => $userSignature,
-                'supervisor_signature' => $supervisorSignature,
-            ],
-            'gso_user_details' => [
-                'gso_name' => $gsoName,
-                'gso_signature' => $gsoSignature,
-            ],
-            'manager_user_details' => [
-                'manager_name' => $ManagerName,
-                'manager_signature' => $ManagerSignature,
-            ],
-        ];
+            $respondData = [
+                'requestor' => [
+                        'r_id' => $ppaUser->id,
+                        'r_name' => $reqUser,
+                        'r_sign' => $reqSignature
+                    ],
+                'supervisor' => [
+                        'sup_id' => $supervisor->id,
+                        'supName' => $supervisorName,
+                        'supSign' => $supervisorSignature
+                    ],
+                'gso' => [
+                        'gso_id' => $gsoUser->id,
+                        'gsoName' => $gsoName,
+                        'gsoSign' => $gsoSignature
+                    ],
+                'manager' => [
+                        'ad_id' => $managerUser->id,
+                        'ad_name' => $managerName,
+                        'ad_sign' => $managerSignature
+                    ],
+                'personnel' => [
+                    'p_name' => $personnelName,
+                    'p_sign' => $personnelSignature
+                    ],
+                'partA' => $InspectionRequest,
+                'partB' => $AdminInspectionRequest,
+                'partCD' => $InspectorRequest,
+                'assign_personnel' => $assignPersonnels->map(function ($assignPersonnel) {
+                    return [
+                        'ap_id' => $assignPersonnel->user->id,
+                        'ap_name' => $assignPersonnel->user->fname.' '.$assignPersonnel->user->mname.'. '.$assignPersonnel->user->lname,
+                        'ap_type' => $assignPersonnel->type_of_personnel
+                    ];
+                })->toArray()
+                 
+            ];
 
         return response()->json($respondData);
-
-    }
-
-    /**
-     * Show data on Part B.
-     */
-    public function viewAdmin(Request $request, $id)
-    {
-        $viewAdminRequest = Inspection_Form::find($id);
-
-        $formId = $viewAdminRequest->id;
-
-        $viewAdminRequestForm = AdminInspectionForm::where('inspection__form_id', $formId)->first();
-
-        $respondData = [
-            'partB' => $viewAdminRequestForm
-        ];
-
-        return response()->json($respondData);
-    }
-
-    /**
-     * Show Part C and D data's
-     */
-    public function InspectorSide(Request $request, $id)
-    {
-
-        $p1 = Inspector_Form::where('inspection__form_id', $id)->first();
-
-        $respondData = [
-            'part_c' => $p1
-        ];
-
-        return response()->json($respondData);
-
     }
 
     /**
@@ -176,14 +172,18 @@ class InspectionFormController extends Controller
         $myRequest = PPAUser::find($id);
 
         //Get the request
-        $getInspectionForm = Inspection_Form::where('user_id', $id)
-        ->orderBy('id', 'asc')
-        ->get(); 
+        $getInspectionForm = Inspection_Form::where('user_id', $id)->get(); 
+
+        // Get supervisor id and name
+        $sup_id = $getInspectionForm->pluck('supervisor_name')->first();
+        $ppaID = PPAUser::find($sup_id);
+        $supName = $ppaID->fname . ' ' . $ppaID->mname . '. ' . $ppaID->lname;
 
         //Display All the data
         $respondData = [
             'my_user' => $myRequest,
             'view_request' => $getInspectionForm,
+            'supervisor' => $supName
         ];
 
         return response()->json($respondData);
@@ -252,27 +252,37 @@ class InspectionFormController extends Controller
      */
     public function storeInspectorForm(Request $request, $id)
     {
+        // Validation rules
+        $validatedData = $request->validate([
+            'findings' => 'required|string',
+            'recommendations' => 'required|string',
+        ]);
+
+        // Find the inspection form
         $findInspection = Inspection_Form::find($id);
 
+        // Find inspector forms related to the inspection form
         $findInspector = Inspector_Form::where('inspection__form_id', $id)->get();
 
+        // Update each inspector form
         foreach ($findInspector as $record) {
             $record->update([
                 'before_repair_date' => $request->input('before_repair_date'),
-                'findings' => $request->input('findings'),
-                'recommendations' => $request->input('recommendations'),
-                'close' => 3
+                'findings' => $validatedData['findings'],
+                'recommendations' => $validatedData['recommendations'],
+                'close' => 3,
             ]);
         }
 
+        // Update inspection form status
         $findInspection->inspector_status = 2;
 
+        // Save changes
         if ($findInspection->save()) {
-            return response()->json(['message' => 'Deployment data created successfully'], 200);
+            return response()->json(['message' => 'Inspector form updated successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
-
     }
 
     /**
@@ -280,16 +290,17 @@ class InspectionFormController extends Controller
      */
     public function InspectorPartB(Request $request, $id)
     {
-        $p2 = Inspector_Form::where('inspection__form_id', $id)->get();
+        // Validation rules
+        $validatedData = $request->validate([
+            'remarks' => 'required|string',
+        ]);
 
-        // if($p2->isEmpty()) {
-        //     return response()->json(['message' => 'No data'], 404);
-        // }
+        $p2 = Inspector_Form::where('inspection__form_id', $id)->get();
 
         foreach ($p2 as $record) {
             $record->update([
                 'after_reapir_date' => $request->input('after_reapir_date'),
-                'remarks' => $request->input('remarks'),
+                'remarks' => $validatedData['remarks'],
                 'close' => 2,
             ]);
         }
@@ -364,7 +375,7 @@ class InspectionFormController extends Controller
             }
         }
 
-        return response()->json(['message' => 'Failed to update the request'], 500);
+        return response()->json(['message' => 'Failed to update the request on Admin'], 500);
     
     }
 

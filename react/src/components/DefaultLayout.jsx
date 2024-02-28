@@ -20,10 +20,12 @@ export default function DefaultLayout() {
   const [isLoading , setLoading] = useState(false);
 
   const { currentUser, userToken, userRole , setCurrentUser, setUserToken } = useUserStateContext();
+
   const [getSupNoti, setSupNoti] = useState([]);
-  const [getGSONoti, setGSONoti] = useState([]);
-  const [getAdminNoti, setAdminNoti] = useState([]);
-  const [getPersoNoti, setPersoNoti] = useState([]);
+
+  const [Notification, setNotification] = useState([]);
+  // const [getAdminNoti, setAdminNoti] = useState([]);
+  // const [getPersoNoti, setPersoNoti] = useState([]);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const navigate = useNavigate();
@@ -67,26 +69,26 @@ export default function DefaultLayout() {
     { name: 'Request Form', 
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
-        { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
-        { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
+        // { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
+        // { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
       ],
     },
     {
       name: 'My Request',
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
-        { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
-        { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
+        // { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
+        // { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
       ],
     },
-    ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '2' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
+    ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
       ? [
           {
             name: 'Request List',
             submenu: [
               { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
-              { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
-              { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
+              // { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
+              // { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
             ],
           },
         ]
@@ -137,9 +139,104 @@ export default function DefaultLayout() {
     });
   };
 
-  
-  
+  // Get Notification
+  const fetchNotification = () => {
+  axiosClient
+    .get(`/notification/${currentUser.id}`)
+    .then((response) => {
+      const responseData = response.data;
+      const supInsCount = responseData.Sup_Not.supInsCount;
+      const supInsDet = responseData.Sup_Not.supInsDet;
+      const gsoInsCount = responseData.GSO_Not.gsoInsCount;
+      const gsoInsDet = responseData.GSO_Not.gsoInsDet;
+      const adminInsCount = responseData.Admin_Not.adminInsCount;
+      const adminInsDet = responseData.Admin_Not.adminInsDet;
+      const personnelInsCount = responseData.Personnel_Not.personnelCount;
+      const personnelInsDet = responseData.Personnel_Not.personnelInsDet;
+      const personnelInspector = responseData.Personnel_Not.personnelInspector;
 
+      // For Inspection Function on Supervisor
+      const mappedInsSupData = supInsDet
+      ? supInsDet.map((SInspItem) => {
+          const { sup_insp_form, insp_user } = SInspItem;
+          return {
+            type: 'Pre-Repair/Post Repair Inspect Form',
+            id: sup_insp_form.id,
+            user_id: sup_insp_form.user_id,
+            requestor: insp_user,
+            supervisor_name: sup_insp_form.supervisor_name,
+            datetimerequest: sup_insp_form.updated_at,
+            countInsp: supInsCount,
+          };
+        })
+      : null;
+
+      // For Inspection Function on GSO
+      const mappedInsGSOData = gsoInsDet
+      ? gsoInsDet.map((GInspItem) =>{
+        const { gso_insp_form, insp_user, code } = GInspItem;
+          return {
+            type: 'Pre-Repair/Post Repair Inspect Form',
+            id: gso_insp_form.id,
+            requestor: insp_user,
+            code: code,
+            datetimerequest: gso_insp_form.updated_at,
+            countInsp: gsoInsCount
+          };
+        })
+      : null;
+
+      // For Inspection Function on Admin
+      const mappedInsAdminData = adminInsDet
+      ? adminInsDet.map((AInspItem) => {
+        const { admin_insp_form, insp_user } = AInspItem;
+          return {
+            type: 'Pre-Repair/Post Repair Inspect Form',
+            id: admin_insp_form.id,
+            supervisor_name: admin_insp_form.supervisor_name,
+            requestor: insp_user,
+            datetimerequest: admin_insp_form.updated_at,
+            countInsp: adminInsCount
+          }
+        })
+      : null;
+
+      // For Inspection Function on Personnel
+      const mappedInsPersonnelData = personnelInsDet
+      ? personnelInsDet.map((PInspItem) => {
+        const inspectionFormId = PInspItem.inspection__form_id;
+        const closeValues = personnelInspector.filter((item) => item.inspection__form_id === inspectionFormId).map((item) => item.close);
+        const datetimeValues = personnelInspector.filter((item) => item.inspection__form_id === inspectionFormId).map((item) => item.updated_at);
+          return{
+            type: 'Pre-Repair/Post Repair Inspect Form',
+            id: inspectionFormId,
+            taskdatetime: PInspItem.updated_at,
+            datetimerequest: datetimeValues,
+            status: closeValues,
+            assign: PInspItem.assign_personnel,
+            countInsp: personnelInsCount
+          }
+      })
+      : null;
+
+      //console.log({mappedInsPersonnelData});
+      setNotification({
+        mappedInsSupData,
+        mappedInsGSOData,
+        mappedInsAdminData,
+        mappedInsPersonnelData
+      });
+
+    })
+    .catch((error) => {
+      console.error('Error fetching Supervisor Notification data:', error);
+      setLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    fetchNotification();
+  }, [currentUser.id]);
   
 
   const handleLinkClick = () => {
@@ -150,36 +247,6 @@ export default function DefaultLayout() {
     fetchPersonnelNoti();
   };
 
-  //Notification Popup
-  //Admin
-  const haveAdminNotifications = (
-    getAdminNoti?.mappedInsData?.length > 0 || 
-    getAdminNoti?.mappedFacData?.length > 0 ||
-    getAdminNoti?.mappedVehData?.length > 0
-  );
-
-  //GSO
-  const haveGSONotifications = (
-    getGSONoti?.mappedInsData?.length > 0 ||
-    getGSONoti?.mappedFacData?.length > 0 ||
-    getGSONoti?.mappedVehData?.length > 0
-  );
-
-  //Count Notification number
-  //Admin
-  const totalAdminNotifications = (
-    getAdminNoti?.mappedInsData?.length +
-    getSupNoti?.mappedInsSupData?.length +
-    getAdminNoti?.mappedFacData?.length +
-    getAdminNoti?.mappedVehData?.length
-  );
-
-  //GSO
-  const totalGSONotifications = (
-    getGSONoti?.mappedInsData?.length + 
-    getGSONoti?.mappedFacData?.length +
-    getGSONoti?.mappedVehData?.length
-  );
 
   return isLoading ? (
   <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -302,9 +369,223 @@ export default function DefaultLayout() {
                 <Menu as="div" className="relative ml-3">
 
                   {/* Notification Number */}
-                  
+                  {(userRole == 'admin' || userRole == 'personnels' || userRole == 'hackers') && (
+                  <div>
+                    <Menu.Button className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <span className="absolute -inset-1.5" />
+                    <span className="sr-only">View notifications</span>
+                    <BellIcon className="h-6 w-6" aria-hidden="true" />
+                    </Menu.Button>
+
+                    {/* Display the count for Supervisor */}
+                    {Notification?.mappedInsSupData?.map((SupDet) => (
+                    <div key={SupDet.id}>
+                    {SupDet.supervisor_name === currentUser.id && (
+                      <span className="notifications">{SupDet.countInsp}</span>
+                    )}
+                    </div>
+                    ))}
+
+                    {/* Display the count for GSO */}
+                    {Notification?.mappedInsGSOData?.map((GSODet) => (
+                    <div key={GSODet.id}>
+                    {currentUser.code_clearance == 3 && (
+                      <span className="notifications">{GSODet.countInsp}</span>
+                    )}
+                    </div>
+                    ))}
+
+                    {/* Display the count for Admin */}
+                    {Notification?.mappedInsAdminData?.map((AdminDet) => (
+                    <div key={AdminDet.id}>
+                    {currentUser.code_clearance == 1 && (
+                       <span className="notifications">{AdminDet.countInsp}</span>
+                    )}
+                    </div>  
+                    ))}
+
+                    {/* Display the count for Personnel */}
+                    {Notification?.mappedInsPersonnelData?.map((PeDet) => (
+                    <div key={PeDet.id}>
+                      {PeDet.assign == currentUser.id && (
+                        <span className="notifications">{PeDet.countInsp}</span>
+                      )}
+                    </div>
+                    ))}
+
+                  </div>
+                  )}
+                  {/* End of Notification Number */}
                   
                   {/* Notification Message */}
+                  {(userRole == 'admin' || userRole == 'personnels' || userRole == 'hackers') && (
+                  <div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute font-arial right-0 z-10 mt-2 w-96 max-h-[445px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <p className="text-xs font-bold text-center leading-7 text-red-500 ml-2">Notifications</p>
+
+                        {/* Supervisor Message */}
+                        {currentUser.code_clearance == 4 && (
+                        <>
+                          {/* Inspection Notification */}
+                          {Notification?.mappedInsSupData?.map((SupIntDet)=> (
+                          <div key={SupIntDet.id}>
+                            {SupIntDet.supervisor_name == currentUser.id && (
+                              <Link 
+                                to={`/repairinspectionform/${SupIntDet.id}`}
+                                onClick={handleLinkClick} 
+                                className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                              >
+                                <h4 className="text-sm text-gray-400">
+                                  {SupIntDet.type}
+                                </h4>
+                                <h3 className="text-l font-normal leading-6 text-gray-900">
+                                  <strong>{SupIntDet.requestor}</strong> has a request that requires your approval.
+                                </h3>
+                                <h4 className="text-sm text-blue-500 font-bold">
+                                  {formatTimeDifference(SupIntDet.datetimerequest)}
+                                </h4>
+                              </Link>
+                            )}
+                          </div>                            
+                          ))}
+
+                          {/* If no Notification */}
+                          {Notification?.mappedInsSupData == null ? (
+                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
+                          ):null}
+                        </>
+                        )}
+
+                        {/* GSO Message */}
+                        {currentUser.code_clearance == 3 && (
+                        <>
+                          {/* Inspection Notification */}
+                          {Notification?.mappedInsGSOData?.map((GSOItem) => (
+                          <div key={GSOItem.id}>
+                            <Link 
+                              to={`/repairinspectionform/${GSOItem.id}`} 
+                              onClick={handleLinkClick}
+                              className="hover:bg-gray-100 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400"> {GSOItem.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                {(GSOItem.code == 1 || GSOItem.code == 2 || GSOItem.code == 4) && (
+                                <><strong>{GSOItem.requestor}</strong>  has a request </>
+                                )}
+
+                                {GSOItem.code == 3 && (
+                                  <><strong>{GSOItem.requestor}</strong>, your request has been approved by your supervisor</>
+                                )}
+
+                                {(GSOItem.code == 5 || GSOItem.code == 6 || GSOItem.code == 10) && (
+                                  <><strong>{GSOItem.requestor}</strong>  has a request and it has already been approved by the supervisor.</>
+                                )}
+                                
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">
+                                {formatTimeDifference(GSOItem.datetimerequest)}
+                              </h4>
+                            </Link>
+                          </div>
+                          ))}
+
+                          {/* If no Notification */}
+                          {Notification?.mappedInsGSOData == null ? (
+                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
+                          ):null}
+                        </>
+                        )}
+
+                        {/* Admin Message */}
+                        {currentUser.code_clearance == 1 && (
+                        <>
+                          {/* Inspection Notification */}
+                          {Notification?.mappedInsAdminData?.map((AdminItem) => (
+                          <div key={AdminItem.id}>
+                            <Link 
+                              to={`/repairinspectionform/${AdminItem.id}`} 
+                              onClick={handleLinkClick}
+                              className="hover:bg-gray-100 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400"> {AdminItem.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                {AdminItem.supervisor_name == currentUser.id ? (
+                                  <div><strong>{AdminItem.requestor}</strong>, your request has been completed by the GSO.</div>
+                                ):(
+                                  <div><strong>{AdminItem.requestor}'s</strong> request has been completed by the GSO and now requires your approval.</div>
+                                )}
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">
+                                {formatTimeDifference(AdminItem.datetimerequest)}
+                              </h4>
+                            </Link>
+                          </div>  
+                          ))}
+
+                          {/* If no Notification */}
+                          {Notification?.mappedInsAdminData == null ? (
+                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
+                          ):null}
+                        </>
+                        )}
+
+                        {/* Personnel Message */}
+                        {Notification?.mappedInsPersonnelData?.map((PInspItem) => (
+                        <div key={PInspItem.id}>
+                          {PInspItem.assign == currentUser.id && (
+                          <>
+                            {/* For Part C Status */}
+                            {PInspItem.status == 4 && (
+                              <Link 
+                                to={`/repairinspectionform/${PInspItem.id}`} 
+                                onClick={handleLinkClick}
+                                className="hover:bg-gray-100 block p-4 transition duration-300"
+                              >
+                                <h4 className="text-sm text-gray-400"> {PInspItem.type} </h4>
+                                <h3 className="text-l font-normal leading-6 text-gray-900">
+                                  Hello <strong>{currentUser.fname}</strong>, there a task for you (Control No: {PInspItem.id})
+                                </h3>
+                                <h4 className="text-sm text-blue-500 font-bold">
+                                  {formatTimeDifference(PInspItem.datetimerequest)}
+                                </h4>
+                              </Link>
+                            )}
+
+                            {/* For Part D status */}
+                            {PInspItem.status == 3 && (
+                              <Link 
+                                to={`/repairinspectionform/${PInspItem.id}`} 
+                                onClick={handleLinkClick}
+                                className="hover:bg-gray-100 block p-4 transition duration-300"
+                              >
+                                <h4 className="text-sm text-gray-400"> {PInspItem.type} </h4>
+                                <h3 className="text-l font-normal leading-6 text-gray-900">
+                                  Hello <strong>{currentUser.fname}</strong>, you still need to fill up PART D (Control No: {PInspItem.id})
+                                </h3>
+                                <h4 className="text-sm text-blue-500 font-bold">
+                                 {formatTimeDifference(PInspItem.datetimerequest)}
+                                </h4>
+                              </Link>
+                            )}
+                          </> 
+                          )}
+                        </div>
+                        ))}
+
+                      </Menu.Items>
+                    </Transition>
+                  </div>  
+                  )}
+                  {/* End of Notification Message */}
                   
                 </Menu>
                 

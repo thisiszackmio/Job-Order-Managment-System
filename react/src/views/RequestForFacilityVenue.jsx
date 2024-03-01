@@ -246,11 +246,14 @@ export default function RequestFormFacility(){
 
   // Auto Approval for Supervisors and Manager
   let output;
+  let date_request;
 
   if (currentUser.code_clearance === 1 ) {
     output = 2;
+    date_request = today;
   } else {
     output = 4;
+    date_request = null;
   }
 
   // Popup Clarification
@@ -345,6 +348,7 @@ export default function RequestFormFacility(){
       other_details: none,
       obr_instruct: oprInstrucValue,
       admin_approval: output,
+      date_approve: date_request,
       remarks: 'Pending',
     };
 
@@ -403,186 +407,430 @@ export default function RequestFormFacility(){
     window.location.assign(`/myrequestfacilityvenueform/${currentUser.id}`);
   };
 
-  return (
-  <PageComponent title="Request for use of Facility / Venue Form">
-  {currentUser.id == id && (
-  <>
-    
-      <form id="fac-submit" onSubmit={SubmitFacilityForm}>
+  //restrictions
+  const Authority = id == currentUser.id;
 
-        {/* Title */}
-        <div>
-          <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-          <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
-          <p className="text-xs font-bold text-red-500">Click <Link to={`/facilityvenuerequestform`} className="text-blue-500">here</Link> to check the schedule to avoid facility conflicts</p>
+  return Authority ? (
+  <PageComponent title="Request for use of Facility / Venue Form">
+
+    <form id="fac-submit" onSubmit={SubmitFacilityForm}>
+
+      {/* Title */}
+      <div>
+        <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
+        <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+        <p className="text-xs font-bold text-red-500">Click <Link to={`/facilityvenuerequestform`} className="text-blue-500">here</Link> to check the schedule to avoid facility conflicts</p>
+      </div>
+
+      {/* Main form */}
+      <div className="grid grid-cols-2 gap-4">
+
+        <div className="col-span-1">
+
+          {/* Date */}
+          <div className="flex items-center mt-6">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+                Date:<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="date"
+                name="rep_date"
+                id="rep_date"
+                defaultValue= {today}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Requesting Office/Division */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                Requesting Office/Division:<span className="text-red-500">*</span>
+              </label>
+            </div>
+            <div className="w-64">
+              <input
+                type="text"
+                name="rf_request"
+                id="rf_request"
+                autoComplete="rf_request"
+                value={reqOffice}
+                onChange={ev => setRegOffice(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!reqOffice && inputFacErrors?.request_office && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Title/Purpose of Activity */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+              Title/Purpose of Activity:<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="text"
+                name="purpose"
+                id="purpose"
+                autoComplete="purpose"
+                value={titleReq}
+                onChange={ev => setTitleReq(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!titleReq && inputFacErrors?.title_of_activity && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Date Start */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+                Date of Activity (Start):<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="date"
+                name="date_start"
+                id="date_start"
+                value={DateStart}
+                onChange={ev => {
+                  setDateStart(ev.target.value);
+                  setDateEndMin(ev.target.value);
+                }}
+                min={today}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!DateStart && inputFacErrors?.date_start && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Time Start */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+                Time of Activity (Start):<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="time"
+                name="time_start"
+                id="time_start"
+                value={timeStart}
+                onChange={ev => setTimeStart(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!timeStart && inputFacErrors?.time_start && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Date End */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+                Date of Activity (End):<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="date"
+                name="date_end"
+                id="date_end"
+                value={DateEnd}
+                onChange={ev => {
+                  setDateEnd(ev.target.value);
+                  if (ev.target.value < DateStart) {
+                    // If DateEnd is before DateStart, set DateEnd to DateStart
+                    setDateEnd(DateStart);
+                  }
+                }}
+                min={DateEndMin}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!DateEnd && inputFacErrors?.date_end && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
+          {/* Time End */}
+          <div className="flex items-center mt-2">
+            <div className="w-56">
+              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+                Time of Activity (End):<span className="text-red-500">*</span>
+              </label> 
+            </div>
+            <div className="w-64">
+              <input
+                type="time"
+                name="time_end"
+                id="time_end"
+                value={timeEnd}
+                onChange={ev => setTimeEnd(ev.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              {!timeEnd && inputFacErrors?.time_end && (
+                <p className="text-red-500 text-xs italic">This field must be required</p>
+              )}
+            </div>
+          </div>
+
         </div>
 
-        {/* Main form */}
+        <div className="col-span-1">
+
+          <div className="mt-6">
+            <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+              Facilities / Venue being Requested :
+            </label> 
+          </div>
+
+          <div class="space-y-4 mt-6">
+
+            {/* For MPH */}
+            <div class="relative flex items-center">
+              <div class="flex items-center h-5">
+                <input
+                  id="mph-checkbox"
+                  type="checkbox"
+                  checked={mphCheck}
+                  onChange={(ev) => handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                  Multi-Purpose Hall (MPH)
+                </label> 
+              </div>
+            </div>
+
+            {/* Conference Hall */}
+            <div class="relative flex items-center">
+              <div class="flex items-center h-5">
+                <input
+                  id="conference-checkbox"
+                  type="checkbox"
+                  checked={confCheck}
+                  onChange={(ev) => handleCheckboxChange(setConfCheck, ev.target.checked, setMphCheck, setOtherCheck)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                  Conference Hall
+                </label> 
+              </div>
+            </div>
+
+            {/* Dormitory */}
+            <div class="relative flex items-center">
+              <div class="flex items-center h-5">
+                <input
+                  id="dormitory-checkbox"
+                  type="checkbox"
+                  checked={dormCheck}
+                  onChange={(ev) => handleCheckboxChange(setDormCheck, ev.target.checked)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                  Dormitory
+                </label> 
+              </div>
+            </div>
+
+            {/* Other */}
+            <div class="relative flex items-center">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={otherCheck}
+                  onChange={(ev) => handleCheckboxChange(setOtherCheck, ev.target.checked, setConfCheck, setMphCheck)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                  Other
+                </label> 
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Facility Form */}
+      {(mphCheck || confCheck || otherCheck) ? (
+      <>
+      <div className="mt-8 border-t border-black">
+
+        <div>
+          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
 
           <div className="col-span-1">
 
-            {/* Date */}
-            <div className="flex items-center mt-6">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                  Date:<span className="text-red-500">*</span>
-                </label> 
-              </div>
-              <div className="w-64">
+            {/* Table */}
+            <div class="relative flex items-center mt-4">
+              <div class="flex items-center h-5">
                 <input
-                  type="date"
-                  name="rep_date"
-                  id="rep_date"
-                  defaultValue= {today}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  readOnly
-                />
-              </div>
-            </div>
-
-            {/* Requesting Office/Division */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                  Requesting Office/Division:<span className="text-red-500">*</span>
-                </label>
-              </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="rf_request"
-                  id="rf_request"
-                  autoComplete="rf_request"
-                  value={reqOffice}
-                  onChange={ev => setRegOffice(ev.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                />
-                {!reqOffice && inputFacErrors?.request_office && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
-              </div>
-            </div>
-
-            {/* Title/Purpose of Activity */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                Title/Purpose of Activity:<span className="text-red-500">*</span>
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="purpose"
-                  id="purpose"
-                  autoComplete="purpose"
-                  value={titleReq}
-                  onChange={ev => setTitleReq(ev.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                />
-                {!titleReq && inputFacErrors?.title_of_activity && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
-              </div>
-            </div>
-
-            {/* Date Start */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                  Date of Activity (Start):<span className="text-red-500">*</span>
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="date"
-                  name="date_start"
-                  id="date_start"
-                  value={DateStart}
-                  onChange={ev => {
-                    setDateStart(ev.target.value);
-                    setDateEndMin(ev.target.value);
+                  id="mph-checktable"
+                  name="mph-checktable"
+                  type="checkbox"
+                  checked={checkTable}
+                  onChange={() => {
+                    setCheckTable(!checkTable);
+                    setInputFacErrors(null);
                   }}
-                  min={today}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                 />
-                {!DateStart && inputFacErrors?.date_start && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
               </div>
-            </div>
-
-            {/* Time Start */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                  Time of Activity (Start):<span className="text-red-500">*</span>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                  Tables
                 </label> 
               </div>
-              <div className="w-64">
-                <input
-                  type="time"
-                  name="time_start"
-                  id="time_start"
-                  value={timeStart}
-                  onChange={ev => setTimeStart(ev.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                />
-                {!timeStart && inputFacErrors?.time_start && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
-              </div>
+              {checkTable && (
+                <div className="flex items-center w-32 ml-2">
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                    (No. 
+                  </label> 
+                  <input
+                    type="number"
+                    name="no-of-table"
+                    id="no-of-table"
+                    value={NoOfTable}
+                    onChange={handleInputTableChange}
+                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                    ) 
+                  </label>
+                </div>
+              )}
             </div>
+            {!NoOfTable && inputFacErrors?.no_table && (
+              <p className="text-red-500 text-xs">No. of table is required</p>
+            )}
 
-            {/* Date End */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                  Date of Activity (End):<span className="text-red-500">*</span>
-                </label> 
-              </div>
-              <div className="w-64">
+            {/* Chair */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
                 <input
-                  type="date"
-                  name="date_end"
-                  id="date_end"
-                  value={DateEnd}
-                  onChange={ev => {
-                    setDateEnd(ev.target.value);
-                    if (ev.target.value < DateStart) {
-                      // If DateEnd is before DateStart, set DateEnd to DateStart
-                      setDateEnd(DateStart);
-                    }
+                  id="mph-checkchair"
+                  name="mph-checkchair"
+                  type="checkbox"
+                  checked={checkChairs}
+                  onChange={() => {
+                    setCheckChairs(!checkChairs);
+                    setInputFacErrors(null);
                   }}
-                  min={DateEndMin}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                 />
-                {!DateEnd && inputFacErrors?.date_end && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                  Chair
+                </label> 
+              </div>
+              {checkChairs && (
+                <div className="flex items-center w-32 ml-2">
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                    (No. 
+                  </label> 
+                  <input
+                    type="number"
+                    name="no-of-chair"
+                    id="no-of-chair"
+                    value={NoOfChairs}
+                    onChange={handleInputChairChange}
+                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                    ) 
+                  </label>
+                </div>
+              )}
+            </div>
+            {!NoOfChairs && inputFacErrors?.no_chair && (
+              <p className="text-red-500 text-xs">No. of chair is required</p>
+            )}
+
+            {/* Projector */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkProjector}
+                  onChange={ev => setCheckProjector(!checkProjector)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Projector
+                </label> 
               </div>
             </div>
 
-            {/* Time End */}
-            <div className="flex items-center mt-2">
-              <div className="w-56">
-                <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
-                  Time of Activity (End):<span className="text-red-500">*</span>
+            {/* Projector Screen */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkProjectorScreen}
+                  onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Projector Screen
                 </label> 
               </div>
-              <div className="w-64">
+            </div>
+            
+            {/* Document Camera */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
                 <input
-                  type="time"
-                  name="time_end"
-                  id="time_end"
-                  value={timeEnd}
-                  onChange={ev => setTimeEnd(ev.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkDocumentCamera}
+                  onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                 />
-                {!timeEnd && inputFacErrors?.time_end && (
-                  <p className="text-red-500 text-xs italic">This field must be required</p>
-                )}
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Document Camera
+                </label> 
               </div>
             </div>
 
@@ -590,734 +838,445 @@ export default function RequestFormFacility(){
 
           <div className="col-span-1">
 
-            <div className="mt-6">
-              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                Facilities / Venue being Requested :
-              </label> 
-            </div>
-
-            <div class="space-y-4 mt-6">
-
-              {/* For MPH */}
-              <div class="relative flex items-center">
-                <div class="flex items-center h-5">
-                  <input
-                    id="mph-checkbox"
-                    type="checkbox"
-                    checked={mphCheck}
-                    onChange={(ev) => handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    Multi-Purpose Hall (MPH)
-                  </label> 
-                </div>
-              </div>
-
-              {/* Conference Hall */}
-              <div class="relative flex items-center">
-                <div class="flex items-center h-5">
-                  <input
-                    id="conference-checkbox"
-                    type="checkbox"
-                    checked={confCheck}
-                    onChange={(ev) => handleCheckboxChange(setConfCheck, ev.target.checked, setMphCheck, setOtherCheck)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    Conference Hall
-                  </label> 
-                </div>
-              </div>
-
-              {/* Dormitory */}
-              <div class="relative flex items-center">
-                <div class="flex items-center h-5">
-                  <input
-                    id="dormitory-checkbox"
-                    type="checkbox"
-                    checked={dormCheck}
-                    onChange={(ev) => handleCheckboxChange(setDormCheck, ev.target.checked)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    Dormitory
-                  </label> 
-                </div>
-              </div>
-
-              {/* Other */}
-              <div class="relative flex items-center">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={otherCheck}
-                    onChange={(ev) => handleCheckboxChange(setOtherCheck, ev.target.checked, setConfCheck, setMphCheck)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    Other
-                  </label> 
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Facility Form */}
-        {(mphCheck || confCheck || otherCheck) ? (
-        <>
-        <div className="mt-8 border-t border-black">
-
-          <div>
-            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-
-            <div className="col-span-1">
-
-              {/* Table */}
-              <div class="relative flex items-center mt-4">
-                <div class="flex items-center h-5">
-                  <input
-                    id="mph-checktable"
-                    name="mph-checktable"
-                    type="checkbox"
-                    checked={checkTable}
-                    onChange={() => {
-                      setCheckTable(!checkTable);
-                      setInputFacErrors(null);
-                    }}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                    Tables
-                  </label> 
-                </div>
-                {checkTable && (
-                  <div className="flex items-center w-32 ml-2">
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                      (No. 
-                    </label> 
-                    <input
-                      type="number"
-                      name="no-of-table"
-                      id="no-of-table"
-                      value={NoOfTable}
-                      onChange={handleInputTableChange}
-                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                      ) 
-                    </label>
-                  </div>
-                )}
-              </div>
-              {!NoOfTable && inputFacErrors?.no_table && (
-                <p className="text-red-500 text-xs">No. of table is required</p>
-              )}
-
-              {/* Chair */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="mph-checkchair"
-                    name="mph-checkchair"
-                    type="checkbox"
-                    checked={checkChairs}
-                    onChange={() => {
-                      setCheckChairs(!checkChairs);
-                      setInputFacErrors(null);
-                    }}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                    Chair
-                  </label> 
-                </div>
-                {checkChairs && (
-                  <div className="flex items-center w-32 ml-2">
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                      (No. 
-                    </label> 
-                    <input
-                      type="number"
-                      name="no-of-chair"
-                      id="no-of-chair"
-                      value={NoOfChairs}
-                      onChange={handleInputChairChange}
-                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                      ) 
-                    </label>
-                  </div>
-                )}
-              </div>
-              {!NoOfChairs && inputFacErrors?.no_chair && (
-                <p className="text-red-500 text-xs">No. of chair is required</p>
-              )}
-
-              {/* Projector */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkProjector}
-                    onChange={ev => setCheckProjector(!checkProjector)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Projector
-                  </label> 
-                </div>
-              </div>
-
-              {/* Projector Screen */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkProjectorScreen}
-                    onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Projector Screen
-                  </label> 
-                </div>
-              </div>
-              
-              {/* Document Camera */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkDocumentCamera}
-                    onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Document Camera
-                  </label> 
-                </div>
-              </div>
-
-            </div>
-
-            <div className="col-span-1">
-
-              {/* Laptop */}
-              <div class="relative flex items-center mt-4">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkLaptop}
-                    onChange={ev => setCheckLaptop(!checkLaptop)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Laptop
-                  </label> 
-                </div>
-              </div>
-
-              {/* Television */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkTelevision}
-                    onChange={ev => setCheckTelevision(!checkTelevision)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Television
-                  </label> 
-                </div>
-              </div>
-
-              {/* Sound System */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkSoundSystem}
-                    onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Sound System
-                  </label> 
-                </div>
-              </div>
-
-              {/* Videoke */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="other-checkbox"
-                    type="checkbox"
-                    checked={checkVideoke}
-                    onChange={ev => setCheckVideoke(!checkVideoke)}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Videoke
-                  </label> 
-                </div>
-              </div>
-
-              {/* Microphone */}
-              <div class="relative flex items-center mt-2">
-                <div class="flex items-center h-5">
-                  <input
-                    id="mph-checkmicrophone"
-                    name="mph-checkmicrophone"
-                    type="checkbox"
-                    checked={checkMicrphone}
-                    onChange={() => {
-                      setCheckMicrphone(!checkMicrphone);
-                      setInputFacErrors(null);
-                    }}
-                    class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-                  />
-                </div>
-                <div class="ml-3">
-                  <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-                  Microphone
-                  </label> 
-                </div>
-                {checkMicrphone && (
-                  <div className="flex items-center w-32 ml-2">
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                      (No. 
-                    </label> 
-                    <input
-                      type="number"
-                      name="no-of-microphone"
-                      id="no-of-microphone"
-                      value={NoOfMicrophone}
-                      onChange={handleInputMicrophoneChange}
-                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                    />
-                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                      ) 
-                    </label>
-                  </div>
-                )}
-              </div>
-              {!NoOfMicrophone && inputFacErrors?.no_microphone && (
-                <p className="text-red-500 text-xs">No. of microphone is required</p>
-              )}
-
-            </div>
-
-          </div>
-
-          {/* Other */}
-          <div class="relative flex items-center mt-2">
-            <div class="flex items-center h-5">
-              <input
-                id="mph-checkmicrophone"
-                name="mph-checkmicrophone"
-                type="checkbox"
-                checked={checkOther}
-                onChange={() => {
-                  setCheckOther(!checkOther);
-                  setInputFacErrors(null);
-                }}
-                class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
-              />
-            </div>
-            <div class="ml-3">
-              <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
-              Others
-              </label> 
-            </div>
-            {checkOther && (
-              <div className="flex items-center w-full ml-2">
+            {/* Laptop */}
+            <div class="relative flex items-center mt-4">
+              <div class="flex items-center h-5">
                 <input
-                  type="text"
-                  name="other-specfic"
-                  id="other-specfic"
-                  placeholder="Please Specify"
-                  value={OtherField}
-                  onChange={ev => setOtherField(ev.target.value)}
-                  className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkLaptop}
+                  onChange={ev => setCheckLaptop(!checkLaptop)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                 />
-                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                </label>
               </div>
-            )}
-          </div>
-          {!OtherField && inputFacErrors?.specify && (
-            <p className="text-red-500 text-xs">This form is required</p>
-          )}
-
-          {/* For OPR Instruction */}
-          {dormCheck ? null:(
-          <>
-          {currentUser.code_clearance == 1 && (
-          <>
-          <div>
-            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
-          </div>
-
-            <div className="flex mt-6">
-              <div className="w-56">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Instruction for the OPR for Action:
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Laptop
                 </label> 
               </div>
-              <div className="w-96 pl-1">
+            </div>
 
-                <textarea
-                  id="findings"
-                  name="findings"
-                  rows={3}
-                  style={{ resize: "none" }}
-                  value= {OprInstruct}
-                  onChange={ev => setOprInstruct(ev.target.value)}
-                  className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            {/* Television */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkTelevision}
+                  onChange={ev => setCheckTelevision(!checkTelevision)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
                 />
-                <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Television
+                </label> 
               </div>
             </div>
-          </> 
-          )}
-          </>
-          )}
+
+            {/* Sound System */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkSoundSystem}
+                  onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Sound System
+                </label> 
+              </div>
+            </div>
+
+            {/* Videoke */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="other-checkbox"
+                  type="checkbox"
+                  checked={checkVideoke}
+                  onChange={ev => setCheckVideoke(!checkVideoke)}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Videoke
+                </label> 
+              </div>
+            </div>
+
+            {/* Microphone */}
+            <div class="relative flex items-center mt-2">
+              <div class="flex items-center h-5">
+                <input
+                  id="mph-checkmicrophone"
+                  name="mph-checkmicrophone"
+                  type="checkbox"
+                  checked={checkMicrphone}
+                  onChange={() => {
+                    setCheckMicrphone(!checkMicrphone);
+                    setInputFacErrors(null);
+                  }}
+                  class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+                />
+              </div>
+              <div class="ml-3">
+                <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+                Microphone
+                </label> 
+              </div>
+              {checkMicrphone && (
+                <div className="flex items-center w-32 ml-2">
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                    (No. 
+                  </label> 
+                  <input
+                    type="number"
+                    name="no-of-microphone"
+                    id="no-of-microphone"
+                    value={NoOfMicrophone}
+                    onChange={handleInputMicrophoneChange}
+                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                  />
+                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                    ) 
+                  </label>
+                </div>
+              )}
+            </div>
+            {!NoOfMicrophone && inputFacErrors?.no_microphone && (
+              <p className="text-red-500 text-xs">No. of microphone is required</p>
+            )}
+
+          </div>
 
         </div>
-        </>
-        ):null}
 
-        {/* Dormitory Form */}
-        {dormCheck ? (
-        <>
-        <div className="mt-8 border-t border-black">
-
-          <div>
-            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
+        {/* Other */}
+        <div class="relative flex items-center mt-2">
+          <div class="flex items-center h-5">
+            <input
+              id="mph-checkmicrophone"
+              name="mph-checkmicrophone"
+              type="checkbox"
+              checked={checkOther}
+              onChange={() => {
+                setCheckOther(!checkOther);
+                setInputFacErrors(null);
+              }}
+              class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-black-500 rounded"
+            />
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-
-            {/* Male */}
-            <div className="col-span-1">
-
-              {/* No of Male Guest */}
-              <div className="mt-6">
-                <div className="flex">
-                  <div className="w-24 border-b border-black font-bold text-center">
-                    <span>
-                      {malelineCount}
-                    </span>
-                  </div>
-                  <div className="w-full ml-2">
-                    <strong>No. of Male Guests</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-
-                <div className="mb-4">
-                  <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
-                </div>
-
-                <textarea
-                  id="dorm-male-list"
-                  name="dorm-male-list"
-                  rows={5}
-                  value={maleList}
-                  onChange={handleMaleTextChange}
-                  style={{ resize: 'none' }}
-                  className="block w-10/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                <p className="text-red-500 text-xs mt-1">Separate name on next line (Leave blank if none)</p>
-
-                {/* For displaying the number of guest */}
-                <div>
-                  <textarea
-                    id="output-male-list"
-                    name="output-male-list"
-                    rows={5}
-                    value={getMaleList}
-                    readOnly
-                    style={{ resize: 'none', display: 'none' }}
-                  />
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* Female */}
-            <div className="col-span-1">
-
-              {/* No of Females */}
-              <div className="mt-6">
-                <div className="flex">
-                  <div className="w-24 border-b border-black font-bold text-center">
-                    <span>
-                      {femalelineCount}
-                    </span>
-                  </div>
-                  <div className="w-full ml-2">
-                    <strong>No. of Female Guests</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-
-                <div className="mb-4">
-                  <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
-                </div>
-
-                <textarea
-                  id="dorm-female-list"
-                  name="dorm-female-list"
-                  rows={5}
-                  value={femaleList}
-                  onChange={handleFemaleTextChange}
-                  style={{ resize: 'none' }}
-                  className="block w-10/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                <p className="text-red-500 text-xs mt-1">Separate name on next line (Leave blank if none)</p>
-
-                {/* For displaying the number of guest */}
-                <div>
-                  <textarea
-                    id="output-female-list"
-                    name="output-female-list"
-                    rows={5}
-                    value={getFemaleList}
-                    readOnly
-                    style={{ resize: 'none', display: 'none' }}
-                  />
-                </div>
-
-              </div>
-
-            </div>
-
+          <div class="ml-3">
+            <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-gray-900">
+            Others
+            </label> 
           </div>
-
-          {/* For Other */}
-          <div className="flex mt-10 ml-40">
-            <div className="w-40">
-              <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
-                Other Details :
+          {checkOther && (
+            <div className="flex items-center w-full ml-2">
+              <input
+                type="text"
+                name="other-specfic"
+                id="other-specfic"
+                placeholder="Please Specify"
+                value={OtherField}
+                onChange={ev => setOtherField(ev.target.value)}
+                className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+              />
+              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
               </label>
             </div>
-            <div className="w-1/2">
-              <textarea
-                id="recomendations"
-                name="recomendations"
-                rows={3}
-                style={{ resize: "none", borderColor: "#272727" }}
-                value={DormOtherField}
-                onChange={(ev) => setDormOtherField(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-              <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
-            </div>  
-          </div>
-
-          {currentUser.code_clearance == 1 && (
-          <>
-          <div>
-            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
-          </div>
-
-            <div className="flex mt-6">
-              <div className="w-56">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Instruction for the OPR for Action:
-                </label> 
-              </div>
-              <div className="w-96 pl-1">
-
-                <textarea
-                  id="findings"
-                  name="findings"
-                  rows={3}
-                  style={{ resize: "none" }}
-                  value= {OprInstruct}
-                  onChange={ev => setOprInstruct(ev.target.value)}
-                  className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
-              </div>
-            </div>
-          </> 
           )}
-
         </div>
-        </>
-        ):null}
+        {!OtherField && inputFacErrors?.specify && (
+          <p className="text-red-500 text-xs">This form is required</p>
+        )}
 
-      </form>
-      
-      {/* Button */}
-      <div className="flex mt-8">
-
-        {/* For Admin Manager User Only */}
-        {currentUser.code_clearance == 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
+        {/* For OPR Instruction */}
+        {dormCheck ? null:(
         <>
-          {/* If the user choose between the Facility and Dorm Form */}
-          {(mphCheck || confCheck || otherCheck) && dormCheck ? (
-          <>
-            {/* Condition if the user choose the field on the Facility will appear the button */}
-            {checkedCount ? (
-              (!maleList && !femaleList) || oprInstrucValue === "None" ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):null
-            ):null}
-          </>
-          ):(
-          <>
-            {/* if user choose only Dormitory */}
-            {dormCheck ? (
-              (!maleList && !femaleList) || oprInstrucValue === "None" ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )
-            ):(
-              checkedCount ? (
-                oprInstrucValue === "None" ? (
-                  <button
-                    onClick={() => handleClarification()}
-                    className={`rounded-md px-2 py-2 text-vase text-white shadow-sm focus:outline-none ${
-                      sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                    }`}
-                    disabled={sumbitLoading}
-                  >
-                    {sumbitLoading ? (
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Processing...</span>
-                      </div>
-                    ) : 'Submit'}
-                  </button>
-                ):(
-                  <button
-                    form="fac-submit"
-                    type="submit"
-                    className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                      sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                    }`}
-                    disabled={sumbitLoading}
-                  >
-                    {sumbitLoading ? (
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Processing...</span>
-                      </div>
-                    ) : 'Submit'}
-                  </button>
-                )
-              ):null
-            )}
-          </>
-          )}
+        {currentUser.code_clearance == 1 && (
+        <>
+        <div>
+          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
+        </div>
 
+          <div className="flex mt-6">
+            <div className="w-56">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Instruction for the OPR for Action:
+              </label> 
+            </div>
+            <div className="w-96 pl-1">
+
+              <textarea
+                id="findings"
+                name="findings"
+                rows={3}
+                style={{ resize: "none" }}
+                value= {OprInstruct}
+                onChange={ev => setOprInstruct(ev.target.value)}
+                className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+
+            </div>
+          </div>
+        </> 
+        )}
         </>
         )}
 
-        {/* For Other Users */}
-        {currentUser.code_clearance != 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
+      </div>
+      </>
+      ):null}
+
+      {/* Dormitory Form */}
+      {dormCheck ? (
+      <>
+      <div className="mt-8 border-t border-black">
+
+        <div>
+          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+
+          {/* Male */}
+          <div className="col-span-1">
+
+            {/* No of Male Guest */}
+            <div className="mt-6">
+              <div className="flex">
+                <div className="w-24 border-b border-black font-bold text-center">
+                  <span>
+                    {malelineCount}
+                  </span>
+                </div>
+                <div className="w-full ml-2">
+                  <strong>No. of Male Guests</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+
+              <div className="mb-4">
+                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+              </div>
+
+              <textarea
+                id="dorm-male-list"
+                name="dorm-male-list"
+                rows={5}
+                value={maleList}
+                onChange={handleMaleTextChange}
+                style={{ resize: 'none' }}
+                className="block w-10/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              <p className="text-red-500 text-xs mt-1">Separate name on next line (Leave blank if none)</p>
+
+              {/* For displaying the number of guest */}
+              <div>
+                <textarea
+                  id="output-male-list"
+                  name="output-male-list"
+                  rows={5}
+                  value={getMaleList}
+                  readOnly
+                  style={{ resize: 'none', display: 'none' }}
+                />
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Female */}
+          <div className="col-span-1">
+
+            {/* No of Females */}
+            <div className="mt-6">
+              <div className="flex">
+                <div className="w-24 border-b border-black font-bold text-center">
+                  <span>
+                    {femalelineCount}
+                  </span>
+                </div>
+                <div className="w-full ml-2">
+                  <strong>No. of Female Guests</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+
+              <div className="mb-4">
+                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+              </div>
+
+              <textarea
+                id="dorm-female-list"
+                name="dorm-female-list"
+                rows={5}
+                value={femaleList}
+                onChange={handleFemaleTextChange}
+                style={{ resize: 'none' }}
+                className="block w-10/12 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              <p className="text-red-500 text-xs mt-1">Separate name on next line (Leave blank if none)</p>
+
+              {/* For displaying the number of guest */}
+              <div>
+                <textarea
+                  id="output-female-list"
+                  name="output-female-list"
+                  rows={5}
+                  value={getFemaleList}
+                  readOnly
+                  style={{ resize: 'none', display: 'none' }}
+                />
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* For Other */}
+        <div className="flex mt-10 ml-40">
+          <div className="w-40">
+            <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
+              Other Details :
+            </label>
+          </div>
+          <div className="w-1/2">
+            <textarea
+              id="recomendations"
+              name="recomendations"
+              rows={3}
+              style={{ resize: "none", borderColor: "#272727" }}
+              value={DormOtherField}
+              onChange={(ev) => setDormOtherField(ev.target.value)}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+            <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
+          </div>  
+        </div>
+
+        {currentUser.code_clearance == 1 && (
         <>
-        
-          {(mphCheck || confCheck || otherCheck) && dormCheck ? (
+        <div>
+          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
+        </div>
+
+          <div className="flex mt-6">
+            <div className="w-56">
+              <label className="block text-base font-medium leading-6 text-gray-900">
+              Instruction for the OPR for Action:
+              </label> 
+            </div>
+            <div className="w-96 pl-1">
+
+              <textarea
+                id="findings"
+                name="findings"
+                rows={3}
+                style={{ resize: "none" }}
+                value= {OprInstruct}
+                onChange={ev => setOprInstruct(ev.target.value)}
+                className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+
+            </div>
+          </div>
+        </> 
+        )}
+
+      </div>
+      </>
+      ):null}
+
+    </form>
+    
+    {/* Button */}
+    <div className="flex mt-8">
+
+      {/* For Admin Manager User Only */}
+      {currentUser.code_clearance == 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
+      <>
+        {/* If the user choose between the Facility and Dorm Form */}
+        {(mphCheck || confCheck || otherCheck) && dormCheck ? (
+        <>
+          {/* Condition if the user choose the field on the Facility will appear the button */}
+          {checkedCount ? (
+            (!maleList && !femaleList) || oprInstrucValue === "None" ? (
+              <button
+                onClick={() => handleClarification()}
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):null
+          ):null}
+        </>
+        ):(
+        <>
+          {/* if user choose only Dormitory */}
+          {dormCheck ? (
+            (!maleList && !femaleList) || oprInstrucValue === "None" ? (
+              <button
+                onClick={() => handleClarification()}
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):(
+              <button
+                form="fac-submit"
+                type="submit"
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            )
+          ):(
             checkedCount ? (
-              (!maleList && !femaleList) ? (
+              oprInstrucValue === "None" ? (
                 <button
                   onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  className={`rounded-md px-2 py-2 text-vase text-white shadow-sm focus:outline-none ${
                     sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
                   }`}
                   disabled={sumbitLoading}
@@ -1347,184 +1306,231 @@ export default function RequestFormFacility(){
                 </button>
               )
             ):null
-          ):(
-            dormCheck ? (
-              (!maleList && !femaleList) ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )
-            ):(
-              checkedCount ? (
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):null 
-            )
           )}
-
         </>
         )}
 
-      </div>
+      </>
+      )}
 
-      {/* Popup */}
-      {showPopup && (
+      {/* For Other Users */}
+      {currentUser.code_clearance != 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
       <>
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-
-        {/* Semi-transparent black overlay */}
-        <div className="fixed inset-0 bg-black opacity-40"></div>
-
-        {/* Popup content with background blur */}
-        <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
-
-          {/* Notification Icons */}
-          <div class="f-modal-alert">
-
-            {/* Error */}
-            {notifications == "error" && (
-            <>
-            <div className="f-modal-icon f-modal-error animate">
-              <span className="f-modal-x-mark">
-                <span className="f-modal-line f-modal-left animateXLeft"></span>
-                <span className="f-modal-line f-modal-right animateXRight"></span>
-              </span>
-            </div>
-            </>
-            )}
-
-            {/* Warning */} 
-            {(notifications == "warning" || 
-            notifications == "warningnull") && (
-            <>
-              <div class="f-modal-icon f-modal-warning scaleWarning">
-                <span class="f-modal-body pulseWarningIns"></span>
-                <span class="f-modal-dot pulseWarningIns"></span>
-              </div>
-            </> 
-            )}
-
-            {/* Success */}
-            {notifications == "success" && (
-            <>
-            <div class="f-modal-icon f-modal-success animate">
-              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-            </div>
-            </>
-            )}
-
-          </div>
-        
-          <p className="text-lg text-center">{popupMessage}</p>
-
-          <div className="flex justify-center mt-4">
-
-          {/* Notice / Warning */}
-          {notifications == "warning" && (
-          <>
-            {!sumbitLoading && (
+      
+        {(mphCheck || confCheck || otherCheck) && dormCheck ? (
+          checkedCount ? (
+            (!maleList && !femaleList) ? (
+              <button
+                onClick={() => handleClarification()}
+                className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):(
               <button
                 form="fac-submit"
                 type="submit"
-                className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
               >
-                Yes
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
               </button>
-            )}
-
-            {!sumbitLoading && (
+            )
+          ):null
+        ):(
+          dormCheck ? (
+            (!maleList && !femaleList) ? (
               <button
-                onClick={closeError}
-                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                onClick={() => handleClarification()}
+                className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
               >
-                No
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
               </button>
-            )}
+            ):(
+              <button
+                form="fac-submit"
+                type="submit"
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            )
+          ):(
+            checkedCount ? (
+              <button
+                form="fac-submit"
+                type="submit"
+                className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):null 
+          )
+        )}
 
-            {sumbitLoading && (
-              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Loading</span>
-                </div>
-              </button>
-            )}
+      </>
+      )}
+
+    </div>
+
+    {/* Popup */}
+    {showPopup && (
+    <>
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+
+      {/* Semi-transparent black overlay */}
+      <div className="fixed inset-0 bg-black opacity-40"></div>
+
+      {/* Popup content with background blur */}
+      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
+
+        {/* Notification Icons */}
+        <div class="f-modal-alert">
+
+          {/* Error */}
+          {notifications == "error" && (
+          <>
+          <div className="f-modal-icon f-modal-error animate">
+            <span className="f-modal-x-mark">
+              <span className="f-modal-line f-modal-left animateXLeft"></span>
+              <span className="f-modal-line f-modal-right animateXRight"></span>
+            </span>
+          </div>
           </>
           )}
 
-          {/* Error / Warning*/}
-          {(notifications == "warningnull" || 
-          notifications == "error") && (
+          {/* Warning */} 
+          {(notifications == "warning" || 
+          notifications == "warningnull") && (
           <>
-            <button
-              onClick={() => (closeError())}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
-            >
-              Close
-            </button>
-          </>
+            <div class="f-modal-icon f-modal-warning scaleWarning">
+              <span class="f-modal-body pulseWarningIns"></span>
+              <span class="f-modal-dot pulseWarningIns"></span>
+            </div>
+          </> 
           )}
 
           {/* Success */}
           {notifications == "success" && (
+          <>
+          <div class="f-modal-icon f-modal-success animate">
+            <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+            <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+          </div>
+          </>
+          )}
+
+        </div>
+      
+        <p className="text-lg text-center">{popupMessage}</p>
+
+        <div className="flex justify-center mt-4">
+
+        {/* Notice / Warning */}
+        {notifications == "warning" && (
+        <>
+          {!sumbitLoading && (
             <button
-              onClick={() => (closePopup())}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+              form="fac-submit"
+              type="submit"
+              className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
             >
-              View my request
+              Yes
             </button>
           )}
 
-          </div>
+          {!sumbitLoading && (
+            <button
+              onClick={closeError}
+              className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+            >
+              No
+            </button>
+          )}
+
+          {sumbitLoading && (
+            <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+              <div className="flex items-center justify-center">
+                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                <span className="ml-2">Loading</span>
+              </div>
+            </button>
+          )}
+        </>
+        )}
+
+        {/* Error / Warning*/}
+        {(notifications == "warningnull" || 
+        notifications == "error") && (
+        <>
+          <button
+            onClick={() => (closeError())}
+            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+          >
+            Close
+          </button>
+        </>
+        )}
+
+        {/* Success */}
+        {notifications == "success" && (
+          <button
+            onClick={() => (closePopup())}
+            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
+          >
+            View my request
+          </button>
+        )}
 
         </div>
 
-        </div>
-      </>  
-      )}
-  </>
-  )}
+      </div>
+
+      </div>
+    </>  
+    )}
+
   </PageComponent>
+  ):(
+    () => navigate(`/repairrequestform/${currentUser.id}`)
   );
 }

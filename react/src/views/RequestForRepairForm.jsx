@@ -9,7 +9,7 @@ import { useUserStateContext } from "../context/ContextProvider";
 export default function RepairRequestForm(){
 
   const {id} = useParams();
-  const { currentUser } = useUserStateContext();
+  const { currentUser, userRole } = useUserStateContext();
 
   const navigate = useNavigate ();
 
@@ -26,6 +26,7 @@ export default function RepairRequestForm(){
   const [inputErrors, setInputErrors] = useState({});
   const [users, setUsers] = useState([]);
   const [sumbitLoading, setSubmitLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   //Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -45,18 +46,20 @@ export default function RepairRequestForm(){
 
   // Get Supervisor Names
   const fetchUsers = () => {
-    axiosClient
-    .get(`/getsupervisor/${id}`)
-    .then((response) => {
-      const responseData = response.data;
-      const supDet = responseData.personnel_details;
-
-      setUsers(supDet);
-    })
-    .catch((error) => {
-      setLoading(false);
-        console.error('Error fetching data:', error);
-    });
+    // Check if a request is already in progress 
+      axiosClient
+        .get(`/getsupervisor/${id}`)
+        .then((response) => {
+          const responseData = response.data;
+          const supDet = responseData.personnel_details;
+          setUsers(supDet);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+          setIsLoading(false); 
+        });
   };
 
   useEffect(()=>{ 
@@ -124,11 +127,12 @@ export default function RepairRequestForm(){
       });
   };
 
-  return(
+  //restrictions
+  const Authority = id == currentUser.id;
+
+  return Authority ? (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
-  {id == currentUser.id && (
-  <div>
-    
+  <>
     <form onSubmit={SubmitInspectionForm}>
 
       {/* Title */}
@@ -288,7 +292,6 @@ export default function RepairRequestForm(){
               )}
             </div>
           </div>
-
         </div>
 
         <div className="col-span-1">
@@ -411,7 +414,7 @@ export default function RepairRequestForm(){
 
         </div>
 
-      </div>  
+      </div>
 
       {/* Submit Button */}
       <div className="mt-6">
@@ -472,10 +475,11 @@ export default function RepairRequestForm(){
       </div>
     </div>
     )}
-
-  </div>
-  )}
+    
+  </>
   </PageComponent>
+  ):(
+    () => navigate(`/repairrequestform/${currentUser.id}`)
   );
 
 }

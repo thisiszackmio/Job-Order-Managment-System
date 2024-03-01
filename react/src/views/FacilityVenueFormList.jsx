@@ -5,7 +5,8 @@ import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import ReactPaginate from "react-paginate";
-import Forbidden from "../components/403";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 // Function to format the date as "Month Day, Year"
 function formatDate(dateString) {
@@ -38,7 +39,7 @@ export default function FacilityVenueRequestList() {
 
   const [loading, setLoading] = useState(true);
 
-  const { currentUser } = useUserStateContext();
+  const { currentUser, userRole } = useUserStateContext();
   const [getFacilityDet, setFacilityDet] = useState([]);
 
   const fetchFacilityData = () => {
@@ -138,11 +139,9 @@ export default function FacilityVenueRequestList() {
   const displayPaginationFacility = pageCountFacility > 1;
 
   //Restrictions
-  const requestlistClearance = [1, 2, 3, 4, 6, 10];
-  const here = requestlistClearance.includes(currentUser.code_clearance);
-  const User = here;
+  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
-  return User ? (
+  return Authorize ? (
   <PageComponent title="Facility / Venue Form Request List">
   {loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -181,56 +180,47 @@ export default function FacilityVenueRequestList() {
       <div className="overflow-x-auto">
         <table className="border-collapse" style={{ width: '1450px' }}>
           <thead>
-          {currentFacility.length > 0 ? (
             <tr className="bg-gray-100">
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start and End)</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-            </tr>
-          ):null}    
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start and End)</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+            </tr>   
           </thead>
           <tbody>
           {currentFacility.length > 0 ? (
             currentFacility.map((FacDet) => (
               <tr key={FacDet.id}>
-                <td className="px-1 py-1 text-center border border-custom w-1 font-bold">{FacDet.id}</td>
-                <td className="px-1 py-1 text-center border border-custom w-40">{formatDate(FacDet.date)}</td>
-                <td className="px-1 py-1 text-center border border-custom w-56">{FacDet.tite_of_activity}</td>
-                <td className="px-1 py-1 text-center border border-custom w-96">
+                <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold">{FacDet.id}</td>
+                <td className="px-1 py-2 align-top border border-custom w-40">{formatDate(FacDet.date)}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{FacDet.tite_of_activity}</td>
+                <td className="px-1 py-2 align-top border border-custom w-72">
                 {FacDet.date_start === FacDet.date_end ? (
                   `${formatDateAct(FacDet.date_start)} @ ${formatTimeAct(FacDet.time_start)} to ${formatTimeAct(FacDet.time_end)}`
                 ) : (
                   `${formatDateAct(FacDet.date_start)} @ ${formatTimeAct(FacDet.time_start)} to ${formatDateAct(FacDet.date_end)} @ ${formatTimeAct(FacDet.time_end)}`
                 )}
                 </td>
-                <td className="px-1 py-1 text-center border border-custom"> {FacDet.type_facility} </td>
-                <td className="px-1 py-1 text-center border border-custom">{FacDet.name}</td>
-                <td className="px-1 py-1 text-center border border-custom">
+                <td className="px-1 py-2 align-top border border-custom w-56"> {FacDet.type_facility} </td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{FacDet.name}</td>
+                <td className="px-1 py-2 align-top border border-custom">
                   {FacDet.remarks == "Approved" && (<span className="approved-status">{FacDet.remarks}</span>)}
                   {FacDet.remarks == "Disapproved" && (<span className="disapproved-status">{FacDet.remarks}</span>)}
                   {FacDet.remarks == "Pending" && (<span className="pending-status">{FacDet.remarks}</span>)}
-                  {FacDet.remarks == "Closed" && (
-                    <>
-                    <div className="flex justify-center">
-                      <span className="approved-status">Approved</span> 
-                      <span className="done-status ml-1">{FacDet.remarks}</span>
-                    </div>
-                    </>
-                  )}
+                  {FacDet.remarks == "Closed" && (<span className="finish-status">{FacDet.remarks}</span>)}
                 </td>
-                <td className="px-1 py-4 text-center border border-custom">
+                <td className="px-1 py-2 align-top border border-custom w-1">
                   <div className="flex justify-center">
                   <Link to={`/facilityvenueform/${FacDet.id}`}>
                     <button 
-                      className="bg-green-600 hover:bg-green-500 text-white py-1 px-2 rounded"
+                      className="text-green-600 font-bold py-1 px-2"
                       title="View Request"
                     >
-                      View
+                      <FontAwesomeIcon icon={faEye} />
                     </button>
                   </Link>
                   </div>
@@ -239,7 +229,7 @@ export default function FacilityVenueRequestList() {
             ))
           ):(
             <tr>
-              <td colSpan={8} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
+              <td colSpan={8} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
             </tr>
           )}
           </tbody>

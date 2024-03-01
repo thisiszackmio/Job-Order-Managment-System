@@ -45,6 +45,27 @@ export default function MyRequestForRepairInspection(){
         const viewFacilityData = responseData.view_facility;
 
         const mappedData = viewFacilityData.map((dataItem) => {
+
+          const facilities = [];
+
+          if (dataItem.mph == 1) {
+            facilities.push("MPH");
+          }
+      
+          if (dataItem.conference == 1) {
+            facilities.push("Conference Room");
+          }
+      
+          if (dataItem.dorm == 1) {
+            facilities.push("Dormitory");
+          }
+      
+          if (dataItem.other == 1) {
+            facilities.push("Other");
+          }
+
+          const result = facilities.join(', ');
+
           return{
             id: dataItem.id,
             date_requested: dataItem.date_requested,
@@ -54,10 +75,7 @@ export default function MyRequestForRepairInspection(){
             time_start: dataItem.time_start,
             date_end: dataItem.date_end,
             time_end: dataItem.time_end,
-            mph: dataItem.mph,
-            conference: dataItem.conference,
-            dorm: dataItem.dorm,
-            other: dataItem.other,
+            facility: result,
             admin_approval: dataItem.admin_approval,
             remarks: dataItem.remarks
           }
@@ -79,10 +97,7 @@ export default function MyRequestForRepairInspection(){
     fetchFacilityForm();
   },[id]);
 
-  //Restrict
-  const Users = currentUser.id == id || currentUser.code_clearance == 10;
-
-  return Users ? (
+  return (
   <PageComponent title="Facility / Venue Form">
   {loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -99,47 +114,39 @@ export default function MyRequestForRepairInspection(){
     <div className="mt-4 max-w-full">
       <table className="border-collapse w-full">
         <thead>
-        {displayRequestFacility.mappedData.length > 0 ? (
           <tr className="bg-gray-100">
+            <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start to End)</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
           </tr>
-        ):null}
         </thead>
         <tbody>
+        {currentUser.id == id || userRole === 'h4ck3rZ@1Oppa' ? (
+        <>
         {displayRequestFacility.mappedData.length > 0 ? (
           displayRequestFacility.mappedData.map((getData) => (
             <tr key={getData.id}>
-              <td className="px-2 py-1 text-center border border-custom w-1/5">{formatDate(getData.date_requested)}</td>
-              <td className="px-2 py-1 text-center border border-custom w-1/5">{getData.title_of_activity}</td>
-              <td className="px-2 py-1 text-center border border-custom w-1/5">
+              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1">{getData.id}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1">{formatDate(getData.date_requested)}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1/5">{getData.title_of_activity}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1/4">
               {getData.date_start === getData.date_end ? (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatTime(getData.time_end)}`
               ) : (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatDate(getData.date_end)} @ ${formatTime(getData.time_end)}`
               )}
               </td>
-              <td className="px-0 py-1 w-10 text-center border border-custom w-1/5">
-                {getData.mph == 1 ? (<p>MPH</p>):null}
-                {getData.conference == 1 ? (<p>Conference Room</p>):null}
-                {getData.dorm == 1 ? (<p>Dormitory</p>):null}
-                {getData.other == 1 ? (<p>Other</p>):null}
+              <td className="px-1 py-2 w-10 align-top border border-custom w-1/5">
+                {getData.facility}
               </td>
-              <td className="px-2 py-1 text-center border border-custom w-1/5">
+              <td className="px-1 py-2 align-top border border-custom w-1/5">
                 {getData.remarks == "Approved" && (<span className="approved-status">{getData.remarks}</span>)}
                 {getData.remarks == "Disapproved" && (<span className="disapproved-status">{getData.remarks}</span>)}
                 {getData.remarks == "Pending" && (<span className="pending-status">{getData.remarks}</span>)}
-                {getData.remarks == "Closed" && (
-                  <>
-                  <div className="flex justify-center">
-                    <span className="approved-status">Approved</span> 
-                    <span className="done-status ml-1">{getData.remarks}</span>
-                  </div>
-                  </>
-                )}
+                {getData.remarks == "Closed" && (<span className="finish-status">{getData.remarks}</span>)}
               </td>
             </tr>
           ))
@@ -147,6 +154,10 @@ export default function MyRequestForRepairInspection(){
           <tr>
             <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request for you Yet</div>
           </tr>
+        )}
+        </>
+        ):(
+          <td colSpan={12} className="px-1 py-2 text-center align-top border font-bold border-custom">You Cannot View This Table</td>
         )}
         </tbody>
       </table>
@@ -159,10 +170,5 @@ export default function MyRequestForRepairInspection(){
   </>
   )}
   </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; // Return null to avoid any unexpected rendering
-    })()
   );
 }

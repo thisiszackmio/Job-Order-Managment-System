@@ -88,6 +88,8 @@ class AuthController extends Controller
         // Determine the user's role based on the 'code_clearance' value
         $userRole = null;
         $codeClearance = (int) $useracc->code_clearance;
+        // $id = $useracc->id;
+        // $lastname = $useracc->lname;
 
         //Code clearance
         // 1 = Admin Division Manager
@@ -98,13 +100,19 @@ class AuthController extends Controller
         // 6 = AssignPersonnels
         // 10 = Hackers
 
-        if ($codeClearance === 1 || $codeClearance === 3 || $codeClearance === 4 ){
-            $userRole = 'admin';
-        }elseif ($codeClearance === 10) {
-            $userRole = 'hackers';
-        }elseif ($codeClearance === 6) {
-            $userRole = 'personnels';
-        }elseif ($codeClearance === 5 || $codeClearance === 2) {
+        if ($codeClearance === 10) {
+            // Hackers
+            $userRole = 'h4ck3rZ@1Oppa';
+        }else if ($codeClearance === 1 || $codeClearance === 3 || $codeClearance === 4){
+            // Admin
+            $userRole = '4DmIn@Pp4';
+        }else if ($codeClearance === 2){
+            // Port Manager
+            $userRole = 'Pm@PP4';
+        }else if ($codeClearance === 6){
+            // Personnel
+            $userRole = 'P3rs0nn3lz@pPa';
+        }else{
             $userRole = 'users';
         }
 

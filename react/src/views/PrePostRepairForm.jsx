@@ -46,47 +46,50 @@ export default function PrePostRepairForm(){
 
   //Get All Data
   useEffect(() => {
-    axiosClient
-      .get(`/inspectionform/${id}`)
-      .then((response) => {
-          const responseData = response.data;
-          const getAssignPersonnel = responseData.assign_personnel;
-          const getPartA = responseData.partA;
-          const getPartB = responseData.partB;
-          const getPartCD = responseData.partCD;
-          const personnel = responseData.personnel;
-          const requestor = responseData.requestor;
-          const supervisor = responseData.supervisor;
-          const gso = responseData.gso;
-          const manager = responseData.manager;
-
-          const getPersonnelData = getAssignPersonnel.map((Personnel) => {
-            const { ap_id, ap_name, ap_type } = Personnel;
-            return{
-              id: ap_id,
-              name: ap_name,
-              type: ap_type
-            };
-          })
-          
-          setInspectionData({
-            getPersonnelData,
-            getPartA,
-            getPartB,
-            getPartCD,
-            personnel,
-            requestor,
-            supervisor,
-            gso,
-            manager
-          });
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosClient.get(`/inspectionform/${id}`);
+        const responseData = response.data;
+  
+        const getAssignPersonnel = responseData.assign_personnel;
+        const getPartA = responseData.partA;
+        const getPartB = responseData.partB;
+        const getPartCD = responseData.partCD;
+        const personnel = responseData.personnel;
+        const requestor = responseData.requestor;
+        const supervisor = responseData.supervisor;
+        const gso = responseData.gso;
+        const manager = responseData.manager;
+  
+        const getPersonnelData = getAssignPersonnel.map((Personnel) => {
+          const { ap_id, ap_name, ap_type } = Personnel;
+          return {
+            id: ap_id,
+            name: ap_name,
+            type: ap_type,
+          };
+        });
+  
+        setInspectionData({
+          getPersonnelData,
+          getPartA,
+          getPartB,
+          getPartCD,
+          personnel,
+          requestor,
+          supervisor,
+          gso,
+          manager,
+        });
+      } catch (error) {
         console.error('Error fetching data:', error);
-      })
-      .finally(() => {
+        // Handle error (e.g., show an error message to the user)
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+  
+    fetchData();
   }, [id]);
 
   //Popup Message
@@ -438,7 +441,7 @@ export default function PrePostRepairForm(){
   }, [seconds]);
 
   //Restrictions
-  const Authorize = userRole == 'admin' || userRole == 'personnels' || userRole == 'hackers';
+  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa';
 
   return Authorize ? (
   <PageComponent title="Pre-Repair/Post Repair Inspection Form">
@@ -2035,6 +2038,6 @@ export default function PrePostRepairForm(){
     window.location = '/forbidden';
     return null; // Return null to avoid any unexpected rendering
   })()
-  )
+  );
 
 }

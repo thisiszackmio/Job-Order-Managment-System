@@ -343,13 +343,11 @@ export default function FacilityFormForm(){
   }, [seconds]);
 
   //Restrictions
-  const requestlistClearance = [1, 2, 3, 10];
-  const here = requestlistClearance.includes(currentUser.code_clearance);
-  const Users = here;
+  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
   const Facility_Room = displayRequestFacility?.viewFacilityData?.mph || displayRequestFacility?.viewFacilityData?.conference || displayRequestFacility?.viewFacilityData?.other;
   const Facility_Dorm = displayRequestFacility?.viewFacilityData?.dorm;
   
-  return Users ? (
+  return Authorize ? (
   <PageComponent title="Facility/Venue Form">
   {isLoading ? (
   <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -363,15 +361,9 @@ export default function FacilityFormForm(){
   ):(
   <>
     {/* Main Button */}
-    {here ? (
-      <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
-        <Link to="/facilityvenuerequestform">Back to Request List</Link>
-      </button>
-    ):(
-      <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 mr-1 rounded text-sm">
-        <Link to="/">Back to Dashboard</Link>
-      </button>
-    )}
+    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
+      <Link to="/facilityvenuerequestform">Back to Request List</Link>
+    </button>
 
     {/* Control Number */}
     <div className="flex items-center mb-6 mt-6">

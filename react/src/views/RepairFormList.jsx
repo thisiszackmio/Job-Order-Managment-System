@@ -100,10 +100,8 @@ export default function RepairRequestList(){
   const displayPaginationRepair = pageCountRepair > 1;
 
   //Restrictions
-  const requestlistClearance = [1, 2, 3, 4, 6, 10];
-  const Codezz = requestlistClearance.includes(currentUser.code_clearance);
-  const authorize = userRole == 'admin' || userRole == 'personnels' || userRole == 'hackers'
-  const Users = Codezz || authorize;
+  const authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa';
+  const Users = authorize;
 
   return Users ? (
   <PageComponent title="Pre/Post Repair Inspection Form Request List">
@@ -141,19 +139,17 @@ export default function RepairRequestList(){
 
     <div className="overflow-x-auto">
       <table className="border-collapse" style={{ width: '1650px' }}>
-        <thead>
-          {currentRepair.length > 0 ? (
-            <tr className="bg-gray-100">
-              <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
-            </tr>
-            ):null}
+        <thead>    
+          <tr className="bg-gray-100">
+            <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+          </tr>
         </thead>
         <thead>
         {currentRepair.length > 0 ? (
@@ -167,7 +163,7 @@ export default function RepairRequestList(){
           ):(
           <td className="px-1 py-2 align-top border border-custom w-80">{repair.type_of_property}</td>
           )}
-          <td className="px-1 py-2 align-top border border-custom w-56">{repair.complain}</td>
+          <td className="px-1 py-2 align-top border border-custom w-80">{repair.complain}</td>
           <td className="px-1 py-2 align-top border border-custom w-56">{repair.name}</td>
           <td className="px-1 py-2 align-top border border-custom w-60">
           {repair.supervisor_approval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
@@ -179,7 +175,7 @@ export default function RepairRequestList(){
           {repair.admin_approval === 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
           {repair.admin_approval === 1 && repair.inspector_status == 1 && (<span className="finish-status">Done</span>)}
           </td>
-          <td className="px-1 py-1 text-center border border-custom">
+          <td className="px-1 py-2 text-center border border-custom w-1">
             <div className="flex justify-center">
               <Link to={`/repairinspectionform/${repair.id}`}>
                 <button 

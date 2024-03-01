@@ -60,10 +60,10 @@ class GetNotificationController extends Controller
         });
 
         //For Facility Request
-        $adminGSONoti = FacilityModel::where('admin_approval', 2)->get();
-        $fID = $adminGSONoti->pluck('user_id')->all();
+        $gsoFacNoti = FacilityModel::where('admin_approval', 2)->get();
+        $fID = $gsoFacNoti->pluck('user_id')->all();
         $getFReq = PPAUser::whereIn('id', $fID)->get();
-        $gsoFDet = $adminGSONoti->map(function ($facilityForm) use ($getFReq) {
+        $gsoFDet = $gsoFacNoti->map(function ($facilityForm) use ($getFReq) {
             $user = $getFReq->where('id', $facilityForm->user_id)->first();
             $userName = $user->fname . ' ' . $user->lname;
             return [
@@ -74,11 +74,29 @@ class GetNotificationController extends Controller
             ];
         });
 
+        //For Vehicle Request
+        $gsoVehNoti = VehicleForm::whereIn('admin_approval', [5,2])->get();
+        $vID = $gsoVehNoti->pluck('user_id')->all();
+        $getVReq = PPAUser::whereIn('id', $vID)->get();
+        $gsoVDet = $gsoVehNoti->map(function ($vehicleForm) use ($getVReq){
+            $user = $getVReq->where('id', $vehicleForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->lname;
+            return [
+                'vehicle_id' => $vehicleForm->id,
+                'vehicle_date' => $vehicleForm->updated_at,
+                'vehicle_userID' => $vehicleForm->user_id,
+                'vehicle_approval' => $vehicleForm->admin_approval,
+                'requestor' => $userName
+            ];
+        });
+
+
         // Calculate the count after mapping
         $inspGSOCount = $gsoInsDet->count();
         $facility = $gsoFDet->count();
+        $vehicleSlip = $gsoVDet->count();
 
-        $GSONotificationCount = $inspGSOCount + $facility;
+        $GSONotificationCount = $inspGSOCount + $facility + $vehicleSlip;
 
 
         // ------------------------------- Is FOR Admin ----------------------------------------------
@@ -111,13 +129,28 @@ class GetNotificationController extends Controller
             ];
         });
 
+        // For Vehicle Request
+        $adminVehicleNoti = VehicleForm::where('admin_approval', 4)->get();
+        $vID = $adminVehicleNoti->pluck('user_id')->all();
+        $getVReq = PPAUser::whereIn('id', $vID)->get();
+        $adminVDet = $adminVehicleNoti->map(function ($vehicleForm) use ($getVReq){
+            $user = $getVReq->where('id', $vehicleForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->lname;
+            return [
+                'vehicle_id' => $vehicleForm->id,
+                'vehicle_date' => $vehicleForm->updated_at,
+                'vehicle_userID' => $vehicleForm->user_id,
+                'requestor' => $userName
+            ];
+        });
+
         // Calculate the count after mapping
         $inspAdminCount = $adminInsDet->count();
         $facility = $adminFDet->count();
+        $vehicleSlip = $adminVDet->count();
 
-        $AdminNotificationCount = $inspAdminCount + $facility;
+        $AdminNotificationCount = $inspAdminCount + $facility + $vehicleSlip;
         
-
 
         // ------------------------------- Is FOR Personnel ----------------------------------------------
         //For Inspection Request
@@ -154,12 +187,14 @@ class GetNotificationController extends Controller
                 ],
             'GSO_Not' => [
                     'gsoRepairDet' => $gsoInsDet->isEmpty() ? null : $gsoInsDet,
-                    'gsoFacilityDet' => $gsoFDet,
+                    'gsoFacilityDet' => $gsoFDet->isEmpty() ? null : $gsoFDet,
+                    'gsoVehicleDet' => $gsoVDet->isEmpty() ? null : $gsoVDet,
                     'gsoCount' => $GSONotificationCount,
                 ],
             'Admin_Not' => [
                     'adminRepairDet' => $adminInsDet->isEmpty() ? null : $adminInsDet,
-                    'adminFacilityDet' => $adminFDet,
+                    'adminFacilityDet' => $adminFDet->isEmpty() ? null : $adminFDet,
+                    'adminVehicleDet' => $adminVDet->isEmpty() ? null : $adminVDet,
                     'adminCount' => $AdminNotificationCount,
                 ],
             'Personnel_Not' => [

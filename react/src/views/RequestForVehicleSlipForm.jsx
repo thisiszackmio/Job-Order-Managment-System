@@ -85,7 +85,9 @@ export default function VehicleSlipForm(){
 
   }
 
-  return(
+  const Authority = id == currentUser.id;
+
+  return Authority ? (
   <PageComponent title="Request on Vehicle Slip Form">
   {id == currentUser.id && (
   <>
@@ -325,6 +327,8 @@ export default function VehicleSlipForm(){
   </>
   )}
   </PageComponent>
+  ):(
+    () => navigate(`/vehiclesliprequestform/${currentUser.id}`)
   );
 
 }

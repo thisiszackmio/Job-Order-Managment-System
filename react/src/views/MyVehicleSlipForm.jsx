@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
-import ForbiddenComponent from "../components/403";
 import { Link, useParams } from "react-router-dom";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
@@ -74,10 +73,7 @@ export default function MyRequestVehicleSlip(){
     fetchVehicleSlipForm();
   }, []);
 
-  //Restrict
-  const Users = currentUser.id == id || userRole == 'hackers';
-
-  return Users ? (
+  return (
     <PageComponent title="Vehicle Slip Form">
     {loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -92,40 +88,44 @@ export default function MyRequestVehicleSlip(){
     <>
       <div className="mt-4 overflow-x-auto">
         {displayRequestVehicle.mappedData.length > 0 ? (
-          <table className="border-collapse">
+          <table className="border-collapse font-arial" style={{ width: '1800px' }}>
             <thead>
               <tr className="bg-gray-100">
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Visited Place</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date/Time of Arrival</th>   
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
-                  <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Visited Place</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date/Time of Arrival</th>   
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
               </tr>
             </thead>
             <tbody>
+              {currentUser.id == id || userRole === 'h4ck3rZ@1Oppa' ? (
+              <>
               {displayRequestVehicle.mappedData.map((getData) => (
                 <tr key={getData.id}>
-                  <td className="px-3 py-1 align-top border border-custom w-40 text-base">{formatDate(getData.date_requested)}</td>
-                  <td className="px-3 py-1 align-top border border-custom w-60 text-base">{getData.purpose}</td>
-                  <td className="px-3 py-1 align-top border border-custom w-60 text-base">{getData.place_visit}</td>
-                  <td className="px-3 py-1 align-top border border-custom w-72 text-base">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
-                  <td className="px-3 py-1 align-top border border-custom w-80 text-base">
+                  <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1">{getData.id}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-44">{formatDate(getData.date_requested)}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-60">{getData.purpose}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-60">{getData.place_visit}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-72">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-64">
                   <span dangerouslySetInnerHTML={{
                     __html: getData.vehicle_type === 'None' 
                       ? getData.vehicle_type 
                       : `<b>${getData.vehicle_type.split('=')?.[0]}</b>${getData.vehicle_type.split('=')?.[1]}`
                   }} />
                   </td>
-                  <td className="px-3 py-1 align-top border border-custom w-56 text-base">
+                  <td className="px-1 py-2 align-top border border-custom w-56 text-base">
                     {getData.driver}
                   </td>
-                  <td className="px-3 py-1 align-top text-center border border-custom w-20 text-base">
+                  <td className="px-1 py-2 align-top text-center border border-custom w-20 text-base">
                     {getData.passenger == 'None' ? (getData.passenger):(getData.passengerCount)}
                   </td>
-                  <td className="px-3 py-1 align-top border border-custom w-auto text-base">
+                  <td className="px-1 py-2 align-top border border-custom w-auto text-base">
                   {getData.remarks == 5 && (<span className="pending-status">Pending</span>)}
                   {getData.remarks == 4 && (<span className="pending-status">Waiting on Admin's Approval</span>)}
                   {getData.remarks == 3 && (<span className="disapproved-status">Disapproved</span>)}
@@ -134,6 +134,11 @@ export default function MyRequestVehicleSlip(){
                   </td>
                 </tr>
               ))}
+              </>
+              ):(
+                <td colSpan={12} className="px-1 py-2 text-center align-top border font-bold border-custom">You Cannot View This Table</td> 
+              )}
+              
             </tbody>
           </table>
         ):(
@@ -148,8 +153,6 @@ export default function MyRequestVehicleSlip(){
     </>  
     )}
     </PageComponent>
-  ):(
-    <ForbiddenComponent />
   );
 
 }

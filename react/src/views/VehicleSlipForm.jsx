@@ -10,7 +10,7 @@ import submitAnimation from '../assets/loading_nobg.gif';
 
 export default function PrePostRepairForm(){
 
-  const { currentUser } = useUserStateContext();
+  const { currentUser, userRole } = useUserStateContext();
 
   //Date Format
   function formatDate(dateString) {
@@ -338,11 +338,9 @@ export default function PrePostRepairForm(){
   const justclose = () => { setShowPopup(false); };
 
   // Restrictions
-  const requestlistClearance = [1, 2, 3, 4, 10];
-  const Codez = requestlistClearance.includes(currentUser.code_clearance);
-  const Users = Codez;
+  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
-  return Users ?(
+  return Authorize ?(
   <PageComponent title="Request For Vehicle Slip">
     {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">

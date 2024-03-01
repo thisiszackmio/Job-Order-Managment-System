@@ -117,7 +117,7 @@ export default function VehicleSlipFormList(){
   const displayPaginationVehicle = pageCountVehicleSlip > 1;
 
   //Restrictions
-  const User = userRole == "admin" || userRole == "hackers";
+  const User = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
   return User ? (
   <PageComponent title="Vehicle Slip Request List">
@@ -156,7 +156,7 @@ export default function VehicleSlipFormList(){
       {/* Vehicle Slip Form */}
       <div className="overflow-x-auto">
         {currentVehicleSlip.length > 0 ? (
-          <table className="border-collapse" style={{ width: '1440px' }}>
+          <table className="border-collapse" style={{ width: '1880px' }}>
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">No</th>
@@ -175,23 +175,23 @@ export default function VehicleSlipFormList(){
             <tbody>
             {currentVehicleSlip.map((VehDet) => (
               <tr key={VehDet.id}>
-                <td className="px-3 py-1 align-top border border-custom w-1 font-bold">{VehDet.id}</td>
-                <td className="px-3 py-1 align-top border border-custom w-48">{VehDet.date}</td>
-                <td className="px-3 py-1 align-top border border-custom w-56">{VehDet.purpose}</td>
-                <td className="px-3 py-1 align-top border border-custom w-56">{VehDet.place_visited}</td>
-                <td className="px-3 py-1 align-top border border-custom w-60">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
-                <td className="px-3 py-1 align-top border border-custom w-96">{VehDet.vehicle_type}</td>
-                <td className="px-3 py-1 align-top border border-custom w-56">{VehDet.driver}</td>
-                <td className="px-3 py-1 align-top text-center border border-custom w-20">{VehDet.passengersCount}</td>
-                <td className="px-3 py-1 align-top border border-custom w-56">{VehDet.requestor}</td>
-                <td className="px-3 py-1 align-top border border-custom w-72">
+                <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold">{VehDet.id}</td>
+                <td className="px-1 py-2 align-top border border-custom w-48">{VehDet.date}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.purpose}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.place_visited}</td>
+                <td className="px-1 py-2 align-top border border-custom w-60">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
+                <td className="px-1 py-2 align-top border border-custom w-96">{VehDet.vehicle_type}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.driver}</td>
+                <td className="px-1 py-2 align-top text-center border border-custom w-20">{VehDet.passengersCount}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.requestor}</td>
+                <td className="px-1 py-2 align-top border border-custom w-72">
                 {VehDet.admin_approval == 5 && (<span className="pending-status">Pending</span>)}
                 {VehDet.admin_approval == 4 && (<span className="pending-status">Waiting on Admin's Approval</span>)}
                 {VehDet.admin_approval == 3 && (<span className="disapproved-status">Disapproved</span>)}
                 {VehDet.admin_approval == 2 && (<span className="approved-status">Approved</span>)}
                 {VehDet.admin_approval == 1 && (<span className="finish-status">Closed</span>)}
                 </td>
-                <td className="px-3 py-1 align-top border border-custom w-12">
+                <td className="px-3 py-2 align-top border border-custom w-12">
                     <div className="flex justify-center">
                       <Link to={`/vehicleslipform/${VehDet.id}`}>
                         <button 

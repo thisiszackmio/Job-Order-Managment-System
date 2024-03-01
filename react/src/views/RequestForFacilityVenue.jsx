@@ -407,10 +407,7 @@ export default function RequestFormFacility(){
     window.location.assign(`/myrequestfacilityvenueform/${currentUser.id}`);
   };
 
-  //restrictions
-  const Authority = id == currentUser.id;
-
-  return Authority ? (
+  return (
   <PageComponent title="Request for use of Facility / Venue Form">
 
     <form id="fac-submit" onSubmit={SubmitFacilityForm}>
@@ -1530,7 +1527,5 @@ export default function RequestFormFacility(){
     )}
 
   </PageComponent>
-  ):(
-    () => navigate(`/repairrequestform/${currentUser.id}`)
   );
 }

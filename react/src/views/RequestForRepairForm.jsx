@@ -127,10 +127,7 @@ export default function RepairRequestForm(){
       });
   };
 
-  //restrictions
-  const Authority = id == currentUser.id;
-
-  return Authority ? (
+  return (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
   <>
     <form onSubmit={SubmitInspectionForm}>
@@ -478,8 +475,6 @@ export default function RepairRequestForm(){
     
   </>
   </PageComponent>
-  ):(
-    () => navigate(`/repairrequestform/${currentUser.id}`)
   );
 
 }

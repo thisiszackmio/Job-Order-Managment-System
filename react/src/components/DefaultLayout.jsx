@@ -23,20 +23,10 @@ export default function DefaultLayout() {
 
   const id = currentUser.id;
 
-  const [getSupNoti, setSupNoti] = useState([]);
-
   const [Notification, setNotification] = useState([]);
-  // const [getAdminNoti, setAdminNoti] = useState([]);
-  // const [getPersoNoti, setPersoNoti] = useState([]);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const navigate = useNavigate();
-
-  // Function to format the date as "Month Day, Year"
-  function formatDate(dateString) {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-  }
 
   //Time stamp notification
   function formatTimeDifference(timestamp) {
@@ -72,7 +62,7 @@ export default function DefaultLayout() {
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
-        // { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
+        { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
       ],
     },
     {
@@ -80,7 +70,7 @@ export default function DefaultLayout() {
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
-        // { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
+        { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
       ],
     },
     ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
@@ -90,7 +80,7 @@ export default function DefaultLayout() {
             submenu: [
               { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
               { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
-              // { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
+              { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
             ],
           },
         ]
@@ -154,10 +144,12 @@ export default function DefaultLayout() {
       const gsoNotiCount = responseData.GSO_Not.gsoCount;
       const gsoRepairDet = responseData.GSO_Not.gsoRepairDet;
       const gsoFacilityDet = responseData.GSO_Not.gsoFacilityDet;
+      const gsoVehicleDet = responseData.GSO_Not.gsoVehicleDet;
 
       const adminNotiCount = responseData.Admin_Not.adminCount;
       const adminRepairDet = responseData.Admin_Not.adminRepairDet;
       const adminFacilityDet = responseData.Admin_Not.adminFacilityDet;
+      const adminVehicleDet = responseData.Admin_Not.adminVehicleDet;
 
       const personnelCount = responseData.Personnel_Not.personnelCount;
       const peronnelRepairDet = responseData.Personnel_Not.personnelRepairDet;
@@ -206,6 +198,20 @@ export default function DefaultLayout() {
       })
       : null
 
+      // For Vehicle Request
+      const mappedVehGSOData = gsoVehicleDet
+      ? gsoVehicleDet.map((GVehItem) => {
+        return {
+          type: 'Vehicle Request Slip',
+          id: GVehItem.vehicle_id,
+          datetimerequest: GVehItem.vehicle_date,
+          requestor: GVehItem.requestor,
+          status: GVehItem.vehicle_approval,
+          req_id: GVehItem.vehicle_userID,
+        }
+      })
+      : null
+
       // ----- Admin Notification ----- //
 
       // For Inspection Request
@@ -233,6 +239,19 @@ export default function DefaultLayout() {
       })
       :null
 
+      // For Vehicle Request
+      const mappedVehAdminData = adminVehicleDet
+      ? adminVehicleDet.map((AVehItem) => {
+        return {
+          type: 'Vehicle Request Slip',
+          id: AVehItem.vehicle_id,
+          datetimerequest: AVehItem.vehicle_date,
+          requestor: AVehItem.requestor,
+          req_id: AVehItem.vehicle_userID,
+        }
+      })
+      : null
+
       // ----- Personnel Notification ----- //
 
       //For Inspection Request
@@ -249,13 +268,15 @@ export default function DefaultLayout() {
       })
       : null;
 
-      //console.log({mappedFacGSOData});
+      //console.log({mappedVehGSOData});
       setNotification({
         mappedInsSupData,
         mappedInsGSOData,
         mappedFacGSOData,
+        mappedVehGSOData,
         mappedInsAdminData,
         mappedFacAdminData,
+        mappedVehAdminData,
         mappedInsPersonnelData,
         adminNotiCount,
         gsoNotiCount,
@@ -565,8 +586,43 @@ export default function DefaultLayout() {
                                 )}
                                 </h3>
                                 <h4 className="text-sm text-blue-500 font-bold">
-                                    {formatTimeDifference(GSOFItem.datetimerequest)}
-                                  </h4>
+                                  {formatTimeDifference(GSOFItem.datetimerequest)}
+                                </h4>
+                              </Link>
+                            </div>
+                            ))}
+
+                            {/* Vehicle Notification */}
+                            {Notification?.mappedVehGSOData?.map((GSOVItem) => (
+                            <div key={GSOVItem.id}>
+                              <Link 
+                                to={`/vehicleslipform/${GSOVItem.id}`} 
+                                onClick={handleLinkClick}
+                                className="hover:bg-gray-100 block p-4 transition duration-300"
+                              >
+                                <h4 className="text-sm text-gray-400"> {GSOVItem.type} </h4>
+                                <h3 className="text-l font-normal leading-6 text-gray-900">
+                                {GSOVItem.status == 5 ? (
+                                <>
+                                  {GSOVItem.req_id == currentUser.id ? (
+                                    <div>Here's the request link <strong>{GSOVItem.requestor}</strong></div>
+                                  ):(
+                                    <div>There is a request for <strong>{GSOVItem.requestor}</strong>.</div>
+                                  )}
+                                </>
+                                ):(
+                                <>
+                                  {GSOVItem.req_id == currentUser.id ? (
+                                    <div><strong>Your</strong> request has been approved</div>
+                                  ):(
+                                    <div><strong>{GSOVItem.requestor}</strong>'s request has been approved.</div>
+                                  )}
+                                </>  
+                                )}
+                                </h3>
+                                <h4 className="text-sm text-blue-500 font-bold">
+                                  {formatTimeDifference(GSOVItem.datetimerequest)}
+                                </h4>
                               </Link>
                             </div>
                             ))}
@@ -623,6 +679,29 @@ export default function DefaultLayout() {
                                   </h4>
                                 </Link>
                               </div>  
+                            ))}
+
+                            {/* For Vehicle Request */}
+                            {Notification?.mappedVehAdminData?.map((AdminVehItem) => (
+                              <div key={AdminVehItem.id}>
+                                <Link 
+                                  to={`/vehicleslipform/${AdminVehItem.id}`} 
+                                  onClick={handleLinkClick}
+                                  className="hover:bg-gray-100 block p-4 transition duration-300"
+                                >
+                                  <h4 className="text-sm text-gray-400"> {AdminVehItem.type} </h4>
+                                  <h3 className="text-l font-normal leading-6 text-gray-900">
+                                  {AdminVehItem.req_id == currentUser.id ? (
+                                    <div><strong>Your</strong> request has been completed by the GSO and now requires your approval.</div>
+                                  ):(
+                                    <div>The request for <strong>{AdminVehItem.requestor}</strong> has been completed by the GSO and now requires your approval.</div>
+                                  )}
+                                  </h3>
+                                  <h4 className="text-sm text-blue-500 font-bold">
+                                    {formatTimeDifference(AdminVehItem.datetimerequest)}
+                                  </h4>
+                                </Link>
+                              </div>
                             ))}
                           </>
                           ):(

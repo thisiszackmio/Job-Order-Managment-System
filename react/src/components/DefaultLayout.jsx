@@ -63,6 +63,7 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
+        { name: 'Equipment Form', to: `/equipmentrequestform/${currentUser.id}` },
       ],
     },
     {

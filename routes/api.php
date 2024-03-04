@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/getsupervisor/{id}', [UserController::class, 'supervisorNames']);
     Route::get('/ppausers', [UserController::class, 'index']);
 
+
+    
     Route::get('/users', [UserController::class, 'allUser']);
     Route::get('/users/{id}', [UserController::class, 'SpecificUser']);
     Route::put('/changecc/{id}', [UserController::class, 'UpdateCodeClearance']);
@@ -97,9 +99,6 @@ Route::middleware(['auth'])->group(function () {
 
 //New Get Notifications
 Route::get('/notification/{id}', [GetNotificationController::class, 'GetNotification']); 
-// Route::get('/gsonotification', [GetNotificationController::class, 'GSONoti']); 
-// Route::get('/adminnotification', [GetNotificationController::class, 'AdminNoti']);
-// Route::get('/personnelnotification', [GetNotificationController::class, 'PersonnelNoti']);
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);

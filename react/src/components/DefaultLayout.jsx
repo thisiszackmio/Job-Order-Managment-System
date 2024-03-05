@@ -72,6 +72,7 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
+        { name: 'Equipment Form', to: `/myequipmentform/${currentUser.id}` }
       ],
     },
     ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'

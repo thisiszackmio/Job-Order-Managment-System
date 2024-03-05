@@ -13,6 +13,7 @@ import RequestEquipmentForm from "./views/RequestForEquipment";
 import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
 import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
 import MyRequestVehicleSlip from "./views/MyVehicleSlipForm";
+import MyEquipmentForm from "./views/MyEquipementForm";
 
 import RepairRequestForm from "./views/RepairFormList";
 import FacilityFormForm from "./views/FacilityVenueFormList";
@@ -85,6 +86,11 @@ const routes = [
             {
                 path: "/myrequestvehicleslipform/:id",
                 element: <MyRequestVehicleSlip />
+            },
+            // Equipment Request Form
+            {
+                path: "/myequipmentform/:id",
+                element: <MyEquipmentForm />
             },
 
             // ---- Request List Form ---- //

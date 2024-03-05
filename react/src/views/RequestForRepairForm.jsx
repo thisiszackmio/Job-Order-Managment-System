@@ -8,18 +8,7 @@ import { useUserStateContext } from "../context/ContextProvider";
 
 export default function RepairRequestForm(){
 
-  const {id} = useParams();
-  const { currentUser, userRole } = useUserStateContext();
-
   const navigate = useNavigate ();
-
-  //Restriction for accessing another form
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/repairrequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
 
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date().toISOString().split('T')[0];
@@ -180,9 +169,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyNo(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!propertyNo && inputErrors.property_number && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+            
             </div>
           </div>
 
@@ -203,9 +190,7 @@ export default function RepairRequestForm(){
                 max={currentDate}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!acquisitionDate && inputErrors.acq_date && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+              
             </div>
           </div>
 
@@ -238,9 +223,7 @@ export default function RepairRequestForm(){
                 className="pl-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
             </div>
-            {!acquisitionCost && inputErrors.acq_cost && (
-              <p className="text-red-500 text-xs italic">This field must be required</p>
-            )}
+            
             </div>
           </div>
 
@@ -261,9 +244,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setBrandModel(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!BrandModel && inputErrors.brand_model && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+              
             </div>
           </div>
 
@@ -284,9 +265,7 @@ export default function RepairRequestForm(){
                 onChange={ev => setSerialEngineNo(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!SerialEngineNo && inputErrors.serial_engine_no && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+              
             </div>
           </div>
         </div>
@@ -319,26 +298,6 @@ export default function RepairRequestForm(){
                 <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
                 <option value="Others">Others</option>
               </select>
-              {!typeOfProperty && inputErrors.type_of_property && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
-              {typeOfProperty === 'Others' && (
-              <div className="flex mt-4">
-                <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Specify:</label> 
-                </div>
-                <div className="w-64">
-                  <input
-                    type="text"
-                    name="specify"
-                    id="specify"
-                    value={propertySpecify}
-                    onChange={ev => setPropertySpecify(ev.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            )}
             </div>
           </div>
 
@@ -358,9 +317,6 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyDescription(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!propertyDescription && inputErrors.property_description && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
             </div>
           </div>
 
@@ -380,9 +336,6 @@ export default function RepairRequestForm(){
                 onChange={ev => setPropertyLocation(ev.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               />
-              {!propertyLocation && inputErrors.location && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
             </div>
           </div>
 
@@ -403,9 +356,6 @@ export default function RepairRequestForm(){
               onChange={ev => setComplainDefect(ev.target.value)}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
             />
-            {!ComplainDefect && inputErrors.complain && (
-              <p className="text-red-500 text-xs italic">This field must be required</p>
-            )}
             </div>
           </div>
 

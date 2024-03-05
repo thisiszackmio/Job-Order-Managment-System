@@ -58,49 +58,35 @@ export default function DefaultLayout() {
 
   const navigation = [
     { name: 'Dashboard', to: '/' },
-    { name: 'Request Form', 
+    {
+      name: 'Request Form',
       submenu: [
-        { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
-        { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
-        { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
-        { name: 'Equipment Form', to: `/equipmentrequestform/${currentUser.id}` },
+        { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/` },
+        { name: 'Facility / Venue Form', to: `/facilityrequestform/` },
+        { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/` },
+        { name: 'Equipment Form', to: `/equipmentrequestform/` },
       ],
     },
     {
       name: 'My Request',
       submenu: [
-        { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
-        { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
-        { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
+        { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/` },
+        { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/` },
+        { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/` },
       ],
     },
-    ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
-      ? [
-          {
-            name: 'Request List',
-            submenu: [
-              { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
-              { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
-              { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
-            ],
-          },
-        ]
-      : []),
-      ...(currentUser.code_clearance == '6'
-      ? [
-          {
-            name: 'Request List',
-            submenu: [
-              { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
-              // { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
-              // { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
-            ],
-          },
-        ]
-      : []),
-    ...(currentUser.code_clearance == '10'
-      ? [{ name: 'Personnel', to: '/account' }]
-      : []),
+    {
+      name: 'Request List',
+      submenu: [
+        { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
+        { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
+        { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
+      ],
+    },
+    {
+      name: 'Personnel',
+      to: '/account',
+    },
   ].filter(Boolean);
 
   // Function to check if a submenu item is active

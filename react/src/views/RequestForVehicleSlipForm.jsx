@@ -8,18 +8,6 @@ import { useUserStateContext } from "../context/ContextProvider";
 
 export default function VehicleSlipForm(){
 
-  const {id} = useParams();
-  const { currentUser } = useUserStateContext();
-
-  const navigate = useNavigate ();
-
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/vehiclesliprequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
-
   const [isLoading , setLoading] = useState(false);
   const today = new Date().toISOString().split('T')[0];
   const [DateArrival, setDateArrival] = useState(today);
@@ -38,52 +26,6 @@ export default function VehicleSlipForm(){
   const [VRTimeArrival, setVRTimeArrival] = useState('');
   const [VRPassenger, setVRPassenger] = useState('');
 
-  let output;
-
-  if(VRPassenger == 'none') {
-    output = 'None';
-  }else{
-    output = VRPassenger
-  }
-
-  // Submit Form
-  const SubmitVehicleForm = (event) => {
-    event.preventDefault();
-
-    setSubmitLoading(true);
-
-    axiosClient
-      .post("vehicleformrequest", {
-      date_of_request: today,
-      purpose: VRPurpose,
-      passengers: output,
-      place_visited: VRPlace,
-      date_arrival: VRDateArrival,
-      time_arrival: VRTimeArrival,
-      vehicle_type: 'None',
-      driver: 'None',
-      admin_approval: 5,
-    })
-    .then((response) => { 
-      setShowPopup(true);
-      setPopupMessage(
-        <div>
-          <p className="popup-title"><strong>Success</strong></p>
-          <p>Form submit successfully</p>
-        </div>
-      );    
-      setSubmitLoading(false);
-    })
-    .catch((error) => {
-      console.error(error);
-      const responseErrors = error.response.data.errors;
-      setInputVechErrors(responseErrors);
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-
-  }
 
   return (
   <PageComponent title="Request on Vehicle Slip Form">
@@ -98,7 +40,7 @@ export default function VehicleSlipForm(){
     </div>
   ):(
   <div>
-    <form onSubmit={SubmitVehicleForm}>
+    <form>
 
       {/* Title */}
       <div>
@@ -306,7 +248,7 @@ export default function VehicleSlipForm(){
           <div className="flex justify-center mt-4">
             <button
               onClick={() => {
-                window.location.href = `/myrequestvehicleslipform/${currentUser.id}`;
+                window.location.href = `/myrequestvehicleslipform/`;
               }}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >

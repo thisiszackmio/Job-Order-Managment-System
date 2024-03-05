@@ -19,10 +19,6 @@ export default function DefaultLayout() {
 
   const [isLoading , setLoading] = useState(false);
 
-  const { currentUser, userToken, userRole , setCurrentUser, setUserToken } = useUserStateContext();
-
-  const id = currentUser.id;
-
   const [Notification, setNotification] = useState([]);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
@@ -64,59 +60,29 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/` },
         { name: 'Facility / Venue Form', to: `/facilityrequestform/` },
         { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/` },
-        { name: 'Equipment Form', to: `/equipmentrequestform/` },
       ],
     },
     {
       name: 'My Request',
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/` },
-        { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/` },
-        { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/` },
+        // { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/` },
+        // { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/` },
       ],
     },
-    {
-      name: 'Request List',
-      submenu: [
-        { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
-        { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
-        { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
-      ],
-    },
-    {
-      name: 'Personnel',
-      to: '/account',
-    },
+    // {
+    //   name: 'Request List',
+    //   submenu: [
+    //     { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
+    //     { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
+    //     { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
+    //   ],
+    // },
+    // {
+    //   name: 'Personnel',
+    //   to: '/account',
+    // },
   ].filter(Boolean);
-
-  // Function to check if a submenu item is active
-  const isSubmenuActive = (submenuItem) => {
-    return window.location.pathname.startsWith(submenuItem.to);
-  };
-
-  // Function to determine if "Personnel" is active
-  const isPersonnelActive = navigation.find((item) => {
-    if (item.submenu) {
-      return item.submenu.some(isSubmenuActive);
-    } else {
-      return isSubmenuActive(item);
-    }
-  });
-
-  if(!userToken){
-    return <Navigate to='login'/>
-  }
-
-  const logout = () => {
-    // Perform the logout logic
-    axiosClient.post('/logout').then((response) => {
-      setCurrentUser({});
-      setUserToken(null);
-
-      // Redirect to the login page using the navigate function
-      navigate('/login');
-    });
-  };
 
   // Get Notification
   const fetchNotification = () => {
@@ -278,11 +244,6 @@ export default function DefaultLayout() {
     });
   };
 
-  useEffect(() => {
-    if (currentUser && currentUser.id) {
-      fetchNotification();
-    }
-  }, [currentUser]);
   
 
   const handleLinkClick = () => {
@@ -415,7 +376,6 @@ export default function DefaultLayout() {
                 <Menu as="div" className="relative ml-3">
 
                   {/* Notification Number */}
-                  {(userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa') && (
                   <div>
                     <Menu.Button className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     <span className="absolute -inset-1.5" />
@@ -424,53 +384,15 @@ export default function DefaultLayout() {
                     </Menu.Button>
 
                     {/* Display the count for Supervisor */}
-                    {Notification.supNotiCount ? (
                     <div>
-                      {Notification?.mappedInsSupData?.map((SupDet) => (
-                        <div key={SupDet.id}>
-                          {SupDet.supervisor_name === currentUser.id && (<span className="notifications">{Notification.supNotiCount}</span>)}
-                        </div>
-                      ))}
+                      <span className="notifications">1</span>
                     </div>
-                    ):null}
-
-                    {/* Display the count for GSO */}
-                    {Notification.gsoNotiCount ? (
-                    <div>
-                      {currentUser.code_clearance == 3 && (
-                        <span className="notifications">{Notification.gsoNotiCount}</span>
-                      )}
-                    </div>
-                    ):null}
-
-                    {/* Admin Count Notification */}
-                    {Notification.adminNotiCount ? (
-                    <div>
-                      {currentUser.code_clearance == 1 && (
-                        <span className="notifications">{Notification.adminNotiCount}</span>
-                      )}
-                    </div>
-                    ):null}
-
-                    {/* Display the count for Personnel */}
-                    {Notification.personnelCount ? (
-                    <>
-                      {Notification?.mappedInsPersonnelData?.map((PeDet) => (
-                        <div key={PeDet.id}>
-                          {PeDet.assign == currentUser.id && (
-                            <span className="notifications">{Notification.personnelCount}</span>
-                          )}
-                        </div>
-                      ))}
-                    </>  
-                    ):null}
-
+                    
                   </div>
-                  )}
+
                   {/* End of Notification Number */}
                   
                   {/* Notification Message */}
-                  {(userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa') && (
                   <div>
                     <Transition
                       as={Fragment}
@@ -484,276 +406,24 @@ export default function DefaultLayout() {
                       <Menu.Items className="absolute font-arial right-0 z-10 mt-2 w-96 max-h-[445px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <p className="text-xs font-bold text-center leading-7 text-red-500 ml-2">Notifications</p>
 
-                        {/* Supervisor Message */}
-                        {currentUser.code_clearance == 4 && (
-                        <>
-                          {Notification.supNotiCount ? (
-                          <>
-                            {/* Inspection Notification */}
-                            {Notification?.mappedInsSupData?.map((SupIntDet)=> (
-                              <div key={SupIntDet.id}>
-                                {SupIntDet.supervisor_name == currentUser.id && (
-                                  <Link 
-                                    to={`/repairinspectionform/${SupIntDet.id}`}
-                                    onClick={handleLinkClick} 
-                                    className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
-                                  >
-                                    <h4 className="text-sm text-gray-400">
-                                      {SupIntDet.type}
-                                    </h4>
-                                    <h3 className="text-l font-normal leading-6 text-gray-900">
-                                      There is a request on <strong>{SupIntDet.requestor}</strong>, and it requires your approval.
-                                    </h3>
-                                    <h4 className="text-sm text-blue-500 font-bold">
-                                      {formatTimeDifference(SupIntDet.datetimerequest)}
-                                    </h4>
-                                  </Link>
-                                )}
-                              </div>                            
-                            ))}
-                          </>
-                          ):(
-                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
-                          )}
-                        </>
-                        )}
-
-                        {/* GSO Message */}
-                        {currentUser.code_clearance == 3 && (
-                        <>
-                          {Notification?.gsoNotiCount ? (
-                          <>
-                            {/* Inspection Notification */}
-                            {Notification?.mappedInsGSOData?.map((GSOItem) => (
-                            <div key={GSOItem.id}>
-                              <Link 
-                                to={`/repairinspectionform/${GSOItem.id}`} 
-                                onClick={handleLinkClick}
-                                className="hover:bg-gray-100 block p-4 transition duration-300"
-                              >
-                                <h4 className="text-sm text-gray-400"> {GSOItem.type} </h4>
-                                <h3 className="text-l font-normal leading-6 text-gray-900">
-                                  {(GSOItem.code == 1 || GSOItem.code == 2 || GSOItem.code == 4) && (
-                                  <><strong>{GSOItem.requestor}</strong>  has a request </>
-                                  )}
-
-                                  {GSOItem.code == 3 && (
-                                    <><strong>{GSOItem.requestor}</strong>, your request has been approved by your supervisor</>
-                                  )}
-
-                                  {(GSOItem.code == 5 || GSOItem.code == 6 || GSOItem.code == 10) && (
-                                    <><strong>{GSOItem.requestor}</strong>  has a request and it has already been approved by the supervisor.</>
-                                  )}
-                                  
-                                </h3>
-                                <h4 className="text-sm text-blue-500 font-bold">
-                                  {formatTimeDifference(GSOItem.datetimerequest)}
-                                </h4>
-                              </Link>
-                            </div>
-                            ))}
-
-                            {/* Facility Notification */}
-                            {Notification?.mappedFacGSOData?.map((GSOFItem) => (
-                            <div key={GSOFItem.id}>
-                              <Link 
-                                to={`/facilityvenueform/${GSOFItem.id}`} 
-                                onClick={handleLinkClick}
-                                className="hover:bg-gray-100 block p-4 transition duration-300"
-                              >
-                                <h4 className="text-sm text-gray-400"> {GSOFItem.type} </h4>
-                                <h3 className="text-l font-normal leading-6 text-gray-900">
-                                {GSOFItem.req_id == 3 ? (
-                                  <div><strong>Your</strong> request has been approved by the admin manager.</div>
-                                ):GSOFItem.req_id == 1 ? (
-                                  <div>Here's the request on <strong>{GSOFItem.requestor}</strong>.</div>
-                                ):
-                                (
-                                  <div>A request for <strong>{GSOFItem.requestor}</strong> has been approved by the admin manager.</div>
-                                )}
-                                </h3>
-                                <h4 className="text-sm text-blue-500 font-bold">
-                                  {formatTimeDifference(GSOFItem.datetimerequest)}
-                                </h4>
-                              </Link>
-                            </div>
-                            ))}
-
-                            {/* Vehicle Notification */}
-                            {Notification?.mappedVehGSOData?.map((GSOVItem) => (
-                            <div key={GSOVItem.id}>
-                              <Link 
-                                to={`/vehicleslipform/${GSOVItem.id}`} 
-                                onClick={handleLinkClick}
-                                className="hover:bg-gray-100 block p-4 transition duration-300"
-                              >
-                                <h4 className="text-sm text-gray-400"> {GSOVItem.type} </h4>
-                                <h3 className="text-l font-normal leading-6 text-gray-900">
-                                {GSOVItem.status == 5 ? (
-                                <>
-                                  {GSOVItem.req_id == currentUser.id ? (
-                                    <div>Here's the request link <strong>{GSOVItem.requestor}</strong></div>
-                                  ):(
-                                    <div>There is a request for <strong>{GSOVItem.requestor}</strong>.</div>
-                                  )}
-                                </>
-                                ):(
-                                <>
-                                  {GSOVItem.req_id == currentUser.id ? (
-                                    <div><strong>Your</strong> request has been approved</div>
-                                  ):(
-                                    <div><strong>{GSOVItem.requestor}</strong>'s request has been approved.</div>
-                                  )}
-                                </>  
-                                )}
-                                </h3>
-                                <h4 className="text-sm text-blue-500 font-bold">
-                                  {formatTimeDifference(GSOVItem.datetimerequest)}
-                                </h4>
-                              </Link>
-                            </div>
-                            ))}
-                          </>
-                          ):(
-                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
-                          )}
-                          
-                        </>
-                        )}
-
-                        {/* Admin Message */}
-                        {currentUser.code_clearance == 1 && (
-                        <>
-                          {Notification.adminNotiCount ? (
-                          <>
-                            {/* For Inspection Repair Request */}
-                            {Notification?.mappedInsAdminData?.map((AdminItem) => (
-                              <div key={AdminItem.id}>
-                                <Link 
-                                  to={`/repairinspectionform/${AdminItem.id}`} 
-                                  onClick={handleLinkClick}
-                                  className="hover:bg-gray-100 block p-4 transition duration-300"
-                                >
-                                  <h4 className="text-sm text-gray-400"> {AdminItem.type} </h4>
-                                  <h3 className="text-l font-normal leading-6 text-gray-900">
-                                    {AdminItem.supervisor_name == currentUser.id ? (
-                                      <div><strong>{AdminItem.requestor}</strong>, your request has been completed by the GSO.</div>
-                                    ):(
-                                      <div><strong>{AdminItem.requestor}'s</strong> request has been completed by the GSO and now requires your approval.</div>
-                                    )}
-                                  </h3>
-                                  <h4 className="text-sm text-blue-500 font-bold">
-                                    {formatTimeDifference(AdminItem.datetimerequest)}
-                                  </h4>
-                                </Link>
-                              </div>
-                            ))}
-
-                            {/* For Facility / Venue Request */}
-                            {Notification?.mappedFacAdminData?.map((AdminFacItem) => (
-                              <div key={AdminFacItem.id}>
-                                <Link 
-                                  to={`/facilityvenueform/${AdminFacItem.id}`} 
-                                  onClick={handleLinkClick}
-                                  className="hover:bg-gray-100 block p-4 transition duration-300"
-                                >
-                                  <h4 className="text-sm text-gray-400"> {AdminFacItem.type} </h4>
-                                  <h3 className="text-l font-normal leading-6 text-gray-900">
-                                    There is a request for <strong>{AdminFacItem.requestor}</strong>, and it requires your approval. 
-                                  </h3>
-                                  <h4 className="text-sm text-blue-500 font-bold">
-                                    {formatTimeDifference(AdminFacItem.datetimerequest)}
-                                  </h4>
-                                </Link>
-                              </div>  
-                            ))}
-
-                            {/* For Vehicle Request */}
-                            {Notification?.mappedVehAdminData?.map((AdminVehItem) => (
-                              <div key={AdminVehItem.id}>
-                                <Link 
-                                  to={`/vehicleslipform/${AdminVehItem.id}`} 
-                                  onClick={handleLinkClick}
-                                  className="hover:bg-gray-100 block p-4 transition duration-300"
-                                >
-                                  <h4 className="text-sm text-gray-400"> {AdminVehItem.type} </h4>
-                                  <h3 className="text-l font-normal leading-6 text-gray-900">
-                                  {AdminVehItem.req_id == currentUser.id ? (
-                                    <div><strong>Your</strong> request has been completed by the GSO and now requires your approval.</div>
-                                  ):(
-                                    <div>The request for <strong>{AdminVehItem.requestor}</strong> has been completed by the GSO and now requires your approval.</div>
-                                  )}
-                                  </h3>
-                                  <h4 className="text-sm text-blue-500 font-bold">
-                                    {formatTimeDifference(AdminVehItem.datetimerequest)}
-                                  </h4>
-                                </Link>
-                              </div>
-                            ))}
-                          </>
-                          ):(
-                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
-                          )}
-                        </>
-                        )}
-
-                        {/* Personnel Message */}
-                        {currentUser.code_clearance == 6 || currentUser.code_clearance == 10 && (
-                        <>
-                          {Notification.personnelCount ? (
-                          <>
-                            {Notification?.mappedInsPersonnelData?.map((PInspItem) => (
-                              <div key={PInspItem.id}>
-                                {PInspItem.assign == currentUser.id && (
-                                <>
-                                  {/* For Part C Status */}
-                                  {PInspItem.status == 4 && (
-                                    <Link 
-                                      to={`/repairinspectionform/${PInspItem.id}`} 
-                                      onClick={handleLinkClick}
-                                      className="hover:bg-gray-100 block p-4 transition duration-300"
-                                    >
-                                      <h4 className="text-sm text-gray-400"> {PInspItem.type} </h4>
-                                      <h3 className="text-l font-normal leading-6 text-gray-900">
-                                        Hello <strong>{currentUser.fname}</strong>, there a task for you on {PInspItem.requestor}'s request (Control No: {PInspItem.id})
-                                      </h3>
-                                      <h4 className="text-sm text-blue-500 font-bold">
-                                        {formatTimeDifference(PInspItem.datetimerequest)}
-                                      </h4>
-                                    </Link>
-                                  )}
-
-                                  {/* For Part D status */}
-                                  {PInspItem.status == 3 && (
-                                    <Link 
-                                      to={`/repairinspectionform/${PInspItem.id}`} 
-                                      onClick={handleLinkClick}
-                                      className="hover:bg-gray-100 block p-4 transition duration-300"
-                                    >
-                                      <h4 className="text-sm text-gray-400"> {PInspItem.type} </h4>
-                                      <h3 className="text-l font-normal leading-6 text-gray-900">
-                                        Hello <strong>{currentUser.fname}</strong>, you still need to fill up PART D (Control No: {PInspItem.id})
-                                      </h3>
-                                      <h4 className="text-sm text-blue-500 font-bold">
-                                      {formatTimeDifference(PInspItem.datetimerequest)}
-                                      </h4>
-                                    </Link>
-                                  )}
-                                </> 
-                                )}
-                              </div>
-                            ))}
-                          </>
-                          ):(
-                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification Today</h3>
-                          )}
-                        </>
-                        )}
+                        {/* Message */}
+                        <Link 
+                          to={'/repairinspectionform'}
+                          onClick={handleLinkClick} 
+                          className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                        >
+                          <h4 className="text-sm text-gray-400"> Repair Inspection Form </h4>
+                          <h3 className="text-l font-normal leading-6 text-gray-900">
+                            There is a request on <strong>John Doe</strong>, and it requires your approval.
+                          </h3>
+                          <h4 className="text-sm text-blue-500 font-bold">
+                            2 days ago
+                          </h4>
+                        </Link>
 
                       </Menu.Items>
                     </Transition>
                   </div>  
-                  )}
                   {/* End of Notification Message */}
                   
                 </Menu>
@@ -781,7 +451,7 @@ export default function DefaultLayout() {
                       <Menu.Item>
                         <a
                           href="#"
-                          onClick={logout}
+                          onClick={() => (window.location.href = '/login')}
                           className={'block px-4 py-2 text-sm text-gray-700 bg-gray-100'}
                         >
                           Sign out
@@ -836,15 +506,15 @@ export default function DefaultLayout() {
               {/* <img className="h-10 w-10 rounded-full" src={currentUser.imageUrl} alt="" /> */}
             </div>
             <div className="ml-3">
-              <div className="text-base font-medium leading-none text-white">{currentUser.fname} {currentUser.lname}</div>
-              <div className="text-sm font-medium leading-none text-gray-400">{currentUser.email}</div>
+              {/* <div className="text-base font-medium leading-none text-white">{currentUser.fname} {currentUser.lname}</div>
+              <div className="text-sm font-medium leading-none text-gray-400">{currentUser.email}</div> */}
             </div>
           </div>
           <div className="mt-3 space-y-1 px-2">
               <Disclosure.Button
                 as="a"
                 href="#"
-                onClick={(ev) => logout(ev)}
+                onClick={() => (window.location.href = '/login')}
                 className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
               >
                 Sign Out

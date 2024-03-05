@@ -33,93 +33,10 @@ export default function RepairRequestForm(){
   const [propertyLocation, setPropertyLocation] = useState('');
   const [ComplainDefect, setComplainDefect] = useState('');
 
-  // Get Supervisor Names
-  const fetchUsers = () => {
-    // Check if a request is already in progress 
-      axiosClient
-        .get(`/getsupervisor/${id}`)
-        .then((response) => {
-          const responseData = response.data;
-          const supDet = responseData.personnel_details;
-          setUsers(supDet);
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        })
-        .finally(() => {
-          setIsLoading(false); 
-        });
-  };
-
-  useEffect(()=>{ 
-    fetchUsers(); 
-  },[]);
-
-  // Auto Approval for Supervisors and Manager
-  let output;
-  let admin;
-
-  if (currentUser.code_clearance === 1 || currentUser.code_clearance === 2 || currentUser.code_clearance === 4) {
-    output = 1;
-    admin = 4;
-  } else {
-    output = 0;
-    admin = 0;
-  }
-
-  // Submit Form
-  const SubmitInspectionForm = (event) => {
-    event.preventDefault();
-
-    setSubmitLoading(true);
-
-    axiosClient
-      .post("/submitrepairformrequest",{
-        // For Inspect Submission
-        date_of_request: today,
-        property_number: propertyNo,
-        acq_date: acquisitionDate,
-        acq_cost: acquisitionCost,
-        brand_model: BrandModel,
-        serial_engine_no: SerialEngineNo,
-        type_of_property: typeOfProperty,
-        property_other_specific: propertySpecify,
-        property_description: propertyDescription,
-        location: propertyLocation,
-        complain: ComplainDefect,
-        supervisor_name: 
-        currentUser.code_clearance === 1 ? currentUser.id.toString() :
-        currentUser.code_clearance === 2 ? currentUser.id.toString() : users.id.toString(),
-        supervisor_approval: output,
-        admin_approval: admin,
-        inspector_status: 0
-      })
-      .then(() => { 
-        setShowPopup(true);
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Success</p>
-            <p>Form submit successfully</p>
-          </div>
-        );    
-        setSubmitLoading(false);
-      })
-      .catch((error) => {
-        if (error.response) {
-          // If there are validation errors in the response, extract and store them.
-          const responseErrors = error.response.data.errors;
-          setInputErrors(responseErrors);
-        }
-      })
-      .finally(() => {
-        setSubmitLoading(false);
-      });
-  };
-
   return (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
   <>
-    <form onSubmit={SubmitInspectionForm}>
+    <form>
 
       {/* Title */}
       <div>

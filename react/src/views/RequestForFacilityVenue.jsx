@@ -8,8 +8,6 @@ import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 
 export default function RequestFormFacility(){
 
-  const {id} = useParams();
-  const { currentUser } = useUserStateContext();
   const [isLoading , setLoading] = useState(false);
   const [sumbitLoading, setSubmitLoading] = useState(false);
 
@@ -20,15 +18,6 @@ export default function RequestFormFacility(){
   const [popupMessage, setPopupMessage] = useState('');
 
   const today = new Date().toISOString().split('T')[0];
-
-  const navigate = useNavigate ();
-
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/facilityrequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
 
   const [DateEndMin, setDateEndMin] = useState(today);
 
@@ -204,12 +193,6 @@ export default function RequestFormFacility(){
   //OPR Instruction (For Admin Manager Only)
   const [OprInstruct, setOprInstruct] = useState('');
 
-  const oprInstrucValue = currentUser.code_clearance === 1
-    ? OprInstruct === null || OprInstruct.trim() === "" 
-      ? "None" 
-      : OprInstruct
-    : "";
-
   //Count Male Guest
   const generateNumberedText = (lines) => {
     return lines.map((line, index) => `${index + 1}. ${line}`).join('\n');
@@ -242,175 +225,19 @@ export default function RequestFormFacility(){
     countFemaleList(newText);
   };
 
-  const none = 'N/A';
-
-  // Auto Approval for Supervisors and Manager
-  let output;
-  let date_request;
-
-  if (currentUser.code_clearance === 1 ) {
-    output = 2;
-    date_request = today;
-  } else {
-    output = 4;
-    date_request = null;
-  }
-
-  // Popup Clarification
-  function handleClarification(){
-
-    setSubmitLoading(true);
-
-    if(dormCheck == true && currentUser.code_clearance == 1){
-      if(!maleList && !femaleList){
-        setShowPopup(true);
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Warning</p>
-            <p>Fillup the Dormitory form please!</p>
-          </div>
-        );
-        setNototifications("warningnull"); 
-        setSubmitLoading(false);
-      }else if(oprInstrucValue == "None"){
-        setShowPopup(true);
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Warning</p>
-            <p>Do you want to proceed if there is no OPR instruction?</p>
-          </div>
-        );
-        setNototifications("warning"); 
-        setSubmitLoading(false);
-      }
-    }else if(dormCheck == true && currentUser.code_clearance != 1){
-      if(!maleList && !femaleList){
-        setShowPopup(true);
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Warning</p>
-            <p>Fillup the Dormitory form please!</p>
-          </div>
-        );
-        setNototifications("warningnull"); 
-        setSubmitLoading(false);
-      }
-    }
-    else{
-      setShowPopup(true);
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Warning</p>
-          <p>Do you want to proceed if there is no OPR instruction?</p>
-        </div>
-      );
-      setNototifications("warning"); 
-      setSubmitLoading(false);
-    }
-
-  };
-
-  //Submit the Form
-  const SubmitFacilityForm = (event) => {
-    event.preventDefault();
-
-    setSubmitLoading(true);
-
-    const requestData = {
-      date_requested: today,
-      request_office: reqOffice,
-      title_of_activity: titleReq,
-      date_start: DateStart,
-      time_start: timeStart,
-      date_end: DateEnd,
-      time_end: timeEnd,
-      mph: mphCheck,
-      conference: confCheck,
-      dorm: dormCheck,
-      other: otherCheck,
-      table: checkTable,
-      no_table: NoOfTable,
-      chair: checkChairs,
-      no_chair: NoOfChairs,
-      microphone: checkMicrphone,
-      no_microphone: NoOfMicrophone,
-      others: checkOther,
-      specify: OtherField,
-      projector: checkProjector,
-      projector_screen: checkProjectorScreen,
-      document_camera: checkDocumentCamera,
-      laptop: checkLaptop,
-      television: checkTelevision,
-      sound_system: checkSoundSystem,
-      videoke: checkVideoke,
-      name_male: none,
-      name_female: none,
-      other_details: none,
-      obr_instruct: oprInstrucValue,
-      admin_approval: output,
-      date_approve: date_request,
-      remarks: 'Pending',
-    };
-
-    if(timestampstart > timestampend){
-      setShowPopup(true);
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Error</p>
-          <p>Please check the Date and Time of Activity</p>
-        </div>
-      );
-      setNototifications("error");
-      setSubmitLoading(false);
-      return;
-    }
-
-    if (dormCheck) {
-      requestData.name_male = getMaleList;
-      requestData.name_female = getFemaleList;
-      requestData.other_details = DormOtherField;
-    }
-
-    axiosClient
-    .post("facilityformrequest", requestData)
-    .then((response) => {
-      setShowPopup(true);
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Success</p>
-          <p>Form submit successfully</p>
-        </div>
-      );
-      setNototifications("success");
-      setSubmitLoading(false);
-      setCheckValidation(null);
-    })
-    .catch((error) => {
-      console.error(error);
-      const responseErrors = error.response.data.errors;
-      setInputFacErrors(responseErrors);
-      setSubmitLoading(false);
-      setShowPopup(false);
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-    
-  }
-
   const closeError = () => {
     setShowPopup(false);
   };
 
   const closePopup = () => {
     setShowPopup(false);
-    window.location.assign(`/myrequestfacilityvenueform/${currentUser.id}`);
+    window.location.assign('/myrequestfacilityvenueform/');
   };
 
   return (
   <PageComponent title="Request for use of Facility / Venue Form">
 
-    <form id="fac-submit" onSubmit={SubmitFacilityForm}>
+    <form id="fac-submit">
 
       {/* Title */}
       <div>
@@ -730,9 +557,6 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {!NoOfTable && inputFacErrors?.no_table && (
-              <p className="text-red-500 text-xs">No. of table is required</p>
-            )}
 
             {/* Chair */}
             <div class="relative flex items-center mt-2">
@@ -773,9 +597,6 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {!NoOfChairs && inputFacErrors?.no_chair && (
-              <p className="text-red-500 text-xs">No. of chair is required</p>
-            )}
 
             {/* Projector */}
             <div class="relative flex items-center mt-2">
@@ -946,9 +767,6 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {!NoOfMicrophone && inputFacErrors?.no_microphone && (
-              <p className="text-red-500 text-xs">No. of microphone is required</p>
-            )}
 
           </div>
 
@@ -990,14 +808,9 @@ export default function RequestFormFacility(){
             </div>
           )}
         </div>
-        {!OtherField && inputFacErrors?.specify && (
-          <p className="text-red-500 text-xs">This form is required</p>
-        )}
 
         {/* For OPR Instruction */}
         {dormCheck ? null:(
-        <>
-        {currentUser.code_clearance == 1 && (
         <>
         <div>
           <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
@@ -1026,8 +839,7 @@ export default function RequestFormFacility(){
           </div>
         </> 
         )}
-        </>
-        )}
+
 
       </div>
       </>
@@ -1207,14 +1019,14 @@ export default function RequestFormFacility(){
     <div className="flex mt-8">
 
       {/* For Admin Manager User Only */}
-      {currentUser.code_clearance == 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
+      {mphCheck || confCheck || otherCheck || dormCheck && (
       <>
         {/* If the user choose between the Facility and Dorm Form */}
         {(mphCheck || confCheck || otherCheck) && dormCheck ? (
         <>
           {/* Condition if the user choose the field on the Facility will appear the button */}
           {checkedCount ? (
-            (!maleList && !femaleList) || oprInstrucValue === "None" ? (
+            (!maleList && !femaleList) ? (
               <button
                 onClick={() => handleClarification()}
                 className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
@@ -1236,7 +1048,7 @@ export default function RequestFormFacility(){
         <>
           {/* if user choose only Dormitory */}
           {dormCheck ? (
-            (!maleList && !femaleList) || oprInstrucValue === "None" ? (
+            (!maleList && !femaleList) ? (
               <button
                 onClick={() => handleClarification()}
                 className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
@@ -1270,7 +1082,6 @@ export default function RequestFormFacility(){
             )
           ):(
             checkedCount ? (
-              oprInstrucValue === "None" ? (
                 <button
                   onClick={() => handleClarification()}
                   className={`rounded-md px-2 py-2 text-vase text-white shadow-sm focus:outline-none ${
@@ -1285,23 +1096,6 @@ export default function RequestFormFacility(){
                     </div>
                   ) : 'Submit'}
                 </button>
-              ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-md px-2 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
-                >
-                  {sumbitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )
             ):null
           )}
         </>
@@ -1311,7 +1105,7 @@ export default function RequestFormFacility(){
       )}
 
       {/* For Other Users */}
-      {currentUser.code_clearance != 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
+      {mphCheck || confCheck || otherCheck || dormCheck && (
       <>
       
         {(mphCheck || confCheck || otherCheck) && dormCheck ? (

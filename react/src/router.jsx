@@ -50,100 +50,100 @@ const routes = [
 
             // Inspection Request Form
             {
-                path: "/repairrequestform/:id",
+                path: "/repairrequestform",
                 element: <RequestRepairForm />
             },
             // Facility / Venue Request Form
             {
-                path: "/facilityrequestform/:id",
+                path: "/facilityrequestform",
                 element: <RequestFormFacility />
             },
-            // Vehicle Slip Request Form
-            {
-                path: "/vehiclesliprequestform/:id",
-                element: <RequestVehicleSlipForm />
-            },
-            // Equipement Request Form
-            {
-                path: "/equipmentrequestform/:id",
-                element: <RequestEquipmentForm />
-            },
-
-            // ---- My Request Form ---- //
-
-            // Inspection Request Form
-            {
-                path: "/myrequestinpectionform/:id",
-                element: <MyRequestInspectionForm />
-            },
-            // Facility / Venue Request Form
-            {
-                path: "/myrequestfacilityvenueform/:id",
-                element: <MyRequestFacilityVenue />
-            },
-            // Vehicle Slip Request Form
-            {
-                path: "/myrequestvehicleslipform/:id",
-                element: <MyRequestVehicleSlip />
-            },
-
-            // ---- Request List Form ---- //
-
-            // Inspection Request Form
-            {
-                path: "/repairrequestform",
-                element: <RepairRequestForm />
-            },
-            // Facility / Venue Request Form
-            {
-                path: "/facilityvenuerequestform",
-                element: <FacilityFormForm />
-            },
-            // Vehicle Slip Request Form
+            // // Vehicle Slip Request Form
             {
                 path: "/vehiclesliprequestform",
-                element: <VehicleSlipFormList />
+                element: <RequestVehicleSlipForm />
             },
+            // // Equipement Request Form
+            // {
+            //     path: "/equipmentrequestform/:id",
+            //     element: <RequestEquipmentForm />
+            // },
 
-            // ---- Form Details ---- //
+            // // ---- My Request Form ---- //
 
-            // Inspection Request Details
+            // // Inspection Request Form
             {
-                path: "/repairinspectionform/:id",
-                element: <PrepostRepairForm />
+                path: "/myrequestinpectionform",
+                element: <MyRequestInspectionForm />
             },
-            // Facility / Venue Request Details
-            {
-                path: "/facilityvenueform/:id",
-                element: <FacilityVenueForm />
-            },
-            // Vehicle Slip Request Details
-            {
-                path: "/vehicleslipform/:id",
-                element: <VehicleSlipForm />
-            },
+            // // Facility / Venue Request Form
+            // {
+            //     path: "/myrequestfacilityvenueform/:id",
+            //     element: <MyRequestFacilityVenue />
+            // },
+            // // Vehicle Slip Request Form
+            // {
+            //     path: "/myrequestvehicleslipform/:id",
+            //     element: <MyRequestVehicleSlip />
+            // },
+
+            // // ---- Request List Form ---- //
+
+            // // Inspection Request Form
+            // {
+            //     path: "/repairrequestform",
+            //     element: <RepairRequestForm />
+            // },
+            // // Facility / Venue Request Form
+            // {
+            //     path: "/facilityvenuerequestform",
+            //     element: <FacilityFormForm />
+            // },
+            // // Vehicle Slip Request Form
+            // {
+            //     path: "/vehiclesliprequestform",
+            //     element: <VehicleSlipFormList />
+            // },
+
+            // // ---- Form Details ---- //
+
+            // // Inspection Request Details
+            // {
+            //     path: "/repairinspectionform/:id",
+            //     element: <PrepostRepairForm />
+            // },
+            // // Facility / Venue Request Details
+            // {
+            //     path: "/facilityvenueform/:id",
+            //     element: <FacilityVenueForm />
+            // },
+            // // Vehicle Slip Request Details
+            // {
+            //     path: "/vehicleslipform/:id",
+            //     element: <VehicleSlipForm />
+            // },
 
 
 
 
-            // ---- Others ---- //
+            // // ---- Others ---- //
 
-            {
-                path: "/my_request/:id",
-                element: <MyRequest />
-            },
-            {
-                path: "/request_list",
-                element: <RequestList />
-            },
-            {
-                path: "/account",
-                element: <Account />
-            },
-            {
-                path: "/editaccount/:id",
-                element: <AccountEdit />
-            },
+            // {
+            //     path: "/my_request/:id",
+            //     element: <MyRequest />
+            // },
+            // {
+            //     path: "/request_list",
+            //     element: <RequestList />
+            // },
+            // {
+            //     path: "/account",
+            //     element: <Account />
+            // },
+            // {
+            //     path: "/editaccount/:id",
+            //     element: <AccountEdit />
+            // },
 
         ]
     },

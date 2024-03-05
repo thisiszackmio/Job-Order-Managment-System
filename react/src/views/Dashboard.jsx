@@ -20,8 +20,6 @@ export default function Dashboard()
   library.add( faEye);
   const [isLoading , setLoading] = useState(false);
 
-  const { currentUser } = useUserStateContext();
-
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {

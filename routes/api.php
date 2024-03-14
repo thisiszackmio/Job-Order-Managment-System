@@ -81,14 +81,22 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/vehicleformrequest', [VehicleFormController::class, 'store']);
 
     //For Equipment Form
-    Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
     Route::get('/myequipmentformrequest/{id}', [EquipmentController::class, 'myRequestEquipment']);
-    Route::get('/equipmentform/{id}', [EquipmentController::class, 'show']);
+    Route::get('/equipmentform', [EquipmentController::class, 'showList']);
+    Route::get('/viewequipment/{id}', [EquipmentController::class, 'equipmentForm']);
     Route::put('/equipmentsupap/{id}', [EquipmentController::class, 'SupAp']);
     Route::put('/equipmentsupdp/{id}', [EquipmentController::class, 'SupDp']);
     Route::put('/equipmentmanap/{id}', [EquipmentController::class, 'ManAp']);
     Route::put('/equipmentmandp/{id}', [EquipmentController::class, 'ManDp']);
     Route::put('/equipmentmanins/{id}', [EquipmentController::class, 'AdminInstruct']);
+    Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
+
+
+
+    
+    
+    
+    
     Route::put('/equipmentgsoform/{id}', [EquipmentController::class, 'GSOForm']);
     Route::put('/equipmentgclose/{id}', [EquipmentController::class, 'closeRequest']);
 

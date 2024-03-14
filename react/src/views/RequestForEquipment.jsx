@@ -63,7 +63,8 @@ export default function EquipmentForm(){
   const [RFTimeActivityStart, setRFTimeActivityStart] = useState('');
   const [RFTimeActivityEnd, setRFTimeActivityEnd] = useState('');
 
-  const SubmitFiretruckForm = (event) => {
+  // For Firetruck
+  const SubmitEquipmentForm = (event) => {
     event.preventDefault();
 
     if(RFTimeActivityStart > RFTimeActivityEnd){
@@ -147,158 +148,154 @@ export default function EquipmentForm(){
       </div>
     </div>
 
-    {/* For Firetruck */}
-    {selectEquipmentOption === 'Firetruck' && (
-      <div className="mt-10">
+    <form onSubmit={SubmitEquipmentForm}>
 
-        <div>
-          <h2 className="text-base font-bold leading-7 text-gray-900"> Request For the use of Firetruck </h2>
-          <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
-        </div>
+      {selectEquipmentOption && (
+        <div className="mt-10">
 
-        <form onSubmit={SubmitFiretruckForm}>
-
-          {/* Date of Request */}
-          <div className="flex items-center mt-6">
-            <div className="w-72">
-              <label htmlFor="firetruck_date" className="block text-base font-medium leading-6 text-gray-900">
-                <span className="text-red-500">*</span>
-                Date:
-              </label> 
-            </div>
-            <div className="w-64">
-              <input
-                type="date"
-                name="firetruck_date"
-                id="firetruck_date"
-                defaultValue= {today}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                readOnly
-              />
-              {inputEquipErrors.date_request && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
-            </div>
+          <div>
+            <h2 className="text-base font-bold leading-7 text-gray-900"> Request For the use of Firetruck </h2>
+            <p className="text-xs font-bold leading-7 text-red-500">Please double check the form before submitting</p>
           </div>
 
-          {/* Title/Purpose of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-72">
-              <label htmlFor="firetruck_purpose" className="block text-base font-medium leading-6 text-gray-900">
-                <span className="text-red-500">*</span>
-                Title/Purpose of Activity :
-              </label> 
+            {/* Date of Request */}
+            <div className="flex items-center mt-6">
+              <div className="w-72">
+                <label htmlFor="firetruck_date" className="block text-base font-medium leading-6 text-gray-900">
+                  <span className="text-red-500">*</span>
+                  Date:
+                </label> 
+              </div>
+              <div className="w-64">
+                <input
+                  type="date"
+                  name="firetruck_date"
+                  id="firetruck_date"
+                  defaultValue= {today}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  readOnly
+                />
+              </div>
             </div>
-            <div className="w-64">
-              <input
-                type="text"
-                name="firetruck_purpose"
-                id="firetruck_purpose"
-                autoComplete="firetruck_purpose"
-                value={RFPurpose}
-                onChange={ev => setRFPurpose(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-              />
-              {inputEquipErrors.title_of_activity && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
-            </div>
-          </div>
 
-          {/* Date of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-72">
-              <label htmlFor="firetruck_act_date" className="block text-base font-medium leading-6 text-gray-900">
-                <span className="text-red-500">*</span>
-                Date of Activity:
-              </label> 
+            {/* Title/Purpose of Activity */}
+            <div className="flex items-center mt-2">
+              <div className="w-72">
+                <label htmlFor="firetruck_purpose" className="block text-base font-medium leading-6 text-gray-900">
+                  <span className="text-red-500">*</span>
+                  Title/Purpose of Activity :
+                </label> 
+              </div>
+              <div className="w-64">
+                <input
+                  type="text"
+                  name="firetruck_purpose"
+                  id="firetruck_purpose"
+                  autoComplete="firetruck_purpose"
+                  value={RFPurpose}
+                  onChange={ev => setRFPurpose(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                {!RFPurpose && inputEquipErrors.title_of_activity && (
+                  <p className="text-red-500 text-xs italic">This field must be required</p>
+                )}
+              </div>
             </div>
-            <div className="w-64">
-              <input
-                type="date"
-                name="firetruck_act_date"
-                id="firetruck_act_date"
-                value= {RFDateActivity}
-                onChange={ev => setRFDateActivity(ev.target.value)}
-                min={today}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-              />
-              {inputEquipErrors.date_of_activity && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
-            </div>
-          </div>
 
-          {/* Time of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-72">
-              <label htmlFor="firetruck_act_time" className="block text-base font-medium leading-6 text-gray-900">
-                <span className="text-red-500">*</span>
-                Time of Activity (START):
-              </label> 
+            {/* Date of Activity */}
+            <div className="flex items-center mt-2">
+              <div className="w-72">
+                <label htmlFor="firetruck_act_date" className="block text-base font-medium leading-6 text-gray-900">
+                  <span className="text-red-500">*</span>
+                  Date of Activity:
+                </label> 
+              </div>
+              <div className="w-64">
+                <input
+                  type="date"
+                  name="firetruck_act_date"
+                  id="firetruck_act_date"
+                  value= {RFDateActivity}
+                  onChange={ev => setRFDateActivity(ev.target.value)}
+                  min={today}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                {!RFDateActivity && inputEquipErrors.date_of_activity && (
+                  <p className="text-red-500 text-xs italic">This field must be required</p>
+                )}
+              </div>
             </div>
-            <div className="w-64">
-              <input
-                type="time"
-                name="firetruck_act_time"
-                id="firetruck_act_time"
-                value= {RFTimeActivityStart}
-                onChange={ev => setRFTimeActivityStart(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-              />
-              {inputEquipErrors.time_start && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+
+            {/* Time of Activity */}
+            <div className="flex items-center mt-2">
+              <div className="w-72">
+                <label htmlFor="firetruck_act_time" className="block text-base font-medium leading-6 text-gray-900">
+                  <span className="text-red-500">*</span>
+                  Time of Activity (START):
+                </label> 
+              </div>
+              <div className="w-64">
+                <input
+                  type="time"
+                  name="firetruck_act_time"
+                  id="firetruck_act_time"
+                  value= {RFTimeActivityStart}
+                  onChange={ev => setRFTimeActivityStart(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                {!RFTimeActivityStart && inputEquipErrors.time_start && (
+                  <p className="text-red-500 text-xs italic">This field must be required</p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center mt-2">
-            <div className="w-72">
-              <label htmlFor="firetruck_act_time" className="block text-base font-medium leading-6 text-gray-900">
-                <span className="text-red-500">*</span>
-                Time of Activity (END):
-              </label> 
+            <div className="flex items-center mt-2">
+              <div className="w-72">
+                <label htmlFor="firetruck_act_time" className="block text-base font-medium leading-6 text-gray-900">
+                  <span className="text-red-500">*</span>
+                  Time of Activity (END):
+                </label> 
+              </div>
+              <div className="w-64">
+                <input
+                  type="time"
+                  name="firetruck_act_time"
+                  id="firetruck_act_time"
+                  value= {RFTimeActivityEnd}
+                  onChange={ev => setRFTimeActivityEnd(ev.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                {!RFTimeActivityEnd && inputEquipErrors.time_end && (
+                  <p className="text-red-500 text-xs italic">This field must be required</p>
+                )}
+              </div>
             </div>
-            <div className="w-64">
-              <input
-                type="time"
-                name="firetruck_act_time"
-                id="firetruck_act_time"
-                value= {RFTimeActivityEnd}
-                onChange={ev => setRFTimeActivityEnd(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-              />
-              {inputEquipErrors.time_end && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
-              )}
+
+            {/* Submit Button */}
+            <div className="mt-10">
+                <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
+              <button
+                type="submit"
+                className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
+                  sumbitLoading ? 'bg-gray-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
+                disabled={sumbitLoading}
+              >
+                {sumbitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="mt-10">
-              <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
-            <button
-              type="submit"
-              className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none ${
-                sumbitLoading ? 'bg-gray-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
-              }`}
-              disabled={sumbitLoading}
-            >
-              {sumbitLoading ? (
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Processing...</span>
-                </div>
-              ) : (
-                'Submit'
-              )}
-            </button>
-          </div>
+        </div>  
+      )}
 
-        </form>
-
-      </div>  
-    )}
+    </form>
 
     {/* Show Popup */}
     {showPopup && (
@@ -341,7 +338,7 @@ export default function EquipmentForm(){
           {notifications == 'success' && (
             <button
               onClick={() => {
-                window.location.href = `/myrequestinpectionform/${currentUser.id}`;
+                window.location.href = `/myequipmentform/${currentUser.id}`;
               }}
               className="w-full px-4 py-2 bg-indigo-500 text-white rounded"
             >

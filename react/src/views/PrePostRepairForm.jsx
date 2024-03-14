@@ -7,6 +7,8 @@ import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../assets/loading_nobg.gif';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function PrePostRepairForm(){
 
@@ -444,7 +446,7 @@ export default function PrePostRepairForm(){
   const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa';
 
   return Authorize ? (
-  <PageComponent title="Pre-Repair/Post Repair Inspection Form">
+  <PageComponent title="Pre-Repair/Post Repair Inspection Request Form">
   {isLoading ? (
   <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
     <img
@@ -462,7 +464,7 @@ export default function PrePostRepairForm(){
     </button>
 
     {/* Part A */}
-    <div className="border-b border-gray-300 pb-6">
+    <div className="border-b border-gray-300 pb-6 font-roboto">
 
       {/* Control No */}
       <div className="flex items-center mt-6 mb-10">
@@ -663,7 +665,7 @@ export default function PrePostRepairForm(){
       {/* Part B */}
       {InspectionData?.getPartA?.supervisor_approval == 1 &&  (
       <>
-        <div className="mt-4 border-b border-gray-300 pb-6">
+        <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
 
         <div>
           <h2 className="text-base font-bold leading-7 text-gray-900"> Part B: To be filled-up by Administrative Division </h2>
@@ -879,7 +881,7 @@ export default function PrePostRepairForm(){
       {/* Part C */}
       {InspectionData?.getPartCD && InspectionData?.getPartA?.admin_approval == 1 && (
       <>
-        <div className="mt-4 border-b border-gray-300 pb-6">
+        <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
 
           <div>
             <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
@@ -1017,7 +1019,7 @@ export default function PrePostRepairForm(){
       {/* Part D */}
       {InspectionData?.getPartCD && InspectionData?.getPartA?.admin_approval == 1 && (
       <>
-        <div className="mt-4 border-b border-gray-300 pb-6">
+        <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
 
           <div>
             <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
@@ -1123,7 +1125,7 @@ export default function PrePostRepairForm(){
     ):null}
 
     {/* Request Close */}
-    <div className="flex items-center mt-8">
+    <div className="flex items-center mt-8 font-roboto">
       <div className="w-32">
         <label className="block text-base font-bold leading-6 text-gray-900">
         Request Close:
@@ -1146,7 +1148,7 @@ export default function PrePostRepairForm(){
         {/* Approve */}
         <button 
           onClick={() => handleApprovalRequest()}
-          className="bg-indigo-600 hover:bg-indigo-500 font-semibold text-white py-2 px-2 rounded text-base"
+          className="rounded-full bg-indigo-600 hover:bg-indigo-500 font-semibold text-white px-6 py-2 rounded text-base"
           title="Supervisor Approve"
         >
           Approve
@@ -1154,7 +1156,7 @@ export default function PrePostRepairForm(){
         {/* Disapprove */}
         <button 
           onClick={() => handleDeclineRequest()}
-          className="bg-red-600 hover:bg-red-500 font-semibold text-white py-2 px-2 rounded ml-1 text-base"
+          className="rounded-full bg-red-600 hover:bg-red-500 font-semibold text-white px-6 py-2 rounded ml-1 text-base"
           title="Supervisor Decline"
         >
           Disapprove
@@ -1168,7 +1170,7 @@ export default function PrePostRepairForm(){
         <button
           form='partB'
           type="submit"
-          className={`text-white py-2 px-2 rounded font-semibold text-base focus:outline-none ${
+          className={`rounded-full text-white py-2 px-6 rounded font-semibold text-base focus:outline-none ${
             submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
           }`}
           style={{ position: 'relative', top: '0px' }}
@@ -1192,7 +1194,7 @@ export default function PrePostRepairForm(){
       {InspectionData?.getPartA?.user_id == currentUser.id ? (
         <button
           onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-          className={`rounded-md px-3 py-2 text-base font-semibold text-white shadow-sm focus:outline-none ${
+          className={`rounded-full px-6 py-2 text-base font-semibold text-white shadow-sm focus:outline-none ${
             submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
           }`}
           disabled={submitLoading}
@@ -1211,7 +1213,7 @@ export default function PrePostRepairForm(){
         {/* Approve */}
         <button 
           onClick={() => handleApprovalRequest()}
-          className="bg-indigo-600 hover:bg-indigo-500 font-semibold text-white py-2 px-2 rounded text-base"
+          className="rounded-full bg-indigo-600 hover:bg-indigo-500 font-semibold text-white py-2 px-6 rounded text-base"
           title="Admin Approve"
         >
           Approve
@@ -1219,7 +1221,7 @@ export default function PrePostRepairForm(){
         {/* Disapprove */}
         <button 
           onClick={() => handleDeclineRequest()}
-          className="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-2 rounded ml-1 text-base"
+          className="rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-6 rounded ml-1 text-base"
           title="Admin Decline"
         >
           Disapprove
@@ -1238,7 +1240,7 @@ export default function PrePostRepairForm(){
           <button
             form='partC'
             type="submit"
-            className={`rounded-md px-3 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
+            className={`rounded-full px-6 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
               submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             disabled={submitLoading}
@@ -1259,7 +1261,7 @@ export default function PrePostRepairForm(){
           <button
             form="partD"
             type="submit"
-            className={`rounded-md px-3 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
+            className={`rounded-full px-6 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
               submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             disabled={submitLoading}
@@ -1282,7 +1284,7 @@ export default function PrePostRepairForm(){
       {InspectionData?.getPartCD?.close == 2 && (
         <button 
           onClick={() => handleCloseRequest(InspectionData?.getPartA?.id)}
-          className={`rounded-md px-3 py-2 text-white font-semibold text-base shadow-sm focus:outline-none ${
+          className={`rounded-full px-6 py-2 text-white font-semibold text-base shadow-sm focus:outline-none ${
             submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
           }`}
           disabled={submitLoading}
@@ -1303,7 +1305,7 @@ export default function PrePostRepairForm(){
         <button
           type="button"
           onClick={handleButtonClick}
-          className={`rounded-md px-3 py-2 font-semibold text-white text-base shadow-sm focus:outline-none ${
+          className={`rounded-full px-6 py-2 font-semibold text-white text-base shadow-sm focus:outline-none ${
             submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
           }`}
           disabled={submitLoading}
@@ -1363,10 +1365,10 @@ export default function PrePostRepairForm(){
         </div>
 
         {/* Popup Message */}
-        <p className="text-lg text-center"> {popupMessage} </p>
+        <p className="text-lg text-center font-roboto"> {popupMessage} </p>
         
         {/* Buttons */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 font-roboto">
 
           {/* Warning for Approval */}
           {popupContent == "warning" && (
@@ -1378,23 +1380,23 @@ export default function PrePostRepairForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 font-semibold hover:bg-indigo-500 text-white rounded"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-600 font-semibold text-white rounded hover:bg-red-500 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-indigo-400 font-semibold text-white rounded cursor-not-allowed">
+                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1411,23 +1413,23 @@ export default function PrePostRepairForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-blue-300 font-semibold text-white rounded cursor-not-allowed">
+                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1449,23 +1451,23 @@ export default function PrePostRepairForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 text-white font-semibold rounded bg-indigo-600 hover:bg-indigo-500"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-600 font-semibold text-white rounded hover:bg-red-500 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 font-semibold bg-indigo-400 text-white rounded cursor-not-allowed">
+                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1482,18 +1484,18 @@ export default function PrePostRepairForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-blue-500 font-semibold text-white rounded hover:bg-blue-600"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 font-semibold hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-500 font-semibold text-white rounded hover:bg-red-600 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 font-semibold text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
@@ -1514,7 +1516,7 @@ export default function PrePostRepairForm(){
           {(popupContent == "success") && (
             <button
               onClick={closePopup}
-              className="w-full px-4 py-2 font-semibold bg-indigo-600 text-white rounded"
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded"
             >
               Close
             </button>
@@ -1524,9 +1526,9 @@ export default function PrePostRepairForm(){
           {popupContent == "error" && (
             <button
               onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-red-600 text-white rounded ml-2"
+              className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
             >
-              No
+              Close
             </button>
           )}
 

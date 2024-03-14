@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         arial: ['Arial', 'sans'],
+        roboto: ['Roboto', 'sans-serif'],
       },
     },
   },

@@ -26,6 +26,7 @@ class Inspection_Form extends Model
         'supervisor_approval',
         'admin_approval',
         'inspector_status',
+        'remarks'
     ];
 
     public function user()

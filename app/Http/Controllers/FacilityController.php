@@ -15,7 +15,7 @@ class FacilityController extends Controller
      */
     public function index()
     {
-        $facilityForms = FacilityModel::with('user')->orderBy('date_requested', 'asc')->get();
+        $facilityForms = FacilityModel::with('user')->orderBy('created_at', 'desc')->get();
 
         $responseData = [];
 
@@ -84,7 +84,7 @@ class FacilityController extends Controller
     {
         $myRequest = PPAUser::find($id);
 
-        $getfacilityForm = FacilityModel::where('user_id', $id)->get(); 
+        $getfacilityForm = FacilityModel::where('user_id', $id)->orderBy('created_at', 'desc')->get(); 
 
         $respondData = [
             'my_user' => $myRequest,
@@ -186,7 +186,7 @@ class FacilityController extends Controller
         $facility->update([
             'admin_approval' => 2,
             'date_approve' => today(),
-            'remarks' => "Approved"
+            'remarks' => "The request has been approved by the Admin Manager"
         ]);
 
         if ($facility->save()) {
@@ -216,7 +216,7 @@ class FacilityController extends Controller
         $facility->update([
             'admin_approval' => 3,
             'date_approve' => today(),
-            'remarks' => "Disapproved"
+            'remarks' => "The request has been disapproved by the Admin Manager"
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
@@ -239,7 +239,7 @@ class FacilityController extends Controller
         // Update the obr_instruct field
         $facility->update([
             'admin_approval' => 1,
-            'remarks' => "Closed"
+            'remarks' => "The request has been received by the GSO"
         ]);
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);

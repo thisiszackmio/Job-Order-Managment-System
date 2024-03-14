@@ -16,7 +16,7 @@ class VehicleFormController extends Controller
      */
     public function index()
     {
-        $vehicleForms = VehicleForm::with('user')->orderBy('id', 'asc')->get();
+        $vehicleForms = VehicleForm::with('user')->orderBy('created_at', 'desc')->get();
 
         $responseData = [];
 
@@ -53,7 +53,7 @@ class VehicleFormController extends Controller
     {
         $myRequest = PPAUser::find($id);
 
-        $getvehicleslipForms = VehicleForm::where('user_id', $id)->get(); 
+        $getvehicleslipForms = VehicleForm::where('user_id', $id)->orderBy('created_at', 'desc')->get(); 
 
         $passengersCounts = [];
         

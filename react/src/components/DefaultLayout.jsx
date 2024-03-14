@@ -63,16 +63,16 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
-        { name: 'Equipment Form', to: `/equipmentrequestform/${currentUser.id}` },
+        // { name: 'Equipment Form', to: `/equipmentrequestform/${currentUser.id}` },
       ],
     },
     {
-      name: 'My Request',
+      name: 'My Request List',
       submenu: [
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
-        { name: 'Equipment Form', to: `/myequipmentform/${currentUser.id}` }
+        // { name: 'Equipment Form', to: `/myequipmentform/${currentUser.id}` }
       ],
     },
     ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
@@ -83,6 +83,7 @@ export default function DefaultLayout() {
               { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
               { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
               { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
+              // { name: 'Equipemnt Form', to: '/equipmentrequestform' }
             ],
           },
         ]

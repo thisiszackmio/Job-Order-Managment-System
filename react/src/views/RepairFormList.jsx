@@ -50,7 +50,8 @@ export default function RepairRequestList(){
             supervisorname: inspection_form.supervisor_name,
             supervisor_approval: inspection_form.supervisor_approval,
             admin_approval: inspection_form.admin_approval,
-            inspector_status: inspection_form.inspector_status
+            inspector_status: inspection_form.inspector_status,
+            remarks: inspection_form.remarks
           };
         });
 
@@ -138,7 +139,7 @@ export default function RepairRequestList(){
     </div>
 
     <div className="overflow-x-auto">
-      <table className="border-collapse" style={{ width: '1650px' }}>
+      <table className="border-collapse font-roboto" style={{ width: '1650px' }}>
         <thead>    
           <tr className="bg-gray-100">
             <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
@@ -147,7 +148,7 @@ export default function RepairRequestList(){
             <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
             <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
             <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+            <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
           </tr>
         </thead>
@@ -155,25 +156,18 @@ export default function RepairRequestList(){
         {currentRepair.length > 0 ? (
         currentRepair.map((repair) => (
         <tr key={repair.id}>
-          <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold">{repair.id}</td>
-          <td className="px-1 py-2 align-top border border-custom w-40">{repair.date}</td>
-          <td className="px-1 py-2 align-top border border-custom w-80">{repair.property_number}</td>
-          {repair.type_of_property === "Others" ? (
-          <td className="px-1 py-2 align-top border border-custom w-80">Others: <i>{repair.property_other_specific}</i></td>
+          <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold table-font">{repair.id}</td>
+          <td className="px-1 py-2 align-top border border-custom w-40 table-font">{repair.date}</td>
+          <td className="px-1 py-2 align-top border border-custom w-60 table-font">{repair.property_number}</td>
+            {repair.type_of_property === "Others" ? (
+          <td className="px-1 py-2 align-top border border-custom w-72 table-font">Others: <i>{repair.property_other_specific}</i></td>
           ):(
-          <td className="px-1 py-2 align-top border border-custom w-80">{repair.type_of_property}</td>
+          <td className="px-1 py-2 align-top border border-custom w-72 table-font">{repair.type_of_property}</td>
           )}
-          <td className="px-1 py-2 align-top border border-custom w-80">{repair.complain}</td>
-          <td className="px-1 py-2 align-top border border-custom w-56">{repair.name}</td>
-          <td className="px-1 py-2 align-top border border-custom w-60">
-          {repair.supervisor_approval == 0 && repair.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
-          {repair.supervisor_approval == 2 && repair.admin_approval == 0 && (<span className="disapproved-status">Disapproved by the Supervisor</span>)}
-          {repair.supervisor_approval == 1 && repair.admin_approval == 4 && (<span className="approved-status">Approved by the Supervisor</span>)}
-          {repair.supervisor_approval === 1 && repair.admin_approval == 3 && (<span className="pending-status">Pending on Admin's Approval</span>)}
-          {repair.supervisor_approval === 1 && repair.admin_approval == 2 && repair .inspector_status == 3 && (<span className="disapproved-status">Disapproved by the Admin</span>)}
-          {repair.supervisor_approval === 1 && repair.admin_approval == 1 && repair.inspector_status == 3 && (<span className="approved-status">Approved by the Admin</span>)}
-          {repair.admin_approval === 1 && repair.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
-          {repair.admin_approval === 1 && repair.inspector_status == 1 && (<span className="finish-status">Done</span>)}
+          <td className="px-1 py-2 align-top border border-custom w-72 table-font">{repair.complain}</td>
+          <td className="px-1 py-2 align-top border border-custom w-56 table-font">{repair.name}</td>
+          <td className="px-1 py-2 align-top border border-custom w-60 table-font">
+            {repair.remarks}
           </td>
           <td className="px-1 py-2 text-center border border-custom w-1">
             <div className="flex justify-center">

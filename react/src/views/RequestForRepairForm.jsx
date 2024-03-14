@@ -9,7 +9,7 @@ import { useUserStateContext } from "../context/ContextProvider";
 export default function RepairRequestForm(){
 
   const {id} = useParams();
-  const { currentUser, userRole } = useUserStateContext();
+  const { currentUser } = useUserStateContext();
 
   const navigate = useNavigate ();
 
@@ -26,7 +26,6 @@ export default function RepairRequestForm(){
   const [inputErrors, setInputErrors] = useState({});
   const [users, setUsers] = useState([]);
   const [sumbitLoading, setSubmitLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   //Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -103,7 +102,8 @@ export default function RepairRequestForm(){
         currentUser.code_clearance === 2 ? currentUser.id.toString() : users.id.toString(),
         supervisor_approval: output,
         admin_approval: admin,
-        inspector_status: 0
+        inspector_status: 0,
+        remarks: "Pending"
       })
       .then(() => { 
         setShowPopup(true);
@@ -129,13 +129,12 @@ export default function RepairRequestForm(){
 
   return (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
-  <>
     <form onSubmit={SubmitInspectionForm}>
 
-      {/* Title */}
+      {/* Part A */}
       <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-        <p className="text-xs text-red-500">Please double check the form before submitting </p>
+        <h2 className="text-base font-bold leading-7 text-gray-900 font-roboto"> Part A: To be filled-up by Requesting Party </h2>
+        <p className="text-xs text-red-500 font-roboto">Please double check the form before submitting </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -143,9 +142,9 @@ export default function RepairRequestForm(){
         <div className="col-span-1">
 
           {/* Date */}
-          <div className="flex items-center mt-6">
+          <div className="flex items-center mt-6 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_date" className="block text-base font-medium leading-6 text-gray-900">
+              <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Date:
               </label> 
             </div>
@@ -156,18 +155,17 @@ export default function RepairRequestForm(){
                 id="rep_date"
                 defaultValue= {today}
                 onChange={ev => setInspectionDate(ev.target.value)}
-                // min={today}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
                 readOnly
               />
             </div>
           </div>
 
           {/* Property Number */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-gray-900">
-                Property No.:<span className="text-red-500">*</span>
+              <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
+                Property No.:
               </label> 
             </div>
             <div className="w-64">
@@ -178,19 +176,19 @@ export default function RepairRequestForm(){
                 autoComplete="rep_property_no"
                 value={propertyNo}
                 onChange={ev => setPropertyNo(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!propertyNo && inputErrors.property_number && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Property Number</p>
               )}
             </div>
           </div>
 
           {/* Acquisition Date */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-gray-900">    
-                Acquisition Date:<span className="text-red-500">*</span>
+              <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-black">    
+                Acquisition Date:
               </label> 
             </div>
             <div className="w-64">
@@ -201,20 +199,19 @@ export default function RepairRequestForm(){
                 value={acquisitionDate}
                 onChange={ev => setAcquisitionDate(ev.target.value)}
                 max={currentDate}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!acquisitionDate && inputErrors.acq_date && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Acquisition Date</p>
               )}
             </div>
           </div>
 
           {/* Acquisition Cost */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-gray-900">
-                
-                Acquisition Cost: <span className="text-red-500">*</span>
+              <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-black">
+                Acquisition Cost:
               </label> 
             </div>
             <div className="w-64">
@@ -235,20 +232,20 @@ export default function RepairRequestForm(){
                     setAcquisitionCost(inputVal);
                   }
                 }}
-                className="pl-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
             </div>
             {!acquisitionCost && inputErrors.acq_cost && (
-              <p className="text-red-500 text-xs italic">This field must be required</p>
+              <p className="font-roboto form-validation">You must input the Acquisition Cost</p>
             )}
             </div>
           </div>
 
           {/* Brand/Model */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-gray-900">
-                Brand/Model: <span className="text-red-500">*</span>
+              <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-black">
+                Brand/Model:
               </label> 
             </div>
             <div className="w-64">
@@ -259,19 +256,19 @@ export default function RepairRequestForm(){
                 autoComplete="rep_brand_model"
                 value={BrandModel}
                 onChange={ev => setBrandModel(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!BrandModel && inputErrors.brand_model && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Brand/Model</p>
               )}
             </div>
           </div>
 
           {/* Serial/Engine No */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-36">
-              <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-gray-900">                  
-                Serial/Engine No.:<span className="text-red-500">*</span>
+              <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-black">                  
+                Serial/Engine No.:
               </label> 
             </div>
             <div className="w-64">
@@ -282,22 +279,23 @@ export default function RepairRequestForm(){
                 autoComplete="rep_serial_engine_no"
                 value={SerialEngineNo}
                 onChange={ev => setSerialEngineNo(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!SerialEngineNo && inputErrors.serial_engine_no && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Serial/Engine No.</p>
               )}
             </div>
           </div>
+
         </div>
 
         <div className="col-span-1">
 
           {/* Type of Property */}
-          <div className="flex items-center mt-6">
+          <div className="flex items-center mt-6 font-roboto">
             <div className="w-60">
-              <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-gray-900">
-                Type of Property:<span className="text-red-500">*</span>
+              <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                Type of Property:
               </label> 
             </div>
             <div className="w-64">
@@ -312,7 +310,7 @@ export default function RepairRequestForm(){
                   setPropertySpecify('');
                 }
               }}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               >
                 <option value="" disabled>Select an option</option>
                 <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
@@ -320,12 +318,12 @@ export default function RepairRequestForm(){
                 <option value="Others">Others</option>
               </select>
               {!typeOfProperty && inputErrors.type_of_property && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Type of Property</p>
               )}
               {typeOfProperty === 'Others' && (
               <div className="flex mt-4">
                 <div className="w-36">
-                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">Specify:</label> 
+                  <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-black">Specify:</label> 
                 </div>
                 <div className="w-64">
                   <input
@@ -334,7 +332,7 @@ export default function RepairRequestForm(){
                     id="specify"
                     value={propertySpecify}
                     onChange={ev => setPropertySpecify(ev.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
                   />
                 </div>
               </div>
@@ -343,10 +341,10 @@ export default function RepairRequestForm(){
           </div>
 
           {/* Description */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-60">
-              <label htmlFor="rep_description" className="block text-base font-medium leading-6 text-gray-900">
-                Description:<span className="text-red-500">*</span>
+              <label htmlFor="rep_description" className="block text-base font-medium leading-6 text-black">
+                Description:
               </label> 
             </div>
             <div className="w-64">
@@ -356,19 +354,19 @@ export default function RepairRequestForm(){
                 id="rep_description"
                 value={propertyDescription}
                 onChange={ev => setPropertyDescription(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!propertyDescription && inputErrors.property_description && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Description</p>
               )}
             </div>
           </div>
 
           {/* Location */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-60">
-              <label htmlFor="rep_location" className="block text-base font-medium leading-6 text-gray-900">
-                Location (Div/Section/Unit):<span className="text-red-500">*</span>
+              <label htmlFor="rep_location" className="block text-base font-medium leading-6 text-black">
+                Location (Div/Section/Unit):
               </label> 
             </div>
             <div className="w-64">
@@ -378,19 +376,19 @@ export default function RepairRequestForm(){
                 id="rep_location"
                 value={propertyLocation}
                 onChange={ev => setPropertyLocation(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!propertyLocation && inputErrors.location && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the Location</p>
               )}
             </div>
           </div>
 
           {/* Complain / Defect */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-60">
-              <label htmlFor="rep_complain" className="block text-base font-medium leading-6 text-gray-900">
-                Complain/Defect:<span className="text-red-500">*</span>
+              <label htmlFor="rep_complain" className="block text-base font-medium leading-6 text-black">
+                Complain/Defect:
               </label> 
             </div>
             <div className="w-64">
@@ -401,10 +399,10 @@ export default function RepairRequestForm(){
               value={ComplainDefect}
               style={{ resize: 'none' }}
               onChange={ev => setComplainDefect(ev.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
             />
             {!ComplainDefect && inputErrors.complain && (
-              <p className="text-red-500 text-xs italic">This field must be required</p>
+              <p className="font-roboto form-validation">You must input the Complain/Defect</p>
             )}
             </div>
           </div>
@@ -414,12 +412,11 @@ export default function RepairRequestForm(){
       </div>
 
       {/* Submit Button */}
-      <div className="mt-6">
-        <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
+      <div className="mt-10">
         <button
           type="submit"
-          className={`rounded-md px-2 py-2 text-base font-medium text-white shadow-sm focus:outline-none ${
-            sumbitLoading ? 'bg-indigo-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
+          className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
+            sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
           }`}
           disabled={sumbitLoading}
         >
@@ -455,10 +452,10 @@ export default function RepairRequestForm(){
         </div>
 
         {/* Message */}
-        <p className="text-lg text-center">{popupMessage}</p>
+        <p className="text-lg text-center font-roboto">{popupMessage}</p>
 
         {/* Button */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 font-roboto">
           <button
             onClick={() => {
               window.location.href = `/myrequestinpectionform/${currentUser.id}`;
@@ -472,8 +469,6 @@ export default function RepairRequestForm(){
       </div>
     </div>
     )}
-    
-  </>
   </PageComponent>
   );
 

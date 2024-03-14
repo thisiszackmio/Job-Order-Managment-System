@@ -112,7 +112,7 @@ export default function VehicleSlipForm(){
         <div className="col-span-1">
 
           {/* Date of Request */}
-          <div className="flex items-center mt-6">
+          <div className="flex items-center mt-6 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_date" className="block text-base font-medium leading-6 text-gray-900">
                 Date:
@@ -128,17 +128,17 @@ export default function VehicleSlipForm(){
                   setDateArrival(ev.target.value);
                   setVRDate(ev.target.value);
                 }}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
                 readOnly
               />
             </div>
           </div>
 
           {/* Purpose */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_purpose" className="block text-base font-medium leading-6 text-gray-900">
-                Purpose:<span className="text-red-500">*</span>
+                Purpose:
               </label> 
             </div>
             <div className="w-64">
@@ -149,16 +149,16 @@ export default function VehicleSlipForm(){
                 autoComplete="vr_purpose"
                 value={VRPurpose}
                 onChange={ev => setVRPurpose(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!VRPurpose && inputVechErrors.purpose && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the purpose</p>
               )}
             </div>
           </div>
 
           {/* Place */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_place" className="block text-base font-medium leading-6 text-gray-900">
                 Place/s To Be Visited:<span className="text-red-500">*</span>
@@ -172,16 +172,16 @@ export default function VehicleSlipForm(){
                 autoComplete="vr_place"
                 value={VRPlace}
                 onChange={ev => setVRPlace(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!VRPlace && inputVechErrors.place_visited && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the place to be visited</p>
               )}
             </div>
           </div>
 
           {/* Date of Arrival */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_datearrival" className="block text-base font-medium leading-6 text-gray-900">
                 Date of Arrival:<span className="text-red-500">*</span>
@@ -195,16 +195,16 @@ export default function VehicleSlipForm(){
                 value= {VRDateArrival}
                 onChange={ev => setVRDateArrival(ev.target.value)}
                 min={DateArrival}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!VRDateArrival && inputVechErrors.date_arrival && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the date of arrival</p>
               )}
             </div>
           </div>
 
           {/* Time of Arrival */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_timearrival" className="block text-base font-medium leading-6 text-gray-900">
                 Time of Arrival:<span className="text-red-500">*</span>
@@ -217,10 +217,10 @@ export default function VehicleSlipForm(){
                 id="vr_timearrival"
                 value= {VRTimeArrival}
                 onChange={ev => setVRTimeArrival(ev.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
               {!VRTimeArrival && inputVechErrors.time_arrival && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the time of arrival</p>
               )}
             </div>
           </div>
@@ -230,10 +230,10 @@ export default function VehicleSlipForm(){
         <div className="col-span-1">
 
           {/* Passengers */}
-          <div className="flex mt-6">
+          <div className="flex mt-6 font-roboto">
             <div className="w-44">
               <label htmlFor="vr_passengers" className="block text-base font-medium leading-6 text-gray-900">
-                Passengers:<span className="text-red-500">*</span>
+                Passengers:
               </label>
             </div>
             <div className="w-full">
@@ -244,11 +244,11 @@ export default function VehicleSlipForm(){
                 value={VRPassenger}
                 onChange={ev => setVRPassenger(ev.target.value)}
                 style={{ resize: 'none' }}
-                className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-96 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
               />
-              <p className="text-gray-500 text-xs mt-2">Separate name on next line (if no passenger, please type "None")</p>
+              <p className="text-gray-500 text-xs mt-2">Separate name on next line</p>
               {!VRPassenger && inputVechErrors.passengers && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="font-roboto form-validation">You must input the list of passengers</p>
               )}
             </div>
 
@@ -259,11 +259,10 @@ export default function VehicleSlipForm(){
       </div>
 
       {/* Submit Button */}
-      <div className="mt-10">
-        <p className="text-xs mb-4"><span className="text-red-500">*</span> Indicates required field</p>
+      <div className="mt-10 font-roboto">
         <button
           type="submit"
-          className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+          className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
             sumbitLoading ? 'bg-indigo-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
           }`}
           disabled={sumbitLoading}

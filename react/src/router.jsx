@@ -18,18 +18,16 @@ import MyEquipmentForm from "./views/MyEquipementForm";
 import RepairRequestForm from "./views/RepairFormList";
 import FacilityFormForm from "./views/FacilityVenueFormList";
 import VehicleSlipFormList from "./views/VehicleSlipFormList";
+import EquipmentFormList from "./views/EquipmentFormList";
 
 import PrepostRepairForm from "./views/PrePostRepairForm";
 import FacilityVenueForm from "./views/FacilityVenueForm";
 import VehicleSlipForm from "./views/VehicleSlipForm";
+import EquipmentForm from "./views/EquipmentForm";
 
 import Forbidden from "./components/403";
-
-import RequestList from "./views/RequestList";
-import MyRequest from "./views/YourRequest";
 import Account from "./views/Personnel"; 
 import AccountEdit from "./views/AccountEdit";
-import EquipmentForm from "./views/EquipmentForm";
 
 const routes = [
     {
@@ -110,6 +108,11 @@ const routes = [
                 path: "/vehiclesliprequestform",
                 element: <VehicleSlipFormList />
             },
+            // Equipment Request Form
+            {
+                path: "/equipmentrequestform",
+                element: <EquipmentFormList />
+            },
 
             // ---- Form Details ---- //
 
@@ -128,20 +131,16 @@ const routes = [
                 path: "/vehicleslipform/:id",
                 element: <VehicleSlipForm />
             },
+            // Equipment Request Details
+            {
+                path: "/equipmentform/:id",
+                element: <EquipmentForm />
+            },
 
 
 
 
             // ---- Others ---- //
-
-            {
-                path: "/my_request/:id",
-                element: <MyRequest />
-            },
-            {
-                path: "/request_list",
-                element: <RequestList />
-            },
             {
                 path: "/account",
                 element: <Account />

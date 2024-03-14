@@ -46,6 +46,7 @@ export default function MyRequestForRepairInspection(){
             supervisor_approval: dataItem.supervisor_approval,
             admin_approval: dataItem.admin_approval,
             inspector_status: dataItem.inspector_status,
+            remarks: dataItem.remarks
           }
         });
 
@@ -82,7 +83,7 @@ export default function MyRequestForRepairInspection(){
   ):(
   <>
     {/* Supervisor */}
-    <div className="flex">
+    <div className="flex font-roboto">
       <p className="text-sm leading-7 text-black w-20" style={{ paddingTop: '10px', paddingBottom: '10px' }}>Approver: </p>
       {displayRequest?.supervisorName && (
         <span style={{ backgroundColor: '#f2f2f2', padding: '10px', fontFamily: 'Rockwell, serif' }}>
@@ -94,7 +95,7 @@ export default function MyRequestForRepairInspection(){
     {/* Display Table */}
     <div className="mt-4 overflow-x-auto">
       {displayRequest?.mappedData?.length > 0 ? (
-        <table className="border-collapse font-arial" style={{ width: '2500px' }}>
+        <table className="border-collapse font-roboto" style={{ width: '2500px' }}>
           <thead>
             <tr className="bg-gray-100">
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
@@ -108,7 +109,7 @@ export default function MyRequestForRepairInspection(){
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Description </th>
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Location </th>
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain/Defect</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             </tr>
           </thead>
           <tbody>
@@ -116,30 +117,23 @@ export default function MyRequestForRepairInspection(){
             <>
             {displayRequest?.mappedData?.map((getData) => (
               <tr key={getData.id}>
-                <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1">{getData.id}</td>
-                <td className="px-1 py-2 align-top border border-custom w-40">{formatDate(getData.date_of_request)}</td>
-                <td className="px-1 py-2 align-top border border-custom w-80">{getData.property_number}</td>
-                <td className="px-1 py-2 align-top border border-custom w-40">{formatDate(getData.acq_date)}</td>
-                <td className="px-1 py-2 align-top border border-custom w-40">₱{getData.acq_cost}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{getData.brand_model}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{getData.serial_engine_no}</td>
-                {getData.type_of_property === "Others" ? (
-                <td className="px-1 py-2 align-top border border-custom w-80">Others: <i>{getData.property_other_specific}</i></td>
+                <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
+                <td className="px-1 py-2 align-top border border-custom w-40 table-font">{formatDate(getData.date_of_request)}</td>
+                <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.property_number}</td>
+                <td className="px-1 py-2 align-top border border-custom w-40 table-font">{formatDate(getData.acq_date)}</td>
+                <td className="px-1 py-2 align-top border border-custom w-40 table-font">₱{getData.acq_cost}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.brand_model}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.serial_engine_no}</td>
+                  {getData.type_of_property === "Others" ? (
+                <td className="px-1 py-2 align-top border border-custom w-80 table-font">Others: <i>{getData.property_other_specific}</i></td>
                 ):(
-                <td className="px-1 py-2 align-top border border-custom w-80">{getData.type_of_property}</td>
+                <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.type_of_property}</td>
                 )}
-                <td className="px-1 py-2 align-top border border-custom w-56">{getData.property_description}</td>
-                <td className="px-1 py-2 align-top text-center border border-custom">{getData.location}</td>
-                <td className="px-1 py-2 align-top border border-custom w-96">{getData.complain}</td>
-                <td className="px-1 py-2 align-top border border-custom w-60">
-                {getData.supervisor_approval == 0 && getData.admin_approval == 0 && (<span className="pending-status">Pending</span>)}
-                {getData.supervisor_approval == 2 && getData.admin_approval == 0 && (<span className="disapproved-status">Disapproved by the Supervisor</span>)}
-                {getData.supervisor_approval == 1 && getData.admin_approval == 4 && (<span className="approved-status">Approved by the Supervisor</span>)}
-                {getData.supervisor_approval === 1 && getData.admin_approval == 3 && (<span className="pending-status">Pending on Admin's Approval</span>)} 
-                {getData.supervisor_approval === 1 && getData.admin_approval == 2 && getData.inspector_status == 3 && (<span className="disapproved-status">Disapproved by the Admin</span>)}
-                {getData.supervisor_approval === 1 && getData.admin_approval == 1 && getData.inspector_status == 3 && (<span className="approved-status">Approved by the Admin</span>)}
-                {getData.admin_approval === 1 && getData.inspector_status == 2 && (<span className="checking-status">Checking</span>)}
-                {getData.admin_approval === 1 && getData.inspector_status == 1 && (<span className="finish-status">Done</span>)}
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.property_description}</td>
+                <td className="px-1 py-2 align-top text-center border border-custom table-font">{getData.location}</td>
+                <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.complain}</td>
+                <td className="px-1 py-2 align-top border border-custom w-72 table-font">
+                  {getData.remarks}
                 </td>
               </tr>
             ))}

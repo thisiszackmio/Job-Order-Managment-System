@@ -10,76 +10,6 @@ use Illuminate\Support\Facades\URL;
 
 class EquipmentController extends Controller
 {
-    /**
-     * Show My Request
-     */
-    public function myRequestEquipment(Request $request, $id)
-    {
-        $myRequest = PPAUser::find($id);
-
-        //Get the request
-        $getEquipmentForm = EquipmentForm::where('user_id', $id)->get();
-
-        //Display All the data
-        $respondData = [
-            'my_user' => $myRequest,
-            'view_equipment' => $getEquipmentForm,
-        ];
-
-        return response()->json($respondData);
-    }
-
-    /**
-     * View the form
-     */
-    public function show(Request $request, $id)
-    {
-        $equipmentForm = EquipmentForm::find($id);
-
-        //Get the ID
-        $divisionManagerId = $equipmentForm->division_manager_id;
-        $userId = $equipmentForm->user_id;
-
-        //Get the user 
-        $userInfo = PPAUser::where('id', $userId)->first();
-        $userMI = $userInfo->mname ? $userInfo->mname[0] . '. ' : '';  
-        $userName = $userInfo->fname . ' ' . $userMI . $userInfo->lname;
-        $userSig = URL::to('/storage/esignature/' . $userInfo->image);
-
-        //Get the division manager
-        $supInfo = PPAUser::where('id', $divisionManagerId)->first();
-        $supervisorMI = $supInfo->mname ? $supInfo->mname[0] . '. ' : '';  
-        $supervisorName = $supInfo->fname . ' ' . $supervisorMI . $supInfo->lname;
-        $supervisorSig = URL::to('/storage/esignature/' . $supInfo->image);
-
-        //Get the Admin Manager (Maam Daisy)
-        $manInfo = PPAUser::where('code_clearance', '1')->first();
-        $manMI = $manInfo->mname ? $manInfo->mname[0] . '. ' : '';  
-        $manName = $manInfo->fname . ' ' . $manMI . $manInfo->lname;
-        $manSig = URL::to('/storage/esignature/' . $manInfo->image);
-
-        //Get Maam Sue ID
-        $gsoInfo = PPAUser::where('id', '4')->first();
-        $gsoMI = $gsoInfo->mname ? $gsoInfo->mname[0] . '. ' : ''; 
-        $gsoName = $gsoInfo->fname . ' ' . $gsoMI . $gsoInfo->lname;
-        $gsoSig = URL::to('/storage/esignature/' . $gsoInfo->image);
-        $gsoPost = $gsoInfo->position;
-
-        $respondData = [
-            'equipment_form' => $equipmentForm,
-            'userName' => $userName,
-            'userSig' => $userSig,
-            'supervisorName' => $supervisorName,
-            'supervisorSig' => $supervisorSig,
-            'adminName' => $manName,
-            'adminSig' => $manSig,
-            'gsoName' => $gsoName,
-            'gsoSig' => $gsoSig,
-            'gsoPost' => $gsoPost
-        ];
-        
-        return response()->json($respondData);
-    }
 
     /**
      * Submit the information
@@ -119,7 +49,106 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Manager's Approval
+     * Show MyRequest List
+     */
+    public function myRequestEquipment(Request $request, $id)
+    {
+        //Get the request
+        $getEquipmentForm = EquipmentForm::where('user_id', $id)->get();
+
+        // Sup Details
+        $sup_id = $getEquipmentForm->pluck('division_manager_id')->first();
+        $ppaID = PPAUser::find($sup_id);
+        $supName = $ppaID->fname . ' ' . $ppaID->mname . '. ' . $ppaID->lname;
+
+
+        //Display All the data
+        $respondData = [
+            'view_equipment' => $getEquipmentForm,
+            'sup_name' => $supName
+        ];
+
+        return response()->json($respondData);
+    }
+
+    /**
+     * View Equipement List
+     */
+    public function showList()
+    {
+        $equipmentForm = EquipmentForm::orderBy('created_at', 'desc')->get();
+        $requestor_ID = $equipmentForm->pluck('user_id')->all();
+        $requestorQuerry = PPAUser::whereIn('id', $requestor_ID)->get();
+
+        // Display all the Form Request on Equipment including Requestor
+        $equipmentFormDet = $equipmentForm->map(function ($equipmentForm) use ($requestorQuerry) {
+            $user = $requestorQuerry->where('id', $equipmentForm->user_id)->first();
+            $userName = $user->fname . ' ' . $user->mname . '. ' . $user->lname;
+
+            return [
+                'equipmentForm' => $equipmentForm,
+                'requestorName' => $userName
+            ];
+        });
+        
+        return response()->json($equipmentFormDet);
+    }
+
+    /**
+     * View Equipment Form
+     */
+    public function equipmentForm(Request $request, $id){
+        
+        //Get the request
+        $getEquipmentForm = EquipmentForm::find($id);
+
+        //Get the Requestor
+        $userId = $getEquipmentForm->user_id;
+        $userInfo = PPAUser::where('id', $userId)->first();
+        $userName = $userInfo->fname . ' ' . $userInfo->mname . '. ' . $userInfo->lname;
+        $userSig = URL::to('/storage/esignature/' . $userInfo->image);
+
+        //Get the Division Manager
+        $divisionManagerId = $getEquipmentForm->division_manager_id;
+        $supInfo = PPAUser::where('id', $divisionManagerId)->first();
+        $supName = $supInfo->fname . ' ' . $supInfo->mname . '. ' . $supInfo->lname;
+        $supSig = URL::to('/storage/esignature/' . $supInfo->image);
+
+        //Get the Admin Manager
+        $AdminInfo = PPAUser::where('code_clearance', '1')->first();
+        $AdminName = $AdminInfo->fname . ' ' . $AdminInfo->mname . '. ' . $AdminInfo->lname;
+        $AdminSig = URL::to('/storage/esignature/' . $AdminInfo->image);
+
+        //Get the Harbor Master
+        $HarborInfo = PPAUser::where('position', 'Harbor Master')->first();
+        $HarborName = $HarborInfo->fname . ' ' . $HarborInfo->mname . '. ' . $HarborInfo->lname;
+        $HarborSig = URL::to('/storage/esignature/' . $HarborInfo->image);
+
+        //Get the Port Manager
+        $PMInfo = PPAUser::where('code_clearance', '2')->first();
+        $PMName = $PMInfo->fname . ' ' . $PMInfo->mname . '. ' . $PMInfo->lname;
+        $PMSig = URL::to('/storage/esignature/' . $PMInfo->image);
+
+        $respondData = [
+            'view_equipment' => $getEquipmentForm,
+            'requestor' => $userName,
+            'requestor_sign' => $userSig,
+            'div_manager_name' => $supName,
+            'div_manager_sign' => $supSig,
+            'admin_manager_name' => $AdminName,
+            'admin_manager_sign' => $AdminSig,
+            'harbor_master' => $HarborName,
+            'harbor_sign' => $HarborSig,
+            'port_manager' => $PMName,
+            'port_sign' => $PMSig
+        ];
+
+        return response()->json($respondData);
+
+    }
+
+    /**
+     * Division Manager's Approval
      */
     public function SupAp(Request $request, $id)
     {
@@ -144,6 +173,25 @@ class EquipmentController extends Controller
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
+    }
+
+    /**
+     * Admin Instructions
+     */
+    public function AdminInstruct(Request $request, $id)
+    {
+        // Validation rules
+        $validatedData = $request->validate([
+            'instructions' => 'required|string',
+        ]);
+
+        // Find the Equipment Form
+        $Eform = EquipmentForm::find($id);
+
+        //Update the Form
+        $Eform->update([
+            'instructions' => $validatedData['instructions'],
+        ]);
     }
 
     /**
@@ -172,66 +220,5 @@ class EquipmentController extends Controller
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
-    }
-
-    /**
-     * Admin Manager's Instruction
-     */
-    public function AdminInstruct(Request $request, $id)
-    {
-        $findEquipment = EquipmentForm::find($id);
-
-        if ($findEquipment) {
-            $findEquipment->update([
-                'instructions' => $request->input('instructions') ?? 'N/A'
-            ]);
-
-            // Check if the update was successful (HTTP status code 200)
-            if ($findEquipment->wasRecentlyCreated || $findEquipment->wasChanged()) {
-                return response()->json(['message' => 'Update successful'], 200);
-            } else {
-                return response()->json(['message' => 'No changes made'], 200);
-            }
-        } else {
-            // Handle the case where no record is found for the given $id
-            return response()->json(['error' => 'Record not found'], 404);
-        }
-    }
-
-    /**
-     * GSO fill up form
-     */
-    public function GSOForm(Request $request, $id)
-    {
-        $findEquipment = EquipmentForm::find($id);
-
-        if ($findEquipment) {
-            $findEquipment->update([
-                'driver' => $request->input('driver'),
-                'operator' => $request->input('operator'),
-                'status' => 2
-            ]);
-
-            // Check if the update was successful (HTTP status code 200)
-            if ($findEquipment->wasRecentlyCreated || $findEquipment->wasChanged()) {
-                return response()->json(['message' => 'Update successful'], 200);
-            } else {
-                return response()->json(['message' => 'No changes made'], 200);
-            }
-        } else {
-            // Handle the case where no record is found for the given $id
-            return response()->json(['error' => 'Record not found'], 404);
-        }
-    }
-
-    /**
-     * Close the Request
-     */
-    public function closeRequest(Request $request, $id)
-    {
-        // Update the close status for all EquipmentForms associated with the Inspection_Form
-        EquipmentForm::where('id', $id)->update(['status' => 1]);
-
-        return response()->json(['message' => 'Request closed successfully'], 200);
     }
 }

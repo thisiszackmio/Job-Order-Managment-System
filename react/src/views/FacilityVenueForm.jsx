@@ -7,6 +7,8 @@ import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../assets/loading_nobg.gif';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function FacilityFormForm(){
 
@@ -348,7 +350,8 @@ export default function FacilityFormForm(){
   const Facility_Dorm = displayRequestFacility?.viewFacilityData?.dorm;
   
   return Authorize ? (
-  <PageComponent title="Facility/Venue Form">
+  <PageComponent title="Facility/Venue Request
+   Form">
   {isLoading ? (
   <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
     <img
@@ -366,7 +369,7 @@ export default function FacilityFormForm(){
     </button>
 
     {/* Control Number */}
-    <div className="flex items-center mb-6 mt-6">
+    <div className="flex items-center mb-6 mt-6 font-roboto">
       <div className="w-24">
         <label className="block text-base font-medium leading-6 text-gray-900">
         Control No:
@@ -378,7 +381,7 @@ export default function FacilityFormForm(){
     </div>
 
     {/* Main Form */}
-    <div className="border-b border-black pb-10">
+    <div className="border-b border-black pb-10 font-roboto">
 
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> Main Form </h2>
@@ -529,7 +532,7 @@ export default function FacilityFormForm(){
 
     {/* For Facility Room */}
     {Facility_Room ? (
-    <div className="mt-4 border-b border-black pb-10">
+    <div className="mt-4 border-b border-black pb-10 font-roboto">
 
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others  </h2>
@@ -705,7 +708,7 @@ export default function FacilityFormForm(){
 
     {/* For Dormitory Room */}
     {Facility_Dorm ? (
-    <div className="mt-4 border-b border-black pb-10">
+    <div className="mt-4 border-b border-black pb-10 font-roboto">
 
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Dormitory  </h2>
@@ -807,7 +810,7 @@ export default function FacilityFormForm(){
     ):null}
 
     {/* Footer */}
-    <div className="border-b border-black pb-6">
+    <div className="border-b border-black pb-6 font-roboto">
 
       <div className="grid grid-cols-2 gap-4">
 
@@ -955,7 +958,7 @@ export default function FacilityFormForm(){
     </div>
 
     {/* Buttons */}
-    <div className="flex mt-4">
+    <div className="flex mt-4 font-roboto">
 
     {/* Generate PDF */}
     {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
@@ -963,7 +966,7 @@ export default function FacilityFormForm(){
       <button
         type="button"
         onClick={handleButtonClick}
-        className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+        className={`rounded-full px-6 py-2 text-white text-base shadow-sm focus:outline-none ${
           submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
         }`}
         disabled={submitLoading}
@@ -990,7 +993,7 @@ export default function FacilityFormForm(){
           {/* Approve */}
           <button 
             onClick={() => handleAdminApproveConfirmation()}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-2 rounded text-base"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-6 rounded-full text-base"
             title="Admin Approve"
           >
             Approve
@@ -999,7 +1002,7 @@ export default function FacilityFormForm(){
           {/* Decline */}
           <button 
             onClick={() => handleDisapproveConfirmation()}
-            className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 rounded ml-1 text-base"
+            className="bg-red-600 hover:bg-red-500 text-white py-2 px-6 rounded-full ml-1 text-base"
             title="Admin Decline"
           >
             Decline
@@ -1013,7 +1016,7 @@ export default function FacilityFormForm(){
           <button
             form='opr-form-admin'
             type="submit"
-            className={`text-white py-2 px-2 rounded text-base focus:outline-none ${
+            className={`text-white py-2 px-6 rounded-full text-base focus:outline-none ${
               submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
             }`}
             style={{ position: 'relative', top: '0px' }}
@@ -1031,7 +1034,7 @@ export default function FacilityFormForm(){
         ):(
           <button 
             onClick={() => handleOPRInstructionClick()}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded text-base"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-6 rounded-full text-base"
             title="Admin Approve"
           >
             Submit
@@ -1051,7 +1054,7 @@ export default function FacilityFormForm(){
       <button
         form='opr-form-gso'
         type="submit"
-        className={`text-white py-2 px-2 rounded text-base focus:outline-none ${
+        className={`text-white py-2 px-6 rounded-full text-base focus:outline-none ${
           submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
         }`}
         style={{ position: 'relative', top: '0px' }}
@@ -1069,10 +1072,11 @@ export default function FacilityFormForm(){
     </>
     )}
 
+    {/* Close the request */}
     {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
       <button 
         onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
-        className={`rounded-md px-3 py-2 text-white text-base shadow-sm focus:outline-none ${
+        className={`rounded-full px-6 py-2 text-white text-base shadow-sm focus:outline-none ${
           submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
         }`}
         disabled={submitLoading}
@@ -1138,12 +1142,12 @@ export default function FacilityFormForm(){
         </div>
         
         {/* Popup Message */}
-        <p className="text-lg text-center">
+        <p className="text-lg text-center font-roboto">
           {popupMessage}
         </p>
 
         {/* Popup Buttons */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 font-roboto">
         
         {/* Warning */}
         {popupContent == "warning" && (
@@ -1155,18 +1159,18 @@ export default function FacilityFormForm(){
               {!submitLoading && (
                 <button
                   onClick={SubmitOPRInstruct}
-                  className="w-1/2 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
 
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
 
@@ -1184,18 +1188,18 @@ export default function FacilityFormForm(){
               {!submitLoading && (
                 <button
                   onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes
+                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
 
               {!submitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
 
@@ -1223,18 +1227,18 @@ export default function FacilityFormForm(){
             {!submitLoading && (
               <button
               onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+              className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
               >
-                Yes
+                 <FontAwesomeIcon icon={faCheck} /> Confirm
               </button>
             )}
 
             {!submitLoading && (
               <button
                 onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
               >
-                No
+                <FontAwesomeIcon icon={faTimes} /> Cancel
               </button>
             )}
 

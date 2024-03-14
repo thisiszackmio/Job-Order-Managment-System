@@ -156,7 +156,7 @@ export default function VehicleSlipFormList(){
       {/* Vehicle Slip Form */}
       <div className="overflow-x-auto">
         {currentVehicleSlip.length > 0 ? (
-          <table className="border-collapse" style={{ width: '1880px' }}>
+          <table className="border-collapse font-roboto" style={{ width: '1880px' }}>
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">No</th>
@@ -168,28 +168,28 @@ export default function VehicleSlipFormList(){
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
               </tr>
             </thead>
             <tbody>
             {currentVehicleSlip.map((VehDet) => (
               <tr key={VehDet.id}>
-                <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold">{VehDet.id}</td>
-                <td className="px-1 py-2 align-top border border-custom w-48">{VehDet.date}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.purpose}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.place_visited}</td>
-                <td className="px-1 py-2 align-top border border-custom w-60">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
-                <td className="px-1 py-2 align-top border border-custom w-96">{VehDet.vehicle_type}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.driver}</td>
-                <td className="px-1 py-2 align-top text-center border border-custom w-20">{VehDet.passengersCount}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56">{VehDet.requestor}</td>
-                <td className="px-1 py-2 align-top border border-custom w-72">
-                {VehDet.admin_approval == 5 && (<span className="pending-status">Pending</span>)}
-                {VehDet.admin_approval == 4 && (<span className="pending-status">Waiting on Admin's Approval</span>)}
-                {VehDet.admin_approval == 3 && (<span className="disapproved-status">Disapproved</span>)}
-                {VehDet.admin_approval == 2 && (<span className="approved-status">Approved</span>)}
-                {VehDet.admin_approval == 1 && (<span className="finish-status">Closed</span>)}
+                <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold table-font">{VehDet.id}</td>
+                <td className="px-1 py-2 align-top border border-custom w-48 table-font">{VehDet.date}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.purpose}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.place_visited}</td>
+                <td className="px-1 py-2 align-top border border-custom w-60 table-font">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
+                <td className="px-1 py-2 align-top border border-custom w-96 table-font">{VehDet.vehicle_type}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.driver}</td>
+                <td className="px-1 py-2 align-top text-center border border-custom w-20 table-font">{VehDet.passengersCount}</td>
+                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.requestor}</td>
+                <td className="px-1 py-2 align-top border border-custom w-72 table-font">
+                {VehDet.admin_approval == 5 && ("Pending")}
+                {VehDet.admin_approval == 4 && ("The GSO has received your request, filled out the data, and is now awaiting approval from the admin manager")}
+                {VehDet.admin_approval == 3 && ("The request has been disapproved by the Admin Manager")}
+                {VehDet.admin_approval == 2 && ("The request has been approved by the Admin Manager")}
+                {VehDet.admin_approval == 1 && ("The request is closed")}
                 </td>
                 <td className="px-3 py-2 align-top border border-custom w-12">
                     <div className="flex justify-center">

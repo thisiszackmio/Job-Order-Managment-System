@@ -7,6 +7,8 @@ import { useReactToPrint } from "react-to-print";
 import { useUserStateContext } from "../context/ContextProvider";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../assets/loading_nobg.gif';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function PrePostRepairForm(){
 
@@ -359,7 +361,7 @@ export default function PrePostRepairForm(){
       </button>
 
       {/* Slip No */}
-      <div className="flex items-center mb-6 mt-4">
+      <div className="flex items-center mb-6 mt-4 font-roboto">
         <div className="w-24">
           <label className="block text-base font-medium leading-6">
           Slip No:
@@ -375,7 +377,7 @@ export default function PrePostRepairForm(){
         <div className="col-span-1">
 
           {/* Date */}
-          <div className="flex items-center mt-6">
+          <div className="flex items-center mt-6 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Date:
@@ -387,7 +389,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Purpose */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Purpose:
@@ -399,7 +401,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Place */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Place to be visited:
@@ -411,7 +413,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Date Time */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Date/Time of Arrival:
@@ -427,7 +429,7 @@ export default function PrePostRepairForm(){
           <>
 
           {/* Vehicle */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Type of Vehicle:
@@ -439,7 +441,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Plate No. */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Plate No:
@@ -451,7 +453,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Driver */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Driver:
@@ -466,7 +468,7 @@ export default function PrePostRepairForm(){
           ):null}
 
           {/* Requested by */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Requested by:
@@ -478,7 +480,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Approved by */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-40">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Approved by:
@@ -494,7 +496,7 @@ export default function PrePostRepairForm(){
         <div className="col-span-1">
 
           {/* Passengers */}
-          <div className="flex mt-4">
+          <div className="flex mt-4 font-roboto">
             <div className="w-28">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Passenger/s:
@@ -523,7 +525,7 @@ export default function PrePostRepairForm(){
       </div>
 
       {/* Status */}
-      <div className="flex items-center mt-8">
+      <div className="flex items-center mt-8 font-roboto">
         <div className="w-16">
           <label className="block text-base font-bold leading-6 text-gray-900">
           Status:
@@ -544,7 +546,7 @@ export default function PrePostRepairForm(){
         <form id="VehicleSlip" onSubmit={VehicleSlipForm}>
 
           {/* Type of Vehicle */}
-          <div className="flex items-center mt-4">
+          <div className="flex items-center mt-4 font-roboto">
             <div className="w-44">
               <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
                 Type of Vehicle:<span className="text-red-500">*</span>
@@ -587,7 +589,7 @@ export default function PrePostRepairForm(){
           </div>
 
           {/* Driver */}
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-2 font-roboto">
             <div className="w-44">
               <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
                 Driver:<span className="text-red-500">*</span>
@@ -619,7 +621,7 @@ export default function PrePostRepairForm(){
       ):null}
 
       {/* Button */}
-      <div className="mt-8 flex">
+      <div className="mt-8 flex font-roboto">
 
         {/* GSO Button  */}
         {currentUser.code_clearance == 3 && (
@@ -630,7 +632,7 @@ export default function PrePostRepairForm(){
             <button
               type="submit"
               form="VehicleSlip"
-              className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+              className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
                 sumbitLoading ? 'bg-indigo-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
               }`}
               disabled={sumbitLoading}
@@ -652,7 +654,7 @@ export default function PrePostRepairForm(){
           <>
             <button
               onClick={() => handleCloseClick(vehicleForms?.vehicleForm?.id)}
-              className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+              className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
                 sumbitLoading ? 'bg-red-400 cursor-not-allowed arrange' : 'bg-red-600 hover:bg-red-500'
               }`}
               disabled={sumbitLoading}
@@ -680,7 +682,7 @@ export default function PrePostRepairForm(){
             {/* Approve */}
             <button
               onClick={() => handleApprovalRequest()}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 text-base px-2 rounded"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 text-base px-6 rounded-full"
               title="Approve"
             >
               Approve
@@ -689,7 +691,7 @@ export default function PrePostRepairForm(){
             {/* Disapprove */}
             <button
               onClick={() => handleDeclineRequest()}
-              className="bg-red-600 hover:bg-red-500 text-white py-2 px-2 text-base rounded ml-1"
+              className="bg-red-600 hover:bg-red-500 text-white py-2 px-6 text-base rounded-full ml-1"
               title="Disapprove"
             >
               Disapprove
@@ -705,7 +707,7 @@ export default function PrePostRepairForm(){
           <button
             type="button"
             onClick={handleButtonClick}
-            className={`rounded-md px-3 py-2 text-base text-white shadow-sm focus:outline-none ${
+            className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
               sumbitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
             }`}
             disabled={sumbitLoading}
@@ -771,10 +773,10 @@ export default function PrePostRepairForm(){
           </div>
           
           {/* Popup Message */}
-          <p className="text-lg text-center">{popupMessage}</p>
+          <p className="text-lg text-center font-roboto">{popupMessage}</p>
 
           {/* Popup Button */}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 font-roboto">
 
             {/* Error */}
             {popupContent == "error" && (
@@ -797,18 +799,18 @@ export default function PrePostRepairForm(){
                 {!sumbitLoading && (
                   <button
                     onClick={() => handleApproveClick(vehicleForms?.vehicleForm?.id)}
-                    className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+                    className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                   >
-                    Yes, Do It!
+                    <FontAwesomeIcon icon={faCheck} /> Confirm
                   </button>
                 )}
 
                 {!sumbitLoading && (
                   <button
                     onClick={justclose}
-                    className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                    className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                   >
-                    No
+                    <FontAwesomeIcon icon={faTimes} /> Cancel
                   </button>
                 )}
 
@@ -831,18 +833,18 @@ export default function PrePostRepairForm(){
               {!sumbitLoading && (
                 <button
                   onClick={() => handleDispproveClick(vehicleForms?.vehicleForm?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                 >
-                  Yes, Do It!
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
 
               {!sumbitLoading && (
                 <button
                   onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 ml-2"
+                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
                 >
-                  No
+                 <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
 

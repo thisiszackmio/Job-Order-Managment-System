@@ -2,53 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Status Style */
-.approved-status {
-  /* Emerald Green */
-  background-color: #50C878;
-  padding: 5px;
-  color: white;
+/* Form */
+.form-text{
+  font-size: 15px;
 }
 
-.disapproved-status {
-  /* Neon Red */
-  background-color: #FF3131;
-  padding: 5px;
-  color: white;
+.form-validation{
+  font-size: 11px;
+  font-weight: 900;
+  color: #8B0000;
+  padding-top: 5px;
 }
-
-.pending-status {
-  /* Lemon Yellow */
-  background-color: #FAFA33;
-  padding: 5px;
-}
-
-.done-status {
-  /* Silver */
-  background-color: #C0C0C0;
-  padding: 5px;
-  color: white;
-}
-
-span.checking-status {
-  /* Orange */
-  background-color: #FFA500; 
-  padding: 5px;
-}
-
-.finish-status {
-  /* Blue */
-  background-color: #1F51FF;
-  padding: 5px;
-  color: white;
-}
-
 
 /* Notification Style */
 p.popup-title {
   font-size: 25px;
   padding: 10px 0px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .notifications {
@@ -207,6 +177,10 @@ p.sign-txt {
 
 
 /* Table Pagination */
+
+.table-font {
+  font-size: 15px;
+}
 
 .pagination {
   display: flex;

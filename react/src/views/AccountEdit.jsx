@@ -152,7 +152,7 @@ export default function RequestList()
 
   return(
     <PageComponent title="Edit User">
-    {currentUser.code_clearance === 6 ?(
+    {currentUser.code_clearance === 10 ?(
     <>
     {loading ? (
       <tr>

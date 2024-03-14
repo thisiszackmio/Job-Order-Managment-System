@@ -29,7 +29,7 @@ return new class extends Migration
             $table->boolean('supervisor_approval')->default(false);
             $table->boolean('admin_approval')->default(false);
             $table->boolean('inspector_status')->default(false);
-            $table->string('remarks')->nullable();
+            $table->string('remarks', 500)->nullable();
             $table->timestamps();
         });
     }

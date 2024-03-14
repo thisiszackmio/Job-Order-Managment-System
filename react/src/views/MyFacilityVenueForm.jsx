@@ -98,7 +98,7 @@ export default function MyRequestForRepairInspection(){
   },[id]);
 
   return (
-  <PageComponent title="Facility / Venue Form">
+  <PageComponent title="My Facility / Venue Form List">
   {loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
@@ -112,7 +112,7 @@ export default function MyRequestForRepairInspection(){
   <>
     {/* Display Table */}
     <div className="mt-4 max-w-full">
-      <table className="border-collapse w-full">
+      <table className="border-collapse w-full font-roboto">
         <thead>
           <tr className="bg-gray-100">
             <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
@@ -120,7 +120,7 @@ export default function MyRequestForRepairInspection(){
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start to End)</th>
             <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
           </tr>
         </thead>
         <tbody>
@@ -129,24 +129,21 @@ export default function MyRequestForRepairInspection(){
         {displayRequestFacility.mappedData.length > 0 ? (
           displayRequestFacility.mappedData.map((getData) => (
             <tr key={getData.id}>
-              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1">{getData.id}</td>
-              <td className="px-1 py-2 align-top border border-custom w-1">{formatDate(getData.date_requested)}</td>
-              <td className="px-1 py-2 align-top border border-custom w-1/5">{getData.title_of_activity}</td>
-              <td className="px-1 py-2 align-top border border-custom w-1/4">
+              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1 table-font">{formatDate(getData.date_requested)}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1/5 table-font">{getData.title_of_activity}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1/4 table-font">
               {getData.date_start === getData.date_end ? (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatTime(getData.time_end)}`
               ) : (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatDate(getData.date_end)} @ ${formatTime(getData.time_end)}`
               )}
               </td>
-              <td className="px-1 py-2 w-10 align-top border border-custom w-1/5">
+              <td className="px-1 py-2 w-10 align-top border border-custom w-1/5 table-font">
                 {getData.facility}
               </td>
-              <td className="px-1 py-2 align-top border border-custom w-1/5">
-                {getData.remarks == "Approved" && (<span className="approved-status">{getData.remarks}</span>)}
-                {getData.remarks == "Disapproved" && (<span className="disapproved-status">{getData.remarks}</span>)}
-                {getData.remarks == "Pending" && (<span className="pending-status">{getData.remarks}</span>)}
-                {getData.remarks == "Closed" && (<span className="finish-status">{getData.remarks}</span>)}
+              <td className="px-1 py-2 align-top border border-custom w-1/5 table-font">
+                {getData.remarks}
               </td>
             </tr>
           ))

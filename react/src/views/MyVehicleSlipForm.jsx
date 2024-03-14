@@ -74,7 +74,7 @@ export default function MyRequestVehicleSlip(){
   }, []);
 
   return (
-    <PageComponent title="Vehicle Slip Form">
+    <PageComponent title="My Vehicle Slip Form List">
     {loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
@@ -88,7 +88,7 @@ export default function MyRequestVehicleSlip(){
     <>
       <div className="mt-4 overflow-x-auto">
         {displayRequestVehicle.mappedData.length > 0 ? (
-          <table className="border-collapse font-arial" style={{ width: '1800px' }}>
+          <table className="border-collapse font-roboto" style={{ width: '1800px' }}>
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
@@ -99,7 +99,7 @@ export default function MyRequestVehicleSlip(){
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Status</th>
+                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -107,30 +107,30 @@ export default function MyRequestVehicleSlip(){
               <>
               {displayRequestVehicle.mappedData.map((getData) => (
                 <tr key={getData.id}>
-                  <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1">{getData.id}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base w-44">{formatDate(getData.date_requested)}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base w-60">{getData.purpose}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base w-60">{getData.place_visit}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base w-72">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base w-64">
+                  <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1 table-font">{getData.id}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-44 table-font">{formatDate(getData.date_requested)}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-60 table-font">{getData.purpose}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-60 table-font">{getData.place_visit}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-72 table-font">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
+                  <td className="px-1 py-2 align-top border border-custom text-base w-64 table-font">
                   <span dangerouslySetInnerHTML={{
                     __html: getData.vehicle_type === 'None' 
                       ? getData.vehicle_type 
                       : `<b>${getData.vehicle_type.split('=')?.[0]}</b>${getData.vehicle_type.split('=')?.[1]}`
                   }} />
                   </td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 text-base">
+                  <td className="px-1 py-2 align-top border border-custom w-56 text-base table-font">
                     {getData.driver}
                   </td>
-                  <td className="px-1 py-2 align-top text-center border border-custom w-20 text-base">
+                  <td className="px-1 py-2 align-top text-center border border-custom w-20 text-base table-font">
                     {getData.passenger == 'None' ? (getData.passenger):(getData.passengerCount)}
                   </td>
-                  <td className="px-1 py-2 align-top border border-custom w-auto text-base">
-                  {getData.remarks == 5 && (<span className="pending-status">Pending</span>)}
-                  {getData.remarks == 4 && (<span className="pending-status">Waiting on Admin's Approval</span>)}
-                  {getData.remarks == 3 && (<span className="disapproved-status">Disapproved</span>)}
-                  {getData.remarks == 2 && (<span className="approved-status">Approved</span>)}
-                  {getData.remarks == 1 && (<span className="finish-status">Closed</span>)}
+                  <td className="px-1 py-2 align-top border border-custom w-auto text-base table-font">
+                  {getData.remarks == 5 && ("Pending")}
+                  {getData.remarks == 4 && ("The GSO has received your request, filled out the data, and is now awaiting approval from the admin manager")}
+                  {getData.remarks == 3 && ("The request has been disapproved by the Admin Manager")}
+                  {getData.remarks == 2 && ("The request has been approved by the Admin Manager")}
+                  {getData.remarks == 1 && ("The request is closed")}
                   </td>
                 </tr>
               ))}

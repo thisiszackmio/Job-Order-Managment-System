@@ -5,6 +5,7 @@ import { useUserStateContext } from "../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWrench , faIndustry , faReceipt} from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
+import TopNav from "../components/TopNav";
 
 // To refrain return null on reloading the page
 const storedUserData = JSON.parse(localStorage.getItem('USER'));
@@ -127,7 +128,6 @@ export default function Dashboard()
 
   return(
     <PageComponent title={`${getTimeOfDay()}! ${currentUser.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUser.fname}`}>
-
     {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
@@ -139,7 +139,6 @@ export default function Dashboard()
     </div>
     ):(
     <div className="font-roboto">
-
       <div className="title">
         <h2>Request Status</h2>
       </div>

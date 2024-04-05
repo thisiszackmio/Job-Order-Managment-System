@@ -12,13 +12,20 @@ export default function Login() {
 
   const handleLogin = async (credentials) => {
     try {
+      setIsLoading(true);
+      setError({ __html: "" });
+
       // Make a POST request to your login endpoint using axiosClient
+      ///const response = await axiosClient.post("/login", credentials);
       const response = await axiosClient.post("/login", credentials);
 
       // Assuming the response contains the user's role in the 'role' field
       const userRole = response.data.role;
 
+      setCurrentUser(response.data.user);
+      setUserToken(response.data.token);
       setUserRole(userRole);
+      
 
       // Now you have the user's role; you can store it in state, context, or any state management solution you use.
       // For example, if you are using React state and setUserRole is a state update function:
@@ -51,7 +58,8 @@ export default function Login() {
         setCurrentUser(data.user);
          setUserToken(data.token);
          setUserRole(userRole);
-         window.location.href = '/';
+        //  window.location.href = '/';
+         window.location.href = '/dashboard';
       })
       .catch((error) => {
         setIsLoading(false);

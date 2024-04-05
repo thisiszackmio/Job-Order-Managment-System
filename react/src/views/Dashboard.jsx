@@ -5,7 +5,6 @@ import { useUserStateContext } from "../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWrench , faIndustry , faReceipt} from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
-import TopNav from "../components/TopNav";
 
 // To refrain return null on reloading the page
 const storedUserData = JSON.parse(localStorage.getItem('USER'));

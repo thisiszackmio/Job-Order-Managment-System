@@ -3,10 +3,29 @@
 @tailwind utilities;
 
 /* PPA Theme Color */
-.bg-ppa-themecolor { background-color: #6495ED; }
+.bg-ppa-themecolor { background-color: #132E51; }
 .ppa-theme-active { background-color: #132E51; }
 .ppa-nav li a { font-size: 15px; }
 .ppa-nav li a.active { background-color: #132E51; color: #fff; }
+
+.submenu {
+  position: absolute;
+  top: calc(100% + 5px); /* Adjust the value as needed for the space between the parent item and the submenu */
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Show submenu when menuOpen state is true */
+.menuOpen + .submenu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
 
 /* Icons */
 .notification-icon { color: #132E51; padding: 5px 5px; border-radius: 20px; }

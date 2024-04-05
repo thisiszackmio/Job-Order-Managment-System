@@ -1,44 +1,53 @@
 {
-  "name": "react",
+  "name": "black-dashboard-react",
+  "version": "1.2.2",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port=9200",
-    "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
+  "homepage": "https://demos.creative-tim.com/black-dashboard-react/#/admin/dashboard",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/react-fontawesome": "^0.2.0",
-    "@headlessui/react": "^1.7.16",
-    "@heroicons/react": "^2.0.18",
-    "@react-pdf/renderer": "^3.1.14",
-    "@tailwindcss/forms": "^0.5.4",
-    "axios": "^1.4.0",
-    "framer-motion": "^10.16.4",
-    "http-proxy-middleware": "^2.0.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hook-form": "^7.45.4",
-    "react-paginate": "^8.2.0",
-    "react-router-dom": "^6.15.0",
-    "react-to-print": "^2.14.15",
-    "tailwindcss-animated": "^1.0.1"
+    "@fortawesome/fontawesome-free": "6.4.0",
+    "bootstrap": "4.6.2",
+    "chart.js": "3.9.1",
+    "classnames": "2.3.2",
+    "perfect-scrollbar": "1.5.5",
+    "prop-types": "15.8.1",
+    "react": "18.2.0",
+    "react-chartjs-2": "3.3.0",
+    "react-dom": "18.2.0",
+    "react-notification-alert": "0.0.13",
+    "react-router-dom": "6.11.1",
+    "react-scripts": "5.0.1",
+    "sass": "1.62.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build && gulp licenses",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "compile-scss": "sass src/assets/scss/black-dashboard-react.scss src/assets/css/black-dashboard-react.css",
+    "minify-scss": "sass src/assets/scss/black-dashboard-react.scss src/assets/css/black-dashboard-react.min.css --style compressed"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "optionalDependencies": {
+    "eslint-plugin-flowtype": "8.0.3",
+    "reactstrap": "8.10.1"
   },
   "devDependencies": {
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^4.0.4",
-    "autoprefixer": "^10.4.14",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react": "^7.32.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
-    "postcss": "^8.4.27",
-    "tailwindcss": "^3.3.3",
-    "vite": "^4.4.5"
+    "typescript": "5.0.4"
+  },
+  "overrides": {
+    "svgo": "3.0.2"
   }
 }

@@ -237,17 +237,6 @@ export default function Dashboard()
 
         </div>
 
-        {/* For Other */}
-        <div className="col-span-1 other-sec">
-
-          <div className="form-title">Other Request</div>
-
-          <div className="text-2xl font-bold text-white">
-            Coming Soon!
-          </div>
-
-        </div>
-
       </div>
 
       {/* Logs */}

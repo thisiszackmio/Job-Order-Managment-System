@@ -12,6 +12,7 @@ use App\Models\AssignPersonnel;
 use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\NotificationModel;
+use App\Models\Logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -202,6 +203,11 @@ class InspectionFormController extends Controller
         // Send the data on Inspection Form
         $deploymentData = Inspection_Form::create($data);
         $deploymentData->save();
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
         
         if(!$deploymentData){
             return response()->json(['error' => 'Data Error'], 500);
@@ -236,11 +242,17 @@ class InspectionFormController extends Controller
         ]);
 
         // After creating the related model, update the admin_approval to 2
-        $findInspection->admin_approval = 3;
-        $findInspection->inspector_status = 3;
-        $findInspection->remarks = "The GSO has finished filling out the Part B form and is waiting for the Admin Manager to approve";
+        $findInspection->update([
+            'admin_approval' => 3,
+            'inspector_status' => 3,
+            'remarks' => "The GSO has finished filling out the Part B form and is waiting for the Admin Manager to approve",
+        ]);
 
-        if ($findInspection->save()) {
+        $logs = Logs::create([
+            'remarks' => $request->input('logs'),
+        ]);
+        
+        if ($findInspection && $logs) {
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -281,6 +293,10 @@ class InspectionFormController extends Controller
 
         // Save changes
         if ($findInspection->save()) {
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
             return response()->json(['message' => 'Inspector form updated successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -311,10 +327,15 @@ class InspectionFormController extends Controller
     
         $findInspection = Inspection_Form::find($inspR);
 
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
         if ($findInspection) {
             $findInspection->inspector_status = 1;
             $findInspection->remarks = "The inspector completed the request";
             $findInspection->save();
+
             return response()->json(['message' => 'Update successful'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -327,18 +348,27 @@ class InspectionFormController extends Controller
      */
     public function updateApprove(Request $request, $id)
     {
+        // Find the Inspection_Form record with the given ID
         $approveRequest = Inspection_Form::find($id);
 
+        // Update the approval status and remarks of the Inspection_Form record
         $approveRequest->supervisor_approval = 1;
         $approveRequest->admin_approval = 4;
         $approveRequest->remarks = "The supervisor has approved the request";
-        
+
+        // Save the updated Inspection_Form record to the database
         if ($approveRequest->save()) {
-            return response()->json(['message' => 'Deployment data created successfully'], 200);
+            // Create a new Logs record with the remarks from the request
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
+            // Return a success response
+            return response()->json(['message' => 'Deployment data updated successfully'], 200);
         } else {
+            // Return an error response
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
-        
     }
 
     /**
@@ -352,6 +382,12 @@ class InspectionFormController extends Controller
         $disapproveRequest->remarks = "The supervisor has disapproved the request";
 
         if ($disapproveRequest->save()) {
+            // Create a new Logs record with the remarks from the request
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
+            // Return a success response
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -376,6 +412,11 @@ class InspectionFormController extends Controller
                     $getInspectorStat->save();
                 }
 
+                // Create a new Logs record with the remarks from the request
+                $logs = new Logs();
+                $logs->remarks = $request->input('logs');
+                $logs->save();
+
                 return response()->json(['message' => 'Deployment data created successfully'], 200);
             }
         }
@@ -395,6 +436,11 @@ class InspectionFormController extends Controller
         $disapproveAdminRequest->remarks = "The Admin Manager has disapproved the request";
 
         if ($disapproveAdminRequest->save()) {
+            // Create a new Logs record with the remarks from the request
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -414,6 +460,11 @@ class InspectionFormController extends Controller
         $inspectionRequest = Inspection_Form::find($id);
         $inspectionRequest->remarks = "The request is closed";
         $inspectionRequest->save();
+
+        // Create a new Logs record with the remarks from the request
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
         
         return response()->json(['message' => 'Request closed successfully'], 200);
     }

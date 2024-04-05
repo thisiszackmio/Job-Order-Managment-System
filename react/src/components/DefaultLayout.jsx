@@ -63,7 +63,6 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/repairrequestform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/facilityrequestform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/vehiclesliprequestform/${currentUser.id}` },
-        // { name: 'Equipment Form', to: `/equipmentrequestform/${currentUser.id}` },
       ],
     },
     {
@@ -72,7 +71,6 @@ export default function DefaultLayout() {
         { name: 'Pre/Post Repair Inspection Form', to: `/myrequestinpectionform/${currentUser.id}` },
         { name: 'Facility / Venue Form', to: `/myrequestfacilityvenueform/${currentUser.id}` },
         { name: 'Vehicle Slip Form', to: `/myrequestvehicleslipform/${currentUser.id}` },
-        // { name: 'Equipment Form', to: `/myequipmentform/${currentUser.id}` }
       ],
     },
     ...(currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10'
@@ -83,7 +81,6 @@ export default function DefaultLayout() {
               { name: 'Pre/Post Repair Inspection Form', to: '/repairrequestform' },
               { name: 'Facility / Venue Form', to: '/facilityvenuerequestform' },
               { name: 'Vehicle Slip Form', to: '/vehiclesliprequestform' },
-              // { name: 'Equipemnt Form', to: '/equipmentrequestform' }
             ],
           },
         ]
@@ -101,7 +98,16 @@ export default function DefaultLayout() {
         ]
       : []),
     ...(currentUser.code_clearance == '10'
-      ? [{ name: 'Personnel', to: '/account' }]
+      ? [
+          { 
+          name: 'Personnel', 
+          submenu: [
+            { name: 'User List', to: '/ppauserlist' },
+            { name: 'Assign Personnel', to: '/ppauserassign' },
+            { name: 'User Registration', to: '/pparegistration' }
+          ],
+          },
+        ]
       : []),
   ].filter(Boolean);
 
@@ -376,7 +382,7 @@ export default function DefaultLayout() {
                         {isSubmenuActive && (
                           // For Submenu
                   
-                          <ul className="absolute left-0 w-60 mt-2 py-2 bg-white rounded-md shadow-lg">
+                          <ul className="absolute left-0 w-64 mt-2 bg-white rounded-md shadow-lg ppa-nav z-10">
                             {item.submenu.map((subItem) => (
                               <li key={subItem.name}>
                                 <NavLink
@@ -384,7 +390,7 @@ export default function DefaultLayout() {
                                   onClick={() => {
                                     setActiveSubmenu(null); // Reset submenu when NavLink in submenu is clicked
                                   }}
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                  className="block px-4 py-4 text-gray-700 rounded-md"
                                 >
                                   {subItem.name}
                                 </NavLink>
@@ -433,7 +439,7 @@ export default function DefaultLayout() {
                   {/* Notification Number */}
                   {(userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4' || userRole == 'P3rs0nn3lz@pPa') && (
                   <div>
-                    <Menu.Button className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <Menu.Button className="notification-icon">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">View notifications</span>
                     <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -714,7 +720,7 @@ export default function DefaultLayout() {
                         )}
 
                         {/* Personnel Message */}
-                        {currentUser.code_clearance == 6 || currentUser.code_clearance == 10 && (
+                        {(currentUser.code_clearance == 6 || currentUser.code_clearance == 10 || currentUser.code_clearance == 7) && (
                         <>
                           {Notification.personnelCount ? (
                           <>
@@ -779,10 +785,10 @@ export default function DefaultLayout() {
               {/* Profile dropdown */}
               <Menu as="div" className="relative ml-5">
                 <div>
-                  <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <Menu.Button className="notification-icon">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
-                    <UserIcon className="w-8 h-8 bg-black/25 p-2 rounded-full text-white" />
+                    <UserIcon className="h-6 w-6" />
                   </Menu.Button>
                   <Transition
                     as={Fragment}

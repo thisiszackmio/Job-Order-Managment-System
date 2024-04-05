@@ -23,7 +23,7 @@ export default function VehicleSlipForm(){
   const [isLoading , setLoading] = useState(false);
   const today = new Date().toISOString().split('T')[0];
   const [DateArrival, setDateArrival] = useState(today);
-  const [sumbitLoading, setSubmitLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const [inputVechErrors, setInputVechErrors] = useState({});
 
@@ -52,6 +52,8 @@ export default function VehicleSlipForm(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Vehicle Slip`;
+
     axiosClient
       .post("vehicleformrequest", {
       date_of_request: today,
@@ -63,6 +65,7 @@ export default function VehicleSlipForm(){
       vehicle_type: 'None',
       driver: 'None',
       admin_approval: 5,
+      logs: logs
     })
     .then((response) => { 
       setShowPopup(true);
@@ -161,7 +164,7 @@ export default function VehicleSlipForm(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_place" className="block text-base font-medium leading-6 text-gray-900">
-                Place/s To Be Visited:<span className="text-red-500">*</span>
+                Place/s To Be Visited:
               </label> 
             </div>
             <div className="w-64">
@@ -184,7 +187,7 @@ export default function VehicleSlipForm(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_datearrival" className="block text-base font-medium leading-6 text-gray-900">
-                Date of Arrival:<span className="text-red-500">*</span>
+                Date of Arrival:
               </label> 
             </div>
             <div className="w-64">
@@ -207,7 +210,7 @@ export default function VehicleSlipForm(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="vr_timearrival" className="block text-base font-medium leading-6 text-gray-900">
-                Time of Arrival:<span className="text-red-500">*</span>
+                Time of Arrival:
               </label> 
             </div>
             <div className="w-64">
@@ -262,12 +265,10 @@ export default function VehicleSlipForm(){
       <div className="mt-10 font-roboto">
         <button
           type="submit"
-          className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
-            sumbitLoading ? 'bg-indigo-400 cursor-not-allowed arrange' : 'bg-indigo-600 hover:bg-indigo-500'
-          }`}
-          disabled={sumbitLoading}
+          className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+          disabled={submitLoading}
         >
-          {sumbitLoading ? (
+          {submitLoading ? (
             <div className="flex items-center justify-center">
               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
               <span className="ml-2">Processing...</span>
@@ -307,7 +308,7 @@ export default function VehicleSlipForm(){
               onClick={() => {
                 window.location.href = `/myrequestvehicleslipform/${currentUser.id}`;
               }}
-              className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="w-full py-2 btn-success"
             >
               Close
             </button>

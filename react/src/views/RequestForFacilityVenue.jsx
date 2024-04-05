@@ -24,7 +24,7 @@ export default function RequestFormFacility(){
   }, [id, currentUser.id, navigate]);
 
   const [DateEndMin, setDateEndMin] = useState(today);
-  const [sumbitLoading, setSubmitLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [inputFacErrors, setInputFacErrors] = useState({});
 
   // Popup
@@ -276,6 +276,8 @@ export default function RequestFormFacility(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Facility/Venue`
+
     const requestData = {
       date_requested: today,
       request_office: reqOffice,
@@ -310,6 +312,7 @@ export default function RequestFormFacility(){
       admin_approval: output,
       date_approve: date_request,
       remarks: 'Pending',
+      logs: logs
     };
 
     if(timestampstart > timestampend){
@@ -747,9 +750,9 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {/* {!NoOfTable && inputFacErrors?.no_table && (
-              <p className="text-red-500 text-xs">No. of table is required</p>
-            )} */}
+            {!NoOfTable && inputFacErrors?.no_table && (
+              <p className="form-validation">No. of table is required</p>
+            )}
 
             {/* Chair */}
             <div class="relative flex items-center mt-2">
@@ -790,9 +793,9 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {/* {!NoOfChairs && inputFacErrors?.no_chair && (
-              <p className="text-red-500 text-xs">No. of chair is required</p>
-            )} */}
+            {!NoOfChairs && inputFacErrors?.no_chair && (
+              <p className="form-validation">No. of chair is required</p>
+            )}
 
             {/* Projector */}
             <div class="relative flex items-center mt-2">
@@ -963,9 +966,9 @@ export default function RequestFormFacility(){
                 </div>
               )}
             </div>
-            {/* {!NoOfMicrophone && inputFacErrors?.no_microphone && (
-              <p className="text-red-500 text-xs">No. of microphone is required</p>
-            )} */}
+            {!NoOfMicrophone && inputFacErrors?.no_microphone && (
+              <p className="form-validation">No. of microphone is required</p>
+            )}
 
           </div>
 
@@ -1007,9 +1010,9 @@ export default function RequestFormFacility(){
             </div>
           )}
         </div>
-        {/* {!OtherField && inputFacErrors?.specify && (
-          <p className="text-red-500 text-xs">This form is required</p>
-        )} */}
+        {!OtherField && inputFacErrors?.specify && (
+          <p className="form-validation">This form is required</p>
+        )}
 
         {/* For OPR Instruction */}
         {dormCheck ? null:(
@@ -1195,15 +1198,11 @@ export default function RequestFormFacility(){
       <>
         {(mphCheck || confCheck || otherCheck) && !dormCheck ? (
         checkedCount ? (
-          <button
-            form="fac-submit"
-            type="submit"
-            className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-              sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-            }`}
-            disabled={sumbitLoading}
+          <button form="fac-submit" type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+            disabled={submitLoading}
           >
-            {sumbitLoading ? (
+            {submitLoading ? (
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                 <span className="ml-2">Processing...</span>
@@ -1214,15 +1213,11 @@ export default function RequestFormFacility(){
         ):(mphCheck || confCheck || otherCheck) && dormCheck ?(
         <>
         {(maleList || femaleList) && checkedCount ? (
-          <button
-            form="fac-submit"
-            type="submit"
-            className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-              sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-            }`}
-            disabled={sumbitLoading}
+          <button form="fac-submit" type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+            disabled={submitLoading}
           >
-            {sumbitLoading ? (
+            {submitLoading ? (
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                 <span className="ml-2">Processing...</span>
@@ -1234,15 +1229,11 @@ export default function RequestFormFacility(){
         ):(
         <>
         {maleList || femaleList ? (
-          <button
-            form="fac-submit"
-            type="submit"
-            className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-              sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-            }`}
-            disabled={sumbitLoading}
+          <button form="fac-submit" type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+            disabled={submitLoading}
           >
-            {sumbitLoading ? (
+            {submitLoading ? (
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                 <span className="ml-2">Processing...</span>
@@ -1265,14 +1256,11 @@ export default function RequestFormFacility(){
             {checkedCount ? (
             <>
               {oprInstrucValue == "None" ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button onClick={() => handleClarification()}
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1280,15 +1268,11 @@ export default function RequestFormFacility(){
                   ) : 'Submit'}
                 </button>
               ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-                    sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button form="fac-submit" type="submit"
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1304,14 +1288,11 @@ export default function RequestFormFacility(){
             {(maleList || femaleList) && checkedCount ? (
             <>
               {oprInstrucValue == "None" ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button onClick={() => handleClarification()}
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1319,15 +1300,11 @@ export default function RequestFormFacility(){
                   ) : 'Submit'}
                 </button>
               ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-                    sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button form="fac-submit" type="submit"
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1343,14 +1320,11 @@ export default function RequestFormFacility(){
             {maleList || femaleList? (
             <>
               {oprInstrucValue == "None" ? (
-                <button
-                  onClick={() => handleClarification()}
-                  className={`rounded-full px-6 py-2 text-base text-white shadow-sm focus:outline-none ${
-                    sumbitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button onClick={() => handleClarification()}
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1358,15 +1332,11 @@ export default function RequestFormFacility(){
                   ) : 'Submit'}
                 </button>
               ):(
-                <button
-                  form="fac-submit"
-                  type="submit"
-                  className={`rounded-full px-6 py-2 text-base font-medium shadow-sm focus:outline-none font-roboto ${
-                    sumbitLoading ? 'bg-indigo-100 text-black cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                  }`}
-                  disabled={sumbitLoading}
+                <button form="fac-submit" type="submit"
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
                 >
-                  {sumbitLoading ? (
+                  {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-2">Processing...</span>
@@ -1432,27 +1402,20 @@ export default function RequestFormFacility(){
         {/* Notice / Warning */}
         {notifications == "warning" && (
         <>
-          {!sumbitLoading && (
-            <button
-              form="fac-submit"
-              type="submit"
-              className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-            >
+          {!submitLoading && (
+            <button form="fac-submit" type="submit" className="w-1/2 py-2 popup-confirm">
               <FontAwesomeIcon icon={faCheck} /> Confirm
             </button>
           )}
 
-          {!sumbitLoading && (
-            <button
-              onClick={closeError}
-              className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-            >
+          {!submitLoading && (
+            <button onClick={closeError} className="w-1/2 py-2 popup-cancel">
               <FontAwesomeIcon icon={faTimes} /> Cancel
             </button>
           )}
 
-          {sumbitLoading && (
-            <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+          {submitLoading && (
+            <button className="w-full cursor-not-allowed py-2 btn-process">
               <div className="flex items-center justify-center">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                 <span className="ml-2">Loading</span>
@@ -1466,10 +1429,7 @@ export default function RequestFormFacility(){
         {(notifications == "warningnull" || 
         notifications == "error") && (
         <>
-          <button
-            onClick={() => (closeError())}
-            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
-          >
+          <button onClick={() => (closeError())} className="w-full py-2 btn-error">
             Close
           </button>
         </>
@@ -1477,10 +1437,7 @@ export default function RequestFormFacility(){
 
         {/* Success */}
         {notifications == "success" && (
-          <button
-            onClick={() => (closePopup())}
-            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-500"
-          >
+          <button onClick={() => (closePopup())} className="w-full py-2 btn-success">
             View my request
           </button>
         )}

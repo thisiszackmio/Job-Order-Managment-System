@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PPAUser;
 use App\Models\AssignPersonnel;
+use App\Models\AdminInspectionForm;
+use App\Models\VehicleForm;
+use App\Models\Logs;
+use App\Http\Requests\AssignPersonnelRequest;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
@@ -13,163 +17,244 @@ use Illuminate\Validation\Rules\Password;
 class UserController extends Controller
 {
     /**
-     * Get The supervisor's names
+     * Get Supervisor on (Inspection For,\m)
      */
-    public function supervisorNames(Request $request, $id) {
-        // Get User details
-        $myDet = PPAUser::find($id);
-        $department = $myDet->division;
-    
-        $supervisorTypeMapping = [
-            "Administrative Division" => "Supervisor/Administrative Division",
-            "Finance Division" => "Manager/Finance Division",
-            "Office of the Port Manager" => "Supervisor/Office of the Port Manager",
-            "Port Service Division" => "Manager/Port Services Division",
-            "Port Police Division" => "Manager/Port Police Division",
-            "Engineering Service Division" => "Manager/Engineering Services Division",
-            "Terminal Management Office - Tubod" => "Manager/TMO-TUBOD",
-        ];
-    
-        $supervisorType = $supervisorTypeMapping[$department] ?? null;
-    
-        if ($supervisorType) {
-            $supervisorPersonnel = AssignPersonnel::with('user')->where("type_of_personnel", $supervisorType)->first();
-    
-            if ($supervisorPersonnel) {
-                $ppaUser = $supervisorPersonnel->user;
-    
-                // Fullname
-                $userId = $ppaUser->id;
-                $userFname = $ppaUser->fname;
-                $userMname = $ppaUser->mname;
-                $userLname = $ppaUser->lname;
-                $fullName = "{$userFname} {$userMname}. {$userLname}";
-            }
+    public function getSupervisor($id){
+        $getUser = PPAUser::find($id);
+
+        // Create a Condition
+        if ($getUser->code_clearance === 1) // For Admin Manager
+        {
+            $getSupID = $getUser->id;
         }
-    
-        $responseData = [
-            'personnel_details' => [
-                'id' => $userId ?? null,
-                'name' => $fullName ?? null,
-            ],
-        ];
-    
-        return response()->json($responseData);
+        else if ($getUser->code_clearance === 2) // For Port Manager
+        {
+            $getSupID = $getUser->id;
+        }
+        else if ($getUser->code_clearance === 4) // For Supervisor
+        {
+            $getSupID = $getUser->id;
+        }
+        else {
+            $getUserDiv = $getUser->division;
+            $getSup = PPAUser::where('division', $getUserDiv)->where('code_clearance', 4)->first();
+            $getSupID = $getSup->id;
+        }
+
+        return response()->json($getSupID);
     }
-
-
-
-
+    
 
     /**
-     * Display the Supervisor Users.
+     * Display all Users (User List)
      */
-    public function index()
-    {
-        $users = PPAUser::where('code_clearance', '2')
-        ->orWhere('code_clearance', '1')
-        ->orWhere('code_clearance', '4')
-        ->get();
-        return response()->json($users);
-    }
-
-    /**
-     * Display all Users.
-     */
-    public function allUser()
-    {
+    public function getAllUser(){
         $Allusers = PPAUser::orderBy('lname')->get();
-        return response()->json($Allusers);
-    }
+        
+        $userData = [];
 
-    /**
-     * Display the specific user.
-     */
-    public function SpecificUser($id)
-    {
-        $Allusers = PPAUser::find($id);
-
-        $Signature = URL::to('/storage/esignature/' . $Allusers->image);
-
-        $responseData = [
-            'users' => $Allusers,
-            'signature' => $Signature
-        ];
-        return response()->json($responseData);
-    }
-
-    /**
-     * Update Code Clearance on a Specific User.
-     */
-    public function updateCodeClearance(Request $request, $id)
-    {
-        $user = PPAUser::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+        foreach ($Allusers as $user){
+            $userData[] = [
+                'userId' => $user->id,
+                'name' => strtoupper($user->lname). ", ".$user->fname. " ".$user->mname. ".",
+                'username' => basename($user->username),
+                'division' => $user->division,
+                'position' => $user->position,
+                'code_clearance' => $user->code_clearance
+            ];
         }
 
-        $user->update([
-            'code_clearance' => $request->input('code_clearance'),
+        return response()->json($userData);
+    }
+
+    /**
+     * Display User Details
+     */
+    public function getUserDetails($id){
+        $getUser = PPAUser::find($id);
+
+        $userData = [
+            'id' => $getUser->id,
+            'name' => $getUser->fname ." " . $getUser->mname . ". " . $getUser->lname,
+            'position' => $getUser->position,
+            'division' => $getUser->division,
+            'code' => $getUser->code_clearance,
+            'username' => basename($getUser->username),
+            'signature' =>  URL::to('/storage/esignature/' . $getUser->image)
+        ];
+
+        return response()->json($userData);
+    }
+
+    /**
+     * Get all the Assign Personnels
+     */
+    public function getPersonnel(){
+        $getPersonnel = AssignPersonnel::orderBy('type_of_personnel')->get();
+        $personnelIds = $getPersonnel->pluck('user_id');
+        $userDetails = PPAUser::whereIn('id', $personnelIds)->get();
+
+        $getInspDet = AdminInspectionForm::all();
+        
+        $getVehicleDet = VehicleForm::all();
+        $driverNames = $getVehicleDet->pluck('driver');
+        $getVehicleCount = $driverNames->groupBy(function ($item) {
+            return $item; // Group by driver names
+        })->map(function ($group) {
+            return $group->count(); // Count occurrences of each driver name
+        });
+
+        $PersonnelDetails = $getPersonnel->map(function ($personnel) use ($userDetails, $getInspDet, $getVehicleCount){
+            $user = $userDetails->where('id', $personnel->user_id)->first();
+            $userName = $user->fname . ' ' . $user->mname . '. ' . $user->lname;
+            $getInspId = $getInspDet->where('assign_personnel', $personnel->user_id);
+
+            return [
+                'personnel_id' => $personnel->id,
+                'personnel_name' => $userName,
+                'personnel_type' => $personnel->type_of_personnel,
+                'count' => $getInspId->count() + $getVehicleCount->get($userName, 0),
+            ];
+        });
+
+        return response()->json($PersonnelDetails);
+    }
+
+    /**
+     * Assign User
+     */
+    public function AssignPersonnel(){
+        $getPersonnel = AssignPersonnel::all();
+        $personnelIds = $getPersonnel->pluck('user_id');
+
+        $ppa = PPAUser::queryUserExcept($personnelIds);
+
+        $formattedUsers = $ppa->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->fname . ' ' . $user->mname . '. ' . $user->lname
+            ];
+        });
+
+        return response()->json($formattedUsers);
+    }
+
+     /**
+     * Get Driver Information.
+     */
+    public function getDriver()
+    {
+        $driverRecords = AssignPersonnel::where('type_of_personnel', 'Driver/Mechanic')->get();
+        $driverIds = $driverRecords->pluck('user_id')->all();
+
+        $drivers = PPAUser::whereIn('id', $driverIds)->get();
+        $driverNames = $drivers->map(function ($driver) {
+            return [
+                'driver_id' => $driver->id,
+                'driver_name' => $driver->fname . ' ' . $driver->mname . '. ' . $driver->lname,
+            ];
+        });
+
+        return response()->json($driverNames);
+    }
+
+    /**
+     * Update User Details
+     * (position, division, username)
+     */
+    public function updateUserDetails(Request $request, $id){
+
+        //Validate
+        $validatedData = $request->validate([
+            'position' => 'nullable|string',
+            'division' => 'nullable|string',
+            'username' => 'nullable|string',
+            'code_clearance' => 'nullable|string'
         ]);
 
-        return response()->json(['message' => 'Code clearance updated successfully'], 200);
-        // return response()->json($request->input('code_clearance'));
+        $getUser = PPAUser::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $updateResult = $getUser->update([
+            'position' => $validatedData['position'],
+            'division' => $validatedData['division'],
+            'username' => $validatedData['username'],
+            'code_clearance' => $validatedData['code_clearance'],
+        ]);
+
+        if ($updateResult) {
+             // Creating logs
+             $logs = new Logs();
+             $logs->remarks = $request->input('logs');
+             $logs->save();
+
+            return response()->json(['message' => 'User details updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'There area some missing.'], 204);
+        }
+
     }
 
     /**
-     * Update Signature on a Specific User.
+     * Update User's Signature
      */
-    public function updateSignature(Request $request, $id)
-    {
-        $user = PPAUser::find($id);
+    public function updateSignature(Request $validatedData, $id){
 
         // Validate the request
-        $request->validate([
+        $validatedData->validate([
             'image' => [
                 'nullable',
                 'file',
                 'mimes:png',
-                'max:10240', // 10MB max file size, adjust as needed
+                'max:2000',
             ],
         ]);
 
+        $getUser = PPAUser::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
         // Check if a file was uploaded
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        if ($validatedData->hasFile('image')) {
+            $image = $validatedData->file('image');
             $extension = $image->getClientOriginalExtension();
 
-            $name = str_replace(' ', '_', trim($user->fname)) . '_' . $user->lname;
+            $name = str_replace(' ', '_', trim($getUser->fname)) . '_' . $getUser->lname;
             $timestamp = now()->format('Y');
             $imageName = $name . '_' . $timestamp . '.' . $extension;
 
             // Delete the old image
-            if (!empty($user->image) && Storage::disk('public')->exists('esignature/' . $user->image)) {
-                Storage::disk('public')->delete('esignature/' . $user->image);
+            if (!empty($getUser->image) && Storage::disk('public')->exists('esignature/' . $getUser->image)) {
+                Storage::disk('public')->delete('esignature/' . $getUser->image);
             }
 
             // Save the image to the public disk
             Storage::disk('public')->put('esignature/' . $imageName, file_get_contents($image));
 
             // Update the user's e-signature field in the database
-            $user->update(['image' => $imageName]);
+            $getUser->update(['image' => $imageName]);
+
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $validatedData->input('logs');
+            $logs->save();
 
             return response()->json(['message' => 'E-Signature updated successfully'], 200);
         } else {
             return response()->json(['message' => 'No file uploaded'], 422);
         }
+
     }
 
     /**
-     * Update Password on a Specific User.
+     * Update User's Password
      */
-    public function updatePassword(Request $request, $id)
-    {
-        $user = PPAUser::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function updatePassword(Request $request, $id){
 
         $request->validate([
             'password' => [
@@ -181,11 +266,80 @@ class UserController extends Controller
             ],
         ]);
 
-        $user->update([
+        $getUser = PPAUser::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $updateResult = $getUser->update([
             'password' => Hash::make($request->input('password'))
         ]);
 
-        return response()->json(['message' => 'Code clearance updated successfully'], 200);
+        if ($updateResult) {
+             // Creating logs
+             $logs = new Logs();
+             $logs->remarks = $request->input('logs');
+             $logs->save();
+
+            return response()->json(['message' => 'User details updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'There area some missing.'], 204);
+        }
     }
 
+    /**
+     * Store Assign Personnel
+     */
+    public function assign(AssignPersonnelRequest $request){
+        $data = $request->validated();
+
+        $deploymentData = AssignPersonnel::create($data);
+
+        if (!$deploymentData) {
+            return response()->json(['error' => 'Data Error'], 500);
+        } else {
+            $update = PPAUser::where('id', $data['user_id'])->first();
+            if ($update->code_clearance == 5) {
+                $update->code_clearance = 6;
+                $update->save(); // Save the changes to the database
+
+                // Creating logs
+                $logs = new Logs();
+                $logs->remarks = $request->input('logs');
+                $logs->save();
+            }
+        }
+
+        return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
+
+    /**
+     * Remove Personnel List on View Form.
+     */
+    public function RemovePersonnel(Request $request, $id)
+    {
+        $user = AssignPersonnel::find($id);
+    
+        if (!$user) {
+            return response()->json(['message' => 'Personnel not found'], 404);
+        }
+
+        $update = PPAUser::where('id', $user->user_id)->first();
+        $update->code_clearance;
+
+        if ($update->code_clearance == 6) {
+            $update->code_clearance = 5;
+            $update->save();
+        }
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+        
+        $user->delete();
+    
+        return response()->json(['message' => 'Personnel deleted successfully'], 200);
+    }
 }

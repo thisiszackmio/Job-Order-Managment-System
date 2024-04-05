@@ -40,8 +40,6 @@ class GetNotificationController extends Controller
 
         $SupervisorNotificationCount = $inspSupCount;
 
-
-
         // ------------------------------- Is FOR GSO ----------------------------------------------
         //For Inspection Request
         $gsoInspectNoti = Inspection_Form::where('supervisor_approval', 1)->where('admin_approval', 4)->orderBy('updated_at', 'desc')->get();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
 use App\Models\PPAUser;
+use App\Models\Logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +18,14 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
+            // Check if the username already exists
+            $existingUser = PPAUser::where('username', $request->input('username'))->first();
+            if ($existingUser) {
+                return response()->json([
+                    'message' => "Username is already taken. Please choose a different username."
+                ], 400);
+            }
+
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $image = $request->file('image');
                 $extension = $image->getClientOriginalExtension();
@@ -50,6 +59,11 @@ class AuthController extends Controller
     
                 Storage::disk('public')->put('esignature/' . $imageName, file_get_contents($image));
     
+                // Creating logs
+                $logs = new Logs();
+                $logs->remarks = $request->input('remarks');
+                $logs->save();
+                
                 return response()->json([
                     'message' => "Product successfully created."
                 ], 200);
@@ -98,9 +112,10 @@ class AuthController extends Controller
         // 4 = Division Manager/Supervisor
         // 5 = Regular and COS Employee
         // 6 = AssignPersonnels
+        // 6 = System Admin
         // 10 = Hackers
 
-        if ($codeClearance === 10) {
+        if ($codeClearance === 10 || $codeClearance === 7) {
             // Hackers
             $userRole = 'h4ck3rZ@1Oppa';
         }else if ($codeClearance === 1 || $codeClearance === 3 || $codeClearance === 4){

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\FacilityRequest;
 use App\Models\PPAUser;
 use App\Models\FacilityModel;
+use App\Models\Logs;
 use Illuminate\Support\Facades\URL;
 
 class FacilityController extends Controller
@@ -117,6 +118,11 @@ class FacilityController extends Controller
             'obr_comment' => $validatedData['obr_comment'],
         ]);
 
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 
     }
@@ -144,6 +150,11 @@ class FacilityController extends Controller
             'obr_instruct' => $validatedData['obr_instruct'],
         ]);
 
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 
     }
@@ -160,6 +171,11 @@ class FacilityController extends Controller
         $userId = PPAUser::find($data['user_id']);
 
         $deploymentData = FacilityModel::create($data);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
 
         if (!$deploymentData) {
             return response()->json(['error' => 'Data Error'], 500);
@@ -190,6 +206,11 @@ class FacilityController extends Controller
         ]);
 
         if ($facility->save()) {
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -219,6 +240,11 @@ class FacilityController extends Controller
             'remarks' => "The request has been disapproved by the Admin Manager"
         ]);
 
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 
     }
@@ -241,6 +267,11 @@ class FacilityController extends Controller
             'admin_approval' => 1,
             'remarks' => "The request has been received by the GSO"
         ]);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
 
         return response()->json(['message' => 'OPR instruction stored successfully'], 200);
 

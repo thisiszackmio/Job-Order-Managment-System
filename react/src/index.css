@@ -2,17 +2,142 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Form */
-.form-text{
-  font-size: 15px;
+/* PPA Theme Color */
+.bg-ppa-themecolor { background-color: #6495ED; }
+.ppa-theme-active { background-color: #132E51; }
+.ppa-nav li a { font-size: 15px; }
+.ppa-nav li a.active { background-color: #132E51; color: #fff; }
+
+/* Icons */
+.notification-icon { color: #132E51; padding: 5px 5px; border-radius: 20px; }
+.notification-icon:hover { background-color: #132E51; transition: 250ms; color: #fff; }
+
+/* Text */
+p.lower-text { font-size: 12px; color: #848884; }
+
+/* Table Style */
+.table-font { font-size: 15px; }
+.border-custom { border-color: #AEBEBE; }
+.border-header { background-color: #BCD0E2; }
+.body-border { border-color: #1b23334a; }
+
+.section { border: 1px #c3c3c3 solid; }
+
+/* Table Pagination */
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+  margin-top: 10px;
 }
 
-.form-validation{
-  font-size: 11px;
-  font-weight: 900;
-  color: #8B0000;
-  padding-top: 5px;
+/* Dashboard */
+.title { padding: 15px 0px; text-align: center; }
+.title h2 { font-size: 20px; text-transform: uppercase; font-weight: 900; }
+
+.pagination li.active {
+  background-color: #FF0000 !important;
+  color: #FFF;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 5px;
 }
+
+.pagination li {
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #D3D3D3;
+  padding: 0px 7px;
+  border-radius: 5px;
+}
+
+.pagination a.page-link {
+  font-size: 12px;
+}
+
+/* Popup Style */
+.popup-confirm {
+  background-color: #0096FF;
+  color: #fff;
+  border-radius: 20px;
+  padding: 8px 0px;
+}
+
+.popup-confirm:hover {
+  background-color: #4ab1f9 !important;
+  transition: 250ms;
+}
+
+.popup-cancel {
+  border: 1px solid #36454F;
+  margin-left: 10px;
+  border-radius: 20px;
+}
+
+.popup-cancel:hover {
+  background-color: #36454F !important;
+  transition: 250ms;
+  color: #fff;
+}
+
+/* Buttons */
+.btn-process { background-color: #6495ED; color: #fff; border-radius: 20px; }
+.btn-submitting { background-color: #40E0D0 !important; cursor: no-drop; position: relative; top: 3px; }
+
+.btn-error { background-color: #C41E3A; color: #fff; border-radius: 20px; }
+.btn-error:hover { background-color: #f26f85; transition: 250ms; }
+
+.btn-success { background-color: #0096FF; color: #fff; border-radius: 20px; }
+.btn-success:hover { background-color: #4ab1f9; transition: 250ms; }
+
+.btn-submit{ background-color: #0096FF; color: #fff; border-radius: 20px; }
+.btn-submit:hover { background-color: #4ab1f9 !important; transition: 250ms; }
+
+.btn-cancel { background-color: #C41E3A; color: #fff; border-radius: 20px; }
+.btn-cancel:hover { background-color: #f26f85; transition: 250ms; }
+
+.btn-close { background-color: #C41E3A; color: #fff; border-radius: 20px; }
+.btn-close:hover { background-color: #f26f85; transition: 250ms; }
+.btn-closing { background-color: #f26f85; cursor: no-drop; position: relative; top: 3px; }
+
+.btn-pdf { background-color: #50C878; color: #fff; border-radius: 20px; }
+.btn-pdf:hover { background-color: #52aa6f; transition: 250ms; }
+.btn-genpdf { background-color: #52aa6f; cursor: no-drop; position: relative; top: 3px; }
+
+.btn-default { background-color: #1F51FF; color: #fff; border-radius: 20px; }
+.btn-default:hover { background-color: #6a83d9; transition: 250ms; }
+.btn-default:disabled { display: none; }
+
+/* Dashboard */
+
+.form-title { color:white; margin-bottom: 10px; }
+.count-det { font-size: 50px; font-weight: 900; color: #fff; }
+.year-count { position: relative; top: 36px; margin-right: 10px; color: #fff; }
+.icon-here { color: #fff; position: relative; top: 8px; left: 10px; }
+
+/* Inspection Details */
+.inspection-sec { background-color: #C04000; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+
+/* Facility Details */
+.facility-sec { background-color: #8A9A5B; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+
+/* Vehicle Details */
+.vehicle-sec { background-color: #6495ED; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+
+/* Equipment Details */
+.equipment-sec { background-color: #5D3FD3; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+
+/* Equipment Details */
+.other-sec { background-color: #000080; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+
+/* Forms */
+.form-text{ font-size: 15px; }
+.form-validation{ font-size: 11px; font-weight: 900; color: #8B0000; padding-top: 5px; }
+.input-placeholder::placeholder { color: #A9A9A9; font-style: italic; }
+.input-placeholder { color: #272727; }
+.icon-form { color: #A9A9A9; }
 
 /* Notification Style */
 p.popup-title {
@@ -31,41 +156,6 @@ p.popup-title {
   position: absolute;
   left: 15px;
   top: -6px;
-}
-
-/* Emoji */
-.icon-center {
-  text-align: -webkit-center;
-}
-
-.face {
-  fill: #FFC10E;
-}
-
-.heart--eye {
-  fill: #CA2027;
-  transform: translate(-40px, 0px);
-  animation: heartEye 2s infinite;
-}
-
-.mouth_alt {
-  fill: #000;
-  transform: scale(0.8,0.8) translate(1rem, 5rem);
-}
-
-@keyframes heartEye {
-  0% {
-    -moz-transform: scale(0.9, 0.9) translate (0px, 0px);
-    -ms-transform: scale(0.9, 0.9) translate (0px, 0px);
-    -webkit-transform: scale(0.9, 0.9) translate (0px, 0px);
-    transform: scale(0.9, 0.9) translate (0px, 0px);
-  }
-  50% {
-    -moz-transform: scale(1.25, 1.25) translate(-70px, -20px);
-    -ms-transform: scale(1.25, 1.25) translate(-70px, -20px);
-    -webkit-transform: scale(1.25, 1.25) translate(-70px, -20px);
-    transform: scale(1.25, 1.25) translate(-70px, -20px);
-  }
 }
 
 /* Forbidden Style */
@@ -124,15 +214,6 @@ p.sign-txt {
   text-align: center;
 }
 
-/* PPA Theme Color */
-.bg-ppa-themecolor {
-  background-color: #4d4e4f;
-}
-
-.ppa-theme-active {
-  background-color: #051B37;
-}
-
 /* Style to show the submenu when the parent is hovered */
 .parent:hover .submenu {
   display: block;
@@ -162,10 +243,6 @@ p.sign-txt {
   animation: heartbeat 1.5s infinite;
 }
 
-/* For the table */
-.border-custom { border-color: #272727; }
-.body-border { border-color: #1b23334a; }
-
 /* For the Form */
 .title-area{ font-size: 11px; }
 .content-area { font-size: 10px; }
@@ -173,39 +250,6 @@ p.sign-txt {
 /* Table size */
 .custom-column {
   width: 200px; /* Adjust the width as needed */
-}
-
-
-/* Table Pagination */
-
-.table-font {
-  font-size: 15px;
-}
-
-.pagination {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  user-select: none;
-  margin-top: 10px;
-}
-
-.pagination li {
-  display: inline-block;
-  margin: 0 5px;
-  cursor: pointer;
-}
-
-.pagination a {
-  text-decoration: none;
-  color: #000;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.active a {
-  font-weight: 900;
 }
 
 /* Animation Check */

@@ -164,7 +164,11 @@ export default function PrePostRepairForm(){
       //For Supervisor
       setSubmitLoading(true);
 
-      axiosClient.put(`/approve/${id}`)
+      const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has approved ${InspectionData?.requestor?.r_name}'s request on Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
+      axiosClient.put(`/approve/${id}`,{
+          logs:logs
+      })
       .then((response) => {
         setSubmitLoading(false);
         setPopupContent("success");
@@ -188,7 +192,11 @@ export default function PrePostRepairForm(){
       // For Admin Manager
       setSubmitLoading(true);
 
-      axiosClient.put(`/admin_approve/${id}`)
+      const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has approved ${InspectionData?.requestor?.r_name}'s request on Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
+      axiosClient.put(`/admin_approve/${id}`,{
+        logs:logs
+      })
       .then((response) => {
         setSubmitLoading(false);
         setPopupContent("success");
@@ -216,8 +224,12 @@ export default function PrePostRepairForm(){
     if(currentUser.code_clearance == 4){
       // For Supervisor
       setSubmitLoading(true);
+
+      const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${InspectionData?.requestor?.r_name}'s request on Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
   
-      axiosClient.put(`/disapprove/${id}`)
+      axiosClient.put(`/disapprove/${id}`,{
+        logs:logs
+      })
       .then((response) => {
         setPopupContent("success");
         setPopupMessage(
@@ -240,7 +252,11 @@ export default function PrePostRepairForm(){
       // For Admin Manager
       setSubmitLoading(true);
 
-      axiosClient.put(`/admin_disapprove/${id}`)
+      const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${InspectionData?.requestor?.r_name}'s request on Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
+      axiosClient.put(`/admin_disapprove/${id}`,{
+        logs: logs
+      })
       .then((response) => {
         setPopupContent("success");
         setPopupMessage(
@@ -266,11 +282,14 @@ export default function PrePostRepairForm(){
     event.preventDefault();
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has processed Part B of ${InspectionData?.requestor?.r_name}'s request for Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
     axiosClient.post(`/inspectionformrequesttwo/${id}`,{
       date_of_filling: today,
       date_of_last_repair: lastfilledDate,
       nature_of_last_repair: natureRepair,
-      assign_personnel: pointPersonnel
+      assign_personnel: pointPersonnel,
+      logs: logs,
     })
     .then((response) => {
       setPopupContent('success');
@@ -299,11 +318,14 @@ export default function PrePostRepairForm(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has completed Part C of ${InspectionData?.requestor?.r_name}'s request for Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
     axiosClient
     .put(`inspector/${id}`, {
       before_repair_date: today,
       findings: finding,
-      recommendations: recommendation
+      recommendations: recommendation,
+      logs: logs
     })
     .then(() => { 
       setPopupContent('success');
@@ -333,10 +355,13 @@ export default function PrePostRepairForm(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has completed Part D of ${InspectionData?.requestor?.r_name}'s request for Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
+
     axiosClient
     .put(`inspectorpartb/${id}`, {
       after_reapir_date: today,
-      remarks: remarks
+      remarks: remarks,
+      logs: logs
     })
     .then((response) => { 
       setPopupContent('success');
@@ -363,8 +388,12 @@ export default function PrePostRepairForm(){
   function handleCloseRequest(id){
 
     setSubmitLoading(true);
+
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has closed the request on Pre/Post Repair Inspection (Control No: ${InspectionData?.getPartA?.id})`
     
-    axiosClient.put(`/insprequestclose/${id}`)
+    axiosClient.put(`/insprequestclose/${id}`,{
+      logs: logs
+    })
     .then((response) => {
       setPopupContent("success");
       setPopupMessage(
@@ -459,7 +488,7 @@ export default function PrePostRepairForm(){
   ):(
   <>
     {/* Back button */}
-    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-3 rounded mr-1 text-sm">
+    <button className="px-6 py-2 btn-default">
       <Link to="/repairrequestform">Back to Request List</Link>
     </button>
 
@@ -761,7 +790,7 @@ export default function PrePostRepairForm(){
               </div>
             </div>
             {!pointPersonnel && inputErrors.assign_personnel && (
-              <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'160px' }}>Assign Personnel is required</p>
+              <p className="font-roboto form-validation" style={{ marginLeft: '155px' }}>Assign Personnel is required</p>
             )}
 
           </form>
@@ -930,7 +959,7 @@ export default function PrePostRepairForm(){
                 </div>
               </div>
               {!finding && inputErrors.findings && (
-                <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'140px' }}>The Findings form is required</p>
+                <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Fidings</p>
               )}
 
               {/* Recomendations */}
@@ -953,7 +982,7 @@ export default function PrePostRepairForm(){
                 </div>
               </div>
               {!recommendation && inputErrors.recommendations && (
-                <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'140px' }}>The Recomendations form is required</p>
+                <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Recommendations</p>
               )}
 
             </form>
@@ -1069,7 +1098,7 @@ export default function PrePostRepairForm(){
                 </div>
               </div>
               {!remarks && inputErrors.remarks && (
-                <p className="text-red-500 text-xs mt-1" style={{ marginLeft:'140px' }}>The Remarks form is required</p>
+                <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Remarks</p>
               )}
 
             </form>
@@ -1146,19 +1175,11 @@ export default function PrePostRepairForm(){
       {(InspectionData?.getPartA?.supervisor_name == currentUser.id && InspectionData?.getPartA?.supervisor_approval == 0) && (
       <div>
         {/* Approve */}
-        <button 
-          onClick={() => handleApprovalRequest()}
-          className="rounded-full bg-indigo-600 hover:bg-indigo-500 font-semibold text-white px-6 py-2 rounded text-base"
-          title="Supervisor Approve"
-        >
+        <button onClick={() => handleApprovalRequest()} className="px-6 py-2 btn-submit" title="Supervisor Approve">
           Approve
         </button>
         {/* Disapprove */}
-        <button 
-          onClick={() => handleDeclineRequest()}
-          className="rounded-full bg-red-600 hover:bg-red-500 font-semibold text-white px-6 py-2 rounded ml-1 text-base"
-          title="Supervisor Decline"
-        >
+        <button onClick={() => handleDeclineRequest()} className="px-6 py-2 btn-cancel ml-2" title="Supervisor Decline">
           Disapprove
         </button>
       </div>
@@ -1167,12 +1188,8 @@ export default function PrePostRepairForm(){
       {/* For GSO */}
       {currentUser.code_clearance == 3 && InspectionData?.getPartA?.admin_approval == 4 && (
       <>
-        <button
-          form='partB'
-          type="submit"
-          className={`rounded-full text-white py-2 px-6 rounded font-semibold text-base focus:outline-none ${
-            submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-          }`}
+        <button form='partB' type="submit"
+          className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
           style={{ position: 'relative', top: '0px' }}
           disabled={submitLoading}
         >
@@ -1191,43 +1208,14 @@ export default function PrePostRepairForm(){
       {/* For Admin */}
       {currentUser.code_clearance == 1 && InspectionData?.getPartA?.admin_approval == 3 && (
       <>
-      {InspectionData?.getPartA?.user_id == currentUser.id ? (
-        <button
-          onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-          className={`rounded-full px-6 py-2 text-base font-semibold text-white shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-          }`}
-          disabled={submitLoading}
-        >
-          {submitLoading ? (
-            <div className="flex items-center justify-center">
-              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-              <span className="ml-2">Processing</span>
-            </div>
-          ) : (
-            'Approve'
-          )}
-        </button>
-      ):(
-      <>
         {/* Approve */}
-        <button 
-          onClick={() => handleApprovalRequest()}
-          className="rounded-full bg-indigo-600 hover:bg-indigo-500 font-semibold text-white py-2 px-6 rounded text-base"
-          title="Admin Approve"
-        >
+        <button onClick={() => handleApprovalRequest()} className="px-6 py-2 btn-submit" title="Admin Approve">
           Approve
         </button>
         {/* Disapprove */}
-        <button 
-          onClick={() => handleDeclineRequest()}
-          className="rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-6 rounded ml-1 text-base"
-          title="Admin Decline"
-        >
+        <button onClick={() => handleDeclineRequest()} className="px-6 py-2 ml-2 btn-cancel" title="Admin Decline">
           Disapprove
         </button>
-      </>  
-      )}
       </>
       )}
 
@@ -1237,12 +1225,8 @@ export default function PrePostRepairForm(){
 
         {/* Part C Button */}
         {InspectionData?.getPartA?.inspector_status == 3 && (
-          <button
-            form='partC'
-            type="submit"
-            className={`rounded-full px-6 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
-              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-            }`}
+          <button form='partC' type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
             disabled={submitLoading}
           >
             {submitLoading ? (
@@ -1258,12 +1242,8 @@ export default function PrePostRepairForm(){
 
         {/* Part D Button */}
         {InspectionData?.getPartA?.inspector_status == 2 && (
-          <button
-            form="partD"
-            type="submit"
-            className={`rounded-full px-6 py-2 text-base text-white font-semibold shadow-sm focus:outline-none ${
-              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-            }`}
+          <button form="partD" type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
             disabled={submitLoading}
           >
             {submitLoading ? (
@@ -1284,9 +1264,7 @@ export default function PrePostRepairForm(){
       {InspectionData?.getPartCD?.close == 2 && (
         <button 
           onClick={() => handleCloseRequest(InspectionData?.getPartA?.id)}
-          className={`rounded-full px-6 py-2 text-white font-semibold text-base shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
-          }`}
+          className={`px-6 py-2 btn-close ${ submitLoading && 'btn-closing'}`}
           disabled={submitLoading}
         >
           {submitLoading ? (
@@ -1302,12 +1280,8 @@ export default function PrePostRepairForm(){
 
       {/* Generate PDF */}
       {InspectionData?.getPartCD?.close == 1 && (
-        <button
-          type="button"
-          onClick={handleButtonClick}
-          className={`rounded-full px-6 py-2 font-semibold text-white text-base shadow-sm focus:outline-none ${
-            submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
-          }`}
+        <button type="button" onClick={handleButtonClick}
+          className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
           disabled={submitLoading}
         >
           {submitLoading ? (
@@ -1378,25 +1352,19 @@ export default function PrePostRepairForm(){
             <>
               {/* Yes */}
               {!submitLoading && (
-                <button
-                  onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                >
+                <button onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)} className="w-1/2 py-2 popup-confirm">
                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1411,25 +1379,19 @@ export default function PrePostRepairForm(){
             <>
               {/* Yes */}
               {!submitLoading && (
-                <button
-                  onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                >
+                <button onClick={() => handleGrantApprovalRequest(InspectionData?.getPartA?.id)} className="w-1/2 py-2 popup-confirm">
                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-blue-300 text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1449,25 +1411,19 @@ export default function PrePostRepairForm(){
             <>
               {/* Yes */}
               {!submitLoading && (
-                <button
-                  onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                >
+                <button onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)} className="w-1/2 py-2 popup-confirm">
                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1482,25 +1438,19 @@ export default function PrePostRepairForm(){
             <>
               {/* Yes */}
               {!submitLoading && (
-                <button
-                  onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 font-semibold hover:bg-indigo-500 text-white rounded"
-                >
+                <button onClick={() => handleDeclineApprovalRequest(InspectionData?.getPartA?.id)} className="w-1/2 py-2 popup-confirm">
                   <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
               {/* No */}
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 font-semibold text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
               {/* Loading */}
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-blue-300 font-semibold text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Please Wait</span>
@@ -1514,20 +1464,14 @@ export default function PrePostRepairForm(){
 
           {/* Success */}
           {(popupContent == "success") && (
-            <button
-              onClick={closePopup}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded"
-            >
+            <button onClick={closePopup} className="w-full py-2 btn-success">
               Close
             </button>
           )}
 
           {/* Error */}
           {popupContent == "error" && (
-            <button
-              onClick={justclose}
-              className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-            >
+            <button onClick={justclose} className="w-full py-2 btn-error">
               Close
             </button>
           )}

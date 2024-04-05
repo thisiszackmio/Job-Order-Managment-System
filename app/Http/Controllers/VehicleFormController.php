@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\VehicleForm;
 use App\Models\PPAUser;
+use App\Models\Logs;
 use App\Http\Requests\VehicleFormRequest;
 use Illuminate\Support\Facades\URL;
 
@@ -126,6 +127,11 @@ class VehicleFormController extends Controller
 
         $deploymentData = VehicleForm::create($data);
 
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
         if (!$deploymentData) {
             return response()->json(['error' => 'Data Error'], 500);
         }
@@ -148,6 +154,13 @@ class VehicleFormController extends Controller
                 'admin_approval' => 4,
             ]);
         }
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
+        return response()->json(['message' => 'Vehicle form submitted successfully'], 200);
     }
 
     /**
@@ -160,6 +173,11 @@ class VehicleFormController extends Controller
         $approveRequest->admin_approval = 2;
 
         if ($approveRequest->save()) {
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -176,6 +194,11 @@ class VehicleFormController extends Controller
         $approveRequest->admin_approval = 3;
 
         if ($approveRequest->save()) {
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+            
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
@@ -192,6 +215,11 @@ class VehicleFormController extends Controller
         $approveRequest->admin_approval = 1;
 
         if ($approveRequest->save()) {
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
             return response()->json(['message' => 'Deployment data created successfully'], 200);
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);

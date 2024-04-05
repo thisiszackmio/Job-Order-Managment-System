@@ -26,24 +26,22 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    //Get User Details
-    Route::get('/getsupervisor/{id}', [UserController::class, 'supervisorNames']);
-    Route::get('/ppausers', [UserController::class, 'index']);
+    // Dashboard
+    Route::get('/getcount', [DashboardController::class, 'getCountRequest']);
+    Route::get('/getlogs', [DashboardController::class, 'getLogs']);
 
-
-    
-    Route::get('/users', [UserController::class, 'allUser']);
-    Route::get('/users/{id}', [UserController::class, 'SpecificUser']);
-    Route::put('/changecc/{id}', [UserController::class, 'UpdateCodeClearance']);
-    Route::put('/changepwd/{id}', [UserController::class, 'updatePassword']);
+    //User Details
+    Route::get('/users', [UserController::class, 'getAllUser']);
+    Route::get('/userdetail/{id}', [UserController::class, 'getUserDetails']);
+    Route::get('/getpersonnel', [UserController::class, 'getPersonnel']);
+    Route::get('/personnelname', [UserController::class, 'AssignPersonnel']);
+    Route::get('/getsupervisor/{id}', [UserController::class, 'getSupervisor']);
+    Route::get('/getdriver', [UserController::class, 'getDriver']);
+    Route::put('/userupdatedet/{id}', [UserController::class, 'updateUserDetails']);
     Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
-    
-
-    //Personnel (For the assignment task)
-    Route::get('/personnel/{id}', [AssignPersonnelController::class, 'getPersonnel']);
-    Route::post('/assignpersonnel', [AssignPersonnelController::class, 'storePersonnel']);
-    Route::delete('/removepersonnel/{id}', [AssignPersonnelController::class, 'RemovePersonnel']);
-    Route::get('/getdriver', [AssignPersonnelController::class, 'getDriver']);
+    Route::put('/changepwd/{id}', [UserController::class, 'updatePassword']);
+    Route::delete('/removepersonnel/{id}', [UserController::class, 'RemovePersonnel']);
+    Route::post('/assignpersonnel', [UserController::class, 'assign']);
 
     //Inspection Form
     Route::get('/inspectionform/{id}', [InspectionFormController::class, 'getInspectionForm']);
@@ -91,11 +89,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/equipmentmanins/{id}', [EquipmentController::class, 'AdminInstruct']);
     Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
 
-
-
-    
-    
-    
     
     Route::put('/equipmentgsoform/{id}', [EquipmentController::class, 'GSOForm']);
     Route::put('/equipmentgclose/{id}', [EquipmentController::class, 'closeRequest']);

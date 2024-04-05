@@ -111,9 +111,12 @@ export default function FacilityFormForm(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has filled-up the OPR Comments on ${displayRequestFacility?.requestor?.name}'s request for Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
+
     axiosClient
     .put(`facilityopr/${id}`,{
-      obr_comment: oprActionValue
+      obr_comment: oprActionValue,
+      logs: logs
     })
     .then((response) => {
       setPopupContent("success");
@@ -158,9 +161,12 @@ export default function FacilityFormForm(){
 
     setSubmitLoading(true);
 
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has filled-up the OPR Instruction on ${displayRequestFacility?.requestor?.name}'s request for Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`; 
+
     axiosClient
     .put(`facilityopradmin/${id}`,{
-      obr_instruct: oprInstrucValue
+      obr_instruct: oprInstrucValue,
+      logs: logs
     })
     .then((response) => {
       setPopupContent("success");
@@ -204,7 +210,11 @@ export default function FacilityFormForm(){
 
     setSubmitLoading(true);
 
-    axiosClient.put(`/facilityapproval/${id}`)
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has approved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
+
+    axiosClient.put(`/facilityapproval/${id}`,{
+      logs: logs
+    })
     .then((response) => {
       setPopupContent("success");
       setPopupMessage(
@@ -242,7 +252,11 @@ export default function FacilityFormForm(){
 
     setSubmitLoading(true);
 
-    axiosClient.put(`/facilitydisapproval/${id}`)
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
+
+    axiosClient.put(`/facilitydisapproval/${id}`,{
+      logs: logs
+    })
     .then((response) => {
       setPopupContent("success");
       setPopupMessage(
@@ -267,8 +281,12 @@ export default function FacilityFormForm(){
   function handleCloseRequest(id){
 
     setSubmitLoading(true);
+
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has closed the request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
     
-    axiosClient.put(`/requestclose/${id}`)
+    axiosClient.put(`/requestclose/${id}`,{
+      logs: logs
+    })
     .then((response) => {
       setPopupContent("success");
       setPopupMessage(
@@ -364,7 +382,7 @@ export default function FacilityFormForm(){
   ):(
   <>
     {/* Main Button */}
-    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-2 rounded mr-1 text-sm">
+    <button className="px-6 py-2 btn-default">
       <Link to="/facilityvenuerequestform">Back to Request List</Link>
     </button>
 
@@ -725,7 +743,7 @@ export default function FacilityFormForm(){
               <div className="w-24 border-b border-black font-bold text-center">
                 <span>
                   {displayRequestFacility?.maleNamesString === "N/A" ? null : (
-                    displayRequestFacility?.femaleNamesArray?.length
+                    displayRequestFacility?.maleNamesArray?.length
                   )}
                 </span>
               </div>
@@ -762,8 +780,8 @@ export default function FacilityFormForm(){
             <div className="flex items-center">
               <div className="w-24 border-b border-black font-bold text-center">
                 <span>
-                  {displayRequestFacility?.maleNamesString === "N/A" ? null : (
-                    displayRequestFacility?.maleNamesArray?.length
+                  {displayRequestFacility?.femaleNamesString === "N/A" ? null : (
+                    displayRequestFacility?.femaleNamesArray?.length
                   )}
                 </span>
               </div>
@@ -963,12 +981,8 @@ export default function FacilityFormForm(){
     {/* Generate PDF */}
     {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
     <>
-      <button
-        type="button"
-        onClick={handleButtonClick}
-        className={`rounded-full px-6 py-2 text-white text-base shadow-sm focus:outline-none ${
-          submitLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
-        }`}
+      <button type="button" onClick={handleButtonClick}
+        className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
         disabled={submitLoading}
       >
         {submitLoading ? (
@@ -991,20 +1005,12 @@ export default function FacilityFormForm(){
         {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
         <>
           {/* Approve */}
-          <button 
-            onClick={() => handleAdminApproveConfirmation()}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-6 rounded-full text-base"
-            title="Admin Approve"
-          >
+          <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
             Approve
           </button>
 
           {/* Decline */}
-          <button 
-            onClick={() => handleDisapproveConfirmation()}
-            className="bg-red-600 hover:bg-red-500 text-white py-2 px-6 rounded-full ml-1 text-base"
-            title="Admin Decline"
-          >
+          <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
             Decline
           </button>
         </>
@@ -1013,12 +1019,8 @@ export default function FacilityFormForm(){
       ):(
       <>
         {OprInstruct ? (
-          <button
-            form='opr-form-admin'
-            type="submit"
-            className={`text-white py-2 px-6 rounded-full text-base focus:outline-none ${
-              submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-            }`}
+          <button form='opr-form-admin' type="submit"
+            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
             style={{ position: 'relative', top: '0px' }}
             disabled={submitLoading}
           >
@@ -1032,11 +1034,7 @@ export default function FacilityFormForm(){
             )}
           </button>
         ):(
-          <button 
-            onClick={() => handleOPRInstructionClick()}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-6 rounded-full text-base"
-            title="Admin Approve"
-          >
+          <button onClick={() => handleOPRInstructionClick()} className="px-6 py-2 btn-submit" title="Admin Approve">
             Submit
           </button>
         )}
@@ -1051,12 +1049,8 @@ export default function FacilityFormForm(){
     {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
     currentUser.code_clearance == 3 && (
     <>
-      <button
-        form='opr-form-gso'
-        type="submit"
-        className={`text-white py-2 px-6 rounded-full text-base focus:outline-none ${
-          submitLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'
-        }`}
+      <button form='opr-form-gso' type="submit"
+        className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
         style={{ position: 'relative', top: '0px' }}
         disabled={submitLoading}
       >
@@ -1076,9 +1070,7 @@ export default function FacilityFormForm(){
     {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
       <button 
         onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
-        className={`rounded-full px-6 py-2 text-white text-base shadow-sm focus:outline-none ${
-          submitLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
-        }`}
+        className={`px-6 py-2 btn-close ${ submitLoading && 'btn-closing'}`}
         disabled={submitLoading}
       >
         {submitLoading ? (
@@ -1157,25 +1149,19 @@ export default function FacilityFormForm(){
             {displayRequestFacility?.viewFacilityData?.obr_instruct == null ? (
             <>
               {!submitLoading && (
-                <button
-                  onClick={SubmitOPRInstruct}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                >
+                <button onClick={SubmitOPRInstruct} className="w-1/2 py-2 popup-confirm">
                    <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
 
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
 
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Loading</span>
@@ -1186,25 +1172,19 @@ export default function FacilityFormForm(){
             ):(
             <>
               {!submitLoading && (
-                <button
-                  onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)}
-                  className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                >
-                   <FontAwesomeIcon icon={faCheck} /> Confirm
+                <button onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
                 </button>
               )}
 
               {!submitLoading && (
-                <button
-                  onClick={justclose}
-                  className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-                >
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </button>
               )}
 
               {submitLoading && (
-                <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+                <button className="w-full cursor-not-allowed py-2 btn-process">
                   <div className="flex items-center justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-2">Loading</span>
@@ -1225,25 +1205,19 @@ export default function FacilityFormForm(){
         {currentUser.code_clearance == 1 && (
           <>
             {!submitLoading && (
-              <button
-              onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)}
-              className="w-1/2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-              >
+              <button onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
                  <FontAwesomeIcon icon={faCheck} /> Confirm
               </button>
             )}
 
             {!submitLoading && (
-              <button
-                onClick={justclose}
-                className="w-1/2 px-4 py-2 bg-white border border-gray-300 text-black-500 rounded hover:bg-gray-300 ml-2"
-              >
+              <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
                 <FontAwesomeIcon icon={faTimes} /> Cancel
               </button>
             )}
 
             {submitLoading && (
-              <button className="w-full px-4 py-2 bg-indigo-400 text-white rounded cursor-not-allowed">
+              <button className="w-full cursor-not-allowed py-2 btn-process">
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                   <span className="ml-2">Loading</span>
@@ -1258,10 +1232,7 @@ export default function FacilityFormForm(){
         {/* Success Button */}
         {popupContent == "success" && (
         <>
-          <button
-            onClick={closePopup}
-            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500"
-          >
+          <button onClick={closePopup} className="w-full py-2 btn-success">
             Close
           </button>
         </>
@@ -1270,10 +1241,7 @@ export default function FacilityFormForm(){
         {/* Error Message */}
         {popupContent == "error" && (
         <>
-          <button
-            onClick={justclose}
-            className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
-          >
+          <button onClick={justclose} className="w-full py-2 btn-error">
             Close
           </button>
         </>
@@ -1642,45 +1610,45 @@ export default function FacilityFormForm(){
                     {/* Male Guest */}
                     <div className="col-span-1 ml-16">
 
-                        {/* Male Count */}
-                        <div>
-                          <div className="flex">
-                            <div className="w-10 border-b border-black font-normal text-center text-sm">
-                              <span>
-                              {displayRequestFacility?.maleNamesString === "N/A" ? null:(
-                                displayRequestFacility?.maleNamesArray?.length
-                              )}
-                              </span>
-                            </div>
-                            <div className="w-full ml-2 text-sm">
-                              <span>No. of Male Guests</span>
-                            </div>
+                      {/* Male Count */}
+                      <div>
+                        <div className="flex">
+                          <div className="w-10 border-b border-black font-normal text-center text-sm">
+                            <span>
+                            {displayRequestFacility?.maleNamesString === "N/A" ? null:(
+                              displayRequestFacility?.maleNamesArray?.length
+                            )}
+                            </span>
+                          </div>
+                          <div className="w-full ml-2 text-sm">
+                            <span>No. of Male Guests</span>
                           </div>
                         </div>
+                      </div>
 
-                        {/* Male List */}
-                        <div className="mt-2">
-                          <div>
-                            <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
+                      {/* Male List */}
+                      <div className="mt-2">
+                        <div>
+                          <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
+                        </div>
+                      </div>
+                      {displayRequestFacility?.maleNamesString === "N/A" ? (
+                        <div>
+                        {[...Array(6)].map((_, index) => (
+                          <div key={index} className="flex mt-1">
+                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
                           </div>
-                        </div>
-                        {displayRequestFacility?.maleNamesString === "N/A" ? (
-                         <div>
-                          {[...Array(6)].map((_, index) => (
-                            <div key={index} className="flex mt-1">
-                              <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                              <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
-                            </div>
-                          ))}
-                        </div>
-                        ):(
-                          displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
-                            <div key={index} className="flex mt-1">
-                              <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                              <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
-                            </div>
-                          ))
-                        )}
+                        ))}
+                      </div>
+                      ):(
+                        displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
+                          <div key={index} className="flex mt-1">
+                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
+                          </div>
+                        ))
+                      )}
 
                     </div>
 
@@ -1708,24 +1676,24 @@ export default function FacilityFormForm(){
                           <div>
                             <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
                           </div>
-                        </div>
-                        {displayRequestFacility?.femaleNamesString === "N/A" ? (
-                          <div>
-                            {[...Array(6)].map((_, index) => (
-                            <div key={index} className="flex mt-1 pr-10">
-                              <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                              <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
-                            </div>
-                          ))}
+                      </div>
+                      {displayRequestFacility?.femaleNamesString === "N/A" ? (
+                        <div>
+                          {[...Array(6)].map((_, index) => (
+                          <div key={index} className="flex mt-1 pr-10">
+                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
                           </div>
-                        ):(
-                          displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
-                            <div key={index} className="flex mt-1">
-                              <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                              <div className="w-3/4 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
-                            </div>
-                          ))
-                        )}
+                        ))}
+                        </div>
+                      ):(
+                        displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
+                          <div key={index} className="flex mt-1">
+                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                            <div className="w-3/4 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                          </div>
+                        ))
+                      )}
                         
                     </div>
 

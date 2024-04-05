@@ -5,7 +5,10 @@ import Logout from "./views/Logout";
 import GuestLayout from "./components/GuestLayout";
 import DefaultLayout from "./components/DefaultLayout";
 
-import RequestRepairForm from "./views/RequestForRepairForm";
+// Inspection Request Form
+import RequestRepairForm from "./views/InspectionFormRequest";
+
+
 import RequestFormFacility from "./views/RequestForFacilityVenue";
 import RequestVehicleSlipForm from "./views/RequestForVehicleSlipForm";
 import RequestEquipmentForm from "./views/RequestForEquipment";
@@ -13,21 +16,24 @@ import RequestEquipmentForm from "./views/RequestForEquipment";
 import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
 import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
 import MyRequestVehicleSlip from "./views/MyVehicleSlipForm";
-import MyEquipmentForm from "./views/MyEquipementForm";
+import MyEquipmentForm from "./views/MyEquipementForm"; // No yet Fixed
 
 import RepairRequestForm from "./views/RepairFormList";
 import FacilityFormForm from "./views/FacilityVenueFormList";
 import VehicleSlipFormList from "./views/VehicleSlipFormList";
-import EquipmentFormList from "./views/EquipmentFormList";
+import EquipmentFormList from "./views/EquipmentFormList"; // No yet Fixed
 
 import PrepostRepairForm from "./views/PrePostRepairForm";
 import FacilityVenueForm from "./views/FacilityVenueForm";
 import VehicleSlipForm from "./views/VehicleSlipForm";
-import EquipmentForm from "./views/EquipmentForm";
+import EquipmentForm from "./views/EquipmentForm"; // No yet Fixed
+
+import UsersList from "./views/UserList";
+import UserDetails from "./views/UserDetails";
+import UserAssign from "./views/UserAssign";
+import UserRegistration from "./views/UserRegistration";
 
 import Forbidden from "./components/403";
-import Account from "./views/Personnel"; 
-import AccountEdit from "./views/AccountEdit";
 
 const routes = [
     {
@@ -137,17 +143,27 @@ const routes = [
                 element: <EquipmentForm />
             },
 
+            // ---- Personnel ---- //
 
-
-
-            // ---- Others ---- //
+            // User List
             {
-                path: "/account",
-                element: <Account />
+                path: "/ppauserlist",
+                element: <UsersList />
             },
+            // User Details
             {
-                path: "/editaccount/:id",
-                element: <AccountEdit />
+                path: "/ppauserdetails/:id",
+                element: <UserDetails />
+            },
+            // User Assignment
+            {
+                path: "/ppauserassign",
+                element: <UserAssign />
+            },
+            // User Registration
+            {
+                path: "/pparegistration",
+                element: <UserRegistration />
             },
 
         ]

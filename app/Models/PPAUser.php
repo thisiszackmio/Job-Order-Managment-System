@@ -46,6 +46,11 @@ class PPAUser extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public static function queryUserExcept($ids)
+    {
+        return static::whereNotIn('id', $ids)->get();
+    }
+
     /**
      * Get the user's username.
      *
@@ -57,4 +62,5 @@ class PPAUser extends Authenticatable
             get: fn ($value) => url('esignature/'.$value),
         );
     }
+
 }

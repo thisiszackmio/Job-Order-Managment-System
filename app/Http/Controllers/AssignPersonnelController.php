@@ -83,36 +83,6 @@ class AssignPersonnelController extends Controller
         
     } 
 
-    /**
-     * Assign Personnel.
-     */
-    public function storePersonnel(AssignPersonnelRequest $request)
-    {
-        $data = $request->validated();
-
-        // Check if the data already exists based on your criteria (e.g., user_id and type_of_personnel)
-        $existingData = AssignPersonnel::where('user_id', $data['user_id'])
-            ->where('type_of_personnel', $data['type_of_personnel'])
-            ->first();
-
-        if ($existingData) {
-            return response()->json(['error' => 'Data already exists'], 409); // 409 Conflict status code
-        }
-
-        $deploymentData = AssignPersonnel::create($data);
-
-        if (!$deploymentData) {
-            return response()->json(['error' => 'Data Error'], 500);
-        } else {
-            $update = PPAUser::where('id', $data['user_id'])->first();
-            if ($update->code_clearance == 5) {
-                $update->code_clearance = 6;
-                $update->save(); // Save the changes to the database
-            }
-        }
-
-        return response()->json(['message' => 'Deployment data created successfully'], 200);
-    }
 
     /**
      * Show Personnel List on Dashboard.
@@ -215,47 +185,8 @@ class AssignPersonnelController extends Controller
         return response()->json($respondData);
     }
 
-    /**
-     * Remove Personnel List on View Form.
-     */
-    public function RemovePersonnel($id)
-    {
-        $user = AssignPersonnel::find($id);
     
-        if (!$user) {
-            return response()->json(['message' => 'Personnel not found'], 404);
-        }
 
-        $update = PPAUser::where('id', $user->user_id)->first();
-        $update->code_clearance;
-
-        if ($update->code_clearance == 6) {
-            $update->code_clearance = 5;
-            $update->save();
-        }
-
-        $user->delete();
-    
-        return response()->json(['message' => 'Personnel deleted successfully'], 200);
-    }
-
-    /**
-     * Get Driver Information.
-     */
-    public function getDriver()
-    {
-        $driverRecords = AssignPersonnel::where('type_of_personnel', 'Driver/Mechanic')->get();
-        $driverIds = $driverRecords->pluck('user_id')->all();
-
-        $drivers = PPAUser::whereIn('id', $driverIds)->get();
-        $driverNames = $drivers->map(function ($driver) {
-            return [
-                'driver_id' => $driver->id,
-                'driver_name' => $driver->fname . ' ' . $driver->mname . '. ' . $driver->lname,
-            ];
-        });
-
-        return response()->json($driverNames);
-    }
+   
 
 }

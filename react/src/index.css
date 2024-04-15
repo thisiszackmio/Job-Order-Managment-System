@@ -21,6 +21,17 @@
   visibility: hidden;
 }
 
+/* Footer */
+.footer {
+  padding: 24px 0px;
+}
+
+.footer p {
+  font-size: 14px;
+  margin-right: 30px;
+  font-weight: 700;
+}
+
 /* Show submenu when menuOpen state is true */
 .dropdown-enter {
   opacity: 0;

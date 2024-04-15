@@ -22,9 +22,8 @@ export default function DefaultLayout() {
 
   return (
     <div className="min-h-full">
-      {/* <TopNav /> */}
       <Sidebar />
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

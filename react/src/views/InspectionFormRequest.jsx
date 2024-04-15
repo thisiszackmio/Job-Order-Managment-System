@@ -10,16 +10,6 @@ export default function RepairRequestForm(){
   const {id} = useParams();
   const { currentUser } = useUserStateContext();
 
-  const navigate = useNavigate ();
-
-  //Restriction for accessing another form
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/repairrequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
-
   // Date
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date().toISOString().split('T')[0];

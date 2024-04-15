@@ -48,7 +48,7 @@ const Sidebar = () => {
                 >
                   <ul id="menu1" className={`pl-4 mb-6 menu ${menuOpen ? "menuOpen" : "hidden"}`}>
                     <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-4">
-                      <Link to="/form1">Pre/Post Repair Inspection Form</Link>
+                      <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
                     </li>
                     <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-4">
                       <Link to="/form2">Facility / Venue Request Form</Link>
@@ -73,7 +73,7 @@ const Sidebar = () => {
 
           {/* Main Content */}
           <div class="ppa-content">
-            <div class="w-full h-full">
+            <div style={{ maxHeight: '100vh'}} class="w-full h-full">
             <Outlet />
             </div>
           </div>

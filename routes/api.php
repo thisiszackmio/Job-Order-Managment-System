@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/userdetail/{id}', [UserController::class, 'getUserDetails']);
     Route::get('/getpersonnel', [UserController::class, 'getPersonnel']);
     Route::get('/personnelname', [UserController::class, 'AssignPersonnel']);
-    Route::get('/getsupervisor/{id}', [UserController::class, 'getSupervisor']);
+    Route::get('/getsupervisor', [UserController::class, 'getSupervisor']);
     Route::get('/getdriver', [UserController::class, 'getDriver']);
     Route::put('/userupdatedet/{id}', [UserController::class, 'updateUserDetails']);
     Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);

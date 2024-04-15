@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('brand_model');
             $table->string('serial_engine_no');
             $table->string('type_of_property');
-            $table->string('property_other_specific')->nullable();
             $table->string('property_description');
             $table->string('location');
             $table->string('complain');

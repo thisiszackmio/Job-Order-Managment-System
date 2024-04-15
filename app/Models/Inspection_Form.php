@@ -19,7 +19,6 @@ class Inspection_Form extends Model
         'serial_engine_no',
         'type_of_property',
         'property_description',
-        'property_other_specific',
         'location',
         'complain',
         'supervisor_name',

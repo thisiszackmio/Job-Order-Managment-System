@@ -30,7 +30,6 @@ class InspectionFormRequest extends FormRequest
             'brand_model' => 'required|string',
             'serial_engine_no' => 'required|string',
             'type_of_property' => 'required|string',
-            'property_other_specific' => 'nullable|string',
             'property_description' => 'required|string',
             'location' => 'required|string',
             'complain' => 'required|string',

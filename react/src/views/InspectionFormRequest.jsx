@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import submitAnimation from '../assets/loading_nobg.gif';
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../context/ContextProvider";
 
 export default function RepairRequestForm(){
@@ -29,38 +29,35 @@ export default function RepairRequestForm(){
   const [BrandModel, setBrandModel] = useState('');
   const [SerialEngineNo, setSerialEngineNo] = useState('');
   const [typeOfProperty, setTypeOfProperty] = useState('');
-  const [propertySpecify, setPropertySpecify] = useState('');
   const [propertyDescription, setPropertyDescription] = useState('');
   const [propertyLocation, setPropertyLocation] = useState('');
   const [ComplainDefect, setComplainDefect] = useState('');
+  const [getSupervisor, setGetSupervisor] = useState('');
+
   const [supervisor, setSupervisor] = useState([]);
 
   // Get Supervisor ID
   useEffect(()=>{ 
 
     axiosClient
-    .get(`/getsupervisor/${id}`)
+    .get(`/getsupervisor`)
     .then((response) => {
       const responseData = response.data;
 
-      setSupervisor(responseData);
+      const supervisorData = responseData.map((dataItem) => {
+        return {
+          id: dataItem.id,
+          name: dataItem.fullname,
+        }
+      })
+
+      setSupervisor({supervisorData:supervisorData});
+      //console.log(supervisor);
     })
     .catch((error) => {
       console.error('Error fetching data:', error);
     });
   },[]);
-
-  // Auto Approval for Supervisors and Manager
-  let output;
-  let admin;
-
-  if (currentUser.code_clearance === 1 || currentUser.code_clearance === 2 || currentUser.code_clearance === 4) {
-    output = 1;
-    admin = 4;
-  } else {
-    output = 0;
-    admin = 0;
-  }
 
   const SubmitInspectionForm = (event) => {
     event.preventDefault();
@@ -77,13 +74,12 @@ export default function RepairRequestForm(){
       brand_model: BrandModel,
       serial_engine_no: SerialEngineNo,
       type_of_property: typeOfProperty,
-      property_other_specific: propertySpecify,
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-      supervisor_name: supervisor,
-      supervisor_approval: output,
-      admin_approval: admin,
+      supervisor_name: getSupervisor,
+      supervisor_approval: 0,
+      admin_approval: 0,
       inspector_status: 0,
       remarks: "Pending",
       logs: logs,
@@ -167,7 +163,7 @@ export default function RepairRequestForm(){
                   id="rep_date"
                   defaultValue= {today}
                   onChange={ev => setInspectionDate(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                   readOnly
                 />
               </div>
@@ -188,7 +184,7 @@ export default function RepairRequestForm(){
                   autoComplete="rep_property_no"
                   value={propertyNo}
                   onChange={ev => setPropertyNo(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!propertyNo && inputErrors.property_number && (
                   <p className="form-validation">You must input the Property Number</p>
@@ -211,7 +207,7 @@ export default function RepairRequestForm(){
                   value={acquisitionDate}
                   onChange={ev => setAcquisitionDate(ev.target.value)}
                   max={currentDate}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!acquisitionDate && inputErrors.acq_date && (
                   <p className="form-validation">You must input the Acquisition Date</p>
@@ -227,29 +223,29 @@ export default function RepairRequestForm(){
                 </label> 
               </div>
               <div className="w-64">
-              <div className="relative flex items-center">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
-                  ₱
-                </span>
-                <input
-                  type="text"
-                  name="rep_acquisition_cost"
-                  id="rep_acquisition_cost"
-                  autoComplete="rep_acquisition_cost"
-                  value={acquisitionCost}
-                  onChange={ev => {
-                    const inputVal = ev.target.value;
-                    // Allow only numeric input
-                    if (/^\d*$/.test(inputVal)) {
-                      setAcquisitionCost(inputVal);
-                    }
-                  }}
-                  className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-                />
-              </div>
-              {!acquisitionCost && inputErrors.acq_cost && (
-                <p className="form-validation">You must input the Acquisition Cost</p>
-              )}
+                <div className="relative flex items-center">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
+                    ₱
+                  </span>
+                  <input
+                    type="text"
+                    name="rep_acquisition_cost"
+                    id="rep_acquisition_cost"
+                    autoComplete="rep_acquisition_cost"
+                    value={acquisitionCost}
+                    onChange={ev => {
+                      const inputVal = ev.target.value;
+                      // Allow only numeric input
+                      if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
+                        setAcquisitionCost(inputVal.replace(/,/g, ''));
+                      }
+                    }}
+                    className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                </div>
+                {!acquisitionCost && inputErrors.acq_cost && (
+                  <p className="form-validation">You must input the Acquisition Cost</p>
+                )}
               </div>
             </div>
 
@@ -268,7 +264,7 @@ export default function RepairRequestForm(){
                   autoComplete="rep_brand_model"
                   value={BrandModel}
                   onChange={ev => setBrandModel(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!BrandModel && inputErrors.brand_model && (
                   <p className="form-validation">You must input the Brand/Model</p>
@@ -291,7 +287,7 @@ export default function RepairRequestForm(){
                   autoComplete="rep_serial_engine_no"
                   value={SerialEngineNo}
                   onChange={ev => setSerialEngineNo(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!SerialEngineNo && inputErrors.serial_engine_no && (
                   <p className="form-validation">You must input the Serial/Engine No.</p>
@@ -323,7 +319,7 @@ export default function RepairRequestForm(){
                     setPropertySpecify('');
                   }
                 }}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 >
                   <option value="" disabled>Select an option</option>
                   <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
@@ -333,23 +329,6 @@ export default function RepairRequestForm(){
                 {!typeOfProperty && inputErrors.type_of_property && (
                   <p className="form-validation">You must input the Type of Property</p>
                 )}
-                {typeOfProperty === 'Others' && (
-                <div className="flex mt-4">
-                  <div className="w-36">
-                    <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-black">Specify:</label> 
-                  </div>
-                  <div className="w-64">
-                    <input
-                      type="text"
-                      name="specify"
-                      id="specify"
-                      value={propertySpecify}
-                      onChange={ev => setPropertySpecify(ev.target.value)}
-                      className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-                    />
-                  </div>
-                </div>
-              )}
               </div>
             </div>
 
@@ -367,7 +346,7 @@ export default function RepairRequestForm(){
                   id="rep_description"
                   value={propertyDescription}
                   onChange={ev => setPropertyDescription(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!propertyDescription && inputErrors.property_description && (
                   <p className="form-validation">You must input the Description</p>
@@ -389,7 +368,7 @@ export default function RepairRequestForm(){
                   id="rep_location"
                   value={propertyLocation}
                   onChange={ev => setPropertyLocation(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 />
                 {!propertyLocation && inputErrors.location && (
                   <p className="form-validation">You must input the Location</p>
@@ -412,11 +391,40 @@ export default function RepairRequestForm(){
                 value={ComplainDefect}
                 style={{ resize: 'none' }}
                 onChange={ev => setComplainDefect(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
               {!ComplainDefect && inputErrors.complain && (
                 <p className="form-validation">You must input the Complain/Defect</p>
               )}
+              </div>
+            </div>
+
+            {/* Type of Property */}
+            <div className="flex items-center mt-4">
+              <div className="w-60">
+                <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                  Immediate Supervisor:
+                </label> 
+              </div>
+              <div className="w-64">
+                <select 
+                name="rep_type_of_property" 
+                id="rep_type_of_property" 
+                autoComplete="rep_type_of_property"
+                value={getSupervisor}
+                onChange={ev => { setGetSupervisor(ev.target.value)}}
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                >
+                  <option value="" disabled>Select your supervisor</option>
+                  {supervisor?.supervisorData?.map((Data) => (
+                    <option key={Data.id} value={Data.id}>
+                      {Data.name}
+                    </option>
+                  ))}
+                </select>
+                {!getSupervisor && inputErrors.supervisor_name && (
+                  <p className="form-validation">You must input your supervisor</p>
+                )}
               </div>
             </div>
 
@@ -494,7 +502,7 @@ export default function RepairRequestForm(){
             {/* Success */}
             {popupContent == 'success' && (
               <button onClick={closePopup} className="w-full py-2 btn-success">
-                Close
+                View My Request
               </button>
             )}
 

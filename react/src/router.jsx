@@ -56,7 +56,7 @@ const routes = [
 
             // Inspection Request Form
             {
-                path: "/repairrequestform",
+                path: "/requestinspectionform",
                 element: <RequestRepairForm />
             },
             // Facility / Venue Request Form

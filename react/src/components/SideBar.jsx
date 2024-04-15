@@ -12,12 +12,11 @@ const Sidebar = () => {
   };
 
   return (
-    <div class="w-full h-full flex">
-      <dh-component>
-        <div class="flex flex-no-wrap">
+    <div class="w-full h-full font-roboto">
+        <div>
 
           {/* Side Bar */}
-          <div style={{ minHeight: '1000px', position: 'relative', top: '-65px'}} className="w-72 bg-ppa-themecolor shadow md:h-full flex">
+          <div style={{ minHeight: '100vh', position: 'fixed'}} className="w-72 bg-ppa-themecolor shadow md:h-full flex">
             <div className="px-8">
 
               {/* Logo */}
@@ -31,23 +30,23 @@ const Sidebar = () => {
                 {/* Dashboard */}
                 <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-6">
                   <Link to="/" className="flex items-center">
-                    <p className="text-base leading-4">Dashboard</p>
+                    <p className="text-base leading-4 text-lg">Dashboard</p>
                   </Link>
                 </li>
 
                 {/* Request Forms */}
-                <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-5" onClick={toggleMenu}>
+                <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-6" data-toggle="collapse" onClick={toggleMenu}>
                   <div className="flex items-center">
-                    <p className="text-base leading-4">Request Forms</p>
+                    <p className="text-base leading-4 text-lg">Request Forms</p>
                   </div>
                 </li>
                 <CSSTransition
                   in={menuOpen}
                   timeout={300}
-                  classNames="fade"
+                  classNames="dropdown"
                   unmountOnExit
                 >
-                  <ul id="menu1" className={`pl-4 ${menuOpen ? "menuOpen" : "hidden"}`}>
+                  <ul id="menu1" className={`pl-4 mb-6 menu ${menuOpen ? "menuOpen" : "hidden"}`}>
                     <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-4">
                       <Link to="/form1">Pre/Post Repair Inspection Form</Link>
                     </li>
@@ -59,7 +58,13 @@ const Sidebar = () => {
                     </li>
                   </ul>
                 </CSSTransition>
-                
+
+                {/* My request */}
+                <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-6">
+                  <Link to="/" className="flex items-center">
+                    <p className="text-base leading-4 text-lg">My Request</p>
+                  </Link>
+                </li>
                 
               </ul>
 
@@ -67,14 +72,12 @@ const Sidebar = () => {
           </div>
 
           {/* Main Content */}
-          <div class="container mx-auto md:w-4/5 w-11/12 px-2 flex-grow">
+          <div class="ppa-content">
             <div class="w-full h-full">
             <Outlet />
             </div>
           </div>
         </div>
-
-      </dh-component>
     </div>
   );
 };

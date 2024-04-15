@@ -4,13 +4,8 @@ import { BellIcon } from '@heroicons/react/24/outline'
 
 const TopNav = () => {
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex h-16 items-center justify-between">
-
-        <div className="flex items-center">
-          {/* Header */}
-          <div className="flex-shrink-0">dfdf</div>
-        </div>
 
         {/* Notification Icon */}
         <div className="hidden md:flex items-center ml-4">

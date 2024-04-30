@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/userdetail/{id}', [UserController::class, 'getUserDetails']);
     Route::get('/getpersonnel', [UserController::class, 'getPersonnel']);
     Route::get('/personnelname', [UserController::class, 'AssignPersonnel']);
-    Route::get('/getsupervisor/{id}', [UserController::class, 'getSupervisor']);
+    Route::get('/getsupervisor', [UserController::class, 'getSupervisor']);
     Route::get('/getdriver', [UserController::class, 'getDriver']);
     Route::put('/userupdatedet/{id}', [UserController::class, 'updateUserDetails']);
     Route::put('/changesg/{id}', [UserController::class, 'updateSignature']);
@@ -48,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/requestrepair', [InspectionFormController::class, 'index']); 
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
     Route::put('/inspector/{id}', [InspectionFormController::class, 'storeInspectorForm']);
+    Route::put('/updateparta/{id}', [InspectionFormController::class, 'updatePartA']);
+    Route::put('/updatepartb/{id}', [InspectionFormController::class, 'updatePartB']);  
+    Route::put('/updatepartc/{id}', [InspectionFormController::class, 'updatePartC']); 
+    Route::put('/updatepartd/{id}', [InspectionFormController::class, 'updatePartD']); 
     Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);
     Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
     Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
@@ -61,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/facilityform', [FacilityController::class, 'index']);
     Route::get('/facilityform/{id}', [FacilityController::class, 'show']);
     Route::get('/myfacilityformrequest/{id}', [FacilityController::class, 'myRequest']);
+    Route::get('/checkavailability', [FacilityController::class, 'checkAvailability']);
     Route::put('/facilityopr/{id}', [FacilityController::class, 'StoreOPRFormGSO']);
     Route::put('/facilityopradmin/{id}', [FacilityController::class, 'StoreOPRFormAdmin']);
     Route::put('/facilityapproval/{id}', [FacilityController::class, 'AdminApproval']);

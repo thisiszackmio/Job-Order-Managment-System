@@ -67,6 +67,7 @@ class GetNotificationController extends Controller
             return [
                 'facility_id' => $facilityForm->id,
                 'facility_date' => $facilityForm->updated_at,
+                'facility_obr' => $facilityForm->obr_comment,
                 'requestor' => $userName,
                 'requestor_code' => $user->code_clearance,
             ];
@@ -95,6 +96,18 @@ class GetNotificationController extends Controller
         $vehicleSlip = $gsoVDet->count();
 
         $GSONotificationCount = $inspGSOCount + $facility + $vehicleSlip;
+
+        // Close the Request
+        $gsoCloseInspReqs = Inspector_Form::where('close', 2)->get();
+        $gsoCloseInspIDs = [];
+
+        foreach ($gsoCloseInspReqs as $gsoCloseInspReq) {
+            $gsoCloseInspIDs[] = [
+                'id' => $gsoCloseInspReq->id,
+                'insp_id' => $gsoCloseInspReq->inspection__form_id,
+                'date_update' => $gsoCloseInspReq->updated_at
+            ];
+        }
 
 
         // ------------------------------- Is FOR Admin ----------------------------------------------
@@ -188,6 +201,7 @@ class GetNotificationController extends Controller
                     'gsoFacilityDet' => $gsoFDet->isEmpty() ? null : $gsoFDet,
                     'gsoVehicleDet' => $gsoVDet->isEmpty() ? null : $gsoVDet,
                     'gsoCount' => $GSONotificationCount,
+                    'gsoCloseInspReq' => $gsoCloseInspIDs,
                 ],
             'Admin_Not' => [
                     'adminRepairDet' => $adminInsDet->isEmpty() ? null : $adminInsDet,

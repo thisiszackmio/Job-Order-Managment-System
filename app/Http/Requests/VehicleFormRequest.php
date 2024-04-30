@@ -32,6 +32,7 @@ class VehicleFormRequest extends FormRequest
             'vehicle_type' => 'required|string',
             'driver' => 'required|string',
             'admin_approval' => 'required|numeric',
+            'remarks' => 'required|string'
         ];
     }
 }

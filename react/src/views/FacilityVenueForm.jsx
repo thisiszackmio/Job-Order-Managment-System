@@ -47,6 +47,10 @@ export default function FacilityFormForm(){
   const [isLoading, setIsLoading] = useState(true);
   const [displayRequestFacility, setDisplayRequestFacility] = useState([]);
 
+  // Disapprove
+  const [giveAdminReason, setGiveAdminReason] = useState(false);
+  const [adminReason, setAdminReason] = useState('');
+
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('Test');
@@ -237,24 +241,24 @@ export default function FacilityFormForm(){
 
   //Admin Disapproval Confirmation
   function handleDisapproveConfirmation(){
-    setPopupContent("warningD");
-    setShowPopup(true);
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Disapproval Request</p>
-        <p>Do you want to disapprove?</p>
-      </div>
-    );
+    setGiveAdminReason(true);
   };
 
-  //Admin Decline function
-  function handleDisapproveClick(id){
+  // Cancel Reason
+  const handleCancelReason = () => {
+    setGiveAdminReason(false);
+    setAdminReason('');
+  }
 
+  // Submit Reason
+  function submitAdminReason(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`;
 
-    axiosClient.put(`/facilitydisapproval/${id}`,{
+    axiosClient
+    .put(`/facilitydisapproval/${id}`,{
+      adminReason: adminReason,
       logs: logs
     })
     .then((response) => {
@@ -274,8 +278,7 @@ export default function FacilityFormForm(){
       setShowPopup(true);   
       setSubmitLoading(false);
     });
-
-  };
+  }
 
   //Close the request
   function handleCloseRequest(id){
@@ -865,10 +868,10 @@ export default function FacilityFormForm(){
               Status:
               </label> 
             </div>
-            <div className="w-72 font-bold">
+            <div className="w-full font-bold">
             {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
             {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && ("Disapproved")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && (displayRequestFacility?.viewFacilityData?.remarks)}
             {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
             </div>
           </div> 
@@ -953,7 +956,7 @@ export default function FacilityFormForm(){
                       onChange={ev => setOprAction(ev.target.value)}
                       className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
-                    <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+                    <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, type "none" please submit the form</p>
                   </form>
 
                 </div>
@@ -974,6 +977,29 @@ export default function FacilityFormForm(){
       </div>     
 
     </div>
+
+    {giveAdminReason ? (
+      <div className="flex items-center mt-6">
+        <div className="w-44">
+          <label htmlFor="supervisor_reason" className="block text-base font-medium leading-6 text-black"> Reason for Disapproval: </label> 
+        </div>
+        <div className="ml-5">
+          <div className="flex items-center">
+            <div className="w-64">
+              <textarea
+                name="reason"
+                id="reason"
+                rows={3}
+                style={{ resize: 'none' }}
+                value={adminReason}
+                onChange={ev => setAdminReason(ev.target.value)}
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    ):null}
 
     {/* Buttons */}
     <div className="flex mt-4 font-roboto">
@@ -1004,15 +1030,44 @@ export default function FacilityFormForm(){
       <>
         {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
         <>
-          {/* Approve */}
-          <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
-            Approve
-          </button>
+          {giveAdminReason ? (
+          <>
+            {/* Admin Submit Reason */}
+            {adminReason && (
+              <button type="submit" onClick={() => submitAdminReason(displayRequestFacility?.viewFacilityData?.id)}
+                className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+            )}
+            {/* Cancel */}
+            <button onClick={() => handleCancelReason()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+              Cancel
+            </button>
+          
+          </>  
+          ):(
+          <>
+            {/* Approve */}
+            <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
+              Approve
+            </button>
 
-          {/* Decline */}
-          <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
-            Decline
-          </button>
+            {/* Decline */}
+            <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
+              Decline
+            </button>
+          </>
+          )}
+          
         </>
         ):null}
       </>
@@ -1049,20 +1104,22 @@ export default function FacilityFormForm(){
     {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
     currentUser.code_clearance == 3 && (
     <>
-      <button form='opr-form-gso' type="submit"
-        className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-        style={{ position: 'relative', top: '0px' }}
-        disabled={submitLoading}
-      >
-        {submitLoading ? (
-          <div className="flex items-center justify-center">
-            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-            <span className="ml-2">Processing...</span>
-          </div>
-        ) : (
-          'Submit'
-        )}
-      </button>
+      {OprAction ? (
+        <button form='opr-form-gso' type="submit"
+          className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+          style={{ position: 'relative', top: '0px' }}
+          disabled={submitLoading}
+        >
+          {submitLoading ? (
+            <div className="flex items-center justify-center">
+              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+              <span className="ml-2">Processing...</span>
+            </div>
+          ) : (
+            'Submit'
+          )}
+        </button>
+      ):null}
     </>
     )}
 
@@ -1258,7 +1315,7 @@ export default function FacilityFormForm(){
 
       <div className="hidden md:none">
         <div ref={componentRef}>
-          <div style={{ width: '216mm', height: '330mm', paddingLeft: '30px', paddingRight: '30px', paddingTop: '10px', border: '0px solid' }}>
+          <div style={{ width: '210mm', height: '297mm', paddingLeft: '30px', paddingRight: '30px', paddingTop: '10px', border: '0px solid' }}>
 
             {/* Control Number */}
             <div className="title-area font-arial pr-6 text-right">
@@ -1793,11 +1850,9 @@ export default function FacilityFormForm(){
                 {/* For OPR Action */}
                 <td className="border border-black w-1/2 p-2 " style={{ verticalAlign: 'top' }}>
                   <div className="font-bold font-arial text-sm">
-                    OPR Action
+                    OPR Action (Comments / Concerns)
                   </div>
-                  <div className="px-5 font-arial text-sm">
-                    Comments / Concerns
-                  </div>
+
                   <div className="px-5 font-arial">
                     
                     <div className="px-5 font-arial mt-2 text-sm">

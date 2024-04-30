@@ -8,6 +8,21 @@
 .ppa-nav li a { font-size: 15px; }
 .ppa-nav li a.active { background-color: #132E51; color: #fff; }
 .ppa-content { padding: 0px 0px 0px 288px; }
+.text-pdf { font-size: 13px; }
+
+/* Title */
+.text-title {
+  font-size: 30px;
+  text-transform: uppercase;
+  color: #fff;
+  padding-bottom: 10px;
+  border-bottom: 2px solid;
+}
+
+.first-letter {
+  font-size: 40px;
+  font-weight: 900;
+}
 
 .submenu {
   position: absolute;
@@ -19,6 +34,11 @@
   transition: opacity 0.3s ease, visibility 0.3s ease;
   opacity: 0;
   visibility: hidden;
+}
+
+.buttom-nav {
+  position: absolute;
+  bottom: 0px;
 }
 
 /* Footer */
@@ -158,6 +178,13 @@ p.lower-text { font-size: 12px; color: #848884; }
 .btn-default { background-color: #1F51FF; color: #fff; border-radius: 20px; }
 .btn-default:hover { background-color: #6a83d9; transition: 250ms; }
 .btn-default:disabled { display: none; }
+
+.btn-edit {
+  background-color: #87CEEB;
+  border-radius: 20px;
+  position: relative;
+  top: -2px;
+}
 
 /* Dashboard */
 

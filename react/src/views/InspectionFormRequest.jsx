@@ -7,7 +7,6 @@ import { useUserStateContext } from "../context/ContextProvider";
 
 export default function RepairRequestForm(){
 
-  const {id} = useParams();
   const { currentUser } = useUserStateContext();
 
   // Date
@@ -52,13 +51,29 @@ export default function RepairRequestForm(){
       })
 
       setSupervisor({supervisorData:supervisorData});
-      //console.log(supervisor);
+      //console.log(supervisorData);
     })
     .catch((error) => {
       console.error('Error fetching data:', error);
     });
   },[]);
 
+  // Set a condition depends of the user
+  let adminManager;
+  let supervisorUser;
+  let remarks;
+
+  if(currentUser.code_clearance == 4 || currentUser.code_clearance == 1){ // For Supervisor Request
+    adminManager = 4;
+    supervisorUser = 1;
+    remarks = "Waiting for GSO to filled up the form";
+  } else { // default
+    adminManager = 0;
+    supervisorUser = 0;
+    remarks = "Pending";
+  }
+
+  // Submit the Form
   const SubmitInspectionForm = (event) => {
     event.preventDefault();
 
@@ -77,11 +92,11 @@ export default function RepairRequestForm(){
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-      supervisor_name: getSupervisor,
-      supervisor_approval: 0,
-      admin_approval: 0,
+      supervisor_name: currentUser.code_clearance == 1 || currentUser.code_clearance == 4 ? currentUser.id : getSupervisor,
+      supervisor_approval: supervisorUser,
+      admin_approval: adminManager,
       inspector_status: 0,
-      remarks: "Pending",
+      remarks: remarks,
       logs: logs,
     }
 
@@ -93,7 +108,7 @@ export default function RepairRequestForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Success</p>
-            <p>Inspection Form submit successfully</p>
+            <p>Form submit successfully</p>
           </div>
         );    
       })
@@ -128,7 +143,7 @@ export default function RepairRequestForm(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.href = `/myrequestinpectionform/${id}`;
+    window.location.href = `/myrequest/${currentUser.id}`;
   }
 
   return (
@@ -140,7 +155,7 @@ export default function RepairRequestForm(){
         {/* Part A */}
         <div>
           <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-          <p className="text-xs text-red-500">Please double check the form before submitting </p>
+          <p className="text-xs text-red-500 font-bold">Please double check the form before submitting </p>
         </div>
 
         {/* Form */}
@@ -315,9 +330,6 @@ export default function RepairRequestForm(){
                 value={typeOfProperty}
                 onChange={ev => {
                   setTypeOfProperty(ev.target.value);
-                  if (ev.target.value !== 'Others') {
-                    setPropertySpecify('');
-                  }
                 }}
                 className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 >
@@ -399,34 +411,36 @@ export default function RepairRequestForm(){
               </div>
             </div>
 
-            {/* Type of Property */}
-            <div className="flex items-center mt-4">
-              <div className="w-60">
-                <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                  Immediate Supervisor:
-                </label> 
+            {/* Supervisor */}
+            {(currentUser.code_clearance == 4 || currentUser.code_clearance == 1) ? null:(
+              <div className="flex items-center mt-4">
+                <div className="w-60">
+                  <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                    Immediate Supervisor:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <select 
+                  name="rep_type_of_property" 
+                  id="rep_type_of_property" 
+                  autoComplete="rep_type_of_property"
+                  value={getSupervisor}
+                  onChange={ev => { setGetSupervisor(ev.target.value)}}
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  >
+                    <option value="" disabled>Select your supervisor</option>
+                    {supervisor?.supervisorData?.map((Data) => (
+                      <option key={Data.id} value={Data.id}>
+                        {Data.name}
+                      </option>
+                    ))}
+                  </select>
+                  {!getSupervisor && inputErrors.supervisor_name && (
+                    <p className="form-validation">You must input your supervisor</p>
+                  )}
+                </div>
               </div>
-              <div className="w-64">
-                <select 
-                name="rep_type_of_property" 
-                id="rep_type_of_property" 
-                autoComplete="rep_type_of_property"
-                value={getSupervisor}
-                onChange={ev => { setGetSupervisor(ev.target.value)}}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                >
-                  <option value="" disabled>Select your supervisor</option>
-                  {supervisor?.supervisorData?.map((Data) => (
-                    <option key={Data.id} value={Data.id}>
-                      {Data.name}
-                    </option>
-                  ))}
-                </select>
-                {!getSupervisor && inputErrors.supervisor_name && (
-                  <p className="form-validation">You must input your supervisor</p>
-                )}
-              </div>
-            </div>
+            )}          
 
           </div>
 

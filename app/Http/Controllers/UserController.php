@@ -19,29 +19,19 @@ class UserController extends Controller
     /**
      * Get Supervisor on (Inspection For,\m)
      */
-    public function getSupervisor($id){
-        $getUser = PPAUser::find($id);
+    public function getSupervisor(){
+        $getUser = PPAUser::whereIn('code_clearance',[1,2,4])->get();
 
-        // Create a Condition
-        if ($getUser->code_clearance === 1) // For Admin Manager
-        {
-            $getSupID = $getUser->id;
-        }
-        else if ($getUser->code_clearance === 2) // For Port Manager
-        {
-            $getSupID = $getUser->id;
-        }
-        else if ($getUser->code_clearance === 4) // For Supervisor
-        {
-            $getSupID = $getUser->id;
-        }
-        else {
-            $getUserDiv = $getUser->division;
-            $getSup = PPAUser::where('division', $getUserDiv)->where('code_clearance', 4)->first();
-            $getSupID = $getSup->id;
-        }
+        $filteredUsers = $getUser->map(function ($user){
+            $id = $user->id;
+            $fullname = $user->fname. ' ' .$user->mname. '. ' .$user->lname; 
+            return [
+                'id' => $id,
+                'fullname' => $fullname
+            ];
+        });
 
-        return response()->json($getSupID);
+        return response()->json($filteredUsers);
     }
     
 

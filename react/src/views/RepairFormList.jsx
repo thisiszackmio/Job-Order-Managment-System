@@ -139,7 +139,7 @@ export default function RepairRequestList(){
     </div>
 
     <div className="overflow-x-auto">
-      <table className="border-collapse font-roboto" style={{ width: '1650px' }}>
+      <table className="border-collapse font-roboto" style={{ width: '100%' }}>
         <thead>    
           <tr className="bg-gray-100">
             <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
@@ -157,16 +157,16 @@ export default function RepairRequestList(){
         currentRepair.map((repair) => (
         <tr key={repair.id}>
           <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold table-font">{repair.id}</td>
-          <td className="px-1 py-2 align-top border border-custom w-40 table-font">{repair.date}</td>
-          <td className="px-1 py-2 align-top border border-custom w-60 table-font">{repair.property_number}</td>
+          <td className="px-1 py-2 align-top border border-custom table-font">{repair.date}</td>
+          <td className="px-1 py-2 align-top border border-custom table-font">{repair.property_number}</td>
             {repair.type_of_property === "Others" ? (
-          <td className="px-1 py-2 align-top border border-custom w-72 table-font">Others: <i>{repair.property_other_specific}</i></td>
+          <td className="px-1 py-2 align-top border border-custom table-font">Others: <i>{repair.property_other_specific}</i></td>
           ):(
-          <td className="px-1 py-2 align-top border border-custom w-72 table-font">{repair.type_of_property}</td>
+          <td className="px-1 py-2 align-top border border-custom table-font">{repair.type_of_property}</td>
           )}
-          <td className="px-1 py-2 align-top border border-custom w-72 table-font">{repair.complain}</td>
-          <td className="px-1 py-2 align-top border border-custom w-56 table-font">{repair.name}</td>
-          <td className="px-1 py-2 align-top border border-custom w-60 table-font">
+          <td className="px-1 py-2 align-top border border-custom table-font">{repair.complain}</td>
+          <td className="px-1 py-2 align-top border border-custom table-font">{repair.name}</td>
+          <td className="px-1 py-2 align-top border border-custom table-font">
             {repair.remarks}
           </td>
           <td className="px-1 py-2 text-center border border-custom w-1">

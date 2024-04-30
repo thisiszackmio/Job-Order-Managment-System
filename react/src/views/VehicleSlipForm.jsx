@@ -507,8 +507,8 @@ export default function PrePostRepairForm(){
             </div>
             <div className="w-1/2">
               <div>
-              {vehicleForms?.vehicleForm?.passengers == 'None' ? (
-                vehicleForms?.vehicleForm?.passengers
+              {vehicleForms?.vehicleForm?.passengers == 'N/A' ? (
+                "No Passengers"
               ):(
               <>
                 {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
@@ -552,7 +552,7 @@ export default function PrePostRepairForm(){
           <div className="flex items-center mt-4 font-roboto">
             <div className="w-44">
               <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
-                Type of Vehicle:<span className="text-red-500">*</span>
+                Type of Vehicle:
               </label> 
             </div>
             
@@ -564,7 +564,6 @@ export default function PrePostRepairForm(){
                 value={VRVehicle}
                 onChange={handleVRVehicleChange}
                 className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Select a vehicle</option>
                 <option value="" disabled class="font-bold text-black"><b>Admin Vehicle</b></option>
@@ -586,7 +585,7 @@ export default function PrePostRepairForm(){
                 <option value="Toyota Innova = SHX 195">Toyota Innova - SHX 195</option>
               </select> 
               {!VRVehicle && inputErrors.vehicle_type && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="form-validation">This field must be required</p>
               )}
             </div>
           </div>
@@ -595,7 +594,7 @@ export default function PrePostRepairForm(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-44">
               <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
-                Driver:<span className="text-red-500">*</span>
+                Driver:
               </label> 
             </div>
             <div className="w-full">
@@ -606,7 +605,6 @@ export default function PrePostRepairForm(){
                 value={selectedDriver}
                 onChange={handleDriverName}
                 className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Select a Driver</option>
                 {driverList.map(driver => (
@@ -614,7 +612,7 @@ export default function PrePostRepairForm(){
                 ))}
               </select>
               {!selectedDriver && inputErrors.driver && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="form-validation">This field must be required</p>
               )}
             </div>
           </div>

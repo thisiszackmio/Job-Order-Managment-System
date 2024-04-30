@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('vehicle_type');
             $table->string('driver');
             $table->boolean('admin_approval')->default(false);
+            $table->string('remarks', 500);
             $table->timestamps();
         });
     }

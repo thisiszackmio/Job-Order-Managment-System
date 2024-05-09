@@ -10,9 +10,49 @@ use App\Models\AdminInspectionForm;
 use App\Models\Inspector_Form;
 use App\Models\FacilityModel;
 use App\Models\VehicleForm;
+use App\Models\NotificationsModel;
 
 class GetNotificationController extends Controller
 {
+    /** 
+     * Get Notifications (Prototype pani)
+     */
+    public function NewNotification($id)
+    {
+        $notification4supervisor = NotificationsModel::where('sender_id', $id)->get();
+        $getForm = Inspection_Form::where('supervisor_approval', 0)
+                                ->whereIn('created_at', $notification4supervisor->pluck('created_at'))
+                                ->orderBy('created_at', 'asc')
+                                ->get();
+
+        $supInsDet = $notification4supervisor->map(function ($Inspnotification) use ($getForm) {
+            $inspection = $getForm->first(function ($form) use ($Inspnotification) {
+                return $form->created_at->equalTo($Inspnotification->created_at);
+            });
+
+            return [
+                'insp_id' => $inspection->id ?? null,
+                'insp_type' => $Inspnotification->type_of_request,
+                'insp_message' => $Inspnotification->message,
+                'insp_date' => $Inspnotification->created_at,
+                'insp_stat' => $Inspnotification->status,
+            ];
+        });
+        $supCont = $supInsDet->count();
+        $supervisorNames = $getForm->isNotEmpty() ? $getForm->first()->supervisor_name : null;
+
+        $responseData = [
+            'Sup_Noti' => [
+               'Inspection_Sup' => $supInsDet->isEmpty() ? null : $supInsDet,
+               'supCount' => $supCont,
+               'supervisor' => $supervisorNames
+            ]
+        ];
+
+        return response()->json($responseData);
+    }
+
+
     /** 
      * Receive Notification by the Supervisor
      */
@@ -89,14 +129,6 @@ class GetNotificationController extends Controller
             ];
         });
 
-
-        // Calculate the count after mapping
-        $inspGSOCount = $gsoInsDet->count();
-        $facility = $gsoFDet->count();
-        $vehicleSlip = $gsoVDet->count();
-
-        $GSONotificationCount = $inspGSOCount + $facility + $vehicleSlip;
-
         // Close the Request
         $gsoCloseInspReqs = Inspector_Form::where('close', 2)->get();
         $gsoCloseInspIDs = [];
@@ -109,6 +141,13 @@ class GetNotificationController extends Controller
             ];
         }
 
+        // Calculate the count after mapping
+        $inspGSOCount = $gsoInsDet->count();
+        $facility = $gsoFDet->count();
+        $vehicleSlip = $gsoVDet->count();
+        $closeInspeReq = $gsoCloseInspReqs->count();
+
+        $GSONotificationCount = $inspGSOCount + $facility + $vehicleSlip + $closeInspeReq;
 
         // ------------------------------- Is FOR Admin ----------------------------------------------
         // For Inspection Request

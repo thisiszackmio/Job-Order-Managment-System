@@ -177,6 +177,7 @@ class VehicleFormController extends Controller
         $approveRequest = VehicleForm::find($id);
 
         $approveRequest->admin_approval = 2;
+        $approveRequest->remarks = 'The Admin Manager has approved the request';
 
         if ($approveRequest->save()) {
             // Creating logs

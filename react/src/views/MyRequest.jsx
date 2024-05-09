@@ -173,19 +173,25 @@ export default function MyRequest(){
     fetchVehicleSlipForm();
   },[id]);
 
-  return (
+  // Restrictions
+  const UserHere = id == currentUser?.id;
+  // const Authorize = (
+  //   UserHere || (userRole === 'h4ck3rZ@1Oppa' || userRole === '4DmIn@Pp4' || userRole === 'Pm@PP4' || userRole === 'P3rs0nn3lz@pPa')
+  // );
+
+  return loading ? (
+    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+      <img
+        className="mx-auto h-44 w-auto"
+        src={loadingAnimation}
+        alt="Your Company"
+      />
+      <span className="ml-2 animate-heartbeat">Loading My Request List</span>
+    </div>
+  ):(
+  <>
+    {UserHere ? (
     <PageComponent title="My Request">
-    {loading ? (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-        <img
-          className="mx-auto h-44 w-auto"
-          src={loadingAnimation}
-          alt="Your Company"
-        />
-        <span className="ml-2 animate-heartbeat">Loading My Request List</span>
-      </div>
-    ):(
-    <>
 
       {/* For Pre/Post Repair Inspection Form */}
       <div>
@@ -193,7 +199,7 @@ export default function MyRequest(){
       </div>
 
       {/* Display Table */}
-      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #1b23334a' }}>
+      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto'}}>
       {displayRequest?.mappedData?.length > 0 ? (
         <table className="border-collapse font-roboto" style={{ width: '100%' }}>
           <thead>
@@ -214,8 +220,6 @@ export default function MyRequest(){
             </tr>
           </thead>
           <tbody>
-          {currentUser.id == id || userRole === 'h4ck3rZ@1Oppa' ? (
-          <>
           {displayRequest?.mappedData?.map((getData) => (
             <tr key={getData.id}>
               <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
@@ -233,14 +237,10 @@ export default function MyRequest(){
               <td className="px-1 py-2 align-top border border-custom w-72 table-font">{getData.remarks}</td>
             </tr>
           ))}
-          </>  
-          ):(
-            <td colSpan={13} className="px-1 py-2 text-center align-top border font-bold border-custom">You Cannot View This Table</td>
-          )}
           </tbody>
         </table>
       ):(
-        <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request Yet</div>
+        <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
       <div className="text-right text-sm/[17px]">
@@ -257,7 +257,7 @@ export default function MyRequest(){
       </div>
 
       {/* Display table */}
-      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #1b23334a' }}>
+      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
       {displayFacRequest?.mappedData?.length > 0 ? (
         <table className="border-collapse font-roboto" style={{ width: '100%' }}>
           <thead>
@@ -271,32 +271,26 @@ export default function MyRequest(){
             </tr>
           </thead>
           <tbody>
-          {currentUser.id == id || userRole === 'h4ck3rZ@1Oppa' ? (
-          <>
-            {displayFacRequest.mappedData.map((getData) => (
-              <tr key={getData.id}>
-                <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
-                <td className="px-1 py-2 align-top border border-custom table-font">{formatDate(getData.date_requested)}</td>
-                <td className="px-1 py-2 align-top border border-custom table-font">{getData.title_of_activity}</td>
-                <td className="px-1 py-2 align-top border border-custom w-1/4 table-font">
-                {getData.date_start === getData.date_end ? (
-                  `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatTime(getData.time_end)}`
-                ) : (
-                  `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatDate(getData.date_end)} @ ${formatTime(getData.time_end)}`
-                )}
-              </td>
-              <td className="px-1 py-2 w-10 align-top border border-custom w-1/5 table-font"> {getData.facility} </td>
-              <td className="px-1 py-2 align-top border border-custom w-1/5 table-font"> {getData.remarks} </td>
-              </tr>
-            ))}
-          </>
-          ):(
-            <td colSpan={13} className="px-1 py-2 text-center align-top border font-bold border-custom">You Cannot View This Table</td>
-          )}
+          {displayFacRequest.mappedData.map((getData) => (
+            <tr key={getData.id}>
+              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
+              <td className="px-1 py-2 align-top border border-custom table-font">{formatDate(getData.date_requested)}</td>
+              <td className="px-1 py-2 align-top border border-custom table-font">{getData.title_of_activity}</td>
+              <td className="px-1 py-2 align-top border border-custom w-1/4 table-font">
+              {getData.date_start === getData.date_end ? (
+                `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatTime(getData.time_end)}`
+              ) : (
+                `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatDate(getData.date_end)} @ ${formatTime(getData.time_end)}`
+              )}
+            </td>
+            <td className="px-1 py-2 w-10 align-top border border-custom w-1/5 table-font"> {getData.facility} </td>
+            <td className="px-1 py-2 align-top border border-custom w-1/5 table-font"> {getData.remarks} </td>
+            </tr>
+          ))}
           </tbody>
         </table>   
       ):(
-        <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request Yet</div>
+        <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
       <div className="text-right text-sm/[17px]">
@@ -313,7 +307,7 @@ export default function MyRequest(){
       </div>
 
       {/* Display table */}
-      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #1b23334a' }}>
+      <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
       {displayRequestVehicle?.mappedData?.length > 0 ? (
         <table className="border-collapse font-roboto" style={{ width: '100%' }}>
           <thead>
@@ -329,6 +323,7 @@ export default function MyRequest(){
               <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             </tr>
           </thead>
+          <tbody>
           {displayRequestVehicle?.mappedData?.map((getData) => (
             <tr key={getData.id}>
               <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1 table-font">{getData.id}</td>
@@ -352,9 +347,10 @@ export default function MyRequest(){
                   </td>
             </tr>
           ))}
+          </tbody>
         </table>
       ):(
-        <div className="px-6 py-6 text-center font-bold whitespace-nowrap">No Request Yet</div>
+        <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
       <div className="text-right text-sm/[17px]">
@@ -362,8 +358,14 @@ export default function MyRequest(){
           <i>Total of <b> {displayRequestVehicle?.mappedData?.length} </b> Vehicle Slip Request</i>
         ) : null}
       </div>
-    </>
-    )}
+
     </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
+    )}
+  </>
   );
 }

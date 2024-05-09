@@ -98,7 +98,7 @@ const routes = [
             },
             // Vehicle Slip Request Form
             {
-                path: "/vehiclesliprequestform",
+                path: "/vehiclesliprequestformlist",
                 element: <VehicleSlipFormList />
             },
             // Equipment Request Form

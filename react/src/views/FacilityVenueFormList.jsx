@@ -141,9 +141,7 @@ export default function FacilityVenueRequestList() {
   //Restrictions
   const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
-  return (
-  <PageComponent title="Facility / Venue Form Request List">
-  {loading ? (
+  return loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -154,10 +152,10 @@ export default function FacilityVenueRequestList() {
     </div>
   ):(
   <>
-    <div>
+    {Authorize ? (
+    <PageComponent title="Facility / Venue Form Request List">
 
       <div className="flex justify-end">
-        
         <div className="align-right">
           {/* For Search Field */}
           <input
@@ -260,11 +258,15 @@ export default function FacilityVenueRequestList() {
           nextLinkClassName="page-link"
         />
       )}
-
-    </div>
+      
+    </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
+    )}
   </>
-  )}
-  </PageComponent>
   );
   
 }

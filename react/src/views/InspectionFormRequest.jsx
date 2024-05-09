@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import submitAnimation from '../assets/loading_nobg.gif';
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
-import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../context/ContextProvider";
 
 export default function RepairRequestForm(){
@@ -70,7 +69,7 @@ export default function RepairRequestForm(){
   } else { // default
     adminManager = 0;
     supervisorUser = 0;
-    remarks = "Pending";
+    remarks = "Waiting for supervisor's approval";
   }
 
   // Submit the Form
@@ -80,6 +79,7 @@ export default function RepairRequestForm(){
     setSubmitLoading(true);
 
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Pre/Post Repair Inspection`;
+    //const message = `There is a request for ${currentUser.gender === 'Male' ? 'sir' : 'maam'} ${currentUser.fname} ${currentUser.lname}, and it requires your approval`;
 
     const FormData = {
       date_of_request: today,
@@ -97,7 +97,10 @@ export default function RepairRequestForm(){
       admin_approval: adminManager,
       inspector_status: 0,
       remarks: remarks,
+      // Logs
       logs: logs,
+      // For Notifications
+      // message: message
     }
 
     axiosClient
@@ -110,7 +113,8 @@ export default function RepairRequestForm(){
             <p className="popup-title">Success</p>
             <p>Form submit successfully</p>
           </div>
-        );    
+        );
+        fetchNotification();    
       })
       .catch((error) => {
         if (error.response.status === 500) {

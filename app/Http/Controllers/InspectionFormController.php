@@ -13,6 +13,7 @@ use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\NotificationModel;
 use App\Models\Logs;
+use App\Models\NotificationsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -226,6 +227,14 @@ class InspectionFormController extends Controller
         if(!$deploymentData){
             return response()->json(['error' => 'Data Error'], 500);
         }
+
+        //Store Notifications
+        // $noti = new NotificationsModel();
+        // $noti->sender_id = $request->input('supervisor_name');
+        // $noti->type_of_request = 'Pre-Repair/Post Repair Inspect Form';
+        // $noti->message = $request->input('message');
+        // $noti->status = 1;
+        // $noti->save();
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
         

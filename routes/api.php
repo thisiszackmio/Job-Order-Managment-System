@@ -94,7 +94,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/equipmentmanins/{id}', [EquipmentController::class, 'AdminInstruct']);
     Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
 
-    
     Route::put('/equipmentgsoform/{id}', [EquipmentController::class, 'GSOForm']);
     Route::put('/equipmentgclose/{id}', [EquipmentController::class, 'closeRequest']);
 
@@ -105,9 +104,11 @@ Route::middleware(['auth'])->group(function () {
 
 //New Get Notifications
 Route::get('/notification/{id}', [GetNotificationController::class, 'GetNotification']); 
+Route::get('/notif/{id}', [GetNotificationController::class, 'NewNotification']); 
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
+Route::get('/getpending/{id}', [DashboardController::class, 'getPendingRequest']);

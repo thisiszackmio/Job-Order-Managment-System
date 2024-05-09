@@ -382,7 +382,7 @@ export default function RequestFormFacility(){
       obr_instruct: oprInstrucValue,
       admin_approval: output,
       date_approve: date_request,
-      remarks: currentUser.code_clearance == 1 ? adminMessage : "Pending",
+      remarks: currentUser.code_clearance == 1 ? adminMessage : "Waiting for the admin manager's approval",
       logs: logs
     };
 

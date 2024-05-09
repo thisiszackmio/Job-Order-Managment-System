@@ -7,7 +7,7 @@
 .ppa-theme-active { background-color: #132E51; }
 .ppa-nav li a { font-size: 15px; }
 .ppa-nav li a.active { background-color: #132E51; color: #fff; }
-.ppa-content { padding: 0px 0px 0px 288px; }
+.ppa-content { padding: 0px 0px 0px 288px; background-color: #F9F9F9; }
 .text-pdf { font-size: 13px; }
 
 /* Title */
@@ -36,11 +36,6 @@
   visibility: hidden;
 }
 
-.buttom-nav {
-  position: absolute;
-  bottom: 0px;
-}
-
 /* Footer */
 .footer {
   padding: 24px 0px;
@@ -53,28 +48,41 @@
 }
 
 /* Show submenu when menuOpen state is true */
-.dropdown-enter {
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
+.ppa-accordion {
+  min-height: 50vh;  
 }
 
-.dropdown-enter-active {
-  opacity: 1;
-  max-height: 1000px; /* Adjust to a value greater than the dropdown's height */
-  transition: opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+.ppa-accordion > li > .accordion-toggle {
+  position: absolute;
+	opacity: 0;
+	display: none;
 }
 
-.dropdown-exit {
-  opacity: 1;
-  max-height: 1000px; /* Adjust to a value greater than the dropdown's height */
-  overflow: hidden;
+.ppa-accordion > li > section{
+	height: 0;
+	transition: .8s all;
+	overflow: hidden;
 }
 
-.dropdown-exit-active {
-  opacity: 0;
-  max-height: 0;
-  transition: opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+.ppa-accordion > li > .accordion-toggle:checked ~ label > span.icon-arrow{
+  transform: rotate(90deg);
+  transition: .3s all;
+}
+
+.ppa-accordion > li > .accordion-toggle:not(:checked) ~ label > span.icon-arrow{
+  transform: rotate(0deg);
+  transition: .3s all;
+}
+
+.ppa-accordion > li > .accordion-toggle:checked ~ section{
+  height: 190px;
+}
+
+.ppa-accordion > li > section p {
+  margin: 15px 0;
+  padding: 0 20px;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 /* Icons */
@@ -103,7 +111,7 @@ p.lower-text { font-size: 12px; color: #848884; }
 }
 
 /* Dashboard */
-.title { padding: 15px 0px; text-align: center; }
+.title { font-size: 30px; font-weight: 900; }
 .title h2 { font-size: 20px; text-transform: uppercase; font-weight: 900; }
 
 .pagination li.active {
@@ -188,25 +196,14 @@ p.lower-text { font-size: 12px; color: #848884; }
 
 /* Dashboard */
 
-.form-title { color:white; margin-bottom: 10px; }
-.count-det { font-size: 50px; font-weight: 900; color: #fff; }
+.dashboard-title { color: #7171a6; font-weight: 900; }
+.count-det { font-size: 50px; font-weight: 900; color: #101010; }
 .year-count { position: relative; top: 36px; margin-right: 10px; color: #fff; }
 .icon-here { color: #fff; position: relative; top: 8px; left: 10px; }
+.pending-title { font-weight: 900; font-size: 25px; }
 
 /* Inspection Details */
-.inspection-sec { background-color: #C04000; padding: 10px; margin: 0px 5px; border-radius: 10px; }
-
-/* Facility Details */
-.facility-sec { background-color: #8A9A5B; padding: 10px; margin: 0px 5px; border-radius: 10px; }
-
-/* Vehicle Details */
-.vehicle-sec { background-color: #6495ED; padding: 10px; margin: 0px 5px; border-radius: 10px; }
-
-/* Equipment Details */
-.equipment-sec { background-color: #5D3FD3; padding: 10px; margin: 0px 5px; border-radius: 10px; }
-
-/* Equipment Details */
-.other-sec { background-color: #000080; padding: 10px; margin: 0px 5px; border-radius: 10px; }
+.request-sec { background-color: #fff; box-shadow: 0px 0px 10px #888888; padding: 10px; margin: 0px 5px; border-radius: 10px; }
 
 /* Forms */
 .form-text{ font-size: 15px; }

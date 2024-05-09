@@ -210,6 +210,7 @@ const TopNav = () => {
     .catch((error) => {
       console.error('Error fetching Supervisor Notification data:', error);
     });
+
   };
 
   useEffect(() => {
@@ -228,14 +229,14 @@ const TopNav = () => {
 
   const NotificationCondition = 
     notification?.mappedInsSupData?.length > 0 ||
-    (notification?.mappedInsGSOData?.length > 0 && currentUser.code_clearance == 3) ||
+    (notification?.mappedInsGSOData?.length > 0 && currentUser.code_clearance === 3) ||
     (notification?.closeRequestData?.length > 0 && currentUser.code_clearance === 3) ||
     (notification?.mappedFacGSOData?.length > 0 && currentUser.code_clearance === 3) ||
     (notification?.mappedVehGSOData?.length > 0 && currentUser.code_clearance === 3) ||
-    (notification?.mappedInsAdminData?.length > 0 && currentUser.code_clearance == 1) ||
-    (notification?.mappedFacAdminData?.length > 0 && currentUser.code_clearance == 1) ||
-    (notification?.mappedVehAdminData?.length > 0 && currentUser.code_clearance == 1) ||
-    notification?.mappedInsPersonnelData?.length > 0;
+    (notification?.mappedInsAdminData?.length > 0 && currentUser.code_clearance === 1) ||
+    (notification?.mappedFacAdminData?.length > 0 && currentUser.code_clearance === 1) ||
+    (notification?.mappedVehAdminData?.length > 0 && currentUser.code_clearance === 1) ||
+    (notification?.mappedInsPersonnelData?.length > 0 && notification?.mappedInsPersonnelData?.some(PersonnelData => PersonnelData.assign === currentUser.id));
       
 
   return (
@@ -247,7 +248,7 @@ const TopNav = () => {
           <div className="relative">
             <Menu as="div" className="relative">
 
-              {/* Count Notification */}
+              {/* Display number of Notification */}
               <div>
                 <Menu.Button className="notification-icon">
                   <span className="absolute -inset-1.5" />
@@ -263,17 +264,23 @@ const TopNav = () => {
                     )}
                   </div>
                 ))}
+
                 {/* ----------------------------------------------- */}
+
                 {/* For GSO */}
                 {currentUser.code_clearance == 3 && (
                   notification?.gsoNotiCount ? (<span className="notifications">{notification?.gsoNotiCount}</span>):null
                 )}
+
                 {/* ----------------------------------------------- */}
+                
                 {/* For Admin */}
                 {currentUser.code_clearance == 1 && (
                   notification?.adminNotiCount ? (<span className="notifications">{notification?.adminNotiCount}</span>):null
                 )}
+
                 {/* ----------------------------------------------- */}
+
                 {/* For Personnel */}
                 {notification?.mappedInsPersonnelData?.map((PersonnelData) => (
                   <div key={PersonnelData.id}>
@@ -282,18 +289,10 @@ const TopNav = () => {
                     ):null}   
                   </div>
                 ))}
-                {/* ----------------------------------------------- */}
-                {/* Close Request Count */}
-                {/* === For Inspection Request */}
-                {(notification?.closeRequestData?.length > 0 && currentUser.code_clearance == 3) ? (
-                  <div>
-                    <span className="notifications">{notification?.closeRequestData?.length}</span>
-                  </div>
-                ):null}
 
               </div>
 
-              {/* Notification Message */}
+              {/* Display the message of notification */}
               <div>
               <Transition
                 as={Fragment}
@@ -310,222 +309,243 @@ const TopNav = () => {
 
                   {NotificationCondition ? (
                   <>
+
                     {/* For Supervisor */}
-                    {notification?.mappedInsSupData?.map((SupData) => (
-                      <div key={SupData.id}>
-                        {SupData.supervisor_name == currentUser.id ? (
-                          <Link 
-                            to={`/repairinspectionform/${SupData.id}`}
-                            onClick={handleLinkClick} 
-                            className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
-                          >
-                            <h4 className="text-sm text-gray-400">{SupData.type}</h4>
-                            <h3 className="text-l font-normal leading-6 text-gray-900">
-                              There is a request for <strong>{SupData.requestor}</strong>, and it requires your approval.
-                            </h3>
-                            <h4 className="text-sm text-blue-500 font-bold">{SupData.datetimerequest}</h4>
-                          </Link>
-                        ):(
-                          <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification</h3>
-                        )}
-                      </div>
-                    ))}
+                    {currentUser.code_clearance == 4 ? (
+                    <>
+                      {notification?.mappedInsSupData?.map((SupData) => (
+                        <div key={SupData.id}>
+                          {SupData.supervisor_name == currentUser.id ? (
+                            <Link 
+                              to={`/repairinspectionform/${SupData.id}`}
+                              onClick={handleLinkClick} 
+                              className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400">{SupData.type}</h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                There is a request for <strong>{SupData.requestor}</strong>, and it requires your approval.
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">{SupData.datetimerequest}</h4>
+                            </Link>
+                          ):(
+                            <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification</h3>
+                          )}
+                        </div>
+                      ))}
+                    </>
+                    ):null}
 
                     {/* ---------------------------------------------------------------------------------------------------- */}
 
                     {/* For GSO */}
-                    {/* ==== For Inspection Request ==== */}
-                    {notification?.mappedInsGSOData?.map((GSOData) => (
-                      <div key={GSOData.id}>
-                        <Link 
-                          to={`/repairinspectionform/${GSOData.id}`}
-                          onClick={handleLinkClick} 
-                          className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {GSOData.type} </h4>
-                          <h3 className="text-l font-normal leading-6 text-gray-900">
-
-                            {/* For Division Managers and Port Manager */}
-                            {(GSOData.code == 1 || GSOData.code == 2 || GSOData.code == 4) && (
-                              <div><strong>{GSOData.requestor}</strong>  has a request </div>
-                            )}
-
-                            {/* For GSO */}
-                            {GSOData.code == 3 && (
-                              <div><strong>{GSOData.requestor}</strong>, your request has been approved by your supervisor</div>
-                            )}
-
-                            {/* For Regular and COS */}
-                            {(GSOData.code == 5 || GSOData.code == 6 || GSOData.code == 10) && (
-                              <div><strong>{GSOData.requestor}</strong>  has a request and it has already been approved by the supervisor.</div>
-                            )}
-
-                          </h3>
-                          <h4 className="text-sm text-blue-500 font-bold">{GSOData.datetimerequest}</h4>
-                        </Link>
-                      </div>
-                    ))}
-
-                    {/* === Close Request on Inpection Form === */}
-                    {(notification?.closeRequestData?.length > 0 && currentUser.code_clearance == 3) ? (
-                      notification?.closeRequestData?.map((CloseReq) => (
-                        <div key={CloseReq.id}>
+                    {currentUser.code_clearance == 3 ? (
+                    <>
+                      {/* ==== For Inspection Request ==== */}
+                      {notification?.mappedInsGSOData?.map((GSOData) => (
+                        <div key={GSOData.id}>
                           <Link 
-                          to={`/repairinspectionform/${CloseReq.insp_id}`}
-                          onClick={handleLinkClick} 
-                          className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                            to={`/repairinspectionform/${GSOData.id}`}
+                            onClick={handleLinkClick} 
+                            className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
                           >
-                            <h4 className="text-sm text-gray-400"> {CloseReq.type} </h4>
+                            <h4 className="text-sm text-gray-400"> {GSOData.type} </h4>
                             <h3 className="text-l font-normal leading-6 text-gray-900">
-                              Hello {currentUser.gender == 'Female' ? ("Ma'am"):("Sir")} {currentUser.fname}. <strong>(Control No. {CloseReq.insp_id})</strong> is complete and ready for closure.
+
+                              {/* For Division Managers and Port Manager */}
+                              {(GSOData.code == 1 || GSOData.code == 2 || GSOData.code == 4) && 
+                              (
+                                <div>There is a request on <strong>{GSOData.requestor}</strong></div>
+                              )}
+
+                              {/* For GSO */}
+                              {GSOData.code == 3 && 
+                              (
+                                <div>Your request has been approved by your supervisor</div>
+                              )}
+
+                              {/* For Regular and COS */}
+                              {(GSOData.code == 5 || GSOData.code == 6 || GSOData.code == 10) && 
+                              (
+                                <div>The request for <strong>{GSOData.requestor}</strong> has been approved by the supervisor</div>
+                              )}
+
                             </h3>
-                            <h4 className="text-sm text-blue-500 font-bold">{CloseReq.datetimerequest}</h4>
+                            <h4 className="text-sm text-blue-500 font-bold">{GSOData.datetimerequest}</h4>
                           </Link>
                         </div>
-                      ))
-                    ):null}
+                      ))}
 
-                    {/* === For Facility Request === */}
-                    {notification?.mappedFacGSOData?.map((GSOFItem) => (
-                      <div key={GSOFItem.id}>
-                        <Link 
-                          to={`/facilityvenueform/${GSOFItem.id}`} 
-                          onClick={handleLinkClick}
-                          className="hover:bg-gray-100 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {GSOFItem.type} </h4>
-                          {GSOFItem.obrComment == null ? (
-                            <h3 className="text-l font-normal leading-6 text-gray-900">
-                            {GSOFItem.req_id == 3 ? (
-                              <div><strong>Your</strong> request has been approved by the admin manager.</div>
-                            ):GSOFItem.req_id == 1 ? (
-                              <div>Here's the request on <strong>{GSOFItem.requestor}</strong>.</div>
-                            ):
-                            (
-                              <div>A request for <strong>{GSOFItem.requestor}</strong> has been approved by the admin manager.</div>
-                            )}
-                            </h3>
-                          ):(
-                            <h3 className="text-l font-normal leading-6 text-gray-900">
-                              <div>
-                                Hello {currentUser.gender == 'Male' ? "Sir":"Maam"} {currentUser.fname}. This form needs to be close <strong>(Control No. {GSOFItem.id})</strong>.
-                              </div>
-                            </h3>
-                          )}
-                          <h4 className="text-sm text-blue-500 font-bold">
-                            {formatTimeDifference(GSOFItem.datetimerequest)}
-                          </h4>
-                        </Link>
-                      </div>
-                    ))}
+                      {/* === Close Request on Inpection Form === */}
+                      {(notification?.closeRequestData?.length > 0 && currentUser.code_clearance == 3) ? (
+                        notification?.closeRequestData?.map((CloseReq) => (
+                          <div key={CloseReq.id}>
+                            <Link 
+                            to={`/repairinspectionform/${CloseReq.insp_id}`}
+                            onClick={handleLinkClick} 
+                            className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400"> {CloseReq.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                Hello {currentUser.gender == 'Female' ? ("Ma'am"):("Sir")} {currentUser.fname}. <strong>(Control No. {CloseReq.insp_id})</strong> is complete and ready for closure.
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">{CloseReq.datetimerequest}</h4>
+                            </Link>
+                          </div>
+                        ))
+                      ):null}
 
-                    {/* === For Vehicle Slip Request === */}
-                    {notification?.mappedVehGSOData?.map((GSOVItem) => (
-                      <div key={GSOVItem.id}>
-                        <Link 
-                          to={`/vehicleslipform/${GSOVItem.id}`} 
-                          onClick={handleLinkClick}
-                          className="hover:bg-gray-100 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {GSOVItem.type} </h4>
-                          <h3 className="text-l font-normal leading-6 text-gray-900">
-                            {GSOVItem.status == 5 ? (
-                            <>
-                              {GSOVItem.req_id == currentUser.id ? (
-                                <div>Here's the request link <strong>{GSOVItem.requestor}</strong></div>
-                              ):(
-                                <div>There is a request for <strong>{GSOVItem.requestor}</strong>.</div>
+                      {/* === For Facility Request === */}
+                      {notification?.mappedFacGSOData?.map((GSOFItem) => (
+                        <div key={GSOFItem.id}>
+                          <Link 
+                            to={`/facilityvenueform/${GSOFItem.id}`} 
+                            onClick={handleLinkClick}
+                            className="hover:bg-gray-100 block p-4 transition duration-300"
+                          >
+                            <h4 className="text-sm text-gray-400"> {GSOFItem.type} </h4>
+                            {GSOFItem.obrComment == null ? (
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                              {GSOFItem.req_id == 3 ? (
+                                <div><strong>Your</strong> request has been approved by the admin manager.</div>
+                              ):GSOFItem.req_id == 1 ? (
+                                <div>Here's the request on <strong>{GSOFItem.requestor}</strong>.</div>
+                              ):
+                              (
+                                <div>A request for <strong>{GSOFItem.requestor}</strong> has been approved by the admin manager.</div>
                               )}
-                            </>
+                              </h3>
                             ):(
-                            <>
-                              {GSOVItem.req_id == currentUser.id ? (
-                                <div><strong>Your</strong> request has been approved</div>
-                              ):(
-                                <div><strong>{GSOVItem.requestor}</strong>'s request has been approved.</div>
-                              )}
-                            </>  
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                <div>
+                                  Hello {currentUser.gender == 'Male' ? "Sir":"Maam"} {currentUser.fname}. This form needs to be close <strong>(Control No. {GSOFItem.id})</strong>.
+                                </div>
+                              </h3>
                             )}
-                          </h3>
-                          <h4 className="text-sm text-blue-500 font-bold">
-                            {formatTimeDifference(GSOVItem.datetimerequest)}
-                          </h4>
-                        </Link>
-                      </div>
-                    ))}
+                            <h4 className="text-sm text-blue-500 font-bold">
+                              {formatTimeDifference(GSOFItem.datetimerequest)}
+                            </h4>
+                          </Link>
+                        </div>
+                      ))}
+
+                      {/* === For Vehicle Slip Request === */}
+                      {notification?.mappedVehGSOData?.map((GSOVItem) => (
+                        <div key={GSOVItem.id}>
+                          {currentUser.code_clearance == 3 ? (
+                            <Link 
+                              to={`/vehicleslipform/${GSOVItem.id}`} 
+                              onClick={handleLinkClick}
+                              className="hover:bg-gray-100 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400"> {GSOVItem.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                {GSOVItem.status == 5 ? (
+                                <>
+                                  {GSOVItem.req_id == currentUser.id ? (
+                                    <div>Here's the request link <strong>{GSOVItem.requestor}</strong></div>
+                                  ):(
+                                    <div>There is a request for <strong>{GSOVItem.requestor}</strong>.</div>
+                                  )}
+                                </>
+                                ):(
+                                <>
+                                  {GSOVItem.req_id == currentUser.id ? (
+                                    <div><strong>Your</strong> request has been approved</div>
+                                  ):(
+                                    <div><strong>{GSOVItem.requestor}</strong>'s request has been approved.</div>
+                                  )}
+                                </>  
+                                )}
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">
+                                {formatTimeDifference(GSOVItem.datetimerequest)}
+                              </h4>
+                            </Link>
+                          ):null}
+                        </div>
+                      ))}
+                    </>
+                    ):null}
 
                     {/* ---------------------------------------------------------------------------------------------------- */}
 
                     {/* For Admin */}
-                    {/* ==== For Inspection Request ==== */}
-                    {notification?.mappedInsAdminData?.map((AdminData) => (
-                      <div key={AdminData.id}>
-                        <Link 
-                          to={`/repairinspectionform/${AdminData.id}`}
-                          onClick={handleLinkClick} 
-                          className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {AdminData.type} </h4>
-                          <h3 className="text-l font-normal leading-6 text-gray-900">
-                            {AdminData.supervisor_name == currentUser.id ? (
-                              <div><strong>{AdminData.requestor}</strong>, your request has been completed by the GSO.</div>
-                            ):(
-                              <div><strong>{AdminData.requestor}'s</strong> request has been completed by the GSO and now requires your approval.</div>
-                            )}
-                          </h3>
-                          <h4 className="text-sm text-blue-500 font-bold">{AdminData.datetimerequest}</h4>
-                        </Link>
-                      </div>
-                    ))}
+                    {currentUser.code_clearance == 1 ? (
+                    <>
+                      {/* ==== For Inspection Request ==== */}
+                      {notification?.mappedInsAdminData?.map((AdminData) => (
+                        <div key={AdminData.id}>
+                          <Link 
+                            to={`/repairinspectionform/${AdminData.id}`}
+                            onClick={handleLinkClick} 
+                            className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
+                          >
+                            <h4 className="text-sm text-gray-400"> {AdminData.type} </h4>
+                            <h3 className="text-l font-normal leading-6 text-gray-900">
+                              {AdminData.supervisor_name == currentUser.id ? (
+                                <div>Your request has been filled out by the GSO</div>
+                              ):(
+                                <div>The request for <strong>{AdminData.requestor}</strong> has been filled out by the GSO and now requires your approval</div>
+                              )}
+                            </h3>
+                            <h4 className="text-sm text-blue-500 font-bold">{AdminData.datetimerequest}</h4>
+                          </Link>
+                        </div>
+                      ))}
 
-                    {/* === For Facility Request === */}
-                    {notification?.mappedFacAdminData?.map((AdminFacItem) => (
-                      <div key={AdminFacItem.id}>
-                        <Link 
-                          to={`/facilityvenueform/${AdminFacItem.id}`} 
-                          onClick={handleLinkClick}
-                          className="hover:bg-gray-100 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {AdminFacItem.type} </h4>
-                          <h3 className="text-l font-normal leading-6 text-gray-900">
-                            There is a request for <strong>{AdminFacItem.requestor}</strong>, and it requires your approval. 
-                          </h3>
-                          <h4 className="text-sm text-blue-500 font-bold">
-                            {formatTimeDifference(AdminFacItem.datetimerequest)}
-                          </h4>
-                        </Link>
-                      </div>
-                    ))}
+                      {/* === For Facility Request === */}
+                      {notification?.mappedFacAdminData?.map((AdminFacItem) => (
+                        <div key={AdminFacItem.id}>
+                          <Link 
+                            to={`/facilityvenueform/${AdminFacItem.id}`} 
+                            onClick={handleLinkClick}
+                            className="hover:bg-gray-100 block p-4 transition duration-300"
+                          >
+                            <h4 className="text-sm text-gray-400"> {AdminFacItem.type} </h4>
+                            <h3 className="text-l font-normal leading-6 text-gray-900">
+                              There is a request for <strong>{AdminFacItem.requestor}</strong>, and it requires your approval. 
+                            </h3>
+                            <h4 className="text-sm text-blue-500 font-bold">
+                              {formatTimeDifference(AdminFacItem.datetimerequest)}
+                            </h4>
+                          </Link>
+                        </div>
+                      ))}
 
-                    {/* === For Vehicle Request === */}
-                    {notification?.mappedVehAdminData?.map((AdminVehItem) => (
-                      <div key={AdminVehItem.id}>
-                        <Link 
-                          to={`/vehicleslipform/${AdminVehItem.id}`} 
-                          onClick={handleLinkClick}
-                          className="hover:bg-gray-100 block p-4 transition duration-300"
-                        >
-                          <h4 className="text-sm text-gray-400"> {AdminVehItem.type} </h4>
-                          <h3 className="text-l font-normal leading-6 text-gray-900">
-                            {AdminVehItem.req_id == currentUser.id ? (
-                              <div><strong>Your</strong> request has been completed by the GSO and now requires your approval.</div>
-                            ):(
-                              <div>The request for <strong>{AdminVehItem.requestor}</strong> has been completed by the GSO and now requires your approval.</div>
-                            )}
-                          </h3>
-                          <h4 className="text-sm text-blue-500 font-bold">
-                            {formatTimeDifference(AdminVehItem.datetimerequest)}
-                          </h4>
-                        </Link>
-                      </div>
-                    ))}
+                      {/* === For Vehicle Request === */}
+                      {notification?.mappedVehAdminData?.map((AdminVehItem) => (
+                        <div key={AdminVehItem.id}>
+                          {currentUser.code_clearance == 1 ? (
+                            <Link 
+                              to={`/vehicleslipform/${AdminVehItem.id}`} 
+                              onClick={handleLinkClick}
+                              className="hover:bg-gray-100 block p-4 transition duration-300"
+                            >
+                              <h4 className="text-sm text-gray-400"> {AdminVehItem.type} </h4>
+                              <h3 className="text-l font-normal leading-6 text-gray-900">
+                                {AdminVehItem.req_id == currentUser.id ? (
+                                  <div><strong>Your</strong> request has been completed by the GSO and now requires your approval.</div>
+                                ):(
+                                  <div>The request for <strong>{AdminVehItem.requestor}</strong> has been completed by the GSO and now requires your approval.</div>
+                                )}
+                              </h3>
+                              <h4 className="text-sm text-blue-500 font-bold">
+                                {formatTimeDifference(AdminVehItem.datetimerequest)}
+                              </h4>
+                            </Link>
+                          ):null}
+                          
+                        </div>
+                      ))}
+                    </>
+                    ):null}
 
                     {/* ---------------------------------------------------------------------------------------------------- */}
 
                     {/* For Personnel */}
                     {notification?.mappedInsPersonnelData?.map((PersonnelData) => (
                       <div key={PersonnelData.id}>
-                        {PersonnelData.assign == currentUser.id ? (
+                        {PersonnelData.assign == currentUser.id && (
                           <Link 
                           to={`/repairinspectionform/${PersonnelData.id}`}
                           onClick={handleLinkClick} 
@@ -534,7 +554,7 @@ const TopNav = () => {
                             <h4 className="text-sm text-gray-400"> {PersonnelData.type} </h4>
                             {PersonnelData.status == 4 && (
                               <h3 className="text-l font-normal leading-6 text-gray-900">
-                                Hello <strong>{currentUser.fname}</strong>, there a task for you on {PersonnelData.requestor}'s request (Control No: {PersonnelData.id})
+                                There is a assign for you on {PersonnelData.requestor}'s request (Control No: {PersonnelData.id})
                               </h3>
                             )}
                             {PersonnelData.status == 3 && (
@@ -544,16 +564,16 @@ const TopNav = () => {
                             )}
                             <h4 className="text-sm text-blue-500 font-bold">{PersonnelData.datetimerequest}</h4>
                           </Link>  
-                        ):(
-                          <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification</h3>
                         )}
                       </div>
                     ))}
 
-                  </>
+                  </>  
                   ):(
                     <h3 className="text-l font-normal leading-6 text-gray-900 p-5 text-center">No Notification</h3>
                   )}
+
+
 
                 </Menu.Items>
               </Transition>

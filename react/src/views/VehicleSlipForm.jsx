@@ -343,11 +343,11 @@ export default function PrePostRepairForm(){
   const justclose = () => { setShowPopup(false); };
 
   // Restrictions
-  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
+  const UserHere = vehicleForms?.vehicleForm?.user_id === currentUser.id;
+  const Authorize = UserHere || (userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4');
+  const Authority = userRole === 'h4ck3rZ@1Oppa' || userRole === '4DmIn@Pp4' || userRole === 'Pm@PP4' || userRole === 'P3rs0nn3lz@pPa';
 
-  return Authorize ?(
-  <PageComponent title="Request For Vehicle Slip">
-    {isLoading ? (
+  return isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -356,12 +356,21 @@ export default function PrePostRepairForm(){
       />
       <span className="ml-2 animate-heartbeat">Loading Form</span>
     </div>
-    ):(
-    <>
-      {/* Back to List */}
-      <button className="px-6 py-2 btn-default">
-        <Link to="/vehiclesliprequestform">Back to Request List</Link>
-      </button>
+  ):(
+  <>
+    {Authorize ? (
+    <PageComponent title="Request For Vehicle Slip">
+
+      {/* Back button */}
+      {Authority ? (
+          <button className="px-6 py-2 btn-default">
+            <Link to="/vehiclesliprequestform">Back to Request List</Link>
+          </button>
+      ):(
+        <button className="px-6 py-2 btn-default">
+          <Link to="/">Back to Dashboard</Link>
+        </button>
+      )}
 
       {/* Slip No */}
       <div className="flex items-center mb-6 mt-4 font-roboto">
@@ -1189,34 +1198,34 @@ export default function PrePostRepairForm(){
                       </td>
                     </tr>
 
-{/* Admin Manager */}
-<tr>
-  <td colSpan={2} className="pt-4">
+                    {/* Admin Manager */}
+                    <tr>
+                      <td colSpan={2} className="pt-4">
 
-    <div className="w-3/4 text-sm font-arial font-bold">
-      {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
-      vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
-    </div>
+                        <div className="w-3/4 text-sm font-arial font-bold">
+                          {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
+                          vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
+                        </div>
 
-    <div className="relative pt-2">
-      {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
-        <img
-          src={vehicleForms?.manager?.manager_signature}
-          style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
-          alt="Signature"
-        />
-      )}
-    </div>
+                        <div className="relative pt-2">
+                          {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
+                            <img
+                              src={vehicleForms?.manager?.manager_signature}
+                              style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                              alt="Signature"
+                            />
+                          )}
+                        </div>
 
-    <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
-      {vehicleForms?.manager?.manager_name}
-    </div> 
-    <div className="w-3/4 text-center text-sm relative">
-      Adminstrative Division Manager
-    </div>  
+                        <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
+                          {vehicleForms?.manager?.manager_name}
+                        </div> 
+                        <div className="w-3/4 text-center text-sm relative">
+                          Adminstrative Division Manager
+                        </div>  
 
-  </td>
-</tr>
+                      </td>
+                    </tr>
 
 </table>
 
@@ -1230,14 +1239,14 @@ export default function PrePostRepairForm(){
           </div>
         </div>
       )}
-
-    </>
+      
+    </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
     )}
-  </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; // Return null to avoid any unexpected rendering
-    })()
+  </>
   );
 }

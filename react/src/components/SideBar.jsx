@@ -6,21 +6,18 @@ import { Outlet } from 'react-router';
 import { useUserStateContext } from '../context/ContextProvider';
 import axiosClient from '../axios';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [requestList, setRequestList] = useState(false);
   const { currentUser, setCurrentUser, setUserToken  } = useUserStateContext();
+  const [activeAccordion, setActiveAccordion] = useState(null);
+
+  const handleToggle = (index) => {
+    setActiveAccordion(index === activeAccordion ? null : index);
+  };
 
   const navigate = useNavigate();
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const toggleList = () => {
-    setRequestList(!requestList);
-  };
 
   const logout = () => {
     // Perform the logout logic
@@ -33,11 +30,14 @@ const Sidebar = () => {
     });
   };
 
+  const restrictions = currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10' ;
+  const onlyNerd = currentUser.code_clearance == '10' ;
+
   return (
     <div className="w-full h-full font-roboto">
       <div>
         {/* Side Bar */}
-        <div style={{ minHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className="w-72 bg-ppa-themecolor shadow md:h-full flex">
+        <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className="w-72 bg-ppa-themecolor shadow md:h-full flex">
           <div className="px-8">
             {/* Logo */}
             <div className="h-30 w-full flex items-center">
@@ -51,7 +51,7 @@ const Sidebar = () => {
             </div>
 
             {/* Nav */}
-            <ul className="mt-10">
+            <ul className="mt-10 ppa-accordion">
 
               {/* Dashboard */}
               <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
@@ -60,55 +60,46 @@ const Sidebar = () => {
                 </Link>
               </li>
 
-              {/* Request Forms */}
-              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6" data-toggle="collapse" onClick={toggleMenu}>
-                <div className="flex items-center">
-                  <p className="text-base leading-4 text-lg">Request Forms</p>
-                </div>
-              </li>
-              <CSSTransition
-                in={menuOpen}
-                timeout={300}
-                classNames="dropdown"
-                unmountOnExit
-              >
-                {/* Dropdown menu */}
-                <ul id="menu1" className={`pl-4 mb-6 menu ${menuOpen ? "menuOpen" : "hidden"}`}>
-                  <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                    <Link to="/requestinspectionform">Pre/Post Repair Inspection Form</Link>
-                  </li>
-                  <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                    <Link to="/facilityrequestform">Facility / Venue Request Form</Link>
-                  </li>
-                  <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                    <Link to="/vehiclesliprequestform">Vehicle Slip Form</Link>
-                  </li>
-                </ul>
-              </CSSTransition>
-
-              {/* My request */}
-              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
+              {/* My Request */}
+              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
                 <Link to={`/myrequest/${currentUser.id}`} className="flex items-center">
                   <p className="text-base leading-4 text-lg">My Request</p>
                 </Link>
               </li>
 
-              {/* Request List */}
-              {currentUser.code_clearance == '1' || currentUser.code_clearance == '3' || currentUser.code_clearance == '4' || currentUser.code_clearance == '10' ? (
-                <>
-                  <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6" data-toggle="collapse" onClick={toggleList}>
-                    <div className="flex items-center">
-                      <p className="text-base leading-4 text-lg">Request List</p>
-                    </div>
-                  </li>
-                  <CSSTransition
-                    in={requestList}
-                    timeout={300}
-                    classNames="dropdown"
-                    unmountOnExit
-                  >
-                    {/* Dropdown menu */}
-                    <ul id="menu1" className={`pl-4 mb-6 menu ${requestList ? "requestList" : "hidden"}`}>
+              {/* Request Forms */}
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+                <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
+                <label for="toggle1" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                  <span>Request Forms</span>
+                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                </label>
+                <section>
+                  <ul id="menu1" className="pl-3 mt-4">
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/requestinspectionform">Pre/Post Repair Inspection Form</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/facilityrequestform">Facility / Venue Request Form</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                      <Link to="/vehiclesliprequestform">Vehicle Slip Form</Link>
+                    </li>
+                  </ul>
+                </section>
+              </li>
+
+              {restrictions && (
+              <>
+                {/* Request List */}
+                <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+                  <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)}/>
+                  <label for="toggle2" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                    <span>Request List</span>
+                    <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                  </label>
+                  <section>
+                    <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
                       </li>
@@ -116,27 +107,54 @@ const Sidebar = () => {
                         <Link to="/facilityvenuerequestform">Facility / Venue Request Form</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                        <Link to="/form2">Vehicle Slip Form</Link>
+                        <Link to="/vehiclesliprequestformlist">Vehicle Slip Form</Link>
                       </li>
                     </ul>
-                  </CSSTransition>
-                </>
-              ) : null}
+                  </section>
+                </li>
+              </>
+              )}
+
+              {onlyNerd && (
+              <>
+                <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+                  <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
+                  <label for="toggle3" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                    <span>Personnel</span>
+                    <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                  </label>
+                  <section>
+                    <ul id="menu1" className="pl-3 mt-4">
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/ppauserlist">User List</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/ppauserassign">Assign Personnel</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                        <Link to="/pparegistration">User Registration</Link>
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+              </>
+              )}
+
             </ul>
 
-            {/* Buttom Nav */}
             <ul className="buttom-nav">
-              <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-6" data-toggle="collapse">
+              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className="flex items-center">
                   <a onClick={logout} className="text-base leading-4 text-lg">Logout</a>
                 </div>
               </li>
-              <li className="flex w-full justify-between text-gray-300 cursor-pointer items-center mb-6" data-toggle="collapse" onClick={toggleList}>
+              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className="flex items-center">
                   <p className="text-base leading-4 text-sm">User: {currentUser.fname} {currentUser.mname}. {currentUser.lname}</p>
                 </div>
               </li>
             </ul>
+            
           </div>
         </div>
 

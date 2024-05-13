@@ -47,7 +47,7 @@ const Sidebar = () => {
             <div className="text-title">
               <span className="first-letter">J</span>ob <span className="first-letter">O</span>rder <br />
               <span className="first-letter">M</span>anagement <br />
-              <span className="first-letter">S</span>ystem
+              <span className="first-letter">S</span>ystem v2
             </div>
 
             {/* Nav */}

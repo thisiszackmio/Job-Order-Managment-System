@@ -9,19 +9,25 @@ import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function RequestFormFacility(){
 
-  const {id} = useParams();
   const { currentUser } = useUserStateContext();
 
   const today = new Date().toISOString().split('T')[0];
+  const currentDate = new Date();
 
-  const navigate = useNavigate ();
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+    const hours = date.getHours().toString().padStart(2, '0'); // Add leading zero if needed
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // Add leading zero if needed
+    const seconds = date.getSeconds().toString().padStart(2, '0'); // Add leading zero if needed
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+  
+  const currentDateFormatted = formatDate(currentDate);
 
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/facilityrequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
+  const [fieldMissing, setFieldMissing] = useState(false);
 
   const [DateEndMin, setDateEndMin] = useState(today);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -44,47 +50,6 @@ export default function RequestFormFacility(){
   const [confCheck, setConfCheck] = useState(false);
   const [dormCheck, setDormCheck] = useState(false);
   const [otherCheck, setOtherCheck] = useState(false);
-
-  const getStartDateTimestamp = () => {
-    // Check if DateStart and timeStart are not empty
-    if (DateStart && timeStart) {
-      // Combine DateStart and timeStart into a single string
-      const combinedDateTimeString = `${DateStart}T${timeStart}`;
-      
-      // Create a Date object from the combined string
-      const combinedDateTime = new Date(combinedDateTimeString);
-      
-      // Get the timestamp
-      const timestamp = combinedDateTime.getTime();
-
-      return timestamp;
-    }
-
-    // Return null if DateStart or timeStart is empty
-    return null;
-  }
-
-  const getEndDateTimestamp = () => {
-    // Check if DateEnd and timeEnd are not empty
-    if (DateEnd && timeEnd) {
-      // Combine DateEnd and timeEnd into a single string
-      const combinedDateTimeString = `${DateEnd}T${timeEnd}`;
-      
-      // Create a Date object from the combined string
-      const combinedDateTime = new Date(combinedDateTimeString);
-      
-      // Get the timestamp
-      const timestamp = combinedDateTime.getTime();
-  
-      return timestamp;
-    }
-  
-    // Return null if DateEnd or timeEnd is empty
-    return null;
-  };
-  
-  const timestampstart = getStartDateTimestamp();
-  const timestampend = getEndDateTimestamp();
 
   // For checkbox
   const handleCheckboxChange = (setStateFunction, isChecked, ...otherStateFunctions) => {
@@ -190,6 +155,7 @@ export default function RequestFormFacility(){
     // Update the state with the sanitized input value
     setNoOfMicrophone(inputValue);
   };
+  
 
   //OPR Instruction (For Admin Manager Only)
   const [OprInstruct, setOprInstruct] = useState('');
@@ -207,6 +173,11 @@ export default function RequestFormFacility(){
   const [getFemaleList, setGetFemaleList] = useState('');
 
   const [DormOtherField, setDormOtherField]= useState('');
+
+  // Other variables
+  const [checkAvailabilityBtn, setCheckAvailabilityBtn] = useState(true);
+  const [activateFacility, setActivateFacility] = useState(false);
+  const [activateDorm, setActivateDorm] = useState(false);
 
   //Count Male Guest
   const generateNumberedText = (lines) => {
@@ -268,6 +239,105 @@ export default function RequestFormFacility(){
       setNototifications("warning"); 
   }
 
+  const handleCancelForm = () => {
+    setCheckTable(false);
+    setNoOfTable('');
+    setCheckChairs(false);
+    setNoOfChairs('');
+    setCheckProjector(false);
+    setCheckProjectorScreen(false);
+    setCheckDocumentCamera(false);
+    setCheckLaptop(false);
+    setCheckTelevision(false);
+    setCheckSoundSystem(false);
+    setCheckVideoke(false);
+    setCheckMicrphone(false);
+    setNoOfMicrophone('');
+    setInputFacErrors(null);
+
+    setActivateFacility(false);
+    setActivateDorm(false);
+    setCheckAvailabilityBtn(true);
+  }
+
+  // Check Availability
+  const checkAvailability = (event) => {
+    event.preventDefault();
+
+    setSubmitLoading(true);
+
+    const checkRequest = {
+      date_start: DateStart,
+      time_start: timeStart +':00',
+      date_end: DateEnd,
+      time_end: timeEnd +':00',
+      mph: mphCheck,
+      conference: confCheck,
+      dorm: dormCheck,
+      other: otherCheck,
+    };
+
+    if(!reqOffice || !titleReq || !DateStart || !timeStart || !DateEnd || !timeEnd || (!mphCheck && !confCheck && !dormCheck && !otherCheck)){
+      setFieldMissing(true);
+      setSubmitLoading(false);
+    }else{
+      
+      axiosClient
+      .get(`/checkavailability`, { params: checkRequest })
+      .then((response) => {
+        const responseData = response.data;
+        if (responseData.message === 'Wrong Date') {
+          setShowPopup(true);
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Invalid Date</p>
+              <p>The date you entered is before today's date.</p>
+            </div>
+          );
+          setNototifications("error"); 
+        }
+        else if(responseData.message === 'EOD'){
+          setShowPopup(true);
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Invalid Date</p>
+              <p>Please check the Date and Time of Activity</p>
+            </div>
+          );
+          setNototifications("error");
+        }
+        else if(responseData.message === 'Not Vacant'){
+          setShowPopup(true);
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Not Vacant</p>
+              <p>This Facility is not yet available. To see it click <a className="text-blue-900 font-bold" href="http://localhost:9200/facilityvenuerequestform">here</a></p>
+            </div>
+          );
+          setNototifications("error");
+        }
+        else if(responseData.message === 'Vacant'){
+          if(mphCheck || confCheck || otherCheck){
+            setActivateFacility(true);
+            setCheckAvailabilityBtn(false);
+          }
+          else if(dormCheck){
+            setActivateDorm(true);
+            setCheckAvailabilityBtn(false);
+          }
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+          console.error('Error fetching data:', error);
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+
+    }
+  }
+
   const none = 'N/A';
 
   //Submit the Form
@@ -276,7 +346,8 @@ export default function RequestFormFacility(){
 
     setSubmitLoading(true);
 
-    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Facility/Venue`
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Facility/Venue`;
+    const adminMessage = "The request has been received by the GSO";
 
     const requestData = {
       date_requested: today,
@@ -305,34 +376,15 @@ export default function RequestFormFacility(){
       television: checkTelevision,
       sound_system: checkSoundSystem,
       videoke: checkVideoke,
-      name_male: none,
-      name_female: none,
-      other_details: none,
+      name_male: getMaleList ? getMaleList : "N/A",
+      name_female: getFemaleList ? getFemaleList : "N/A",
+      other_details: DormOtherField ? DormOtherField : "N/A",
       obr_instruct: oprInstrucValue,
       admin_approval: output,
       date_approve: date_request,
-      remarks: 'Pending',
+      remarks: currentUser.code_clearance == 1 ? adminMessage : "Waiting for the admin manager's approval",
       logs: logs
     };
-
-    if(timestampstart > timestampend){
-      setShowPopup(true);
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Error</p>
-          <p>Please check the Date and Time of Activity</p>
-        </div>
-      );
-      setNototifications("error");
-      setSubmitLoading(false);
-      return;
-    }
-
-    if (dormCheck) {
-      requestData.name_male = getMaleList || none;
-      requestData.name_female = getFemaleList || none;
-      requestData.other_details = DormOtherField || none;
-    }
 
     axiosClient
     .post("facilityformrequest", requestData)
@@ -367,7 +419,7 @@ export default function RequestFormFacility(){
 
   const closePopup = () => {
     setShowPopup(false);
-    window.location.assign(`/myrequestfacilityvenueform/${currentUser.id}`);
+    window.location.href = `/myrequest/${currentUser.id}`;
   };
   
 
@@ -380,12 +432,12 @@ export default function RequestFormFacility(){
       <div>
         <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
         <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
-        <p className="text-xs font-bold text-red-500">Click <Link to={`/facilityvenuerequestform`} className="text-gray-400">here</Link> to check the schedule to avoid facility conflicts</p>
       </div>
 
       {/* Main form */}
       <div className="grid grid-cols-2 gap-4">
 
+        {/* Form */}
         <div className="col-span-1">
 
           {/* Date */}
@@ -401,7 +453,7 @@ export default function RequestFormFacility(){
                 name="rep_date"
                 id="rep_date"
                 defaultValue= {today}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 readOnly
               />
             </div>
@@ -411,7 +463,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Requesting Office/Division:<span className="text-red-500">*</span>
+                Requesting Office/Division:
               </label>
             </div>
             <div className="w-64">
@@ -422,9 +474,10 @@ export default function RequestFormFacility(){
                 autoComplete="rf_request"
                 value={reqOffice}
                 onChange={ev => setRegOffice(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!reqOffice && inputFacErrors?.request_office && (
+              {(!reqOffice && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the Office/Division here</p>
               )}
             </div>
@@ -434,7 +487,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-              Title/Purpose of Activity:<span className="text-red-500">*</span>
+              Title/Purpose of Activity:
               </label> 
             </div>
             <div className="w-64">
@@ -445,9 +498,10 @@ export default function RequestFormFacility(){
                 autoComplete="purpose"
                 value={titleReq}
                 onChange={ev => setTitleReq(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!titleReq && inputFacErrors?.title_of_activity && (
+              {(!titleReq && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the Title/Purpose of Activity</p>
               )}
             </div>
@@ -457,7 +511,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                Date of Activity (Start):<span className="text-red-500">*</span>
+                Date of Activity (Start):
               </label> 
             </div>
             <div className="w-64">
@@ -471,9 +525,10 @@ export default function RequestFormFacility(){
                   setDateEndMin(ev.target.value);
                 }}
                 min={today}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!DateStart && inputFacErrors?.date_start && (
+              {(!DateStart && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the Start Date of Activity</p>
               )}
             </div>
@@ -483,7 +538,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                Time of Activity (Start):<span className="text-red-500">*</span>
+                Time of Activity (Start):
               </label> 
             </div>
             <div className="w-64">
@@ -493,9 +548,10 @@ export default function RequestFormFacility(){
                 id="time_start"
                 value={timeStart}
                 onChange={ev => setTimeStart(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!timeStart && inputFacErrors?.time_start && (
+              {(!timeStart && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the Start Time of Activity</p>
               )}
             </div>
@@ -505,7 +561,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                Date of Activity (End):<span className="text-red-500">*</span>
+                Date of Activity (End):
               </label> 
             </div>
             <div className="w-64">
@@ -522,9 +578,10 @@ export default function RequestFormFacility(){
                   }
                 }}
                 min={DateEndMin}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!DateEnd && inputFacErrors?.date_end && (
+              {(!DateEnd && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the End Date of Activity</p>
               )}
             </div>
@@ -534,7 +591,7 @@ export default function RequestFormFacility(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-56">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                Time of Activity (End):<span className="text-red-500">*</span>
+                Time of Activity (End):
               </label> 
             </div>
             <div className="w-64">
@@ -544,16 +601,18 @@ export default function RequestFormFacility(){
                 id="time_end"
                 value={timeEnd}
                 onChange={ev => setTimeEnd(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                readOnly={activateFacility}
               />
-              {!timeEnd && inputFacErrors?.time_end && (
+              {(!timeEnd && fieldMissing) && (
                 <p className="font-roboto form-validation">You must input the End Time of Activity</p>
               )}
             </div>
           </div>
 
         </div>
-
+        
+        {/* Checkbox */}
         <div className="col-span-1">
 
           <div className="mt-6 font-roboto">
@@ -572,7 +631,8 @@ export default function RequestFormFacility(){
                   type="checkbox"
                   checked={mphCheck}
                   onChange={(ev) => {
-                    handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck);
+                    const isChecked = ev.target.checked ? 1 : 0;
+                    handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck, setDormCheck);
                     if (!ev.target.checked) {
                       setCheckTable(false);
                       setNoOfTable(null);
@@ -590,8 +650,10 @@ export default function RequestFormFacility(){
                       setCheckProjectorScreen(false);
                       setCheckProjector(false);
                     }
+                    setMphCheck(isChecked);
                   }}
                   class={`focus:ring-gray-400 h-5 w-5 ${mphCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  disabled={activateFacility}
                 />
               </div>
               <div class="ml-3">
@@ -609,7 +671,8 @@ export default function RequestFormFacility(){
                   type="checkbox"
                   checked={confCheck}
                   onChange={(ev) => {
-                    handleCheckboxChange(setConfCheck, ev.target.checked, setMphCheck, setOtherCheck);
+                    const isChecked = ev.target.checked ? 1 : 0;
+                    handleCheckboxChange(setConfCheck, ev.target.checked, setOtherCheck, setDormCheck, setMphCheck);
                     if (!ev.target.checked) {
                       setCheckTable(false);
                       setNoOfTable(null);
@@ -627,8 +690,10 @@ export default function RequestFormFacility(){
                       setCheckProjectorScreen(false);
                       setCheckProjector(false);
                     }
+                    setConfCheck(isChecked);
                   }}
                   class={`focus:ring-gray-400 h-5 w-5 ${confCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  disabled={activateFacility}
                 />
               </div>
               <div class="ml-3">
@@ -645,8 +710,13 @@ export default function RequestFormFacility(){
                   id="dormitory-checkbox"
                   type="checkbox"
                   checked={dormCheck}
-                  onChange={(ev) => handleCheckboxChange(setDormCheck, ev.target.checked)}
+                  onChange={(ev) => {
+                    const isChecked = ev.target.checked ? 1 : 0;
+                    handleCheckboxChange(setDormCheck, ev.target.checked, setOtherCheck, setMphCheck, setConfCheck);
+                    setDormCheck(isChecked);
+                  }}
                   class={`focus:ring-gray-400 h-5 w-5 ${dormCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  disabled={activateFacility}
                 />
               </div>
               <div class="ml-3">
@@ -664,7 +734,8 @@ export default function RequestFormFacility(){
                   type="checkbox"
                   checked={otherCheck}
                   onChange={(ev) => {
-                    handleCheckboxChange(setOtherCheck, ev.target.checked, setMphCheck, setConfCheck);
+                    const isChecked = ev.target.checked ? 1 : 0;
+                    handleCheckboxChange(setOtherCheck, ev.target.checked, setMphCheck, setConfCheck, setDormCheck);
                     if (!ev.target.checked) {
                       setCheckTable(false);
                       setNoOfTable(null);
@@ -682,8 +753,10 @@ export default function RequestFormFacility(){
                       setCheckProjectorScreen(false);
                       setCheckProjector(false);
                     }
+                    setOtherCheck(isChecked);
                   }}
                   class={`focus:ring-gray-400 h-5 w-5 ${otherCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  disabled={activateFacility}
                 />
               </div>
               <div class="ml-3">
@@ -693,665 +766,643 @@ export default function RequestFormFacility(){
               </div>
             </div>
 
+            {(!mphCheck && !confCheck && !dormCheck && !otherCheck && fieldMissing) && (
+              <p className="font-roboto form-validation">You must input the End Time of Activity</p>
+            )}
+
           </div>
 
         </div>
 
       </div>
 
-      {/* Facility Form */}
-      {(mphCheck || confCheck || otherCheck) ? (
+      {/* Activate Facility */}
+      {activateFacility && (
         <div className="mt-8 border-t border-black font-roboto">
 
-        <div>
-          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
-        </div>
+          {/* Caption */}
+          <div>
+            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
+          </div>
 
-        <div className="grid grid-cols-2 gap-4">
+          {/* Check Boxes */}
+          <div className="grid grid-cols-2 gap-4">
 
-          <div className="col-span-1">
+            {/* 1st Column */}
+            <div className="col-span-1">
 
-            {/* Table */}
-            <div class="relative flex items-center mt-4">
-              <div class="flex items-center h-5">
-                <input
-                  id="mph-checktable"
-                  name="mph-checktable"
-                  type="checkbox"
-                  checked={checkTable}
-                  onChange={() => {
-                    setCheckTable(!checkTable);
-                    setInputFacErrors(null);
-                  }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                  Tables
-                </label> 
-              </div>
-              {checkTable && (
-                <div className="flex items-center w-32 ml-2">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    (No. 
-                  </label> 
+              {/* Table */}
+              <div class="relative flex items-center mt-4">
+                <div class="flex items-center h-5">
                   <input
-                    type="number"
-                    name="no-of-table"
-                    id="no-of-table"
-                    value={NoOfTable}
-                    onChange={handleInputTableChange}
-                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                    id="mph-checktable"
+                    name="mph-checktable"
+                    type="checkbox"
+                    checked={checkTable}
+                    onChange={() => {
+                      setCheckTable(!checkTable);
+                      setInputFacErrors(null);
+                    }}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                    ) 
-                  </label>
                 </div>
-              )}
-            </div>
-            {!NoOfTable && inputFacErrors?.no_table && (
-              <p className="form-validation">No. of table is required</p>
-            )}
-
-            {/* Chair */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="mph-checkchair"
-                  name="mph-checkchair"
-                  type="checkbox"
-                  checked={checkChairs}
-                  onChange={() => {
-                    setCheckChairs(!checkChairs);
-                    setInputFacErrors(null);
-                  }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                  Chair
-                </label> 
-              </div>
-              {checkChairs && (
-                <div className="flex items-center w-32 ml-2">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    (No. 
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                    Tables
                   </label> 
-                  <input
-                    type="number"
-                    name="no-of-chair"
-                    id="no-of-chair"
-                    value={NoOfChairs}
-                    onChange={handleInputChairChange}
-                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                  />
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                    ) 
-                  </label>
                 </div>
+                {checkTable && (
+                  <div className="flex items-center w-32 ml-2">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      (No. 
+                    </label> 
+                    <input
+                      type="number"
+                      name="no-of-table"
+                      id="no-of-table"
+                      value={NoOfTable}
+                      onChange={handleInputTableChange}
+                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                    />
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                      ) 
+                    </label>
+                  </div>
+                )}
+              </div>
+              {!NoOfTable && inputFacErrors?.no_table && (
+                <p className="form-validation">No. of table is required</p>
               )}
-            </div>
-            {!NoOfChairs && inputFacErrors?.no_chair && (
-              <p className="form-validation">No. of chair is required</p>
-            )}
 
-            {/* Projector */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkProjector}
-                  onChange={ev => setCheckProjector(!checkProjector)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Projector
-                </label> 
-              </div>
-            </div>
-
-            {/* Projector Screen */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkProjectorScreen}
-                  onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Projector Screen
-                </label> 
-              </div>
-            </div>
-            
-            {/* Document Camera */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkDocumentCamera}
-                  onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Document Camera
-                </label> 
-              </div>
-            </div>
-
-          </div>
-
-          <div className="col-span-1">
-
-            {/* Laptop */}
-            <div class="relative flex items-center mt-4">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkLaptop}
-                  onChange={ev => setCheckLaptop(!checkLaptop)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Laptop
-                </label> 
-              </div>
-            </div>
-
-            {/* Television */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkTelevision}
-                  onChange={ev => setCheckTelevision(!checkTelevision)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Television
-                </label> 
-              </div>
-            </div>
-
-            {/* Sound System */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkSoundSystem}
-                  onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Sound System
-                </label> 
-              </div>
-            </div>
-
-            {/* Videoke */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="other-checkbox"
-                  type="checkbox"
-                  checked={checkVideoke}
-                  onChange={ev => setCheckVideoke(!checkVideoke)}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Videoke
-                </label> 
-              </div>
-            </div>
-
-            {/* Microphone */}
-            <div class="relative flex items-center mt-2">
-              <div class="flex items-center h-5">
-                <input
-                  id="mph-checkmicrophone"
-                  name="mph-checkmicrophone"
-                  type="checkbox"
-                  checked={checkMicrphone}
-                  onChange={() => {
-                    setCheckMicrphone(!checkMicrphone);
-                    setInputFacErrors(null);
-                  }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                />
-              </div>
-              <div class="ml-3">
-                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                Microphone
-                </label> 
-              </div>
-              {checkMicrphone && (
-                <div className="flex items-center w-32 ml-2">
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                    (No. 
+              {/* Chair */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="mph-checkchair"
+                    name="mph-checkchair"
+                    type="checkbox"
+                    checked={checkChairs}
+                    onChange={() => {
+                      setCheckChairs(!checkChairs);
+                      setInputFacErrors(null);
+                    }}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                    Chair
                   </label> 
-                  <input
-                    type="number"
-                    name="no-of-microphone"
-                    id="no-of-microphone"
-                    value={NoOfMicrophone}
-                    onChange={handleInputMicrophoneChange}
-                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                  />
-                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                    ) 
-                  </label>
                 </div>
+                {checkChairs && (
+                  <div className="flex items-center w-32 ml-2">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      (No. 
+                    </label> 
+                    <input
+                      type="number"
+                      name="no-of-chair"
+                      id="no-of-chair"
+                      value={NoOfChairs}
+                      onChange={handleInputChairChange}
+                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                    />
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                      ) 
+                    </label>
+                  </div>
+                )}
+              </div>
+              {!NoOfChairs && inputFacErrors?.no_chair && (
+                <p className="form-validation">No. of chair is required</p>
               )}
+
+              {/* Projector */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkProjector}
+                    onChange={ev => setCheckProjector(!checkProjector)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Projector
+                  </label> 
+                </div>
+              </div>
+
+              {/* Projector Screen */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkProjectorScreen}
+                    onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Projector Screen
+                  </label> 
+                </div>
+              </div>
+
+              {/* Document Camera */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkDocumentCamera}
+                    onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Document Camera
+                  </label> 
+                </div>
+              </div>
+
             </div>
-            {!NoOfMicrophone && inputFacErrors?.no_microphone && (
-              <p className="form-validation">No. of microphone is required</p>
-            )}
+
+            {/* 2nd Column */}
+            <div className="col-span-1">
+
+              {/* Laptop */}
+              <div class="relative flex items-center mt-4">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkLaptop}
+                    onChange={ev => setCheckLaptop(!checkLaptop)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Laptop
+                  </label> 
+                </div>
+              </div>
+
+              {/* Television */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkTelevision}
+                    onChange={ev => setCheckTelevision(!checkTelevision)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Television
+                  </label> 
+                </div>
+              </div>
+
+              {/* Sound System */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkSoundSystem}
+                    onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Sound System
+                  </label> 
+                </div>
+              </div>
+
+              {/* Videoke */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="other-checkbox"
+                    type="checkbox"
+                    checked={checkVideoke}
+                    onChange={ev => setCheckVideoke(!checkVideoke)}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Videoke
+                  </label> 
+                </div>
+              </div>
+
+              {/* Microphone */}
+              <div class="relative flex items-center mt-2">
+                <div class="flex items-center h-5">
+                  <input
+                    id="mph-checkmicrophone"
+                    name="mph-checkmicrophone"
+                    type="checkbox"
+                    checked={checkMicrphone}
+                    onChange={() => {
+                      setCheckMicrphone(!checkMicrphone);
+                      setInputFacErrors(null);
+                    }}
+                    class={`focus:ring-gray-400 h-5 w-5 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div class="ml-3">
+                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Microphone
+                  </label> 
+                </div>
+                {checkMicrphone && (
+                  <div className="flex items-center w-32 ml-2">
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                      (No. 
+                    </label> 
+                    <input
+                      type="number"
+                      name="no-of-microphone"
+                      id="no-of-microphone"
+                      value={NoOfMicrophone}
+                      onChange={handleInputMicrophoneChange}
+                      className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                    />
+                    <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                      ) 
+                    </label>
+                  </div>
+                )}
+              </div>
+              {!NoOfMicrophone && inputFacErrors?.no_microphone && (
+                <p className="form-validation">No. of microphone is required</p>
+              )}
+
+            </div>
 
           </div>
 
-        </div>
-
-        {/* Other */}
-        <div class="relative flex items-center mt-2">
-          <div class="flex items-center h-5">
-            <input
-              id="mph-checkmicrophone"
-              name="mph-checkmicrophone"
-              type="checkbox"
-              checked={checkOther}
-              onChange={() => {
-                setCheckOther(!checkOther);
-                setInputFacErrors(null);
-              }}
-              class={`focus:ring-gray-400 h-5 w-5 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-            />
-          </div>
-          <div class="ml-3">
-            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-            Others
-            </label> 
-          </div>
-          {checkOther && (
-            <div className="flex items-center w-full ml-2">
+          {/* Other */}
+          <div class="relative flex items-center mt-2">
+            <div class="flex items-center h-5">
               <input
-                type="text"
-                name="other-specfic"
-                id="other-specfic"
-                placeholder="Please Specify"
-                value={OtherField}
-                onChange={ev => setOtherField(ev.target.value)}
-                className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                id="mph-checkmicrophone"
+                name="mph-checkmicrophone"
+                type="checkbox"
+                checked={checkOther}
+                onChange={() => {
+                  setCheckOther(!checkOther);
+                  setInputFacErrors(null);
+                }}
+                class={`focus:ring-gray-400 h-5 w-5 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
               />
-              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+            </div>
+            <div class="ml-3">
+              <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+              Others
+              </label> 
+            </div>
+            {checkOther && (
+              <div className="flex items-center w-full ml-2">
+                <input
+                  type="text"
+                  name="other-specfic"
+                  id="other-specfic"
+                  placeholder="Please Specify"
+                  value={OtherField}
+                  onChange={ev => setOtherField(ev.target.value)}
+                  className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                />
+                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                </label>
+              </div>
+            )}
+          </div>
+          {!OtherField && inputFacErrors?.specify && (
+            <p className="form-validation">This form is required</p>
+          )}
+
+          {/* For OPR Instruction on Admin Manager */}
+          {!dormCheck ? (
+          <div>
+
+            {currentUser.code_clearance == 1 && (
+            <>
+              <div>
+                <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
+              </div>
+
+              <div className="flex mt-6">
+                <div className="w-56">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Instruction for the OPR for Action:
+                  </label> 
+                </div>
+                <div className="w-96 pl-1">
+
+                  <textarea
+                    id="findings"
+                    name="findings"
+                    rows={3}
+                    style={{ resize: "none" }}
+                    value= {OprInstruct}
+                    onChange={ev => setOprInstruct(ev.target.value)}
+                    className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                  <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+
+                </div>
+              </div>
+            </>
+            )}
+
+          </div>
+          ):null} 
+
+        </div> 
+      )}
+
+      {/* Activate Dormitory */}
+      {activateDorm && (
+        <div className="mt-8 border-t border-black font-roboto">
+
+          <div>
+            <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            {/* Male */}
+            <div className="col-span-1">
+
+              <div className="mt-6">
+
+                <div className="mb-4">
+                  <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Input name of male guests:</strong> </label>
+                </div>
+
+                <textarea
+                  id="dorm-male-list"
+                  name="dorm-male-list"
+                  rows={5}
+                  value={maleList}
+                  onChange={handleMaleTextChange}
+                  style={{ resize: 'none' }}
+                  className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                />
+                <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+
+                {/* For displaying the number of guest */}
+                <div>
+                  <textarea
+                    id="output-male-list"
+                    name="output-male-list"
+                    rows={5}
+                    value={getMaleList}
+                    style={{ resize: 'none', display: 'none' }}
+                  />
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Female */}
+            <div className="col-span-1">
+
+              <div className="mt-6">
+
+                <div className="mb-4">
+                  <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Input name of female guests:</strong> </label>
+                </div>
+
+                <textarea
+                  id="dorm-female-list"
+                  name="dorm-female-list"
+                  rows={5}
+                  value={femaleList}
+                  onChange={handleFemaleTextChange}
+                  style={{ resize: 'none' }}
+                  className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                />
+                <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+
+                {/* For displaying the number of guest */}
+                <div>
+                  <textarea
+                    id="output-female-list"
+                    name="output-female-list"
+                    rows={5}
+                    value={getFemaleList}
+                    style={{ resize: 'none', display: 'none' }}
+                  />
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* For Other */}
+          <div className="flex mt-10 ml-40">
+            <div className="w-40">
+              <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
+                Other Details :
               </label>
             </div>
-          )}
-        </div>
-        {!OtherField && inputFacErrors?.specify && (
-          <p className="form-validation">This form is required</p>
-        )}
-
-        {/* For OPR Instruction */}
-        {dormCheck ? null:(
-        <>
-        {currentUser.code_clearance == 1 && (
-        <>
-        <div>
-          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
-        </div>
-
-          <div className="flex mt-6">
-            <div className="w-56">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Instruction for the OPR for Action:
-              </label> 
-            </div>
-            <div className="w-96 pl-1">
-
+            <div className="w-1/2">
               <textarea
-                id="findings"
-                name="findings"
+                id="recomendations"
+                name="recomendations"
                 rows={3}
                 style={{ resize: "none" }}
-                value= {OprInstruct}
-                onChange={ev => setOprInstruct(ev.target.value)}
-                className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                value={DormOtherField}
+                onChange={(ev) => setDormOtherField(ev.target.value)}
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
-              <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
-            </div>
+              <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
+            </div>  
           </div>
-        </> 
-        )}
-        </>
-        )}
+
+          {currentUser.code_clearance == 1 && (
+          <>
+            <div>
+              <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
+            </div>
+
+            <div className="flex mt-6">
+              <div className="w-56">
+                <label className="block text-base font-medium leading-6 text-gray-900">
+                Instruction for the OPR for Action:
+                </label> 
+              </div>
+              <div className="w-96 pl-1">
+
+                <textarea
+                  id="findings"
+                  name="findings"
+                  rows={3}
+                  style={{ resize: "none" }}
+                  value= {OprInstruct}
+                  onChange={ev => setOprInstruct(ev.target.value)}
+                  className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+                <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+
+              </div>
+            </div>
+          </> 
+          )}
           
         </div>
-      ):null}
-
-      {/* Dormitory Form */}
-      {dormCheck ? (
-      <div className="mt-8 border-t border-black font-roboto">
-
-        <div>
-          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-
-          {/* Male */}
-          <div className="col-span-1">
-
-            <div className="mt-6">
-
-              <div className="mb-4">
-                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Input name of male guests:</strong> </label>
-              </div>
-
-              <textarea
-                id="dorm-male-list"
-                name="dorm-male-list"
-                rows={5}
-                value={maleList}
-                onChange={handleMaleTextChange}
-                style={{ resize: 'none' }}
-                className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-              />
-              <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-
-              {/* For displaying the number of guest */}
-              <div>
-                <textarea
-                  id="output-male-list"
-                  name="output-male-list"
-                  rows={5}
-                  value={getMaleList}
-                  style={{ resize: 'none', display: 'none' }}
-                />
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Female */}
-          <div className="col-span-1">
-
-            <div className="mt-6">
-
-              <div className="mb-4">
-                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Input name of female guests:</strong> </label>
-              </div>
-
-              <textarea
-                id="dorm-female-list"
-                name="dorm-female-list"
-                rows={5}
-                value={femaleList}
-                onChange={handleFemaleTextChange}
-                style={{ resize: 'none' }}
-                className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-              />
-              <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-
-              {/* For displaying the number of guest */}
-              <div>
-                <textarea
-                  id="output-female-list"
-                  name="output-female-list"
-                  rows={5}
-                  value={getFemaleList}
-                  style={{ resize: 'none', display: 'none' }}
-                />
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* For Other */}
-        <div className="flex mt-10 ml-40">
-          <div className="w-40">
-            <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
-              Other Details :
-            </label>
-          </div>
-          <div className="w-1/2">
-            <textarea
-              id="recomendations"
-              name="recomendations"
-              rows={3}
-              style={{ resize: "none" }}
-              value={DormOtherField}
-              onChange={(ev) => setDormOtherField(ev.target.value)}
-              className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-            />
-            <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
-          </div>  
-        </div>
-
-        {currentUser.code_clearance == 1 && (
-        <>
-        <div>
-          <h2 className="pt-4 text-base font-bold leading-7 text-gray-900 border-t border-black mt-9"> * For OPR Instruction (Admin Manager Only) </h2>
-        </div>
-
-          <div className="flex mt-6">
-            <div className="w-56">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Instruction for the OPR for Action:
-              </label> 
-            </div>
-            <div className="w-96 pl-1">
-
-              <textarea
-                id="findings"
-                name="findings"
-                rows={3}
-                style={{ resize: "none" }}
-                value= {OprInstruct}
-                onChange={ev => setOprInstruct(ev.target.value)}
-                className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-              <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
-            </div>
-          </div>
-        </> 
-        )}
-
-      </div>
-      ):null}
+      )}
 
     </form>
+        
 
-      {/* Button */}
+    {/* Button Validation */}
 
-      {/* For main users */}
-      <div className="mt-10 font-roboto">
-      {currentUser.code_clearance != 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
-      <>
-        {(mphCheck || confCheck || otherCheck) && !dormCheck ? (
-        checkedCount ? (
-          <button form="fac-submit" type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
-              </div>
-            ) : 'Submit'}
-          </button>
-        ):null
-        ):(mphCheck || confCheck || otherCheck) && dormCheck ?(
-        <>
-        {(maleList || femaleList) && checkedCount ? (
-          <button form="fac-submit" type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
-              </div>
-            ) : 'Submit'}
-          </button>
-        ):null}
-        </>
-        ):(
-        <>
-        {maleList || femaleList ? (
-          <button form="fac-submit" type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
-              </div>
-            ) : 'Submit'}
-          </button>
-        ):null}
-        </>
+    {/* Check Availbility Button */}
+    {checkAvailabilityBtn ? (
+    <div className="mt-10 font-roboto">
+      <button type="submit" onClick={checkAvailability}
+        className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+        disabled={submitLoading}
+      >
+        {submitLoading ? (
+          <div className="flex items-center justify-center">
+            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+            <span className="ml-2">Checking</span>
+          </div>
+        ) : (
+          'Check Availability'
         )}
-      </>
-      )}
-      </div>
+      </button>
+    </div>
+    ):null}
 
-      {/* For Admin user */}
-      <div className="mt-10 font-roboto">
-      {currentUser.code_clearance == 1 && (mphCheck || confCheck || otherCheck || dormCheck) && (
-      <>
-          {(mphCheck || confCheck || otherCheck) && !dormCheck ? (
+    {/* Activate Facility */}
+    {(activateFacility && !activateDorm) && (
+      <div className="mt-10 font-roboto flex">
+        {checkedCount ? (
+        <>
+          {currentUser.code_clearance == 1 ? (
           <>
-            {checkedCount ? (
-            <>
-              {oprInstrucValue == "None" ? (
-                <button onClick={() => handleClarification()}
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):(
-                <button form="fac-submit" type="submit"
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )}
-            </>
-            ):null}
-          </>
-          ):(mphCheck || confCheck || otherCheck) && dormCheck ? (
-          <>
-            {(maleList || femaleList) && checkedCount ? (
-            <>
-              {oprInstrucValue == "None" ? (
-                <button onClick={() => handleClarification()}
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):(
-                <button form="fac-submit" type="submit"
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )}
-            </>
-            ):null}
-          </>
+            {OprInstruct ? (
+              <button form="fac-submit" type="submit"
+                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):(
+              <button onClick={() => handleClarification()}
+                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            )}
+          </> 
           ):(
-          <>
-            {maleList || femaleList? (
-            <>
-              {oprInstrucValue == "None" ? (
-                <button onClick={() => handleClarification()}
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              ):(
-                <button form="fac-submit" type="submit"
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing...</span>
-                    </div>
-                  ) : 'Submit'}
-                </button>
-              )}
-            </>
-            ):null}
-          </>
+            <button form="fac-submit" type="submit"
+              className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing...</span>
+                </div>
+              ) : 'Submit'}
+            </button>
           )}
-      
-      </>
-      )}
+        </>    
+        ):null}
+        {/* Cancel */}
+        <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+          Cancel
+        </button>
       </div>
+    )}
+
+    {/* Activate Dorm */}
+    {(!activateFacility && activateDorm) && (
+      <div className="mt-10 font-roboto flex">
+        {maleList || femaleList ? (
+        <>
+          {currentUser.code_clearance == 1 ? (
+          <>
+            {OprInstruct ? (
+              <button form="fac-submit" type="submit"
+                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            ):(
+              <button onClick={() => handleClarification()}
+                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : 'Submit'}
+              </button>
+            )}
+          </> 
+          ):(
+            <button form="fac-submit" type="submit"
+              className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing...</span>
+                </div>
+              ) : 'Submit'}
+            </button>
+          )}
+        </>
+        ):null}
+        <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+          Cancel
+        </button>
+      </div>
+    )}
 
     {/* Popup */}
     {showPopup && (
@@ -1378,7 +1429,7 @@ export default function RequestFormFacility(){
           )}
 
           {/* Warning */}
-          {(notifications == "warning" || notifications == "warningD") && (
+          {(notifications == "warning" || notifications == "warningD" || notifications == "check") && (
           <div class="f-modal-icon f-modal-warning scaleWarning">
             <span class="f-modal-body pulseWarningIns"></span>
             <span class="f-modal-dot pulseWarningIns"></span>
@@ -1439,6 +1490,13 @@ export default function RequestFormFacility(){
         {notifications == "success" && (
           <button onClick={() => (closePopup())} className="w-full py-2 btn-success">
             View my request
+          </button>
+        )}
+
+        {/* Validation */}
+        {notifications == "check" && (
+          <button onClick={() => (closeError())} className="w-full py-2 btn-error">
+            Close
           </button>
         )}
 

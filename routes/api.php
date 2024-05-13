@@ -48,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/requestrepair', [InspectionFormController::class, 'index']); 
     Route::get('/myinspecreq/{id}', [InspectionFormController::class, 'myRequestInspec']);
     Route::put('/inspector/{id}', [InspectionFormController::class, 'storeInspectorForm']);
+    Route::put('/updateparta/{id}', [InspectionFormController::class, 'updatePartA']);
+    Route::put('/updatepartb/{id}', [InspectionFormController::class, 'updatePartB']);  
+    Route::put('/updatepartc/{id}', [InspectionFormController::class, 'updatePartC']); 
+    Route::put('/updatepartd/{id}', [InspectionFormController::class, 'updatePartD']); 
     Route::put('/inspectorpartb/{id}', [InspectionFormController::class, 'InspectorPartB']);
     Route::put('/approve/{id}', [InspectionFormController::class, 'updateApprove']);
     Route::put('/disapprove/{id}', [InspectionFormController::class, 'updateDisapprove']);
@@ -61,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/facilityform', [FacilityController::class, 'index']);
     Route::get('/facilityform/{id}', [FacilityController::class, 'show']);
     Route::get('/myfacilityformrequest/{id}', [FacilityController::class, 'myRequest']);
+    Route::get('/checkavailability', [FacilityController::class, 'checkAvailability']);
     Route::put('/facilityopr/{id}', [FacilityController::class, 'StoreOPRFormGSO']);
     Route::put('/facilityopradmin/{id}', [FacilityController::class, 'StoreOPRFormAdmin']);
     Route::put('/facilityapproval/{id}', [FacilityController::class, 'AdminApproval']);
@@ -89,7 +94,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::put('/equipmentmanins/{id}', [EquipmentController::class, 'AdminInstruct']);
     Route::post('/equipmentformrequest', [EquipmentController::class, 'store']);
 
-    
     Route::put('/equipmentgsoform/{id}', [EquipmentController::class, 'GSOForm']);
     Route::put('/equipmentgclose/{id}', [EquipmentController::class, 'closeRequest']);
 
@@ -100,9 +104,11 @@ Route::middleware(['auth'])->group(function () {
 
 //New Get Notifications
 Route::get('/notification/{id}', [GetNotificationController::class, 'GetNotification']); 
+Route::get('/notif/{id}', [GetNotificationController::class, 'NewNotification']); 
 
 // Landing Page
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
+Route::get('/getpending/{id}', [DashboardController::class, 'getPendingRequest']);

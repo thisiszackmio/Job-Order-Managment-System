@@ -8,15 +8,12 @@ import DefaultLayout from "./components/DefaultLayout";
 
 // Inspection Request Form
 import RequestRepairForm from "./views/InspectionFormRequest";
-
+import MyRequestForm from "./views/MyRequest";
 
 import RequestFormFacility from "./views/RequestForFacilityVenue";
 import RequestVehicleSlipForm from "./views/RequestForVehicleSlipForm";
 import RequestEquipmentForm from "./views/RequestForEquipment";
 
-import MyRequestInspectionForm from "./views/MyRequestforInspectionForm";
-import MyRequestFacilityVenue from "./views/MyFacilityVenueForm";
-import MyRequestVehicleSlip from "./views/MyVehicleSlipForm";
 import MyEquipmentForm from "./views/MyEquipementForm"; // No yet Fixed
 
 import RepairRequestForm from "./views/RepairFormList";
@@ -56,17 +53,17 @@ const routes = [
 
             // Inspection Request Form
             {
-                path: "/repairrequestform/:id",
+                path: "/requestinspectionform",
                 element: <RequestRepairForm />
             },
             // Facility / Venue Request Form
             {
-                path: "/facilityrequestform/:id",
+                path: "/facilityrequestform",
                 element: <RequestFormFacility />
             },
             // Vehicle Slip Request Form
             {
-                path: "/vehiclesliprequestform/:id",
+                path: "/vehiclesliprequestform",
                 element: <RequestVehicleSlipForm />
             },
             // Equipement Request Form
@@ -77,20 +74,9 @@ const routes = [
 
             // ---- My Request Form ---- //
 
-            // Inspection Request Form
             {
-                path: "/myrequestinpectionform/:id",
-                element: <MyRequestInspectionForm />
-            },
-            // Facility / Venue Request Form
-            {
-                path: "/myrequestfacilityvenueform/:id",
-                element: <MyRequestFacilityVenue />
-            },
-            // Vehicle Slip Request Form
-            {
-                path: "/myrequestvehicleslipform/:id",
-                element: <MyRequestVehicleSlip />
+                path: "/myrequest/:id",
+                element: <MyRequestForm />
             },
             // Equipment Request Form
             {
@@ -112,7 +98,7 @@ const routes = [
             },
             // Vehicle Slip Request Form
             {
-                path: "/vehiclesliprequestform",
+                path: "/vehiclesliprequestformlist",
                 element: <VehicleSlipFormList />
             },
             // Equipment Request Form

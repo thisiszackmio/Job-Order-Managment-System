@@ -159,7 +159,7 @@ class UserController extends Controller
             'position' => 'nullable|string',
             'division' => 'nullable|string',
             'username' => 'nullable|string',
-            'code_clearance' => 'nullable|string'
+            'code_clearance' => 'nullable|numeric'
         ]);
 
         $getUser = PPAUser::find($id);

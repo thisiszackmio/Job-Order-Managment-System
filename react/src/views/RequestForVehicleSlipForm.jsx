@@ -11,16 +11,6 @@ export default function VehicleSlipForm(){
   const {id} = useParams();
   const { currentUser } = useUserStateContext();
 
-  const navigate = useNavigate ();
-
-  useEffect(() => {
-    // Check the condition and redirect if necessary
-    if (id !== currentUser.id) {
-      navigate(`/vehiclesliprequestform/${currentUser.id}`);
-    }
-  }, [id, currentUser.id, navigate]);
-
-  const [isLoading , setLoading] = useState(false);
   const today = new Date().toISOString().split('T')[0];
   const [DateArrival, setDateArrival] = useState(today);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -53,18 +43,20 @@ export default function VehicleSlipForm(){
     setSubmitLoading(true);
 
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Vehicle Slip`;
+    const remarks = 'Pending';
 
     axiosClient
       .post("vehicleformrequest", {
       date_of_request: today,
       purpose: VRPurpose,
-      passengers: output,
+      passengers: output ? output : "N/A",
       place_visited: VRPlace,
       date_arrival: VRDateArrival,
       time_arrival: VRTimeArrival,
       vehicle_type: 'None',
       driver: 'None',
       admin_approval: 5,
+      remarks: remarks,
       logs: logs
     })
     .then((response) => { 
@@ -90,16 +82,6 @@ export default function VehicleSlipForm(){
 
   return (
   <PageComponent title="Request on Vehicle Slip Form">
-  {isLoading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="ml-2 animate-heartbeat">Loading Form</span>
-    </div>
-  ):(
   <div>
     <form onSubmit={SubmitVehicleForm}>
 
@@ -131,7 +113,7 @@ export default function VehicleSlipForm(){
                   setDateArrival(ev.target.value);
                   setVRDate(ev.target.value);
                 }}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                 readOnly
               />
             </div>
@@ -152,7 +134,7 @@ export default function VehicleSlipForm(){
                 autoComplete="vr_purpose"
                 value={VRPurpose}
                 onChange={ev => setVRPurpose(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
               {!VRPurpose && inputVechErrors.purpose && (
                 <p className="font-roboto form-validation">You must input the purpose</p>
@@ -175,7 +157,7 @@ export default function VehicleSlipForm(){
                 autoComplete="vr_place"
                 value={VRPlace}
                 onChange={ev => setVRPlace(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
               {!VRPlace && inputVechErrors.place_visited && (
                 <p className="font-roboto form-validation">You must input the place to be visited</p>
@@ -198,7 +180,7 @@ export default function VehicleSlipForm(){
                 value= {VRDateArrival}
                 onChange={ev => setVRDateArrival(ev.target.value)}
                 min={DateArrival}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
               {!VRDateArrival && inputVechErrors.date_arrival && (
                 <p className="font-roboto form-validation">You must input the date of arrival</p>
@@ -220,7 +202,7 @@ export default function VehicleSlipForm(){
                 id="vr_timearrival"
                 value= {VRTimeArrival}
                 onChange={ev => setVRTimeArrival(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
               {!VRTimeArrival && inputVechErrors.time_arrival && (
                 <p className="font-roboto form-validation">You must input the time of arrival</p>
@@ -247,9 +229,9 @@ export default function VehicleSlipForm(){
                 value={VRPassenger}
                 onChange={ev => setVRPassenger(ev.target.value)}
                 style={{ resize: 'none' }}
-                className="block w-96 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                className="block w-96 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
               />
-              <p className="text-gray-500 text-xs mt-2">Separate name on next line</p>
+              <p className="text-gray-500 text-xs mt-2">Separate name on next line (If no passengers just leave it blank)</p>
               {!VRPassenger && inputVechErrors.passengers && (
                 <p className="font-roboto form-validation">You must input the list of passengers</p>
               )}
@@ -306,11 +288,11 @@ export default function VehicleSlipForm(){
           <div className="flex justify-center mt-4">
             <button
               onClick={() => {
-                window.location.href = `/myrequestvehicleslipform/${currentUser.id}`;
+                window.location.href = `/myrequest/${currentUser.id}`;
               }}
               className="w-full py-2 btn-success"
             >
-              Close
+              View My Request
             </button>
           </div>
 
@@ -319,7 +301,7 @@ export default function VehicleSlipForm(){
     )}
 
   </div>
-  )}
+
   </PageComponent>
   );
 

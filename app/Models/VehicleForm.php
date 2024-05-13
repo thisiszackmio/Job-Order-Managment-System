@@ -21,7 +21,8 @@ class VehicleForm extends Model
         'time_arrival',
         'vehicle_type',
         'driver',
-        'admin_approval'
+        'admin_approval',
+        'remarks'
     ];
 
     public function user()

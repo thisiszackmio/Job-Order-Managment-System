@@ -32,38 +32,65 @@ class DashboardController extends Controller
         
         // Inspection Request
         $inspection = Inspection_Form::get();
-        $inspApproval = Inspection_Form::where('admin_approval', '1')->get();
-        $inspDisapproval = Inspection_Form::where('admin_approval', '2')->orWhere('supervisor_approval', '2')->get();
-        $inspPending = Inspection_Form::where('supervisor_approval', '0')->orWhereIn('admin_approval', [3,4])->get();
 
         // Facility Request
         $facility = FacilityModel::get();
-        $facilityApproval = FacilityModel::whereIn('admin_approval', [2, 1])->get();
-        $facilityDisapproval = FacilityModel::where('admin_approval', 3)->get();
-        $facilityPending = FacilityModel::where('admin_approval', 4)->get();
 
         // Vehicle Request
         $vehicle = VehicleForm::get();
-        $vehApproval = VehicleForm::whereIn('admin_approval', [1, 2])->get();
-        $vehDisapproval = VehicleForm::where('admin_approval', '3')->get();
-        $vehPending = VehicleForm::whereIn('admin_approval', [5, 4])->get();
 
         $data = [
             'inspection_count' => $inspection->count(),
-            'inspection_approve' => $inspApproval->count(),
-            'inspection_disapprove' => $inspDisapproval->count(),
-            'inspection_pending' => $inspPending->count(),
             'facility_count' => $facility->count(),
-            'facility_approve' => $facilityApproval->count(),
-            'facility_disapprove' => $facilityDisapproval->count(),
-            'facility_pending' => $facilityPending->count(),
             'vehicle_count' => $vehicle->count(),
-            'vehicle_approve' => $vehApproval->count(),
-            'vehicle_disapprove' => $vehDisapproval->count(),
-            'vehicle_pending' => $vehPending->count(),
         ];
 
         return response()->json($data);
+    }
+
+    /**
+     * Pending Request Details
+     */
+    public function getPendingRequest($id){
+
+        // Inspection Request
+        $inspection = Inspection_Form::where(function($query) use ($id) {
+            $query->where('supervisor_approval', '0')
+                  ->orWhere('admin_approval', 3)
+                  ->orWhere('admin_approval', 4);
+        })->where('user_id', $id)->get();
+        $inspDet = $inspection->map(function ($inspectionForm) {
+            return [
+                'repair_id' => $inspectionForm->id,
+                'repair_remarks' => $inspectionForm->remarks,
+            ];
+        });
+
+        $facility = FacilityModel::where('admin_approval', 4)->where('user_id', $id)->get();
+        $facDet = $facility->map(function ($facilityForm) {
+            return [
+                'facility_id' => $facilityForm->id,
+                'facility_remarks' => $facilityForm->remarks,
+            ];
+        });
+
+        $vehicle = VehicleForm::whereIn('admin_approval', [4, 5])->where('user_id', $id)->get();
+        $vehDet = $vehicle->map(function ($vehicleForm) {
+            return [
+                'vehicle_id' => $vehicleForm->id,
+                'vehicle_remarks' => $vehicleForm->remarks,
+            ];
+        });
+
+        $responseData = [
+            'Inspection' => $inspDet->isEmpty() ? null : $inspDet,
+            'Facility' => $facDet->isEmpty() ? null : $facDet,
+            'Vehicle' => $vehDet->isEmpty() ? null : $vehDet
+        ];
+
+
+        return response()->json($responseData);
+
     }
 
     /**

@@ -13,6 +13,7 @@ use App\Models\Inspector_Form;
 use App\Models\AdminInspectionForm;
 use App\Models\NotificationModel;
 use App\Models\Logs;
+use App\Models\NotificationsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -85,11 +86,13 @@ class InspectionFormController extends Controller
         if ($AdminInspectionRequest !== null || $InspectorRequest !== null){
             $personnelfetch = $AdminInspectionRequest->where('inspection__form_id', $id)->pluck('assign_personnel')->first();
             $personnelUser =  PPAUser::where('id', $personnelfetch)->first();
+            $personnelId = $personnelUser->id;
             $personnelName = $personnelUser->fname . ' ' . $personnelUser->mname. '. ' . $personnelUser->lname;
             $personnelSignature = URL::to('/storage/esignature/' . $personnelUser->image);
         } else {
             $personnelfetch = null;
             $personnelUser =  null;
+            $personnelId = null;
             $personnelName = null;
             $personnelSignature = null;
             $$AdminInspectionRequest = null;
@@ -145,6 +148,7 @@ class InspectionFormController extends Controller
                         'ad_sign' => $managerSignature
                     ],
                 'personnel' => [
+                    'p_id' => $personnelId,
                     'p_name' => $personnelName,
                     'p_sign' => $personnelSignature
                     ],
@@ -174,24 +178,35 @@ class InspectionFormController extends Controller
 
         //Get the request
         $getInspectionForm = Inspection_Form::where('user_id', $id)->orderBy('created_at', 'desc')->get(); 
+        $iID = $getInspectionForm->pluck('supervisor_name')->all();
+        $getSup = PPAUser::whereIn('id', $iID)->get();
+        $InspectionData = $getInspectionForm->map(function ($inspectionForm) use ($getSup) {
+            $sup = $getSup->where('id', $inspectionForm->supervisor_name)->first();
+            $supName = $sup->fname . ' ' .$sup->mname.'. ' . $sup->lname;
+            $acqCostFormatted = number_format($inspectionForm->acq_cost, 2);
+            return [
+                'id' => $inspectionForm->id,
+                'user_id' => $inspectionForm->user_id,
+                'date_of_request' => $inspectionForm->date_of_request,
+                'property_number' => $inspectionForm->property_number,
+                'acq_date' => $inspectionForm->acq_date,
+                'acq_cost' => $acqCostFormatted,
+                'brand_model' => $inspectionForm->brand_model,
+                'serial_engine_no' => $inspectionForm->serial_engine_no,
+                'type_of_property' => $inspectionForm->type_of_property,
+                'property_description' => $inspectionForm->property_description,
+                'location' => $inspectionForm->location,
+                'complain' => $inspectionForm->complain,
+                'supervisor_name' => $supName,
+                'remarks' => $inspectionForm->remarks
+            ];
+        });
 
-        // Get supervisor id and name
-        $sup_id = $getInspectionForm->pluck('supervisor_name')->first();
-        $ppaID = PPAUser::find($sup_id);
-        $supName = $ppaID->fname . ' ' . $ppaID->mname . '. ' . $ppaID->lname;
-
-        //Display All the data
-        $respondData = [
-            'my_user' => $myRequest,
-            'view_request' => $getInspectionForm,
-            'supervisor' => $supName
-        ];
-
-        return response()->json($respondData);
+        return response()->json($InspectionData);
 
     }
 
-   /**
+    /**
      * Store a newly created resource in storage.
      * Part A
      */
@@ -213,8 +228,143 @@ class InspectionFormController extends Controller
             return response()->json(['error' => 'Data Error'], 500);
         }
 
+        //Store Notifications
+        // $noti = new NotificationsModel();
+        // $noti->sender_id = $request->input('supervisor_name');
+        // $noti->type_of_request = 'Pre-Repair/Post Repair Inspect Form';
+        // $noti->message = $request->input('message');
+        // $noti->status = 1;
+        // $noti->save();
+
         return response()->json(['message' => 'Deployment data created successfully'], 200);
         
+    }
+
+    /**
+     * Update Part A
+     */
+    public function updatePartA(Request $request, $id)
+    {
+        // Validate
+        $validatedData = $request->validate([
+            'property_number' => 'required|string',
+            'acq_date' => 'required|string',
+            'acq_cost' => 'required|string',
+            'brand_model' => 'required|string',
+            'serial_engine_no' => 'required|string',
+        ]);
+
+        $updateIns = Inspection_Form::where('id', $id)->first();
+
+        if(!$updateIns){
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        $updateIns->update([
+            'property_number' => $validatedData['property_number'],
+            'acq_date' => $validatedData['acq_date'],
+            'acq_cost' => $validatedData['acq_cost'],
+            'brand_model' => $validatedData['brand_model'],
+            'serial_engine_no' => $validatedData['serial_engine_no']
+        ]);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+    }
+
+    /**
+     * Update Part B
+     */
+    public function updatePartB(Request $request, $id)
+    {
+        // Validate
+        $validatedData = $request->validate([
+            'date_of_last_repair' => 'required|string',
+            'nature_of_last_repair' => 'required|string',
+            'assign_personnel' => 'required|numeric',
+        ]);
+
+        $updateIns = AdminInspectionForm::where('inspection__form_id', $id)->first();
+
+        if(!$updateIns){
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        $updateIns->update([
+            'date_of_last_repair' => $validatedData['date_of_last_repair'],
+            'nature_of_last_repair' => $validatedData['nature_of_last_repair'],
+            'assign_personnel' => $validatedData['assign_personnel'],
+        ]);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+    }
+
+    /**
+     * Update Part C
+     */
+    public function updatePartC(Request $request, $id)
+    {
+        // Validate
+        $validatedData = $request->validate([
+            'findings' => 'required|string',
+            'recommendations' => 'required|string',
+        ]);
+
+        $updateIns = Inspector_Form::where('inspection__form_id', $id)->first();
+
+        if(!$updateIns){
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        $updateIns->update([
+            'findings' => $validatedData['findings'],
+            'recommendations' => $validatedData['recommendations'],
+        ]);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
+
+    }
+
+    /**
+     * Update Part D
+     */
+    public function updatePartD(Request $request, $id)
+    {
+        // Validate
+        $validatedData = $request->validate([
+            'remarks' => 'required|string',
+        ]);
+
+        $updateIns = Inspector_Form::where('inspection__form_id', $id)->first();
+
+        if(!$updateIns){
+            return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        $updateIns->update([
+            'remarks' => $validatedData['remarks'],
+        ]);
+
+        // Creating logs
+        $logs = new Logs();
+        $logs->remarks = $request->input('logs');
+        $logs->save();
+
+        return response()->json(['message' => 'OPR instruction stored successfully'], 200);
     }
 
     /**
@@ -376,10 +526,16 @@ class InspectionFormController extends Controller
      */
     public function updateDisapprove(Request $request, $id)
     {
+
         $disapproveRequest = Inspection_Form::find($id);
 
         $disapproveRequest->supervisor_approval = 2;
-        $disapproveRequest->remarks = "The supervisor has disapproved the request";
+        $reason = $request->input('reason');
+        if($reason == 'Others'){
+            $disapproveRequest->remarks = "Disapproved by Supervisor (Reason: " .$request->input('other_reason'). ")";
+        }else{
+            $disapproveRequest->remarks = "Disapproved by Supervisor (Reason: " .$request->input('reason'). ")";
+        }
 
         if ($disapproveRequest->save()) {
             // Create a new Logs record with the remarks from the request
@@ -433,7 +589,7 @@ class InspectionFormController extends Controller
         $disapproveAdminRequest = Inspection_Form::find($id);
     
         $disapproveAdminRequest->admin_approval = 2;
-        $disapproveAdminRequest->remarks = "The Admin Manager has disapproved the request";
+        $disapproveAdminRequest->remarks = "Disapproved by Admin Manager (Reason: ".$request->input('adminReason').")";
 
         if ($disapproveAdminRequest->save()) {
             // Create a new Logs record with the remarks from the request

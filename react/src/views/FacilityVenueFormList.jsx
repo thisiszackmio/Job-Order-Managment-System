@@ -141,9 +141,7 @@ export default function FacilityVenueRequestList() {
   //Restrictions
   const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
-  return Authorize ? (
-  <PageComponent title="Facility / Venue Form Request List">
-  {loading ? (
+  return loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -154,10 +152,10 @@ export default function FacilityVenueRequestList() {
     </div>
   ):(
   <>
-    <div>
+    {Authorize ? (
+    <PageComponent title="Facility / Venue Form Request List">
 
       <div className="flex justify-end">
-        
         <div className="align-right">
           {/* For Search Field */}
           <input
@@ -178,7 +176,7 @@ export default function FacilityVenueRequestList() {
 
       {/* Facility / Venue List */}
       <div className="overflow-x-auto">
-        <table className="border-collapse font-roboto" style={{ width: '1450px' }}>
+        <table className="border-collapse font-roboto">
           <thead>
             <tr className="bg-gray-100">
               <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
@@ -188,7 +186,9 @@ export default function FacilityVenueRequestList() {
               <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
               <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
               <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+              {Authorize ? (
+                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+              ):null}
             </tr>   
           </thead>
           <tbody>
@@ -210,18 +210,20 @@ export default function FacilityVenueRequestList() {
                 <td className="px-1 py-2 align-top border border-custom table-font">
                   {FacDet.remarks}
                 </td>
-                <td className="px-1 py-2 align-top border border-custom w-1">
-                  <div className="flex justify-center">
-                  <Link to={`/facilityvenueform/${FacDet.id}`}>
-                    <button 
-                      className="text-green-600 font-bold py-1 px-2"
-                      title="View Request"
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </button>
-                  </Link>
-                  </div>
-                </td>
+                {Authorize ? (
+                  <td className="px-1 py-2 align-top border border-custom w-1">
+                    <div className="flex justify-center">
+                    <Link to={`/facilityvenueform/${FacDet.id}`}>
+                      <button 
+                        className="text-green-600 font-bold py-1 px-2"
+                        title="View Request"
+                      >
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                    </Link>
+                    </div>
+                  </td>
+                ):null}
               </tr>
             ))
           ):(
@@ -256,16 +258,15 @@ export default function FacilityVenueRequestList() {
           nextLinkClassName="page-link"
         />
       )}
-
-    </div>
+      
+    </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
+    )}
   </>
-  )}
-  </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; // Return null to avoid any unexpected rendering
-    })()
   );
   
 }

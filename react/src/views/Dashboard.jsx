@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWrench , faIndustry , faReceipt} from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 // To refrain return null on reloading the page
 const storedUserData = JSON.parse(localStorage.getItem('USER'));
@@ -14,6 +14,7 @@ export default function Dashboard()
   const [isLoading , setLoading] = useState(true);
   const [isStatus, setStatus] = useState([]);
   const [isLogs, setLogs] = useState([]);
+  const [isPendingTask, setPendingTask] = useState([]);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -44,33 +45,13 @@ export default function Dashboard()
       const responseData = response.data;
 
       const totalInspectionReq = responseData.inspection_count;
-      const totalInspectionApprove = responseData.inspection_approve;
-      const totalInspectionDisapprove = responseData.inspection_disapprove;
-      const totalInspectionPending = responseData.inspection_pending;
-
       const totalFacilityReq = responseData.facility_count;
-      const totalFacilityApprove = responseData.facility_approve;
-      const totalFacilityDisapprove = responseData.facility_disapprove;
-      const totalFacilityPending = responseData.facility_pending;
-
       const totalVehicleReq = responseData.vehicle_count;
-      const totalVehicleApprove = responseData.vehicle_approve;
-      const totalVehicleDisapprove = responseData.vehicle_disapprove;
-      const totalVehiclePending = responseData.vehicle_pending;
 
       setStatus({
         totalInspectionReq,
-        totalInspectionApprove,
-        totalInspectionDisapprove,
-        totalInspectionPending,
         totalFacilityReq,
-        totalFacilityApprove,
-        totalFacilityDisapprove,
-        totalFacilityPending,
         totalVehicleReq,
-        totalVehicleApprove,
-        totalVehicleDisapprove,
-        totalVehiclePending
       });
     })
     .catch((error) => {
@@ -82,6 +63,61 @@ export default function Dashboard()
     });
   };
 
+  // Pending Request
+  const fetchPendingRequest = () => {
+    axiosClient
+    .get(`/getpending/${currentUser.id}`)
+    .then((response) => {
+      const responseData = response.data;
+
+      const InspectionData = responseData.Inspection;
+      const FacilityData = responseData.Facility;
+      const VehicleData = responseData.Vehicle;
+
+      const InspendingRequest = InspectionData 
+      ? InspectionData.map((pending) => {
+        return {
+          id: pending.repair_id,
+          remarks: pending.repair_remarks
+        };
+      })
+      :null
+
+      const FacPendingRequest = FacilityData
+      ? FacilityData.map((facPending) => {
+        return {
+          id: facPending.facility_id,
+          remarks: facPending.facility_remarks
+        }
+      })
+      :null
+
+      const VehPendingRequest = VehicleData
+      ? VehicleData.map((vehpending) => {
+        return {
+          id: vehpending.vehicle_id,
+          remarks: vehpending.vehicle_remarks
+        }
+      })
+      :null
+
+      //console.log(InspectionData);
+      setPendingTask({
+        InspendingRequest,
+        FacPendingRequest,
+        VehPendingRequest
+      });
+    })
+    .catch((error) => {
+      console.error('Error fetching Supervisor Notification data:', error);
+      setLoading(false);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }
+
+  // Logs
   const fetchLogs = () => {
     axiosClient
     .get('/getlogs')
@@ -121,12 +157,15 @@ export default function Dashboard()
   };
 
   useEffect(() => {
+    if (currentUser && currentUser.id) {
     fetchCountRequest();
     fetchLogs();
-  },[]);
+    fetchPendingRequest();
+    }
+  },[currentUser]);
 
   return(
-    <PageComponent title={`${getTimeOfDay()}! ${currentUser.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUser.fname}`}>
+    <PageComponent title="Dashboard">
     {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
@@ -138,128 +177,163 @@ export default function Dashboard()
     </div>
     ):(
     <div className="font-roboto">
+
       <div className="title">
-        <h2>Request Status</h2>
-      </div>
+      {getTimeOfDay()}! {currentUser.gender === 'Male' ? 'Sir' : 'Maam'} {currentUser.fname}
+      </div>  
       
       {/* Form Count */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-4 mt-10">
 
         {/* For Inspection */}
-        <div className="col-span-1 inspection-sec">
+        <div className="col-span-1 request-sec">
 
-          <div className="form-title">Repair Inspection Request</div>
+          <div className="dashboard-title">Total Repair Inspection Request</div>
 
           <div className="flex">
-            <div className="flex-grow icon-here"><FontAwesomeIcon icon={faWrench} size="3x" /></div>
             <div className="count-det">{isStatus.totalInspectionReq}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Approved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalInspectionApprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Disapproved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalInspectionDisapprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Pending:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalInspectionPending}</div>
           </div>
 
         </div>
 
         {/* For Facility */}
-        <div className="col-span-1 facility-sec">
+        <div className="col-span-1 request-sec">
 
-          <div className="form-title">Facility/Venue Request</div>
+          <div className="dashboard-title">Total Facility/Venue Request</div>
 
           <div className="flex">
-            <div className="flex-grow icon-here"><FontAwesomeIcon icon={faIndustry} size="3x" /></div>
             <div className="count-det">{isStatus.totalFacilityReq}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Approved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalFacilityApprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Disapproved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalFacilityDisapprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Pending:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalFacilityPending}</div>
           </div>
 
         </div>
 
         {/* For Vehicle */}
-        <div className="col-span-1 vehicle-sec">
+        <div className="col-span-1 request-sec">
 
-          <div className="form-title">Vehicle Slip Request</div>
+          <div className="dashboard-title">Total Vehicle Slip Request</div>
 
           <div className="flex">
-            <div className="flex-grow icon-here"><FontAwesomeIcon icon={faReceipt} size="3x" /></div>
             <div className="count-det">{isStatus.totalVehicleReq}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Approved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalVehicleApprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Disapproved:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalVehicleDisapprove}</div>
-          </div>
-
-          <div className="flex">
-            <div className="text-white">Form Pending:</div>
-            <div className="ml-2 text-white font-bold">{isStatus.totalVehiclePending}</div>
           </div>
 
         </div>
 
         {/* For Equipment */}
-        <div className="col-span-1 equipment-sec">
+        <div className="col-span-1 request-sec">
 
-          <div className="form-title">Equipment Request</div>
+          <div className="dashboard-title">Total Equipment Request</div>
 
-          <div className="text-2xl font-bold text-white">
-            Coming Soon!
-          </div>
+          <div className="text-2xl font-bold text-black"> Coming Soon!</div>
 
         </div>
 
         {/* For Other */}
-        <div className="col-span-1 other-sec">
+        <div className="col-span-1 request-sec">
 
-          <div className="form-title">Other Request</div>
+          <div className="dashboard-title">Other Request</div>
 
-          <div className="text-2xl font-bold text-white">
-            Coming Soon!
-          </div>
+          <div className="text-2xl font-bold text-black"> Coming Soon! </div>
 
         </div>
 
       </div>
 
+      <div className="grid grid-cols-2 gap-4 mt-10">
+
+      {/* Pending Request */}
+      <div className="col-span-1 request-sec" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
+
+        <div className="dashboard-title">Pending Request</div>
+
+        {isPendingTask?.InspendingRequest?.length > 0 || isPendingTask?.FacPendingRequest?.length > 0 || isPendingTask?.VehPendingRequest?.length > 0 ?
+        (
+        <>
+          <table style={{ width: '100%' }}>
+            <tbody>
+
+              {/* Inspection */}
+              {isPendingTask?.InspendingRequest?.length > 0 && (
+              <>
+                <tr>
+                  <td colSpan="3" className="pending-title pb-3"> Repair Inspection Request </td>
+                </tr>
+                {isPendingTask?.InspendingRequest?.map((InspPending) => (
+                  <tr key={InspPending.id} className="border-t border-gray-300">
+                    <td className="p-2">Control No. {InspPending.id}</td>
+                    <td className="p-2">{InspPending.remarks}</td>
+                    <td className="p-2 text-center">
+                      <Link to={`/repairinspectionform/${InspPending.id}`}>
+                        <button className="text-green-600 font-bold" title="View Request">
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </>
+              )}
+
+              {/* Facility */}
+              {isPendingTask?.FacPendingRequest?.length > 0 && (
+              <>
+                <tr>
+                  <td colSpan="3" className="pending-title pb-3"> Facility / Venue Request </td>
+                </tr>
+                {isPendingTask?.FacPendingRequest?.map((FacPending) => (
+                <tr key={FacPending.id} className="border-t border-gray-300">
+                  <td className="p-2">Control No. {FacPending.id}</td>
+                  <td className="p-2">{FacPending.remarks}</td>
+                  <td  className="p-2 text-center">
+                    <Link to={`/facilityvenueform/${FacPending.id}`}>
+                      <button className="text-green-600 font-bold" title="View Request">
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+                ))}
+              </>
+              )}
+
+              {/* Vehicle */}
+              {isPendingTask?.VehPendingRequest?.length > 0 && (
+              <>
+                <tr>
+                  <td colSpan="3" className="pending-title pb-3"> Vehicle Slip Request </td>
+                </tr>
+                {isPendingTask?.VehPendingRequest?.map((VehPending) => (
+                <tr key={VehPending.id} className="border-t border-gray-300">
+                  <td className="p-2">Control No. {VehPending.id}</td>
+                  <td className="p-2">{VehPending.remarks}</td>
+                  <td className="text-center p-2">
+                    <Link to={`/vehicleslipform/${VehPending.id}`}>
+                      <button className="text-green-600 font-bold" title="View Request">
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+                ))}
+              </>
+              )}
+
+            </tbody>
+          </table>
+        </>  
+        ):(
+          <div className="pending-title pt-3">
+            No Pending Request
+          </div>
+        )}
+
+      </div>
+
       {/* Logs */}
-      <div className="section p-5 mt-10">
+      <div className="col-span-1 request-sec" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
 
-        <div className="title">
-          <h2>Logs (Month of {currentMonthName})</h2>
-        </div>
+        <div className="dashboard-title">Logs (Month of {currentMonthName}) </div>
 
-        <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
-
-          <table className="border-collapse w-full mb-4 mt-2">
+        <table className="border-collapse w-full mb-4 mt-2">
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom">Date and Time</th>
@@ -281,15 +355,8 @@ export default function Dashboard()
               )}
             </tbody>
           </table>
-          
-        </div>
 
-          {/* Back button */}
-          {/* <div className="text-center">
-            <button className="px-6 py-2 btn-default">
-              <Link to="/">Show All Logs</Link>
-            </button>
-          </div> */}
+      </div>
 
       </div>
 

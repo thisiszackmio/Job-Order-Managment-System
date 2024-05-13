@@ -79,9 +79,7 @@ export default function UserList(){
   // Restriction
   const Authorize = userRole == 'h4ck3rZ@1Oppa';
 
-  return Authorize ? (
-  <PageComponent title="User List">
-  {isLoading ? (
+  return isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -91,109 +89,113 @@ export default function UserList(){
       <span className="ml-2 animate-heartbeat">Loading User List</span>
     </div>
   ):(
-    <div className="font-roboto">
+  <>
+    {Authorize ? (
+      <PageComponent title="User List">
+        <div className="font-roboto">
 
-    {/* Legend */}
-    <div>
-      <h2 className="text-left text-sm font-bold leading-9 tracking-tight"> Legends of Code Clearance </h2>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">1 - Admin Division Manager</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Port Manager</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Division Manager/Supervisor</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">5 - Regular and COS Employee</td>
-      <td className="px-2 py-1 text-center text-sm border-r border-custom">6 - Assign Personnel</td>
-    </div>
+          {/* Legend */}
+          <div>
+            <h2 className="text-left text-sm font-bold leading-9 tracking-tight"> Legends of Code Clearance </h2>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">1 - Admin Division Manager</td>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">2 - Port Manager</td>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">3 - GSO</td>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">4 - Division Manager/Supervisor</td>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">5 - Regular and COS Employee</td>
+            <td className="px-2 py-1 text-center text-sm border-r border-custom">6 - Assign Personnel</td>
+          </div>
 
-    {/* Search Filter */}
-    <div className="mt-10 flex">
+          {/* Search Filter */}
+          <div className="mt-10 flex">
 
-      {/* Search */}
-      <div className="flex-grow">
-        <input
-          type="text"
-          placeholder="Search Here"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="w-96 p-2 border border-gray-300 rounded text-sm"
-        />
-      </div>
+            {/* Search */}
+            <div className="flex-grow">
+              <input
+                type="text"
+                placeholder="Search Here"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-96 p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
 
-      {/* Count */}
-      <div className="ml-4" style={{ position: "relative", bottom: "-25px" }}>
-        <div className="text-right text-sm/[17px]">
-        Total of {users.length} user's list
+            {/* Count */}
+            <div className="ml-4" style={{ position: "relative", bottom: "-25px" }}>
+              <div className="text-right text-sm/[17px]">
+              Total of {users.length} user's list
+              </div>
+            </div>
+            
+          </div>
+
+          {/* Table */}
+          <table className="border-collapse w-full mb-10 mt-2">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Name</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Username</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">User ID</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Position</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Division</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Code CLR</th>
+              </tr>
+            </thead>
+            <tbody>
+            {currentUser.length > 0 ? (
+              currentUser.map((UserDet) => (
+              <tr key={UserDet.id}>
+                <td className="px-1 py-2 align-top border border-custom w-64 table-font">
+                  <Link to={`/ppauserdetails/${UserDet.id}`}>
+                      {UserDet.name}
+                  </Link>
+                </td>
+                <td className="px-1 py-2 align-top border border-custom w-40 table-font text-center">{UserDet.username}</td>
+                <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center italic">{UserDet.id}</td>
+                <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.position}</td>
+                <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.division}</td>
+                <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
+              </tr>
+              ))
+            ):(
+              <tr>
+                <td colSpan={6} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
+              </tr>
+            )}
+            </tbody>
+            {/* Pagination */}
+            {displayPaginationUser && (
+              <ReactPaginate
+                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                breakLabel="..."
+                pageCount={pageCountUser}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                containerClassName="pagination"
+                subContainerClassName="pages pagination"
+                activeClassName="active"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+              />
+            )}
+          </table>
+
         </div>
-      </div>
-      
-    </div>
-
-    {/* Table */}
-    <table className="border-collapse w-full mb-10 mt-2">
-      <thead>
-        <tr className="bg-gray-100">
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Name</th>
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Username</th>
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">User ID</th>
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Position</th>
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Division</th>
-          <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Code CLR</th>
-        </tr>
-      </thead>
-      <tbody>
-      {currentUser.length > 0 ? (
-        currentUser.map((UserDet) => (
-        <tr key={UserDet.id}>
-          <td className="px-1 py-2 align-top border border-custom w-64 table-font">
-            <Link to={`/ppauserdetails/${UserDet.id}`}>
-                {UserDet.name}
-            </Link>
-          </td>
-          <td className="px-1 py-2 align-top border border-custom w-40 table-font text-center">{UserDet.username}</td>
-          <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center italic">{UserDet.id}</td>
-          <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.position}</td>
-          <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.division}</td>
-          <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
-        </tr>
-        ))
-      ):(
-        <tr>
-          <td colSpan={6} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
-        </tr>
-      )}
-      </tbody>
-      {/* Pagination */}
-      {displayPaginationUser && (
-        <ReactPaginate
-          previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-          nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-          breakLabel="..."
-          pageCount={pageCountUser}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageChange}
-          containerClassName="pagination"
-          subContainerClassName="pages pagination"
-          activeClassName="active"
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          breakClassName="page-item"
-          breakLinkClassName="page-link"
-          previousClassName="page-item"
-          previousLinkClassName="page-link"
-          nextClassName="page-item"
-          nextLinkClassName="page-link"
-        />
-      )}
-    </table>
-
-    </div>
-  )}
+      </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
+    )}
+  </>  
+  );
   
-  </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null;
-    })()
-    );
 }

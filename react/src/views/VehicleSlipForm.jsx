@@ -343,11 +343,11 @@ export default function PrePostRepairForm(){
   const justclose = () => { setShowPopup(false); };
 
   // Restrictions
-  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
+  const UserHere = vehicleForms?.vehicleForm?.user_id === currentUser.id;
+  const Authorize = UserHere || (userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4');
+  const Authority = userRole === 'h4ck3rZ@1Oppa' || userRole === '4DmIn@Pp4' || userRole === 'Pm@PP4' || userRole === 'P3rs0nn3lz@pPa';
 
-  return Authorize ?(
-  <PageComponent title="Request For Vehicle Slip">
-    {isLoading ? (
+  return isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -356,12 +356,21 @@ export default function PrePostRepairForm(){
       />
       <span className="ml-2 animate-heartbeat">Loading Form</span>
     </div>
-    ):(
-    <>
-      {/* Back to List */}
-      <button className="px-6 py-2 btn-default">
-        <Link to="/vehiclesliprequestform">Back to Request List</Link>
-      </button>
+  ):(
+  <>
+    {Authorize ? (
+    <PageComponent title="Request For Vehicle Slip">
+
+      {/* Back button */}
+      {Authority ? (
+          <button className="px-6 py-2 btn-default">
+            <Link to="/vehiclesliprequestform">Back to Request List</Link>
+          </button>
+      ):(
+        <button className="px-6 py-2 btn-default">
+          <Link to="/">Back to Dashboard</Link>
+        </button>
+      )}
 
       {/* Slip No */}
       <div className="flex items-center mb-6 mt-4 font-roboto">
@@ -507,8 +516,8 @@ export default function PrePostRepairForm(){
             </div>
             <div className="w-1/2">
               <div>
-              {vehicleForms?.vehicleForm?.passengers == 'None' ? (
-                vehicleForms?.vehicleForm?.passengers
+              {vehicleForms?.vehicleForm?.passengers == 'N/A' ? (
+                "No Passengers"
               ):(
               <>
                 {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
@@ -552,7 +561,7 @@ export default function PrePostRepairForm(){
           <div className="flex items-center mt-4 font-roboto">
             <div className="w-44">
               <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
-                Type of Vehicle:<span className="text-red-500">*</span>
+                Type of Vehicle:
               </label> 
             </div>
             
@@ -564,7 +573,6 @@ export default function PrePostRepairForm(){
                 value={VRVehicle}
                 onChange={handleVRVehicleChange}
                 className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Select a vehicle</option>
                 <option value="" disabled class="font-bold text-black"><b>Admin Vehicle</b></option>
@@ -586,7 +594,7 @@ export default function PrePostRepairForm(){
                 <option value="Toyota Innova = SHX 195">Toyota Innova - SHX 195</option>
               </select> 
               {!VRVehicle && inputErrors.vehicle_type && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="form-validation">This field must be required</p>
               )}
             </div>
           </div>
@@ -595,7 +603,7 @@ export default function PrePostRepairForm(){
           <div className="flex items-center mt-2 font-roboto">
             <div className="w-44">
               <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
-                Driver:<span className="text-red-500">*</span>
+                Driver:
               </label> 
             </div>
             <div className="w-full">
@@ -606,7 +614,6 @@ export default function PrePostRepairForm(){
                 value={selectedDriver}
                 onChange={handleDriverName}
                 className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
               >
                 <option value="" disabled>Select a Driver</option>
                 {driverList.map(driver => (
@@ -614,7 +621,7 @@ export default function PrePostRepairForm(){
                 ))}
               </select>
               {!selectedDriver && inputErrors.driver && (
-                <p className="text-red-500 text-xs italic">This field must be required</p>
+                <p className="form-validation">This field must be required</p>
               )}
             </div>
           </div>
@@ -1191,34 +1198,34 @@ export default function PrePostRepairForm(){
                       </td>
                     </tr>
 
-{/* Admin Manager */}
-<tr>
-  <td colSpan={2} className="pt-4">
+                    {/* Admin Manager */}
+                    <tr>
+                      <td colSpan={2} className="pt-4">
 
-    <div className="w-3/4 text-sm font-arial font-bold">
-      {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
-      vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
-    </div>
+                        <div className="w-3/4 text-sm font-arial font-bold">
+                          {vehicleForms?.vehicleForm?.admin_approval == 1 ? ("APPROVED:"):
+                          vehicleForms?.vehicleForm?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
+                        </div>
 
-    <div className="relative pt-2">
-      {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
-        <img
-          src={vehicleForms?.manager?.manager_signature}
-          style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
-          alt="Signature"
-        />
-      )}
-    </div>
+                        <div className="relative pt-2">
+                          {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
+                            <img
+                              src={vehicleForms?.manager?.manager_signature}
+                              style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                              alt="Signature"
+                            />
+                          )}
+                        </div>
 
-    <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
-      {vehicleForms?.manager?.manager_name}
-    </div> 
-    <div className="w-3/4 text-center text-sm relative">
-      Adminstrative Division Manager
-    </div>  
+                        <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-5">
+                          {vehicleForms?.manager?.manager_name}
+                        </div> 
+                        <div className="w-3/4 text-center text-sm relative">
+                          Adminstrative Division Manager
+                        </div>  
 
-  </td>
-</tr>
+                      </td>
+                    </tr>
 
 </table>
 
@@ -1232,14 +1239,14 @@ export default function PrePostRepairForm(){
           </div>
         </div>
       )}
-
-    </>
+      
+    </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
     )}
-  </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; // Return null to avoid any unexpected rendering
-    })()
+  </>
   );
 }

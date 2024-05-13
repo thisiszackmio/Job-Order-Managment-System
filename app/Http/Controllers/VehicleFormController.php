@@ -145,13 +145,19 @@ class VehicleFormController extends Controller
      */
     public function submitVehicle (Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'vehicle_type' => 'required|string',
+            'driver' => 'required|string'
+        ]);
+
         $v2 = VehicleForm::find($id);
 
         if ($v2) {
             $v2->update([
-                'vehicle_type' => $request->input('vehicle_type'),
-                'driver' => $request->input('driver'),
+                'vehicle_type' => $validatedData['vehicle_type'],
+                'driver' => $validatedData['driver'],
                 'admin_approval' => 4,
+                'remarks' => 'The GSO has filled your slip and submit to the Admin Manager for approval.'
             ]);
         }
 
@@ -171,6 +177,7 @@ class VehicleFormController extends Controller
         $approveRequest = VehicleForm::find($id);
 
         $approveRequest->admin_approval = 2;
+        $approveRequest->remarks = 'The Admin Manager has approved the request';
 
         if ($approveRequest->save()) {
             // Creating logs

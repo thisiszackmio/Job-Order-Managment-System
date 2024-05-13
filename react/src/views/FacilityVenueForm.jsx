@@ -47,6 +47,10 @@ export default function FacilityFormForm(){
   const [isLoading, setIsLoading] = useState(true);
   const [displayRequestFacility, setDisplayRequestFacility] = useState([]);
 
+  // Disapprove
+  const [giveAdminReason, setGiveAdminReason] = useState(false);
+  const [adminReason, setAdminReason] = useState('');
+
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('Test');
@@ -237,24 +241,24 @@ export default function FacilityFormForm(){
 
   //Admin Disapproval Confirmation
   function handleDisapproveConfirmation(){
-    setPopupContent("warningD");
-    setShowPopup(true);
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Disapproval Request</p>
-        <p>Do you want to disapprove?</p>
-      </div>
-    );
+    setGiveAdminReason(true);
   };
 
-  //Admin Decline function
-  function handleDisapproveClick(id){
+  // Cancel Reason
+  const handleCancelReason = () => {
+    setGiveAdminReason(false);
+    setAdminReason('');
+  }
 
+  // Submit Reason
+  function submitAdminReason(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has disapproved ${displayRequestFacility?.requestor?.name}'s request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`;
 
-    axiosClient.put(`/facilitydisapproval/${id}`,{
+    axiosClient
+    .put(`/facilitydisapproval/${id}`,{
+      adminReason: adminReason,
       logs: logs
     })
     .then((response) => {
@@ -274,8 +278,7 @@ export default function FacilityFormForm(){
       setShowPopup(true);   
       setSubmitLoading(false);
     });
-
-  };
+  }
 
   //Close the request
   function handleCloseRequest(id){
@@ -363,1470 +366,1531 @@ export default function FacilityFormForm(){
   }, [seconds]);
 
   //Restrictions
-  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
+  const UserHere = displayRequestFacility?.viewFacilityData?.user_id === currentUser.id;
+  const Authorize = UserHere || (userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4');
   const Facility_Room = displayRequestFacility?.viewFacilityData?.mph || displayRequestFacility?.viewFacilityData?.conference || displayRequestFacility?.viewFacilityData?.other;
   const Facility_Dorm = displayRequestFacility?.viewFacilityData?.dorm;
+  const Authority = userRole === 'h4ck3rZ@1Oppa' || userRole === '4DmIn@Pp4' || userRole === 'Pm@PP4' || userRole === 'P3rs0nn3lz@pPa';
   
-  return Authorize ? (
-  <PageComponent title="Facility/Venue Request
-   Form">
-  {isLoading ? (
-  <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-    <img
-      className="mx-auto h-44 w-auto"
-      src={loadingAnimation}
-      alt="Your Company"
-    />
-    <span className="ml-2 animate-heartbeat">Loading Facility/Venue Form</span>
-  </div>
+  return isLoading ? (
+    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+      <img
+        className="mx-auto h-44 w-auto"
+        src={loadingAnimation}
+        alt="Your Company"
+      />
+      <span className="ml-2 animate-heartbeat">Loading Facility/Venue Form</span>
+    </div>
   ):(
   <>
-    {/* Main Button */}
-    <button className="px-6 py-2 btn-default">
-      <Link to="/facilityvenuerequestform">Back to Request List</Link>
-    </button>
-
-    {/* Control Number */}
-    <div className="flex items-center mb-6 mt-6 font-roboto">
-      <div className="w-24">
-        <label className="block text-base font-medium leading-6 text-gray-900">
-        Control No:
-        </label> 
-      </div>
-      <div className="w-auto px-4 border-b border-black text-center font-bold">
-      {displayRequestFacility?.viewFacilityData?.id}
-      </div>
-    </div>
-
-    {/* Main Form */}
-    <div className="border-b border-black pb-10 font-roboto">
-
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Main Form </h2>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-
-        <div className="col-span-1">
-
-          {/* Date */}
-          <div className="flex items-center mt-6">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Date:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}
-            </div>
-          </div>
-
-          {/* Request Office */}
-          <div className="flex items-center mt-2">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Request Office/Division:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {displayRequestFacility?.viewFacilityData?.request_office}
-            </div>
-          </div>
-
-          {/* Title/Purpose of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Title/Purpose of Activity:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {displayRequestFacility?.viewFacilityData?.title_of_activity}
-            </div>
-          </div>
-
-          {/* Date of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Date of Activity:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-              {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
-              <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} </span>
-              ):(
-              <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} </span>
-              )}
-            </div>
-          </div>
-
-          {/* Time of Activity */}
-          <div className="flex items-center mt-2">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Time of Activity (START and END):
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-              {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
-              <span> {formatTime(displayRequestFacility?.viewFacilityData?.time_start)} to {formatTime(displayRequestFacility?.viewFacilityData?.time_end)}</span>
-              ):(
-              <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_start)}) to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_end)}) </span>
-              )}
-            </div>
-          </div>
-
-        </div>
-
-        <div className="col-span-1">
-
-          {/* Type of Facility */}
-          <div className="flex items-center mt-6">
-            <div className="w-64">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Facility/ies Venue being Requested:
-              </label> 
-            </div>
-          </div>
-
-          {/* Multi-Purpose Hall */}
-          <div className="mt-2">
-            <div className="flex items-center">
-              <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold"> 
-                {displayRequestFacility?.viewFacilityData?.mph == 1 || 
-                displayRequestFacility?.viewFacilityData?.mph == 2 || 
-                displayRequestFacility?.viewFacilityData?.mph == 3
-                ? 'X' : null} 
-              </div>
-              <span style={{ fontWeight: 'bold' }}>Multi-Purpose Hall (MPH)</span>
-            </div>
-          </div>
-
-          {/* Conference Room */}
-          <div className="mt-2">
-            <div className="flex items-center">
-              <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
-                {displayRequestFacility?.viewFacilityData?.conference == 1 || 
-                displayRequestFacility?.viewFacilityData?.conference == 2 ||
-                displayRequestFacility?.viewFacilityData?.conference == 3
-                ? 'X' : null}
-              </div>
-              <span style={{ fontWeight: 'bold' }}>Conference Room</span>
-            </div>
-          </div>
-
-          {/* Dormitory */}
-          <div className="mt-2">
-            <div className="flex items-center">
-              <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
-                {displayRequestFacility?.viewFacilityData?.dorm == 1 || 
-                displayRequestFacility?.viewFacilityData?.dorm == 2 ||
-                displayRequestFacility?.viewFacilityData?.dorm == 3
-                ? 'X' : null}
-              </div>
-              <span style={{ fontWeight: 'bold' }}>Dormitory</span>
-            </div>
-          </div>
-
-          {/* Others */}
-          <div className="mt-2">
-            <div className="flex items-center">
-              <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
-                {displayRequestFacility?.viewFacilityData?.other == 1 || 
-                displayRequestFacility?.viewFacilityData?.other == 2 ||
-                displayRequestFacility?.viewFacilityData?.other == 3
-                ? 'X' : null}
-              </div>
-              <span style={{ fontWeight: 'bold' }}>Others</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    {/* For Facility Room */}
-    {Facility_Room ? (
-    <div className="mt-4 border-b border-black pb-10 font-roboto">
-
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others  </h2>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-
-        <div className="col-span-1">
-          
-          {/* Table */}
-          <div className="mt-4">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.table ? 'X':null}
-              </div>
-              <div className="w-12 ml-1">
-                <span>Tables</span>
-              </div>
-              <div className="w-30 ml-2">
-              (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                {displayRequestFacility?.viewFacilityData?.no_table ? displayRequestFacility?.viewFacilityData?.no_table:null} 
-              </span>)
-              </div>
-            </div>
-          </div>
-
-          {/* Chair */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.chair ? 'X':null}
-              </div>
-              <div className="w-12 ml-1">
-                <span>Chair</span>
-              </div>
-              <div className="w-30 ml-2">
-              (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                {displayRequestFacility?.viewFacilityData?.no_chair ? displayRequestFacility?.viewFacilityData?.no_chair:null} 
-              </span>)
-              </div>
-            </div>
-          </div>
-
-          {/* Projector */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.projector ? 'X':null}
-              </div>
-              <div className="w-16 ml-1">
-                <span>Projector</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Projector Screen */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.projector_screen ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Projector Screen</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Document Camera */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.document_camera ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Document Camera</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div className="col-span-1">
-
-          {/* Laptop */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.laptop ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Laptop</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Television */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.television ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Television</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Sound System */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.sound_system ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Sound System</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Videoke */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.videoke ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Videoke</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Microphone */}
-          <div className="mt-2">
-            <div className="flex">
-              <div className="w-20 border-b border-black pl-1 font-bold text-center">
-              {displayRequestFacility?.viewFacilityData?.microphone ? 'X':null}
-              </div>
-              <div className="w-26 ml-1">
-                <span>Microphone</span>
-              </div>
-              <div className="w-30 ml-2">
-              (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                {displayRequestFacility?.viewFacilityData?.no_microphone ? displayRequestFacility?.viewFacilityData?.no_microphone:null} 
-              </span>)
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Others */}
-      <div className="mt-2">
-        <div className="flex">
-          <div className="w-20 border-b border-black pl-1 font-bold text-center">
-          {displayRequestFacility?.viewFacilityData?.others ? 'X':null}
-          </div>
-          <div className="w-26 ml-1">
-            <span>Others,</span>
-          </div>
-          <div className="w-28 ml-2">
-          please specify
-          </div>
-          <div className="w-1/2 border-b border-black px-5 font-bold text-center"> 
-            {displayRequestFacility?.viewFacilityData?.specify ? displayRequestFacility?.viewFacilityData?.specify:null} 
-          </div>
-        </div>
-      </div>
-
-    </div>
-    ):null}
-
-    {/* For Dormitory Room */}
-    {Facility_Dorm ? (
-    <div className="mt-4 border-b border-black pb-10 font-roboto">
-
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Dormitory  </h2>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-
-        {/* For Male Guest */}
-        <div className="col-span-1">
-          
-          {/* Male Guest Count */}
-          <div className="mt-0 mb-6">
-            <div className="flex items-center">
-              <div className="w-24 border-b border-black font-bold text-center">
-                <span>
-                  {displayRequestFacility?.maleNamesString === "N/A" ? null : (
-                    displayRequestFacility?.maleNamesArray?.length
-                  )}
-                </span>
-              </div>
-              <div className="ml-2">
-                <strong>No. of Male Guests</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Male Guest List */}
-          <div className="mt-6">
-            <div className="mb-4">
-              <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
-            </div>
-          </div>
-          {displayRequestFacility?.maleNamesString === "N/A" ? (
-            <span className="font-meduim">No Male Guest</span>
-          ):(
-            displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
-              <div key={index} className="flex">
-                <span className="font-bold">{`${index + 1}.`}</span>
-                <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
-              </div>
-            ))
-          )}
-
-        </div>
-
-        {/* For Female Guest */}
-        <div className="col-span-1">
-          
-          {/* Female Guest Count */}
-          <div className="mt-0 mb-6">
-            <div className="flex items-center">
-              <div className="w-24 border-b border-black font-bold text-center">
-                <span>
-                  {displayRequestFacility?.femaleNamesString === "N/A" ? null : (
-                    displayRequestFacility?.femaleNamesArray?.length
-                  )}
-                </span>
-              </div>
-              <div className="ml-2">
-                <strong>No. of Male Guests</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Female Guest List */}
-          <div className="mt-6">
-            <div className="mb-4">
-              <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
-            </div>
-          </div>
-          {displayRequestFacility?.femaleNamesString === "N/A" ? (
-            <span className="font-meduim">No Female Guest</span>
-          ):(
-            displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
-              <div key={index} className="flex">
-                <span className="font-bold">{`${index + 1}.`}</span>
-                <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
-              </div>
-            ))
-          )}
-
-        </div>
-
-      </div>
-
-      {/* Other Details */}
-      <div className="mt-4">
-        <div className="flex">
-          <div className="w-28">
-            <span>Other Details:</span>
-          </div>
-          <div className="w-3/4 border-b border-black text-left pl-2">
-          {displayRequestFacility?.viewFacilityData?.other_details}
-          </div>
-        </div>
-      </div>
-
-    </div>
-    ):null}
-
-    {/* Footer */}
-    <div className="border-b border-black pb-6 font-roboto">
-
-      <div className="grid grid-cols-2 gap-4">
-
-        <div className="col-span-1">
-
-          {/* Requested by */}
-          <div className="flex items-center mt-4">
-            <div className="w-32">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Requested by:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1 font-bold">
-            {displayRequestFacility?.requestor?.name}
-            </div>
-          </div>
-
-          {/* Approver */}
-          <div className="flex items-center mt-2">
-            <div className="w-32">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Approver:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1 font-bold">
-            {displayRequestFacility?.manager?.name}
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="flex items-center mt-8">
-            <div className="w-16">
-              <label className="block text-base font-bold leading-6 text-gray-900">
-              Status:
-              </label> 
-            </div>
-            <div className="w-72 font-bold">
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && ("Disapproved")}
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
-            </div>
-          </div> 
-
-        </div>
-
-        <div className="col-span-1">
-
-          {/* For OPR Instruction */}
-          <div className="flex mt-6">
-            <div className="w-80">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Instruction for the OPR for Action:
-              </label> 
-            </div>
-            {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
-            <>
-              <div className="w-96 pl-1 border-b border-black">
-                {displayRequestFacility?.viewFacilityData?.obr_instruct}
-              </div>
-            </>
-            ):(
-            <>
-              {currentUser.code_clearance == 1 ? (
-              <>
-                <div className="w-96 pl-1">
-
-                  <form id="opr-form-admin" onSubmit={SubmitOPRInstruct}>
-
-                    <textarea
-                      id="findings"
-                      name="findings"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {OprInstruct}
-                      onChange={ev => setOprInstruct(ev.target.value)}
-                      className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                    <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
-                    </form>
-
-                </div>
-              </>
-              ):(
-              <>
-                <div className="w-96 pl-1 border-b border-black">
-                  {displayRequestFacility?.viewFacilityData?.obr_instruct}
-                </div>
-              </>
-              )}
-            </>
-            )}
-          </div>
-
-          {/* OPR Action */}
-          <div className="flex mt-2">
-            <div className="w-80">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              OPR Action (Comment/Concerns):
-              </label> 
-            </div>
-            {displayRequestFacility?.viewFacilityData?.obr_comment ? (
-            <>
-              <div className="w-96 pl-1 border-b border-black">
-                {displayRequestFacility?.viewFacilityData?.obr_comment}
-              </div>
-            </>
-            ):(
-            <>
-              {currentUser.code_clearance == 3 ? (
-              <>
-                <div className="w-96 pl-1">
-
-                  <form id="opr-form-gso" onSubmit={SubmitOPRAction}>
-                    <textarea
-                      id="findings"
-                      name="findings"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {OprAction}
-                      onChange={ev => setOprAction(ev.target.value)}
-                      className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                    <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-                  </form>
-
-                </div>
-              </>
-              ):(
-              <>
-                <div className="w-96 pl-1 border-b border-black">
-                  {displayRequestFacility?.viewFacilityData?.obr_comment}
-                </div>
-              </>
-              )} 
-            </>
-            )}
-          </div>
-
-        </div>
-
-      </div>     
-
-    </div>
-
-    {/* Buttons */}
-    <div className="flex mt-4 font-roboto">
-
-    {/* Generate PDF */}
-    {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
-    <>
-      <button type="button" onClick={handleButtonClick}
-        className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-        disabled={submitLoading}
-      >
-        {submitLoading ? (
-          <div className="flex items-center justify-center">
-            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-            <span className="ml-2">Generating</span>
-          </div>
-        ) : (
-          'Get PDF'
-        )}
-      </button>
-    </>
-    )}
-    
-    {/* For Admin */}
-    {currentUser.code_clearance == 1 && (
-    <>
-      {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
-      <>
-        {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
-        <>
-          {/* Approve */}
-          <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
-            Approve
-          </button>
-
-          {/* Decline */}
-          <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
-            Decline
-          </button>
-        </>
-        ):null}
-      </>
-      ):(
-      <>
-        {OprInstruct ? (
-          <button form='opr-form-admin' type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            style={{ position: 'relative', top: '0px' }}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing...</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
+    {Authorize ? (
+      <PageComponent title="Facility/Venue Request Form"> 
+
+        {/* Back button */}
+        {Authority ? (
+          <button className="px-6 py-2 btn-default">
+            <Link to="/facilityvenuerequestform">Back to Request List</Link>
           </button>
         ):(
-          <button onClick={() => handleOPRInstructionClick()} className="px-6 py-2 btn-submit" title="Admin Approve">
-            Submit
+          <button className="px-6 py-2 btn-default">
+            <Link to="/">Back to Dashboard</Link>
           </button>
         )}
-        
-      </>
-      )}
-    
-    </>
-    )}
-    
-    {/* For GSO */}
-    {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
-    currentUser.code_clearance == 3 && (
-    <>
-      <button form='opr-form-gso' type="submit"
-        className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-        style={{ position: 'relative', top: '0px' }}
-        disabled={submitLoading}
-      >
-        {submitLoading ? (
-          <div className="flex items-center justify-center">
-            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-            <span className="ml-2">Processing...</span>
+
+        {/* Control Number */}
+        <div className="flex items-center mb-6 mt-6 font-roboto">
+          <div className="w-24">
+            <label className="block text-base font-medium leading-6 text-gray-900">
+            Control No:
+            </label> 
           </div>
-        ) : (
-          'Submit'
-        )}
-      </button>
-    </>
-    )}
-
-    {/* Close the request */}
-    {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
-      <button 
-        onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
-        className={`px-6 py-2 btn-close ${ submitLoading && 'btn-closing'}`}
-        disabled={submitLoading}
-      >
-        {submitLoading ? (
-          <div className="flex items-center justify-center">
-            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-            <span className="ml-2">Closing</span>
+          <div className="w-auto px-4 border-b border-black text-center font-bold">
+          {displayRequestFacility?.viewFacilityData?.id}
           </div>
-        ) : (
-          'Close Request'
-        )}
-      </button>
-    ):null}
+        </div>
 
-    </div>
-    
-    {/* Show Popup */}
-    {showPopup && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Semi-transparent black overlay */}
-      <div
-        className="fixed inset-0 bg-black opacity-40" // Close on overlay click
-      ></div>
-      {/* Popup content with background blur */}
-      <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
-        
-        {/* Notification Icons */}
-        <div class="f-modal-alert">
+        {/* Main Form */}
+        <div className="border-b border-black pb-10 font-roboto">
 
-          {/* Error */}
-          {popupContent == "error" && (
-          <>
-          <div className="f-modal-icon f-modal-error animate">
-            <span className="f-modal-x-mark">
-              <span className="f-modal-line f-modal-left animateXLeft"></span>
-              <span className="f-modal-line f-modal-right animateXRight"></span>
-            </span>
+          <div>
+            <h2 className="text-base font-bold leading-7 text-gray-900"> Main Form </h2>
           </div>
-          </>
-          )}
 
-          {/* Warning */}
-          {(popupContent == "warning" || popupContent == "warningD") && (
-          <>
-            <div class="f-modal-icon f-modal-warning scaleWarning">
-              <span class="f-modal-body pulseWarningIns"></span>
-              <span class="f-modal-dot pulseWarningIns"></span>
+          <div className="grid grid-cols-2 gap-4">
+
+            <div className="col-span-1">
+
+              {/* Date */}
+              <div className="flex items-center mt-6">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Date:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}
+                </div>
+              </div>
+
+              {/* Request Office */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Request Office/Division:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                {displayRequestFacility?.viewFacilityData?.request_office}
+                </div>
+              </div>
+
+              {/* Title/Purpose of Activity */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Title/Purpose of Activity:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                {displayRequestFacility?.viewFacilityData?.title_of_activity}
+                </div>
+              </div>
+
+              {/* Date of Activity */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Date of Activity:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                  {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
+                  <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} </span>
+                  ):(
+                  <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Time of Activity */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Time of Activity (START and END):
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1">
+                  {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
+                  <span> {formatTime(displayRequestFacility?.viewFacilityData?.time_start)} to {formatTime(displayRequestFacility?.viewFacilityData?.time_end)}</span>
+                  ):(
+                  <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_start)}) to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_end)}) </span>
+                  )}
+                </div>
+              </div>
+
             </div>
-          </> 
-          )}
 
-          {/* Success */}
-          {popupContent == "success" && (
-          <>
-          <div class="f-modal-icon f-modal-success animate">
-            <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-            <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+            <div className="col-span-1">
+
+              {/* Type of Facility */}
+              <div className="flex items-center mt-6">
+                <div className="w-64">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Facility/ies Venue being Requested:
+                  </label> 
+                </div>
+              </div>
+
+              {/* Multi-Purpose Hall */}
+              <div className="mt-2">
+                <div className="flex items-center">
+                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold"> 
+                    {displayRequestFacility?.viewFacilityData?.mph == 1 || 
+                    displayRequestFacility?.viewFacilityData?.mph == 2 || 
+                    displayRequestFacility?.viewFacilityData?.mph == 3
+                    ? 'X' : null} 
+                  </div>
+                  <span style={{ fontWeight: 'bold' }}>Multi-Purpose Hall (MPH)</span>
+                </div>
+              </div>
+
+              {/* Conference Room */}
+              <div className="mt-2">
+                <div className="flex items-center">
+                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                    {displayRequestFacility?.viewFacilityData?.conference == 1 || 
+                    displayRequestFacility?.viewFacilityData?.conference == 2 ||
+                    displayRequestFacility?.viewFacilityData?.conference == 3
+                    ? 'X' : null}
+                  </div>
+                  <span style={{ fontWeight: 'bold' }}>Conference Room</span>
+                </div>
+              </div>
+
+              {/* Dormitory */}
+              <div className="mt-2">
+                <div className="flex items-center">
+                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                    {displayRequestFacility?.viewFacilityData?.dorm == 1 || 
+                    displayRequestFacility?.viewFacilityData?.dorm == 2 ||
+                    displayRequestFacility?.viewFacilityData?.dorm == 3
+                    ? 'X' : null}
+                  </div>
+                  <span style={{ fontWeight: 'bold' }}>Dormitory</span>
+                </div>
+              </div>
+
+              {/* Others */}
+              <div className="mt-2">
+                <div className="flex items-center">
+                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                    {displayRequestFacility?.viewFacilityData?.other == 1 || 
+                    displayRequestFacility?.viewFacilityData?.other == 2 ||
+                    displayRequestFacility?.viewFacilityData?.other == 3
+                    ? 'X' : null}
+                  </div>
+                  <span style={{ fontWeight: 'bold' }}>Others</span>
+                </div>
+              </div>
+
+            </div>
+
           </div>
-          </>
-          )}
 
         </div>
-        
-        {/* Popup Message */}
-        <p className="text-lg text-center font-roboto">
-          {popupMessage}
-        </p>
 
-        {/* Popup Buttons */}
-        <div className="flex justify-center mt-4 font-roboto">
-        
-        {/* Warning */}
-        {popupContent == "warning" && (
-        <>
+        {/* For Facility Room */}
+        {Facility_Room ? (
+          <div className="mt-4 border-b border-black pb-10 font-roboto">
+
+            <div>
+              <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others  </h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+
+              <div className="col-span-1">
+                
+                {/* Table */}
+                <div className="mt-4">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.table ? 'X':null}
+                    </div>
+                    <div className="w-12 ml-1">
+                      <span>Tables</span>
+                    </div>
+                    <div className="w-30 ml-2">
+                    (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                      {displayRequestFacility?.viewFacilityData?.no_table ? displayRequestFacility?.viewFacilityData?.no_table:null} 
+                    </span>)
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chair */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.chair ? 'X':null}
+                    </div>
+                    <div className="w-12 ml-1">
+                      <span>Chair</span>
+                    </div>
+                    <div className="w-30 ml-2">
+                    (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                      {displayRequestFacility?.viewFacilityData?.no_chair ? displayRequestFacility?.viewFacilityData?.no_chair:null} 
+                    </span>)
+                    </div>
+                  </div>
+                </div>
+
+                {/* Projector */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.projector ? 'X':null}
+                    </div>
+                    <div className="w-16 ml-1">
+                      <span>Projector</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Projector Screen */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.projector_screen ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Projector Screen</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Document Camera */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.document_camera ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Document Camera</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="col-span-1">
+
+                {/* Laptop */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.laptop ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Laptop</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Television */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.television ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Television</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sound System */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.sound_system ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Sound System</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Videoke */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.videoke ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Videoke</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Microphone */}
+                <div className="mt-2">
+                  <div className="flex">
+                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                    {displayRequestFacility?.viewFacilityData?.microphone ? 'X':null}
+                    </div>
+                    <div className="w-26 ml-1">
+                      <span>Microphone</span>
+                    </div>
+                    <div className="w-30 ml-2">
+                    (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                      {displayRequestFacility?.viewFacilityData?.no_microphone ? displayRequestFacility?.viewFacilityData?.no_microphone:null} 
+                    </span>)
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Others */}
+            <div className="mt-2">
+              <div className="flex">
+                <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                {displayRequestFacility?.viewFacilityData?.others ? 'X':null}
+                </div>
+                <div className="w-26 ml-1">
+                  <span>Others,</span>
+                </div>
+                <div className="w-28 ml-2">
+                please specify
+                </div>
+                <div className="w-1/2 border-b border-black px-5 font-bold text-center"> 
+                  {displayRequestFacility?.viewFacilityData?.specify ? displayRequestFacility?.viewFacilityData?.specify:null} 
+                </div>
+              </div>
+            </div>
+
+          </div>
+        ):null}
+
+        {/* For Dormitory Room */}
+        {Facility_Dorm ? (
+          <div className="mt-4 border-b border-black pb-10 font-roboto">
+
+            <div>
+              <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Dormitory  </h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+
+              {/* For Male Guest */}
+              <div className="col-span-1">
+                
+                {/* Male Guest Count */}
+                <div className="mt-0 mb-6">
+                  <div className="flex items-center">
+                    <div className="w-24 border-b border-black font-bold text-center">
+                      <span>
+                        {displayRequestFacility?.maleNamesString === "N/A" ? null : (
+                          displayRequestFacility?.maleNamesArray?.length
+                        )}
+                      </span>
+                    </div>
+                    <div className="ml-2">
+                      <strong>No. of Male Guests</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Male Guest List */}
+                <div className="mt-6">
+                  <div className="mb-4">
+                    <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+                  </div>
+                </div>
+                {displayRequestFacility?.maleNamesString === "N/A" ? (
+                  <span className="font-meduim">No Male Guest</span>
+                ):(
+                  displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
+                    <div key={index} className="flex">
+                      <span className="font-bold">{`${index + 1}.`}</span>
+                      <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
+                    </div>
+                  ))
+                )}
+
+              </div>
+
+              {/* For Female Guest */}
+              <div className="col-span-1">
+                
+                {/* Female Guest Count */}
+                <div className="mt-0 mb-6">
+                  <div className="flex items-center">
+                    <div className="w-24 border-b border-black font-bold text-center">
+                      <span>
+                        {displayRequestFacility?.femaleNamesString === "N/A" ? null : (
+                          displayRequestFacility?.femaleNamesArray?.length
+                        )}
+                      </span>
+                    </div>
+                    <div className="ml-2">
+                      <strong>No. of Male Guests</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Female Guest List */}
+                <div className="mt-6">
+                  <div className="mb-4">
+                    <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Name of Guests:</strong> </label>
+                  </div>
+                </div>
+                {displayRequestFacility?.femaleNamesString === "N/A" ? (
+                  <span className="font-meduim">No Female Guest</span>
+                ):(
+                  displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
+                    <div key={index} className="flex">
+                      <span className="font-bold">{`${index + 1}.`}</span>
+                      <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                    </div>
+                  ))
+                )}
+
+              </div>
+
+            </div>
+
+            {/* Other Details */}
+            <div className="mt-4">
+              <div className="flex">
+                <div className="w-28">
+                  <span>Other Details:</span>
+                </div>
+                <div className="w-3/4 border-b border-black text-left pl-2">
+                {displayRequestFacility?.viewFacilityData?.other_details}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        ):null}
+
+        {/* Footer */}
+        <div className="border-b border-black pb-6 font-roboto">
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <div className="col-span-1">
+
+              {/* Requested by */}
+              <div className="flex items-center mt-4">
+                <div className="w-32">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Requested by:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1 font-bold">
+                {displayRequestFacility?.requestor?.name}
+                </div>
+              </div>
+
+              {/* Approver */}
+              <div className="flex items-center mt-2">
+                <div className="w-32">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Approver:
+                  </label> 
+                </div>
+                <div className="w-64 border-b border-black pl-1 font-bold">
+                {displayRequestFacility?.manager?.name}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center mt-8">
+                <div className="w-16">
+                  <label className="block text-base font-bold leading-6 text-gray-900">
+                  Status:
+                  </label> 
+                </div>
+                <div className="w-full font-bold">
+                {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
+                {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
+                {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && (displayRequestFacility?.viewFacilityData?.remarks)}
+                {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
+                </div>
+              </div> 
+
+            </div>
+
+            <div className="col-span-1">
+
+              {/* For OPR Instruction */}
+              <div className="flex mt-6">
+                <div className="w-80">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  Instruction for the OPR for Action:
+                  </label> 
+                </div>
+                {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+                <>
+                  <div className="w-96 pl-1 border-b border-black">
+                    {displayRequestFacility?.viewFacilityData?.obr_instruct}
+                  </div>
+                </>
+                ):(
+                <>
+                  {currentUser.code_clearance == 1 ? (
+                  <>
+                    <div className="w-96 pl-1">
+
+                      <form id="opr-form-admin" onSubmit={SubmitOPRInstruct}>
+
+                        <textarea
+                          id="findings"
+                          name="findings"
+                          rows={3}
+                          style={{ resize: "none" }}
+                          value= {OprInstruct}
+                          onChange={ev => setOprInstruct(ev.target.value)}
+                          className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
+
+                        </form>
+
+                    </div>
+                  </>
+                  ):(
+                  <>
+                    <div className="w-96 pl-1 border-b border-black">
+                      {displayRequestFacility?.viewFacilityData?.obr_instruct}
+                    </div>
+                  </>
+                  )}
+                </>
+                )}
+              </div>
+
+              {/* OPR Action */}
+              <div className="flex mt-2">
+                <div className="w-80">
+                  <label className="block text-base font-medium leading-6 text-gray-900">
+                  OPR Action (Comment/Concerns):
+                  </label> 
+                </div>
+                {displayRequestFacility?.viewFacilityData?.obr_comment ? (
+                <>
+                  <div className="w-96 pl-1 border-b border-black">
+                    {displayRequestFacility?.viewFacilityData?.obr_comment}
+                  </div>
+                </>
+                ):(
+                <>
+                  {currentUser.code_clearance == 3 ? (
+                  <>
+                    <div className="w-96 pl-1">
+
+                      <form id="opr-form-gso" onSubmit={SubmitOPRAction}>
+                        <textarea
+                          id="findings"
+                          name="findings"
+                          rows={3}
+                          style={{ resize: "none" }}
+                          value= {OprAction}
+                          onChange={ev => setOprAction(ev.target.value)}
+                          className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                        <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, type "none" please submit the form</p>
+                      </form>
+
+                    </div>
+                  </>
+                  ):(
+                  <>
+                    <div className="w-96 pl-1 border-b border-black">
+                      {displayRequestFacility?.viewFacilityData?.obr_comment}
+                    </div>
+                  </>
+                  )} 
+                </>
+                )}
+              </div>
+
+            </div>
+
+          </div>     
+
+        </div>
+
+        {giveAdminReason ? (
+          <div className="flex items-center mt-6">
+            <div className="w-44">
+              <label htmlFor="supervisor_reason" className="block text-base font-medium leading-6 text-black"> Reason for Disapproval: </label> 
+            </div>
+            <div className="ml-5">
+              <div className="flex items-center">
+                <div className="w-64">
+                  <textarea
+                    name="reason"
+                    id="reason"
+                    rows={3}
+                    style={{ resize: 'none' }}
+                    value={adminReason}
+                    onChange={ev => setAdminReason(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ):null}
+
+        {/* Buttons */}
+        <div className="flex mt-4 font-roboto">
+
+          {/* Generate PDF */}
+          {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
+          <>
+            <button type="button" onClick={handleButtonClick}
+              className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Generating</span>
+                </div>
+              ) : (
+                'Get PDF'
+              )}
+            </button>
+          </>
+          )}
+
+          {/* For Admin */}
           {currentUser.code_clearance == 1 && (
           <>
-            {displayRequestFacility?.viewFacilityData?.obr_instruct == null ? (
+            {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
             <>
-              {!submitLoading && (
-                <button onClick={SubmitOPRInstruct} className="w-1/2 py-2 popup-confirm">
-                   <FontAwesomeIcon icon={faCheck} /> Confirm
-                </button>
-              )}
+              {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
+              <>
+                {giveAdminReason ? (
+                <>
+                  {/* Admin Submit Reason */}
+                  {adminReason && (
+                    <button type="submit" onClick={() => submitAdminReason(displayRequestFacility?.viewFacilityData?.id)}
+                      className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex items-center justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Processing</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
+                    </button>
+                  )}
+                  {/* Cancel */}
+                  <button onClick={() => handleCancelReason()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+                    Cancel
+                  </button>
+                
+                </>  
+                ):(
+                <>
+                  {/* Approve */}
+                  <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
+                    Approve
+                  </button>
 
-              {!submitLoading && (
-                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
-                  <FontAwesomeIcon icon={faTimes} /> Cancel
-                </button>
-              )}
-
-              {submitLoading && (
-                <button className="w-full cursor-not-allowed py-2 btn-process">
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Loading</span>
-                  </div>
-                </button>
-              )}
+                  {/* Decline */}
+                  <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
+                    Decline
+                  </button>
+                </>
+                )}
+                
+              </>
+              ):null}
             </>
             ):(
             <>
-              {!submitLoading && (
-                <button onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
-                  <FontAwesomeIcon icon={faCheck} /> Confirm
+              {OprInstruct ? (
+                <button form='opr-form-admin' type="submit"
+                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  style={{ position: 'relative', top: '0px' }}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
+                </button>
+              ):(
+                <button onClick={() => handleOPRInstructionClick()} className="px-6 py-2 btn-submit" title="Admin Approve">
+                  Submit
                 </button>
               )}
-
-              {!submitLoading && (
-                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
-                  <FontAwesomeIcon icon={faTimes} /> Cancel
-                </button>
-              )}
-
-              {submitLoading && (
-                <button className="w-full cursor-not-allowed py-2 btn-process">
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Loading</span>
-                  </div>
-                </button>
-              )}
-            </> 
+              
+            </>
             )}
 
           </>
           )}
-        </>
-        )}
 
-        {/* Warning Decline */}
-        {popupContent == "warningD" && (
-        <>
-        {currentUser.code_clearance == 1 && (
+          {/* For GSO */}
+          {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
+          currentUser.code_clearance == 3 && (
           <>
-            {!submitLoading && (
-              <button onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
-                 <FontAwesomeIcon icon={faCheck} /> Confirm
+            {OprAction ? (
+              <button form='opr-form-gso' type="submit"
+                className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                style={{ position: 'relative', top: '0px' }}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing...</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
               </button>
-            )}
+            ):null}
+          </>
+          )}
 
-            {!submitLoading && (
-              <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
-                <FontAwesomeIcon icon={faTimes} /> Cancel
-              </button>
-            )}
-
-            {submitLoading && (
-              <button className="w-full cursor-not-allowed py-2 btn-process">
+          {/* Close the request */}
+          {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
+            <button 
+              onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
+              className={`px-6 py-2 btn-close ${ submitLoading && 'btn-closing'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Loading</span>
+                  <span className="ml-2">Closing</span>
                 </div>
-              </button>
-            )}
-          </> 
-        )}
-        </>
-        )}
+              ) : (
+                'Close Request'
+              )}
+            </button>
+          ):null}
 
-        {/* Success Button */}
-        {popupContent == "success" && (
-        <>
-          <button onClick={closePopup} className="w-full py-2 btn-success">
-            Close
-          </button>
-        </>
-        )}
+        </div>
 
-        {/* Error Message */}
-        {popupContent == "error" && (
-        <>
-          <button onClick={justclose} className="w-full py-2 btn-error">
-            Close
-          </button>
-        </>
-        )}
+        {/* Show Popup */}
+        {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Semi-transparent black overlay */}
+          <div
+            className="fixed inset-0 bg-black opacity-40" // Close on overlay click
+          ></div>
+          {/* Popup content with background blur */}
+          <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '400px' }}>
+            
+            {/* Notification Icons */}
+            <div class="f-modal-alert">
 
-        </div> 
-      </div>
-      </div>
-    )}
+              {/* Error */}
+              {popupContent == "error" && (
+              <>
+              <div className="f-modal-icon f-modal-error animate">
+                <span className="f-modal-x-mark">
+                  <span className="f-modal-line f-modal-left animateXLeft"></span>
+                  <span className="f-modal-line f-modal-right animateXRight"></span>
+                </span>
+              </div>
+              </>
+              )}
 
-    {/* Generate PFD */}
-    {isVisible && (
-    <div>
+              {/* Warning */}
+              {(popupContent == "warning" || popupContent == "warningD") && (
+              <>
+                <div class="f-modal-icon f-modal-warning scaleWarning">
+                  <span class="f-modal-body pulseWarningIns"></span>
+                  <span class="f-modal-dot pulseWarningIns"></span>
+                </div>
+              </> 
+              )}
 
-      <div className="hidden md:none">
-        <div ref={componentRef}>
-          <div style={{ width: '216mm', height: '330mm', paddingLeft: '30px', paddingRight: '30px', paddingTop: '10px', border: '0px solid' }}>
+              {/* Success */}
+              {popupContent == "success" && (
+              <>
+              <div class="f-modal-icon f-modal-success animate">
+                <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+                <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+              </div>
+              </>
+              )}
 
-            {/* Control Number */}
-            <div className="title-area font-arial pr-6 text-right">
-              <span>Control No:</span>{" "}
-              <span style={{ textDecoration: "underline", fontWeight: "900" }}>
-                _______
-                {displayRequestFacility?.viewFacilityData?.id}
-                _______
-              </span>
             </div>
+            
+            {/* Popup Message */}
+            <p className="text-lg text-center font-roboto">
+              {popupMessage}
+            </p>
 
-            {/* Main Form */}
-            <table className="w-full mt-1 border-collapse border border-black">
+            {/* Popup Buttons */}
+            <div className="flex justify-center mt-4 font-roboto">
+            
+            {/* Warning */}
+            {popupContent == "warning" && (
+            <>
+              {currentUser.code_clearance == 1 && (
+              <>
+                {displayRequestFacility?.viewFacilityData?.obr_instruct == null ? (
+                <>
+                  {!submitLoading && (
+                    <button onClick={SubmitOPRInstruct} className="w-1/2 py-2 popup-confirm">
+                      <FontAwesomeIcon icon={faCheck} /> Confirm
+                    </button>
+                  )}
 
-              {/* Title and Logo */}
-              <tr>
-                <td className="border border-black w-32 p-2 text-center">
-                  <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
-                </td>
-                <td className="border text-lg w-3/5 border-black font-arial text-center">
-                  <b>REQUEST FOR THE USE OF FACILITY / VENUE</b>
-                </td>
-                <td className="border border-black p-0 font-arial">
-                  <div className="border-b text-xs border-black px-3 py-3" style={{ fontWeight: 'bold' }}>RF 03-2018 ver 1</div>
-                  <div className="border-black text-xs px-3 py-3" style={{ fontWeight: 'bold' }}>DATE: {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}</div>
-                </td>
-              </tr>
+                  {!submitLoading && (
+                    <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
+                      <FontAwesomeIcon icon={faTimes} /> Cancel
+                    </button>
+                  )}
 
-              {/* Black */}
-              <tr>
-                <td colSpan={3} className="border border-black p-1 font-arial"></td>
-              </tr>
-
-              {/* Form */}
-              <tr>
-                <td colSpan={3} className="border border-black pl-2 pr-2 pb-2 font-arial">
-
-                  {/* Request Office/Division */}
-                  <div className="mt-2">
-                    <div className="flex">
-                      <div className="w-60 text-sm">
-                        <span>Request Office/Division:</span>
+                  {submitLoading && (
+                    <button className="w-full cursor-not-allowed py-2 btn-process">
+                      <div className="flex items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Loading</span>
                       </div>
-                      <div className="w-96 border-b border-black pl-1 text-sm">
-                        <span>{displayRequestFacility?.viewFacilityData?.request_office}</span>
+                    </button>
+                  )}
+                </>
+                ):(
+                <>
+                  {!submitLoading && (
+                    <button onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
+                      <FontAwesomeIcon icon={faCheck} /> Confirm
+                    </button>
+                  )}
+
+                  {!submitLoading && (
+                    <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
+                      <FontAwesomeIcon icon={faTimes} /> Cancel
+                    </button>
+                  )}
+
+                  {submitLoading && (
+                    <button className="w-full cursor-not-allowed py-2 btn-process">
+                      <div className="flex items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Loading</span>
                       </div>
+                    </button>
+                  )}
+                </> 
+                )}
+
+              </>
+              )}
+            </>
+            )}
+
+            {/* Warning Decline */}
+            {popupContent == "warningD" && (
+            <>
+            {currentUser.code_clearance == 1 && (
+              <>
+                {!submitLoading && (
+                  <button onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
+                    <FontAwesomeIcon icon={faCheck} /> Confirm
+                  </button>
+                )}
+
+                {!submitLoading && (
+                  <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
+                    <FontAwesomeIcon icon={faTimes} /> Cancel
+                  </button>
+                )}
+
+                {submitLoading && (
+                  <button className="w-full cursor-not-allowed py-2 btn-process">
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Loading</span>
                     </div>
-                  </div>
+                  </button>
+                )}
+              </> 
+            )}
+            </>
+            )}
 
-                  {/* Title/Purpose of Activity */}
-                  <div className="mt-1">
-                    <div className="flex">
-                      <div className="w-60 text-sm">
-                        <span>Title/Purpose of Activity:</span>
-                      </div>
-                      <div className="w-96 border-b border-black pl-1 text-sm">
-                        <span> {displayRequestFacility?.viewFacilityData?.title_of_activity} </span>
-                      </div>
-                    </div>
-                  </div>
+            {/* Success Button */}
+            {popupContent == "success" && (
+            <>
+              <button onClick={closePopup} className="w-full py-2 btn-success">
+                Close
+              </button>
+            </>
+            )}
 
-                  {/* Date of Activity */}
-                  <div className="mt-1">
-                    <div className="flex">
-                      <div className="w-60 text-sm">
-                        <span>Date of Activity:</span>
-                      </div>
-                      <div className="w-96 border-b border-black pl-1 text-sm">
-                      {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
-                      <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} </span>
-                      ):(
-                      <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} </span>
-                      )}
-                      </div>
-                    </div>
-                  </div>
+            {/* Error Message */}
+            {popupContent == "error" && (
+            <>
+              <button onClick={justclose} className="w-full py-2 btn-error">
+                Close
+              </button>
+            </>
+            )}
 
-                  {/* Time of Activity */}
-                  <div className="mt-1">
-                    <div className="flex">
-                      <div className="w-60 text-sm">
-                        <span>Time of Activity (START and END):</span>
-                      </div>
-                      <div className="w-96 border-b border-black pl-1 text-sm">
-                      {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
-                      <span> {formatTime(displayRequestFacility?.viewFacilityData?.time_start)} to {formatTime(displayRequestFacility?.viewFacilityData?.time_end)}</span>
-                      ):(
-                      <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_start)}) to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_end)}) </span>
-                      )}
-                      </div>
-                    </div>
-                  </div>
+            </div> 
+          </div>
+          </div>
+        )}
 
-                  {/* Type of Facility */}
-                  <div className="mt-1">
-                    <div className="flex">
-                      <div className="w-full text-sm">
-                        <span>Facility/ies Venue being Requested:</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* 4 Facilities */}
-                  <div className="mt-4">
-                    <div className="w-full">
-                      <div className="grid grid-cols-4 gap-1">
+        {/* Generate PFD */}
+        {isVisible && (
+        <div>
 
-                        {/* MPH */}
-                        <div className="col-span-1">
-                          <div className="flex items-start text-sm">
-                            <div className="w-5 h-5 border border-black mr-2 flex items-start justify-center text-black"> 
-                              {displayRequestFacility?.viewFacilityData?.mph == 1 ? 'X' : null} 
-                            </div>
-                            <span style={{ fontWeight: 'bold' }}>Multi-Purpose Hall (MPH)</span>
-                          </div>
-                        </div>
+          <div className="hidden md:none">
+            <div ref={componentRef}>
+              <div style={{ width: '210mm', height: '297mm', paddingLeft: '30px', paddingRight: '30px', paddingTop: '10px', border: '0px solid' }}>
 
-                        {/* Conference */}
-                        <div className="col-span-1">
-                          <div className="flex items-center text-sm">
-                            <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
-                              {displayRequestFacility?.viewFacilityData?.conference == 1 ? 'X' : null}
-                            </div>
-                            <span style={{ fontWeight: 'bold' }}>Conference Room</span>
-                          </div>
-                        </div>
+                {/* Control Number */}
+                <div className="title-area font-arial pr-6 text-right">
+                  <span>Control No:</span>{" "}
+                  <span style={{ textDecoration: "underline", fontWeight: "900" }}>
+                    _______
+                    {displayRequestFacility?.viewFacilityData?.id}
+                    _______
+                  </span>
+                </div>
 
-                        {/* Dorm */}
-                        <div className="col-span-1">
-                          <div className="flex items-center text-sm">
-                            <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
-                              {displayRequestFacility?.viewFacilityData?.dorm == 1 ? 'X' : null}
-                            </div>
-                            <span style={{ fontWeight: 'bold' }}>Dormitory</span>
-                          </div>
-                        </div>
+                {/* Main Form */}
+                <table className="w-full mt-1 border-collapse border border-black">
 
-                        {/* Other */}
-                        <div className="col-span-1">
-                          <div className="flex items-center text-sm">
-                            <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
-                              {displayRequestFacility?.viewFacilityData?.other == 1 ? 'X' : null}
-                            </div>
-                            <span style={{ fontWeight: 'bold' }}>Others</span>
-                          </div>
-                        </div>
+                  {/* Title and Logo */}
+                  <tr>
+                    <td className="border border-black w-32 p-2 text-center">
+                      <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
+                    </td>
+                    <td className="border text-lg w-3/5 border-black font-arial text-center">
+                      <b>REQUEST FOR THE USE OF FACILITY / VENUE</b>
+                    </td>
+                    <td className="border border-black p-0 font-arial">
+                      <div className="border-b text-xs border-black px-3 py-3" style={{ fontWeight: 'bold' }}>RF 03-2018 ver 1</div>
+                      <div className="border-black text-xs px-3 py-3" style={{ fontWeight: 'bold' }}>DATE: {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}</div>
+                    </td>
+                  </tr>
 
-                      </div>
-                    </div>
-                  </div>
+                  {/* Black */}
+                  <tr>
+                    <td colSpan={3} className="border border-black p-1 font-arial"></td>
+                  </tr>
 
-                </td>
-              </tr>
+                  {/* Form */}
+                  <tr>
+                    <td colSpan={3} className="border border-black pl-2 pr-2 pb-2 font-arial">
 
-            </table>
-
-            {/* For Facility Room */}
-            <table className="w-full border-collapse border border-black mt-1">
-              <tr>
-                <td colSpan={3} className="text-base w-full border-black font-arial text-left pl-2">
-
-                  <div className="text-sm mt-1">
-                    <span>* For the Multi-Purpose Hall / Conference Room / Others: </span>
-                  </div>
-
-                  <div className="mt-4 mb-4">
-                    <div className="w-full">
-
-                      <div className="grid grid-cols-2 gap-4">
-                        
-                        <div className="col-span-1 ml-36">
-
-                          {/* Table */}
-                          <div className="mt-0">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.table === 1 ? 'X':null}
-                              </div>
-                              <div className="w-10 text-sm mr-1 ml-1">
-                                <span>Tables</span>
-                              </div>
-                              <div className="w-30 text-sm">
-                              (No.<span className="border-b border-black px-2 text-center mr-1"> {displayRequestFacility?.viewFacilityData?.no_table ? displayRequestFacility?.viewFacilityData?.no_table:null} </span> )
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Chair */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black text-xs pl-1 text-center h-4">
-                                {displayRequestFacility?.viewFacilityData?.chair === 1 ? 'X':null}
-                              </div>
-                              <div className="w-10 text-sm mr-1 ml-1">
-                                <span>Chairs</span>
-                              </div>
-                              <div className="w-30 text-sm">
-                              (No.<span className="border-b border-black px-2 text-center mr-1"> {displayRequestFacility?.viewFacilityData?.no_chair ? displayRequestFacility?.viewFacilityData?.no_chair:null} </span>)
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Projector */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-xs text-center h-4">
-                                {displayRequestFacility?.viewFacilityData?.projector === 1 ? 'X':null}
-                              </div>
-                              <div className="w-10 text-sm mr-1 ml-1">
-                                <span>Projector</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Projector Screen */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black text-xs text-center h-4">
-                                {displayRequestFacility?.viewFacilityData?.projector === 1 ? 'X':null}
-                              </div>
-                              <div className="w-22 text-sm mr-1 ml-1">
-                                <span>Projector Screen</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Document Camera */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black text-xs text-center h-4">
-                                {displayRequestFacility?.viewFacilityData?.document_camera === 1 ? 'X':null}
-                              </div>
-                              <div className="w-22 text-sm mr-1 ml-1">
-                                <span>Document Camera</span>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div>
-
-                        <div className="col-span-1">
-
-                          {/* Laptop */}
-                          <div className="mt-0">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.laptop === 1 ? 'X':null}
-                              </div>
-                              <div className="w-12 text-sm mr-1 ml-1">
-                                <span>Laptop</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Television */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.television === 1 ? 'X':null}
-                              </div>
-                              <div className="w-12 text-sm mr-1 ml-1">
-                                <span>Television</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Sound System */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.sound_system === 1 ? 'X':null}
-                              </div>
-                              <div className="w-22 text-sm mr-1 ml-1">
-                                <span>Sound System</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Videoke */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.videoke === 1 ? 'X':null}
-                              </div>
-                              <div className="w-32 text-sm mr-1 ml-1">
-                                <span>Videoke</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Microphone */}
-                          <div className="mt-1">
-                            <div className="flex">
-                              <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                                {displayRequestFacility?.viewFacilityData?.microphone === 1 ? 'X':null}
-                              </div>
-                              <div className="w-22 text-sm mr-1 ml-1">
-                                <span>Microphone</span>
-                              </div>
-                              <div className="w-30 text-sm">
-                              (No.<span className="border-b border-black px-2 mr-1 text-center"> {displayRequestFacility?.viewFacilityData?.no_microphone ? displayRequestFacility?.viewFacilityData?.no_microphone:null} </span>)
-                              </div>
-                            </div>
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                      {/* Others */}
+                      {/* Request Office/Division */}
                       <div className="mt-2">
+                        <div className="flex">
+                          <div className="w-60 text-sm">
+                            <span>Request Office/Division:</span>
+                          </div>
+                          <div className="w-96 border-b border-black pl-1 text-sm">
+                            <span>{displayRequestFacility?.viewFacilityData?.request_office}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Title/Purpose of Activity */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-60 text-sm">
+                            <span>Title/Purpose of Activity:</span>
+                          </div>
+                          <div className="w-96 border-b border-black pl-1 text-sm">
+                            <span> {displayRequestFacility?.viewFacilityData?.title_of_activity} </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date of Activity */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-60 text-sm">
+                            <span>Date of Activity:</span>
+                          </div>
+                          <div className="w-96 border-b border-black pl-1 text-sm">
+                          {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
+                          <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} </span>
+                          ):(
+                          <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} </span>
+                          )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Time of Activity */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-60 text-sm">
+                            <span>Time of Activity (START and END):</span>
+                          </div>
+                          <div className="w-96 border-b border-black pl-1 text-sm">
+                          {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
+                          <span> {formatTime(displayRequestFacility?.viewFacilityData?.time_start)} to {formatTime(displayRequestFacility?.viewFacilityData?.time_end)}</span>
+                          ):(
+                          <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_start)}) to {formatDate(displayRequestFacility?.viewFacilityData?.date_end)} ({formatTime(displayRequestFacility?.viewFacilityData?.time_end)}) </span>
+                          )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Type of Facility */}
+                      <div className="mt-1">
+                        <div className="flex">
+                          <div className="w-full text-sm">
+                            <span>Facility/ies Venue being Requested:</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* 4 Facilities */}
+                      <div className="mt-4">
+                        <div className="w-full">
+                          <div className="grid grid-cols-4 gap-1">
+
+                            {/* MPH */}
+                            <div className="col-span-1">
+                              <div className="flex items-start text-sm">
+                                <div className="w-5 h-5 border border-black mr-2 flex items-start justify-center text-black"> 
+                                  {displayRequestFacility?.viewFacilityData?.mph == 1 ? 'X' : null} 
+                                </div>
+                                <span style={{ fontWeight: 'bold' }}>Multi-Purpose Hall (MPH)</span>
+                              </div>
+                            </div>
+
+                            {/* Conference */}
+                            <div className="col-span-1">
+                              <div className="flex items-center text-sm">
+                                <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
+                                  {displayRequestFacility?.viewFacilityData?.conference == 1 ? 'X' : null}
+                                </div>
+                                <span style={{ fontWeight: 'bold' }}>Conference Room</span>
+                              </div>
+                            </div>
+
+                            {/* Dorm */}
+                            <div className="col-span-1">
+                              <div className="flex items-center text-sm">
+                                <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
+                                  {displayRequestFacility?.viewFacilityData?.dorm == 1 ? 'X' : null}
+                                </div>
+                                <span style={{ fontWeight: 'bold' }}>Dormitory</span>
+                              </div>
+                            </div>
+
+                            {/* Other */}
+                            <div className="col-span-1">
+                              <div className="flex items-center text-sm">
+                                <div className="w-5 h-5 border border-black mr-2 flex items-center justify-center text-black">
+                                  {displayRequestFacility?.viewFacilityData?.other == 1 ? 'X' : null}
+                                </div>
+                                <span style={{ fontWeight: 'bold' }}>Others</span>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+
+                    </td>
+                  </tr>
+
+                </table>
+
+                {/* For Facility Room */}
+                <table className="w-full border-collapse border border-black mt-1">
+                  <tr>
+                    <td colSpan={3} className="text-base w-full border-black font-arial text-left pl-2">
+
+                      <div className="text-sm mt-1">
+                        <span>* For the Multi-Purpose Hall / Conference Room / Others: </span>
+                      </div>
+
+                      <div className="mt-4 mb-4">
                         <div className="w-full">
 
-                        <div className="mt-1 ml-36">
-                          <div className="flex">
-                            <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
-                              {displayRequestFacility?.viewFacilityData?.others === 1 ? 'X':null}
+                          <div className="grid grid-cols-2 gap-4">
+                            
+                            <div className="col-span-1 ml-36">
+
+                              {/* Table */}
+                              <div className="mt-0">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.table === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-10 text-sm mr-1 ml-1">
+                                    <span>Tables</span>
+                                  </div>
+                                  <div className="w-30 text-sm">
+                                  (No.<span className="border-b border-black px-2 text-center mr-1"> {displayRequestFacility?.viewFacilityData?.no_table ? displayRequestFacility?.viewFacilityData?.no_table:null} </span> )
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Chair */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black text-xs pl-1 text-center h-4">
+                                    {displayRequestFacility?.viewFacilityData?.chair === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-10 text-sm mr-1 ml-1">
+                                    <span>Chairs</span>
+                                  </div>
+                                  <div className="w-30 text-sm">
+                                  (No.<span className="border-b border-black px-2 text-center mr-1"> {displayRequestFacility?.viewFacilityData?.no_chair ? displayRequestFacility?.viewFacilityData?.no_chair:null} </span>)
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Projector */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-xs text-center h-4">
+                                    {displayRequestFacility?.viewFacilityData?.projector === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-10 text-sm mr-1 ml-1">
+                                    <span>Projector</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Projector Screen */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black text-xs text-center h-4">
+                                    {displayRequestFacility?.viewFacilityData?.projector === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-22 text-sm mr-1 ml-1">
+                                    <span>Projector Screen</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Document Camera */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black text-xs text-center h-4">
+                                    {displayRequestFacility?.viewFacilityData?.document_camera === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-22 text-sm mr-1 ml-1">
+                                    <span>Document Camera</span>
+                                  </div>
+                                </div>
+                              </div>
+
                             </div>
-                            <div className="w-22 text-sm mr-1 ml-1">
-                              <span>Others</span>, please specify
+
+                            <div className="col-span-1">
+
+                              {/* Laptop */}
+                              <div className="mt-0">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.laptop === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-12 text-sm mr-1 ml-1">
+                                    <span>Laptop</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Television */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.television === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-12 text-sm mr-1 ml-1">
+                                    <span>Television</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Sound System */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.sound_system === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-22 text-sm mr-1 ml-1">
+                                    <span>Sound System</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Videoke */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.videoke === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-32 text-sm mr-1 ml-1">
+                                    <span>Videoke</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Microphone */}
+                              <div className="mt-1">
+                                <div className="flex">
+                                  <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                    {displayRequestFacility?.viewFacilityData?.microphone === 1 ? 'X':null}
+                                  </div>
+                                  <div className="w-22 text-sm mr-1 ml-1">
+                                    <span>Microphone</span>
+                                  </div>
+                                  <div className="w-30 text-sm">
+                                  (No.<span className="border-b border-black px-2 mr-1 text-center"> {displayRequestFacility?.viewFacilityData?.no_microphone ? displayRequestFacility?.viewFacilityData?.no_microphone:null} </span>)
+                                  </div>
+                                </div>
+                              </div>
+
                             </div>
-                            <div className="w-1/2 border-b p-0 pl-2 border-black text-sm text-left ml-1">
-                            <span className=""> {displayRequestFacility?.viewFacilityData?.specify ? displayRequestFacility?.viewFacilityData?.specify:null} </span>
+
+                          </div>
+
+                          {/* Others */}
+                          <div className="mt-2">
+                            <div className="w-full">
+
+                            <div className="mt-1 ml-36">
+                              <div className="flex">
+                                <div className="w-12 border-b border-black pl-1 text-center text-xs h-4">
+                                  {displayRequestFacility?.viewFacilityData?.others === 1 ? 'X':null}
+                                </div>
+                                <div className="w-22 text-sm mr-1 ml-1">
+                                  <span>Others</span>, please specify
+                                </div>
+                                <div className="w-1/2 border-b p-0 pl-2 border-black text-sm text-left ml-1">
+                                <span className=""> {displayRequestFacility?.viewFacilityData?.specify ? displayRequestFacility?.viewFacilityData?.specify:null} </span>
+                                </div>
+                              </div>
+                            </div>
+
                             </div>
                           </div>
-                        </div>
 
                         </div>
                       </div>
 
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
+                </table>
 
-                </td>
-              </tr>
-            </table>
+                {/* For Dormitory */}
+                <table className="w-full border-collapse border border-black mt-1">
+                  <tr>
+                    <td colSpan={3} className="text-base w-full border-black font-arial text-left pl-2 pb-6">
 
-            {/* For Dormitory */}
-            <table className="w-full border-collapse border border-black mt-1">
-              <tr>
-                <td colSpan={3} className="text-base w-full border-black font-arial text-left pl-2 pb-6">
-
-                  <div className="text-sm mt-1">
-                    <span>* For the Dormitory</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6 mt-4">
-
-                    {/* Male Guest */}
-                    <div className="col-span-1 ml-16">
-
-                      {/* Male Count */}
-                      <div>
-                        <div className="flex">
-                          <div className="w-10 border-b border-black font-normal text-center text-sm">
-                            <span>
-                            {displayRequestFacility?.maleNamesString === "N/A" ? null:(
-                              displayRequestFacility?.maleNamesArray?.length
-                            )}
-                            </span>
-                          </div>
-                          <div className="w-full ml-2 text-sm">
-                            <span>No. of Male Guests</span>
-                          </div>
-                        </div>
+                      <div className="text-sm mt-1">
+                        <span>* For the Dormitory</span>
                       </div>
 
-                      {/* Male List */}
-                      <div className="mt-2">
-                        <div>
-                          <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
-                        </div>
-                      </div>
-                      {displayRequestFacility?.maleNamesString === "N/A" ? (
-                        <div>
-                        {[...Array(6)].map((_, index) => (
-                          <div key={index} className="flex mt-1">
-                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
-                          </div>
-                        ))}
-                      </div>
-                      ):(
-                        displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
-                          <div key={index} className="flex mt-1">
-                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
-                          </div>
-                        ))
-                      )}
+                      <div className="grid grid-cols-2 gap-6 mt-4">
 
-                    </div>
+                        {/* Male Guest */}
+                        <div className="col-span-1 ml-16">
 
-                    {/* Female Guest */}
-                    <div className="col-span-1">
-
-                      {/* Female Count */}
-                      <div>
-                        <div className="flex">
-                          <div className="w-10 border-b border-black font-normal text-center text-sm">
-                            <span>
-                            {displayRequestFacility?.femaleNamesString === "N/A" ? null:(
-                              displayRequestFacility?.femaleNamesArray?.length
-                            )}
-                            </span>
-                          </div>
-                          <div className="w-full ml-2 text-sm">
-                            <span>No. of Female Guests</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Female List */}
-                      <div className="mt-2">
+                          {/* Male Count */}
                           <div>
-                            <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
+                            <div className="flex">
+                              <div className="w-10 border-b border-black font-normal text-center text-sm">
+                                <span>
+                                {displayRequestFacility?.maleNamesString === "N/A" ? null:(
+                                  displayRequestFacility?.maleNamesArray?.length
+                                )}
+                                </span>
+                              </div>
+                              <div className="w-full ml-2 text-sm">
+                                <span>No. of Male Guests</span>
+                              </div>
+                            </div>
                           </div>
-                      </div>
-                      {displayRequestFacility?.femaleNamesString === "N/A" ? (
-                        <div>
-                          {[...Array(6)].map((_, index) => (
-                          <div key={index} className="flex mt-1 pr-10">
-                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                            <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
+
+                          {/* Male List */}
+                          <div className="mt-2">
+                            <div>
+                              <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
+                            </div>
                           </div>
-                        ))}
+                          {displayRequestFacility?.maleNamesString === "N/A" ? (
+                            <div>
+                            {[...Array(6)].map((_, index) => (
+                              <div key={index} className="flex mt-1">
+                                <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                                <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
+                              </div>
+                            ))}
+                          </div>
+                          ):(
+                            displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
+                              <div key={index} className="flex mt-1">
+                                <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                                <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
+                              </div>
+                            ))
+                          )}
+
                         </div>
-                      ):(
-                        displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
-                          <div key={index} className="flex mt-1">
-                            <span className="font-normal text-sm">{`${index + 1}.`}</span>
-                            <div className="w-3/4 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+
+                        {/* Female Guest */}
+                        <div className="col-span-1">
+
+                          {/* Female Count */}
+                          <div>
+                            <div className="flex">
+                              <div className="w-10 border-b border-black font-normal text-center text-sm">
+                                <span>
+                                {displayRequestFacility?.femaleNamesString === "N/A" ? null:(
+                                  displayRequestFacility?.femaleNamesArray?.length
+                                )}
+                                </span>
+                              </div>
+                              <div className="w-full ml-2 text-sm">
+                                <span>No. of Female Guests</span>
+                              </div>
+                            </div>
                           </div>
-                        ))
-                      )}
+
+                          {/* Female List */}
+                          <div className="mt-2">
+                              <div>
+                                <label htmlFor="type_of_property" className="block text-base font-normal leading-6 text-sm"> <span>Name of Guests:</span> </label>
+                              </div>
+                          </div>
+                          {displayRequestFacility?.femaleNamesString === "N/A" ? (
+                            <div>
+                              {[...Array(6)].map((_, index) => (
+                              <div key={index} className="flex mt-1 pr-10">
+                                <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                                <div className="w-full text-sm border-b border-black pl-1 text-left ml-1 pl-2"></div>
+                              </div>
+                            ))}
+                            </div>
+                          ):(
+                            displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
+                              <div key={index} className="flex mt-1">
+                                <span className="font-normal text-sm">{`${index + 1}.`}</span>
+                                <div className="w-3/4 text-sm border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                              </div>
+                            ))
+                          )}
+                            
+                        </div>
+
+                      </div>
+
+                      
+                      {/* Other Details */}
+                      <div className="mt-4 ml-16">
+                        <div className="flex">
+                          <div className="w-24 text-sm">
+                            <span>Other Details:</span>
+                          </div>
+                          <div className="w-3/4 border-b border-black font-regular text-sm text-left pl-2">
+                          {displayRequestFacility?.viewFacilityData?.other_details}
+                          </div>
+                        </div>
+                      </div>
+
+                    </td>
+                  </tr>
+                </table>
+
+                {/* Footer */}
+                <table className="w-full border-collapse border border-black mt-2">
+                  <tr>
+                    {/* Requestor */}
+                    <td className="border border-black w-1/2 p-2">
+                        <div className="text-sm font-arial">
+                          Requested by:
+                        </div>
+                        <div className="relative">
+                          <img
+                            src={displayRequestFacility?.requestor?.signature}
+                            style={{ position: 'absolute', width: '180px', top: '-16px', left: '90px' }}
+                            alt="Signature"
+                          />
+                        </div>
+                        <div className="text-center font-bold text-base relative mt-5">
+                          {displayRequestFacility?.requestor?.name}
+                        </div>
+                      </td>
+
+                      {/* Admin Manager */}
+                      <td className="border w-1/2 border-black">
+                        <div className="text-sm font-arial ml-6">
+                        {displayRequestFacility?.viewFacilityData?.admin_approval === 1 ? 'Approved' 
+                        : displayRequestFacility?.viewFacilityData?.admin_approval === 2 ? 'Approved'
+                        : displayRequestFacility?.viewFacilityData?.admin_approval === 3 ? 'Disapproved'
+                        : 'Approved / Disapproved by:' }
+                        </div>
+                        {displayRequestFacility?.viewFacilityData?.admin_approval === 1 || displayRequestFacility.viewFacilityData.admin_approval === 2  ? (
+                          <div className="relative">
+                            <img
+                              src={displayRequestFacility?.manager?.signature}
+                              style={{ position: 'absolute', width: '180px', top: '-16px', left: '98px' }}
+                              alt="Signature"
+                            />
+                          </div>
+                        ):null}
                         
-                    </div>
-
-                  </div>
-
-                  
-                  {/* Other Details */}
-                  <div className="mt-4 ml-16">
-                    <div className="flex">
-                      <div className="w-24 text-sm">
-                        <span>Other Details:</span>
+                      <div className="text-center font-bold text-base relative mt-5">
+                          {displayRequestFacility?.manager?.name}
                       </div>
-                      <div className="w-3/4 border-b border-black font-regular text-sm text-left pl-2">
-                      {displayRequestFacility?.viewFacilityData?.other_details}
+                      </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black w-1/2 text-center text-sm">{displayRequestFacility?.requestor?.position}</td>
+                    <td className="border border-black w-1/2 text-center text-sm">Admin. Division Manager</td>
+                  </tr>
+                  <tr>
+                      <td className="border text-base border-black w-1/2 text-center text-sm"><b>DATE: </b> {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}</td>
+                      <td className="border text-base border-black w-1/2 text-center text-sm"><b>DATE: </b> 
+                        {displayRequestFacility?.viewFacilityData?.date_approve ? formatDate(displayRequestFacility?.viewFacilityData?.date_approve) : null}
+                      </td>
+                    </tr>
+                </table>
+
+                {/* OPR */}
+                <table className="w-full border-collapse border border-black mt-1">
+                  <tr>
+
+                    {/* For OPR Instruction */}
+                    <td className="border border-black w-1/2 p-2" style={{ verticalAlign: 'top' }}>
+                      <div className="font-bold font-arial text-sm">
+                        Instruction for the OPR for Action
                       </div>
-                    </div>
-                  </div>
 
-                </td>
-              </tr>
-            </table>
+                      <div className="px-5 font-arial mt-2 text-sm">
+                        {displayRequestFacility?.viewFacilityData?.obr_instruct == 'N/A' ? (
+                          displayRequestFacility?.viewFacilityData?.obr_instruct
+                        ):(
+                          <span className="underline-text">{displayRequestFacility?.viewFacilityData?.obr_instruct}</span>
+                        )}
+                      </div>  
+                    </td>
 
-            {/* Footer */}
-            <table className="w-full border-collapse border border-black mt-2">
-              <tr>
-                 {/* Requestor */}
-                 <td className="border border-black w-1/2 p-2">
-                    <div className="text-sm font-arial">
-                      Requested by:
-                    </div>
-                    <div className="relative">
-                      <img
-                        src={displayRequestFacility?.requestor?.signature}
-                        style={{ position: 'absolute', width: '180px', top: '-16px', left: '90px' }}
-                        alt="Signature"
-                      />
-                    </div>
-                    <div className="text-center font-bold text-base relative mt-5">
-                      {displayRequestFacility?.requestor?.name}
-                    </div>
-                  </td>
-
-                  {/* Admin Manager */}
-                  <td className="border w-1/2 border-black">
-                    <div className="text-sm font-arial ml-6">
-                    {displayRequestFacility?.viewFacilityData?.admin_approval === 1 ? 'Approved' 
-                    : displayRequestFacility?.viewFacilityData?.admin_approval === 2 ? 'Approved'
-                    : displayRequestFacility?.viewFacilityData?.admin_approval === 3 ? 'Disapproved'
-                    : 'Approved / Disapproved by:' }
-                    </div>
-                    {displayRequestFacility?.viewFacilityData?.admin_approval === 1 || displayRequestFacility.viewFacilityData.admin_approval === 2  ? (
-                      <div className="relative">
-                        <img
-                          src={displayRequestFacility?.manager?.signature}
-                          style={{ position: 'absolute', width: '180px', top: '-16px', left: '98px' }}
-                          alt="Signature"
-                        />
+                    {/* For OPR Action */}
+                    <td className="border border-black w-1/2 p-2 " style={{ verticalAlign: 'top' }}>
+                      <div className="font-bold font-arial text-sm">
+                        OPR Action (Comments / Concerns)
                       </div>
-                    ):null}
+
+                      <div className="px-5 font-arial">
+                        
+                        <div className="px-5 font-arial mt-2 text-sm">
+                        {displayRequestFacility.viewFacilityData.obr_comment == 'N/A' ? (
+                          displayRequestFacility.viewFacilityData.obr_comment
+                        ):(
+                          <span className="underline-text">{displayRequestFacility.viewFacilityData.obr_comment}</span>
+                        )}
+                        </div>
                     
-                  <div className="text-center font-bold text-base relative mt-5">
-                      {displayRequestFacility?.manager?.name}
-                  </div>
-                  </td>
-              </tr>
-              <tr>
-                <td className="border border-black w-1/2 text-center text-sm">{displayRequestFacility?.requestor?.position}</td>
-                <td className="border border-black w-1/2 text-center text-sm">Admin. Division Manager</td>
-              </tr>
-              <tr>
-                  <td className="border text-base border-black w-1/2 text-center text-sm"><b>DATE: </b> {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}</td>
-                  <td className="border text-base border-black w-1/2 text-center text-sm"><b>DATE: </b> 
-                    {displayRequestFacility?.viewFacilityData?.date_approve ? formatDate(displayRequestFacility?.viewFacilityData?.date_approve) : null}
-                  </td>
-                </tr>
-            </table>
+                      </div>
+                    </td>
 
-            {/* OPR */}
-            <table className="w-full border-collapse border border-black mt-1">
-              <tr>
+                  </tr>
+                </table>
 
-                {/* For OPR Instruction */}
-                <td className="border border-black w-1/2 p-2" style={{ verticalAlign: 'top' }}>
-                  <div className="font-bold font-arial text-sm">
-                    Instruction for the OPR for Action
-                  </div>
-
-                  <div className="px-5 font-arial mt-2 text-sm">
-                    {displayRequestFacility?.viewFacilityData?.obr_instruct == 'N/A' ? (
-                      displayRequestFacility?.viewFacilityData?.obr_instruct
-                    ):(
-                      <span className="underline-text">{displayRequestFacility?.viewFacilityData?.obr_instruct}</span>
-                    )}
-                  </div>  
-                </td>
-
-                {/* For OPR Action */}
-                <td className="border border-black w-1/2 p-2 " style={{ verticalAlign: 'top' }}>
-                  <div className="font-bold font-arial text-sm">
-                    OPR Action
-                  </div>
-                  <div className="px-5 font-arial text-sm">
-                    Comments / Concerns
-                  </div>
-                  <div className="px-5 font-arial">
-                    
-                    <div className="px-5 font-arial mt-2 text-sm">
-                    {displayRequestFacility.viewFacilityData.obr_comment == 'N/A' ? (
-                      displayRequestFacility.viewFacilityData.obr_comment
-                    ):(
-                      <span className="underline-text">{displayRequestFacility.viewFacilityData.obr_comment}</span>
-                    )}
-                    </div>
-                
-                  </div>
-                </td>
-
-              </tr>
-            </table>
-
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-    </div>
+        </div>
+        )}
+      
+      </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
     )}
-  </> 
-  )}
-  </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; // Return null to avoid any unexpected rendering
-    })()
+  </>
   );
 }

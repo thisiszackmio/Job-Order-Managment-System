@@ -8,6 +8,7 @@ use App\Models\PPAUser;
 use App\Models\FacilityModel;
 use App\Models\Logs;
 use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
 
 class FacilityController extends Controller
 {
@@ -76,6 +77,79 @@ class FacilityController extends Controller
         ];
 
         return response()->json($respondData);
+    }
+
+    /**
+     * Check the Request Date
+     */
+    public function checkAvailability(Request $request)
+    {
+        $currentDateTime = Carbon::now();
+        $currentDateTimeString = $currentDateTime->format('Y-m-d H:i:s');
+
+        $dateStart = $request->query('date_start');
+        $timeStart = $request->query('time_start');
+        $dateEnd = $request->query('date_end');
+        $timeEnd = $request->query('time_end');
+        $mphCheck = $request->query('mph');
+        $confCheck = $request->query('conference');
+        $dormCheck = $request->query('dorm');
+        $otherCheck = $request->query('other');
+
+        //Combine date and time strings for start datetime
+        $startDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $dateStart.' '.$timeStart);
+        $endDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $dateEnd.' '.$timeEnd);
+
+        // Condition Begins!
+        if($startDateTime < $currentDateTimeString){
+            return response()->json(['message' => 'Wrong Date']);
+        }else{
+            // Check the DateTime
+            if($endDateTime < $startDateTime){
+                return response()->json(['message' => 'EOD']);
+            }
+
+            $query = FacilityModel::query()->where('date_start', $dateStart)->whereIn('admin_approval', [4,2,1]);
+
+            if ($mphCheck !== null) {
+                $query->where('mph', $mphCheck);
+            }
+    
+            if ($confCheck !== null) {
+                $query->where('conference', $confCheck);
+            }
+    
+            if ($dormCheck !== null) {
+                $query->where('dorm', $dormCheck);
+            }
+    
+            if ($otherCheck !== null) {
+                $query->where('other', $otherCheck);
+            }
+    
+            $getDataFacs = $query->get();
+
+            $occupiedFacility = false;
+            foreach ($getDataFacs as $facility) {
+                $facilityStartDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_start.' '.$facility->time_start);
+                $facilityEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_end.' '.$facility->time_end);
+                
+                if ((($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
+                    ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime))) {
+                    $occupiedFacility = true;
+                    break;
+                } 
+    
+            }
+
+            if ($occupiedFacility) {
+                return response()->json(['message' => 'Not Vacant']);
+            } else {
+                return response()->json(['message' => 'Vacant']);
+            }
+
+        }
+        
     }
 
     /**
@@ -237,7 +311,7 @@ class FacilityController extends Controller
         $facility->update([
             'admin_approval' => 3,
             'date_approve' => today(),
-            'remarks' => "The request has been disapproved by the Admin Manager"
+            'remarks' => "Disapproved by Admin Manager (Reason: ".$request->input('adminReason').")"
         ]);
 
         // Creating logs

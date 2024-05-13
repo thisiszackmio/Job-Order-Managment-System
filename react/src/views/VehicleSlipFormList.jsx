@@ -64,6 +64,7 @@ export default function VehicleSlipFormList(){
             admin_approval: vehicleForms.admin_approval,
             passengersCount: passengersCount,
             requestor: `${fname} ${mname} ${lname}`,
+            remarks: vehicleForms.remarks
           }
         });
   
@@ -117,11 +118,9 @@ export default function VehicleSlipFormList(){
   const displayPaginationVehicle = pageCountVehicleSlip > 1;
 
   //Restrictions
-  const User = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
+  const Authorize = userRole == 'h4ck3rZ@1Oppa' || userRole == '4DmIn@Pp4' || userRole == 'Pm@PP4';
 
-  return User ? (
-  <PageComponent title="Vehicle Slip Request List">
-  {loading ? (
+  return loading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img
         className="mx-auto h-44 w-auto"
@@ -132,8 +131,8 @@ export default function VehicleSlipFormList(){
     </div>
   ):(
   <>
-    <div>
-
+    {Authorize ? (
+      <PageComponent title="Vehicle Slip Request List">
       <div className="flex justify-end">
         <div className="align-right">
           {/* For Search Field */}
@@ -156,7 +155,7 @@ export default function VehicleSlipFormList(){
       {/* Vehicle Slip Form */}
       <div className="overflow-x-auto">
         {currentVehicleSlip.length > 0 ? (
-          <table className="border-collapse font-roboto" style={{ width: '1880px' }}>
+          <table className="border-collapse font-roboto" style={{ width: '100%' }}>
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">No</th>
@@ -185,11 +184,7 @@ export default function VehicleSlipFormList(){
                 <td className="px-1 py-2 align-top text-center border border-custom w-20 table-font">{VehDet.passengersCount}</td>
                 <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.requestor}</td>
                 <td className="px-1 py-2 align-top border border-custom w-72 table-font">
-                {VehDet.admin_approval == 5 && ("Pending")}
-                {VehDet.admin_approval == 4 && ("The GSO has received your request, filled out the data, and is now awaiting approval from the admin manager")}
-                {VehDet.admin_approval == 3 && ("The request has been disapproved by the Admin Manager")}
-                {VehDet.admin_approval == 2 && ("The request has been approved by the Admin Manager")}
-                {VehDet.admin_approval == 1 && ("The request is closed")}
+                {VehDet.remarks}
                 </td>
                 <td className="px-3 py-2 align-top border border-custom w-12">
                     <div className="flex justify-center">
@@ -235,13 +230,15 @@ export default function VehicleSlipFormList(){
           nextLinkClassName="page-link"
         />
       )}
-
-    </div>
-  </>  
-  )}
-  </PageComponent>
-  ):(
-  <Forbidden />
+    </PageComponent>
+    ):(
+      (() => {
+        window.location = '/forbidden';
+        return null; // Return null to avoid any unexpected rendering
+      })()
+    )}
+    
+  </>
   );
 
 }

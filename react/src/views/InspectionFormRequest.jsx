@@ -50,19 +50,13 @@ export default function RepairRequestForm(){
       })
 
       setSupervisor({supervisorData:supervisorData});
-<<<<<<< HEAD
-      //console.log(supervisor);
-=======
       //console.log(supervisorData);
->>>>>>> devv2.1
     })
     .catch((error) => {
       console.error('Error fetching data:', error);
     });
   },[]);
 
-<<<<<<< HEAD
-=======
   // Set a condition depends of the user
   let adminManager;
   let supervisorUser;
@@ -79,7 +73,6 @@ export default function RepairRequestForm(){
   }
 
   // Submit the Form
->>>>>>> devv2.1
   const SubmitInspectionForm = (event) => {
     event.preventDefault();
 
@@ -99,15 +92,9 @@ export default function RepairRequestForm(){
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-<<<<<<< HEAD
-      supervisor_name: getSupervisor,
-      supervisor_approval: 0,
-      admin_approval: 0,
-=======
       supervisor_name: currentUser.code_clearance == 1 || currentUser.code_clearance == 4 ? currentUser.id : getSupervisor,
       supervisor_approval: supervisorUser,
       admin_approval: adminManager,
->>>>>>> devv2.1
       inspector_status: 0,
       remarks: remarks,
       // Logs
@@ -428,36 +415,6 @@ export default function RepairRequestForm(){
               </div>
             </div>
 
-<<<<<<< HEAD
-            {/* Type of Property */}
-            <div className="flex items-center mt-4">
-              <div className="w-60">
-                <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                  Immediate Supervisor:
-                </label> 
-              </div>
-              <div className="w-64">
-                <select 
-                name="rep_type_of_property" 
-                id="rep_type_of_property" 
-                autoComplete="rep_type_of_property"
-                value={getSupervisor}
-                onChange={ev => { setGetSupervisor(ev.target.value)}}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                >
-                  <option value="" disabled>Select your supervisor</option>
-                  {supervisor?.supervisorData?.map((Data) => (
-                    <option key={Data.id} value={Data.id}>
-                      {Data.name}
-                    </option>
-                  ))}
-                </select>
-                {!getSupervisor && inputErrors.supervisor_name && (
-                  <p className="form-validation">You must input your supervisor</p>
-                )}
-              </div>
-            </div>
-=======
             {/* Supervisor */}
             {(currentUser.code_clearance == 4 || currentUser.code_clearance == 1) ? null:(
               <div className="flex items-center mt-4">
@@ -488,7 +445,6 @@ export default function RepairRequestForm(){
                 </div>
               </div>
             )}          
->>>>>>> devv2.1
 
           </div>
 

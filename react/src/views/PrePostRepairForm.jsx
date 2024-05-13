@@ -41,21 +41,6 @@ export default function PrePostRepairForm(){
   const [popupMessage, setPopupMessage] = useState('');
   const [popupContent, setPopupContent] = useState('');
 
-<<<<<<< HEAD
-  const [originalText, setOriginalText] = useState(true);
-  const [updatePartA, setUpdatePartA] = useState(false);
-  const [validate, setValidate] = useState(false);
-
-  // Variables
-  // Part A
-  const [propertyNo, setPropertyNo] = useState('');
-  const [acquisitionDate, setAcquisitionDate] = useState('');
-  const [acquisitionCost, setAcquisitionCost] = useState('');
-  const [BrandModel, setBrandModel] = useState('');
-  const [SerialEngineNo, setSerialEngineNo] = useState('');
-
-  // For Part B
-=======
   // Variable Functions
   const [giveSupReason, setGiveSupReason] = useState(false);
   const [giveAdminReason, setGiveAdminReason] = useState(false);
@@ -69,7 +54,6 @@ export default function PrePostRepairForm(){
   const [adminReason, setAdminReason] = useState('');
 
   // Part B, C, and D
->>>>>>> devv2.1
   const [lastfilledDate, setLastFilledDate] = useState('');
   const [natureRepair, setNatureRepair] = useState('');
   const [pointPersonnel, setPointPersonnel] = useState('');
@@ -147,37 +131,6 @@ export default function PrePostRepairForm(){
     fetchData();
   }, [id]);
 
-<<<<<<< HEAD
-  // Enable Edit Part A
-  const handleEditDetails = () => {
-    setOriginalText(false);
-    setUpdatePartA(true);
-    setValidate(false);
-  }
-
-  // Disable Edit Part A
-  const handleDisableEdit = () => {
-    setOriginalText(true);
-    setUpdatePartA(false);
-    setValidate(false);
-    setPropertyNo('');
-  }
-
-  // Validate
-  const handleValidate = () => {
-    setUpdatePartA(false);
-    setValidate(true);
-  }
-
-  // Submit the Form
-  const SubmitPartADetails = (event) => {
-    event.preventDefault();
-
-    alert("Done!")
-  }
-
-  //Popup Message
-=======
   // Buttons Functions
   // Enable Edit Part A
   const handleEditADetails = () => { setEditPartA(true); }
@@ -508,7 +461,6 @@ export default function PrePostRepairForm(){
   }
 
   // Popup Dev Message
->>>>>>> devv2.1
   const DevErrorText = (
     <div>
       <p className="popup-title">Something Wrong!</p>
@@ -821,226 +773,6 @@ export default function PrePostRepairForm(){
       {/* Part A */}
       <div className="border-b border-gray-300 pb-6 font-roboto">
 
-<<<<<<< HEAD
-      <div>
-        <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-        {validate ? (
-          <p className="text-xs text-red-500">Kindly double-check the form before submitting </p>
-        ):null}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-
-        <div className="col-span-1">
-
-          {/* Date */}
-          <div className="flex items-center mt-6">
-            <div className="w-40">
-              <label className="block text-base font-medium leading-6 text-gray-900">
-              Date:
-              </label> 
-            </div>
-            <div className="w-64 border-b border-black pl-1">
-            {formatDate(InspectionData?.getPartA?.date_of_request)}
-            </div>
-          </div>
-
-          <form id="update_partA" onSubmit={SubmitPartADetails}>
-
-            {/* Property No */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Property No:
-                </label> 
-              </div>
-              {/* Main Text */}
-              {originalText ? (
-                <div className="w-64 border-b border-black pl-1">
-                  {InspectionData?.getPartA?.property_number}
-                </div>
-              ):null}
-              {/* Enable Edit */}
-              {updatePartA ? (
-                <div className="w-64">
-                  <input
-                    type="text"
-                    name="rep_property_no"
-                    id="rep_property_no"
-                    autoComplete="rep_property_no"
-                    value={propertyNo}
-                    onChange={ev => setPropertyNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                    placeholder={InspectionData?.getPartA?.property_number}
-                    required
-                  />
-                </div>
-              ):null}
-              {/* Validation */}
-              {validate ? (
-                <div className="w-64 border-b-2 border-black pl-1 font-bold">
-                  {propertyNo}
-                </div>
-              ):null}
-            </div>
-
-            {/* Acquisition Date */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Acquisition Date:
-                </label> 
-              </div>
-              {/* Main Text */}
-              {originalText ? (
-                <div className="w-64 border-b border-black pl-1">
-                  {formatDate(InspectionData?.getPartA?.acq_date)}
-                </div>
-              ):null}
-              {/* Enable Edit */}
-              {updatePartA ? (
-                <div className="w-64">
-                  <input
-                    type="date"
-                    name="rep_acquisition_date"
-                    id="rep_acquisition_date"
-                    value={acquisitionDate}
-                    onChange={ev => setAcquisitionDate(ev.target.value)}
-                    max={currentDate}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                  />
-                </div>
-              ):null}
-              {/* Validation */}
-              {validate ? (
-                <div className="w-64 border-b-2 border-black pl-1 font-bold">
-                  {formatDate(acquisitionDate)}
-                </div>
-              ):null}
-            </div>
-
-            {/* Acquisition Cost */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Acquisition Cost:
-                </label> 
-              </div>
-              {/* Main Text */}
-              {originalText ? (
-                <div className="w-64 border-b border-black pl-1">
-                  ₱{InspectionData?.getPartA?.acq_cost}
-                </div>
-              ):null}
-              {/* Enable Edit */}
-              {updatePartA ? (
-                <div className="w-64">
-                  <div className="relative flex items-center">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
-                      ₱
-                    </span>
-                    <input
-                      type="text"
-                      name="rep_acquisition_cost"
-                      id="rep_acquisition_cost"
-                      autoComplete="rep_acquisition_cost"
-                      value={acquisitionCost}
-                      onChange={ev => {
-                        const inputVal = ev.target.value;
-                        // Allow only numeric input
-                        if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
-                          setAcquisitionCost(inputVal.replace(/,/g, ''));
-                        }
-                      }}
-                      className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                      placeholder={InspectionData?.getPartA?.acq_cost}
-                    />
-                  </div>
-                </div>
-              ):null}
-              {/* Validation */}
-              {validate ? (
-                <div className="w-64 border-b-2 border-black pl-1 font-bold">
-                  ₱{acquisitionCost}
-                </div>
-              ):null}
-            </div>
-
-            {/* Brand/Model */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Brand/Model:
-                </label> 
-              </div>
-              {/* Main Text */}
-              {originalText ? (
-                <div className="w-64 border-b border-black pl-1">
-                  {InspectionData?.getPartA?.brand_model}
-                </div>
-              ):null}
-              {/* Enable Edit */}
-              {updatePartA ? (
-                <div className="w-64">
-                  <input
-                    type="text"
-                    name="brand_mrep_brand_modelodel"
-                    id="rep_brand_model"
-                    autoComplete="rep_brand_model"
-                    value={BrandModel}
-                    onChange={ev => setBrandModel(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                    placeholder={InspectionData?.getPartA?.brand_model}
-                  />
-                </div>
-              ):null}
-              {/* Validation */}
-              {validate ? (
-                <div className="w-64 border-b-2 border-black pl-1 font-bold">
-                  {BrandModel}
-                </div>
-              ):null}
-            </div>
-
-            {/* Serial/Engine No */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Serial/Engine No:
-                </label> 
-              </div>
-              {/* Main Text */}
-              {originalText ? (
-                <div className="w-64 border-b border-black pl-1">
-                  {InspectionData?.getPartA?.serial_engine_no}
-                </div>
-              ):null}
-              {/* Enable Edit */}
-              {updatePartA ? (
-                <div className="w-64">
-                  <input
-                    type="text"
-                    name="rep_serial_engine_no"
-                    id="rep_serial_engine_no"
-                    autoComplete="rep_serial_engine_no"
-                    value={SerialEngineNo}
-                    onChange={ev => setSerialEngineNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                    placeholder={InspectionData?.getPartA?.serial_engine_no}
-                  />
-                </div>
-              ):null}
-              {/* Validation */}
-              {validate ? (
-                <div className="w-64 border-b-2 border-black pl-1 font-bold">
-                  {SerialEngineNo}
-                </div>
-              ):null}
-            </div>
-
-          </form>
-          
-=======
         {/* Control No */}
         <div className="flex items-center mt-6 mb-10">
           <div className="w-24">
@@ -1051,7 +783,6 @@ export default function PrePostRepairForm(){
           <div className="w-auto px-5 border-b border-black text-center font-bold">
           {InspectionData?.getPartA?.id}
           </div>
->>>>>>> devv2.1
         </div>
 
         {/* Caption */}
@@ -1067,56 +798,6 @@ export default function PrePostRepairForm(){
         {/* Part A Fields */}
         <div className="grid grid-cols-2 gap-4">
 
-<<<<<<< HEAD
-      {/* Complain */}
-      <div className="flex items-center mt-2">
-        <div className="w-40">
-          <label className="block text-base font-medium leading-6 text-gray-900">
-          Complain:
-          </label> 
-        </div>
-        <div className="w-3/4 border-b border-black pl-1">
-        {InspectionData?.getPartA?.complain}
-        </div>
-      </div>
-
-      {/* Status */}
-      <div className="flex items-center mt-8">
-        <div className="w-16">
-          <label className="block text-base font-bold leading-6 text-gray-900">
-          Status:
-          </label> 
-        </div>
-        <div className="w-full font-bold">
-        {InspectionData?.getPartA?.supervisor_approval == 1 ? ("Approved")
-        :InspectionData?.getPartA?.supervisor_approval == 2 ? ("Disapproved")
-        :(<>{InspectionData?.getPartA?.supervisor_name == currentUser.id ? ("Waiting for your approval"):("Pending")}</>)}
-        </div>
-      </div>
-
-    </div>
-
-    {/* Supervisor Decision */}
-    {InspectionData?.getPartA?.supervisor_approval != 2 ? (
-    <>
-
-      {/* If the GSO want to edit PART A */}
-      {updatePartA ? null:(
-      <>
-
-        {/* Part B */}
-        {InspectionData?.getPartA?.supervisor_approval == 1 &&  (
-        <>
-          <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
-
-          <div>
-            <h2 className="text-base font-bold leading-7 text-gray-900"> Part B: To be filled-up by Administrative Division </h2>
-          </div>
-
-          {currentUser.code_clearance == 3 && InspectionData?.getPartA?.admin_approval == 4 ? (
-          <>
-
-=======
           {/* Part A left side */}
           <div className="col-span-1">
 
@@ -1502,7 +1183,6 @@ export default function PrePostRepairForm(){
           </div>
 
           {enablePartB ? (
->>>>>>> devv2.1
             <form id='partB' onSubmit={event => SubmitInspectionFormTo(event, InspectionData?.getPartA?.id)}>
 
               {/* Date */}
@@ -1544,7 +1224,6 @@ export default function PrePostRepairForm(){
                 </div>
               </div>
               <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
-<<<<<<< HEAD
 
               {/* Nature of Repair */}
               <div className="flex items-center mt-2">
@@ -1590,347 +1269,6 @@ export default function PrePostRepairForm(){
                 </select>
                 </div>
               </div>
-              {!pointPersonnel && inputErrors.assign_personnel && (
-                <p className="font-roboto form-validation" style={{ marginLeft: '155px' }}>Assign Personnel is required</p>
-              )}
-
-            </form>
-
-          </>
-          ):(
-          <>
-
-            <div className="grid grid-cols-2 gap-4">
-
-              <div className="col-span-1">
-
-                {/* Date */}
-                <div className="flex items-center mt-6">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Date:
-                    </label> 
-                  </div>
-                  {InspectionData?.getPartB?.date_of_filling ? 
-                  <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartB?.date_of_filling)}</div>:
-                  <div className="w-64 border-b border-black pl-1 h-4"></div>}
-                </div>
-
-                {/* Date of Last Repair */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Date of Last Repair:
-                    </label> 
-                  </div>
-                  {InspectionData?.personnel?.p_name ? 
-                  <div className="w-64 border-b border-black pl-1">{InspectionData?.getPartB?.date_of_last_repair ? (formatDate(InspectionData?.getPartB?.date_of_last_repair)):("N/A")}</div>:
-                  <div className="w-64 border-b border-black pl-1 h-4"></div>}
-                </div>
-
-                {/* Assigned Personnel: */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Assigned Personnel:
-                    </label> 
-                  </div>
-                  {InspectionData?.personnel?.p_name ?
-                  <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                  <div className="w-64 border-b border-black pl-1 h-4"></div>}
-                </div>
-
-              </div>
-
-              <div className="col-span-1">
-
-                {/* Requested By */}
-                <div className="flex items-center mt-6">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Requested By:
-                    </label> 
-                  </div>
-                  <div className="w-64 font-bold border-b border-black pl-1">
-                  {InspectionData?.gso?.gsoName}
-                  </div>
-                </div>
-
-                {/* Noted By */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Noted By:
-                    </label> 
-                  </div>
-                  <div className="w-64 font-bold border-b border-black pl-1">
-                  {InspectionData?.manager?.ad_name}
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* Nature of Repair */}
-            <div className="flex items-center mt-2">
-              <div className="w-40">
-                <label className="block text-base font-medium leading-6 text-gray-900">
-                Nature of Repair:
-                </label> 
-              </div>
-              {InspectionData?.personnel?.p_name ? 
-              <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartB?.nature_of_last_repair ? (InspectionData?.getPartB?.nature_of_last_repair):("N/A")}</div>:
-              <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
-            </div>
-
-            {/* Status */}
-            <div className="flex items-center mt-8">
-              <div className="w-16">
-                <label className="block text-base font-bold leading-6 text-gray-900">
-                Status:
-                </label> 
-              </div>
-              <div className="w-96 font-bold">
-              {InspectionData?.getPartB != null ? 
-              (<>
-              {InspectionData?.getPartA?.admin_approval == 1 && ("Approved")}
-              {InspectionData?.getPartA?.admin_approval == 2 && ("Disapproved")}
-              {InspectionData?.getPartA?.admin_approval == 3 && (InspectionData?.manager?.ad_id == currentUser.id ? ("Waiting for your approval"):("Pending"))}
-              </>):"To be filled by GSO"}
-              </div>
-            </div>
-
-          </>
-          )}
-
-          </div>
-        </>
-        )}
-        {/* -- End of PART B -- */}
-
-        {/* Part C */}
-        {InspectionData?.getPartCD && InspectionData?.getPartA?.admin_approval == 1 && (
-        <>
-          <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
-
-            <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
-            </div>
-
-            {InspectionData?.getPartB?.assign_personnel == currentUser.id && InspectionData?.getPartCD?.findings == 'no data' ? (
-            <>
-              <form id="partC" onSubmit={SubmitPartC}>
-
-                {/* Date */}
-                <div className="flex items-center mt-6">
-                  <div className="w-36">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                      Date Inspected:
-                    </label> 
-                  </div>
-                  <div className="w-64 border-b border-black">
-                    <input
-                      type="date"
-                      name="date_filled"
-                      id="date_filled"
-                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      defaultValue={today}
-                      readOnly
-                    />
-                  </div>
-                </div>
-
-                {/* Findings */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Findings:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <textarea
-                      id="findings"
-                      name="findings"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {finding}
-                      onChange={ev => setFinding(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-                {!finding && inputErrors.findings && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Fidings</p>
-                )}
-
-                {/* Recomendations */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Recomendations:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <textarea
-                      id="recomendations"
-                      name="recomendations"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {recommendation}
-                      onChange={ev => setRecommendation(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-                {!recommendation && inputErrors.recommendations && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Recommendations</p>
-                )}
-
-              </form>
-            </>
-            ):(
-            <>
-
-              {/* Date Inspected */}
-              <div className="flex items-center mt-6">
-                <div className="w-36">
-                  <label className="block text-base font-medium leading-6 text-gray-900">
-                  Date Inspected:
-                  </label> 
-                </div>
-                {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartCD?.before_repair_date)}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
-              </div>
-=======
->>>>>>> devv2.1
-
-              {/* Nature of Repair */}
-              <div className="flex items-center mt-2">
-<<<<<<< HEAD
-                <div className="w-36">
-=======
-                <div className="w-44">
->>>>>>> devv2.1
-                  <label className="block text-base font-medium leading-6 text-gray-900">
-                  Nature of Repair:
-                  </label> 
-                </div>
-<<<<<<< HEAD
-                {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.findings}</div>:
-                <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
-              </div>
-=======
-                <div className="w-full">
-                  <textarea
-                    id="nature_repair"
-                    name="nature_repair"
-                    rows={3}
-                    value={natureRepair}
-                    onChange={ev => setNatureRepair(ev.target.value)}
-                    style={{ resize: "none" }}  
-                    className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <p className="text-gray-400 text-xs mt-1" style={{ marginLeft:'160px' }}>Leave it blank if "N/A"</p>
->>>>>>> devv2.1
-
-              {/* Assign Personnel */}
-              <div className="flex items-center mt-2">
-<<<<<<< HEAD
-                <div className="w-36">
-=======
-                <div className="w-44">
->>>>>>> devv2.1
-                  <label className="block text-base font-medium leading-6 text-gray-900">
-                  Assign Personnel:
-                  </label> 
-                </div>
-<<<<<<< HEAD
-                {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.recommendations}</div>:
-                <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
-              </div>
-
-              {/* Noted By */}
-              <div className="flex items-center mt-2">
-                <div className="w-36">
-                  <label className="block text-base font-medium leading-6 text-gray-900">
-                  Noted By:
-                  </label> 
-=======
-                <div className="w-full">
-                <select 
-                  name="plate_number" 
-                  id="plate_number" 
-                  autoComplete="request-name"
-                  value={pointPersonnel}
-                  onChange={ev => setPointPersonnel(ev.target.value)}
-                  className="block w-full rounded-md border-1 border-black py-1 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                > 
-                  <option value="" disabled>Select an option</option>
-                  {InspectionData?.getPersonnelData?.map(user => (
-                  <option key={user.id} value={user.id}> {user.name} </option>
-                  ))}
-                </select>
->>>>>>> devv2.1
-                </div>
-                {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
-              </div>
-<<<<<<< HEAD
-            
-            </>
-            )}
-
-          </div>
-        </>
-        )}
-        {/* -- End of PART C */}
-
-        {/* Part D */}
-        {InspectionData?.getPartCD && InspectionData?.getPartA?.admin_approval == 1 && (
-        <>
-          <div className="mt-4 border-b border-gray-300 pb-6 font-roboto">
-
-            <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
-            </div>
-
-            {InspectionData?.getPartCD?.close == 3 && InspectionData?.getPartB?.assign_personnel == currentUser.id ? (
-            <>
-
-              <form id="partD" onSubmit={SubmitPartD}>
-
-                {/* Date */}
-                <div className="flex items-center mt-6">
-                  <div className="w-36">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                      Date Inspected:
-                    </label> 
-                  </div>
-                  <div className="w-64 border-b border-black">
-                    <input
-                      type="date"
-                      name="date_filled"
-                      id="date_filled"
-                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                      defaultValue={today}
-                      readOnly
-                    />
-                  </div>
-                </div>
-
-                {/* Remarks */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="block text-base font-medium leading-6 text-gray-900">
-                    Remarks:
-=======
               {!pointPersonnel && inputErrors.assign_personnel && (
                 <p className="font-roboto form-validation" style={{ marginLeft: '155px' }}>Assign Personnel is required</p>
               )}
@@ -2299,32 +1637,10 @@ export default function PrePostRepairForm(){
                   <div className="w-40">
                     <label className="block text-base font-medium leading-6 text-gray-900">
                     Findings:
->>>>>>> devv2.1
                     </label> 
                   </div>
                   <div className="w-full">
                     <textarea
-<<<<<<< HEAD
-                      id="remarks"
-                      name="remarks"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value= {remarks}
-                      onChange={ev => setRemarks(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                  </div>
-                </div>
-                {!remarks && inputErrors.remarks && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Remarks</p>
-                )}
-
-              </form>
-            
-            </>
-            ):(
-            <>
-=======
                       id="findings"
                       name="findings"
                       rows={3}
@@ -2367,7 +1683,6 @@ export default function PrePostRepairForm(){
             ):(
             <>
               {/* Display Part C */}
->>>>>>> devv2.1
 
               {/* Date Inspected */}
               <div className="flex items-center mt-6">
@@ -2376,8 +1691,6 @@ export default function PrePostRepairForm(){
                   Date Inspected:
                   </label> 
                 </div>
-<<<<<<< HEAD
-=======
                 {InspectionData?.getPartCD?.findings != 'no data' ? 
                 <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartCD?.before_repair_date)}</div>:
                 <div className="w-64 border-b border-black pl-1 h-4"></div>}
@@ -2605,7 +1918,6 @@ export default function PrePostRepairForm(){
                   Date Inspected:
                   </label> 
                 </div>
->>>>>>> devv2.1
                 {InspectionData?.getPartCD?.after_reapir_date != null ? 
                 <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartCD?.after_reapir_date)}</div>:
                 <div className="w-64 border-b border-black pl-1 h-4"></div>}
@@ -2614,24 +1926,11 @@ export default function PrePostRepairForm(){
               {/* Remarks */}
               {enablePartD ? (
               <div className="flex items-center mt-2">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Remarks:
                   </label> 
                 </div>
-<<<<<<< HEAD
-                {InspectionData?.getPartCD?.remarks != null ? 
-                <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.remarks}</div>:
-                <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
-              </div>
-
-              {/* Noted By */}
-              <div className="flex items-center mt-2">
-                <div className="w-36">
-                  <label className="block text-base font-medium leading-6 text-gray-900">
-                  Noted By:
-                  </label> 
-=======
                 <div className="w-full">
                   <textarea
                     id="remarks"
@@ -2644,180 +1943,8 @@ export default function PrePostRepairForm(){
                     placeholder={InspectionData?.getPartCD?.remarks}
                   />
                   {(fieldMissing && !updateRemark) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
->>>>>>> devv2.1
                 </div>
-                {InspectionData?.getPartCD?.remarks ? 
-                <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
               </div>
-<<<<<<< HEAD
-
-            </>
-            )}
-
-          </div>
-        </>
-        )}
-        {/* -- End of PART D -- */}
-
-      </>  
-      )}
-
-    </>
-    ):null}
-
-    {/* Request Close */}
-    <div className="flex items-center mt-8 font-roboto">
-      <div className="w-32">
-        <label className="block text-base font-bold leading-6 text-gray-900">
-        Request Close:
-        </label> 
-      </div>
-      <div className="w-24 font-bold">
-      {InspectionData?.getPartCD?.close == 1 ? ("Yes"):
-      InspectionData?.getPartA?.admin_approval == 2 ? ("Yes"):
-      InspectionData?.getPartA?.supervisor_approval == 2 ? ("Yes"):
-      ("No")}
-      </div>
-    </div>
-
-    {/* Buttons */}
-    <div className="flex mt-8">
-
-      {/* For Supervisor */}
-      {(InspectionData?.getPartA?.supervisor_name == currentUser.id && InspectionData?.getPartA?.supervisor_approval == 0) && (
-      <div>
-        {/* Approve */}
-        <button onClick={() => handleApprovalRequest()} className="px-6 py-2 btn-submit" title="Supervisor Approve">
-          Approve
-        </button>
-        {/* Disapprove */}
-        <button onClick={() => handleDeclineRequest()} className="px-6 py-2 btn-cancel ml-2" title="Supervisor Decline">
-          Disapprove
-        </button>
-      </div>
-      )}
-
-      {/* For GSO */}
-      {currentUser.code_clearance == 3 && InspectionData?.getPartA?.admin_approval == 4 && (
-      <>
-
-        {/* Main buttton */}
-        {originalText ? (
-        <>
-          {/* Part A */}
-          <button onClick={handleEditDetails} className="px-6 py-2 btn-default">
-            Edit Part A
-          </button>
-
-          {/* Part B */}
-          {pointPersonnel && (
-          <>
-          <button form='partB' type="submit"
-            className={`px-6 py-2 ml-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            style={{ position: 'relative', top: '0px' }}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Submitting</span>
-              </div>
-            ) : (
-              'Submit Part B'
-            )}
-          </button>
-          </>
-          )}
-        </>
-        ):null}
-
-        {/* Enable Edit Part A */}
-        {updatePartA ? (
-        <>
-          {/* Cancel the Edit */}
-          <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-            Cancel
-          </button>
-          {/* Validate */}
-          <button onClick={handleValidate} className="px-6 py-2 ml-2 btn-submit">
-            Validate
-          </button>
-        </>
-        ):null}
-
-        {/* Validation */}
-        {validate ? (
-        <>
-          {/* Cancel the Edit */}
-          <button onClick={handleEditDetails} className="px-6 py-2 btn-default">
-            Edit
-          </button>
-          {/* Validate */}
-          <button form="update_partA" className="px-6 py-2 ml-2 btn-submit">
-            Submit
-          </button>
-        </>  
-        ):null}
-
-      </>
-      )}
-
-      {/* For Admin */}
-      {currentUser.code_clearance == 1 && InspectionData?.getPartA?.admin_approval == 3 && (
-      <>
-        {/* Approve */}
-        <button onClick={() => handleApprovalRequest()} className="px-6 py-2 btn-submit" title="Admin Approve">
-          Approve
-        </button>
-        {/* Disapprove */}
-        <button onClick={() => handleDeclineRequest()} className="px-6 py-2 ml-2 btn-cancel" title="Admin Decline">
-          Disapprove
-        </button>
-      </>
-      )}
-
-      {/* For Assign Personnels */}
-      {InspectionData?.getPartB?.assign_personnel == currentUser.id && (InspectionData?.getPartA?.inspector_status == 3 || InspectionData?.getPartA?.inspector_status == 2) && (
-      <>
-
-        {/* Part C Button */}
-        {InspectionData?.getPartA?.inspector_status == 3 && (
-          <button form='partC' type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Submitting</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-        )}
-
-        {/* Part D Button */}
-        {InspectionData?.getPartA?.inspector_status == 2 && (
-          <button form="partD" type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Submitting</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-        )}
-
-      </>
-      )}
-=======
               ):(
               <div className="flex items-center mt-2">
                 <div className="w-36">
@@ -2924,7 +2051,6 @@ export default function PrePostRepairForm(){
         ("No")}
         </div>
       </div>
->>>>>>> devv2.1
 
       {/* Close Request Button */}
       {currentUser.code_clearance == 3 && InspectionData?.getPartCD?.close == 2 && (
@@ -3609,4 +2735,4 @@ export default function PrePostRepairForm(){
   </>
   )
 
-}
+};

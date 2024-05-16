@@ -10,8 +10,14 @@ export default defineConfig({
         }),
     ],
     server: {
-        hmr: {
-          host: 'localhost',
-        }
+      hmr: {
+        host: '20.20.2.1'
       }
+    },
+    resolve: {
+      alias: {
+        '@': '/src',
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    },
 });

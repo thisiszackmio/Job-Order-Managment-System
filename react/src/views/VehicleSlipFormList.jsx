@@ -154,7 +154,7 @@ export default function VehicleSlipFormList(){
 
       {/* Vehicle Slip Form */}
       <div className="overflow-x-auto">
-        {currentVehicleSlip.length > 0 ? (
+        
           <table className="border-collapse font-roboto" style={{ width: '100%' }}>
             <thead>
               <tr className="bg-gray-100">
@@ -171,42 +171,45 @@ export default function VehicleSlipFormList(){
                 <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
               </tr>
             </thead>
-            <tbody>
-            {currentVehicleSlip.map((VehDet) => (
-              <tr key={VehDet.id}>
-                <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold table-font">{VehDet.id}</td>
-                <td className="px-1 py-2 align-top border border-custom w-48 table-font">{VehDet.date}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.purpose}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.place_visited}</td>
-                <td className="px-1 py-2 align-top border border-custom w-60 table-font">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
-                <td className="px-1 py-2 align-top border border-custom w-96 table-font">{VehDet.vehicle_type}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.driver}</td>
-                <td className="px-1 py-2 align-top text-center border border-custom w-20 table-font">{VehDet.passengersCount}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.requestor}</td>
-                <td className="px-1 py-2 align-top border border-custom w-72 table-font">
-                {VehDet.remarks}
-                </td>
-                <td className="px-3 py-2 align-top border border-custom w-12">
-                    <div className="flex justify-center">
-                      <Link to={`/vehicleslipform/${VehDet.id}`}>
-                        <button 
-                          className="text-green-600 font-bold py-1 px-2"
-                          title="View Request"
-                        >
-                          <FontAwesomeIcon icon={faEye} /> 
-                        </button>
-                      </Link>
-                    </div>
+            <tbody style={{ backgroundColor: '#fff' }}>
+            {currentVehicleSlip.length > 0 ? (
+            <>
+              {currentVehicleSlip.map((VehDet) => (
+                <tr key={VehDet.id}>
+                  <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold table-font">{VehDet.id}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-48 table-font">{VehDet.date}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.purpose}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.place_visited}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-60 table-font">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-96 table-font">{VehDet.vehicle_type}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.driver}</td>
+                  <td className="px-1 py-2 align-top text-center border border-custom w-20 table-font">{VehDet.passengersCount}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.requestor}</td>
+                  <td className="px-1 py-2 align-top border border-custom w-72 table-font">
+                  {VehDet.remarks}
                   </td>
+                  <td className="px-3 py-2 align-top border border-custom w-12">
+                      <div className="flex justify-center">
+                        <Link to={`/vehicleslipform/${VehDet.id}`}>
+                          <button 
+                            className="text-green-600 font-bold py-1 px-2"
+                            title="View Request"
+                          >
+                            <FontAwesomeIcon icon={faEye} /> 
+                          </button>
+                        </Link>
+                      </div>
+                    </td>
+                </tr>
+              ))}
+            </>
+            ):(
+              <tr>
+                <td colSpan={11} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
               </tr>
-            ))}
+            )}
             </tbody>
           </table>
-        ):(
-          <tr>
-            <td colSpan={8} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
-          </tr>
-        )}
       </div>
       {displayPaginationVehicle && (
         <ReactPaginate

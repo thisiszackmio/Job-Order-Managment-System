@@ -151,7 +151,7 @@ export default function RepairRequestList(){
               <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
             </tr>
           </thead>
-          <thead>
+          <thead style={{ backgroundColor: '#fff' }}>
           {currentRepair.length > 0 ? (
           currentRepair.map((repair) => (
           <tr key={repair.id}>

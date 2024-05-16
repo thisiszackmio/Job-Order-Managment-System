@@ -160,7 +160,7 @@ export default function UserAssign(){
                   value={fname}
                   onChange={ev => setFname(capitalizeFirstLetter(ev.target.value))}
                   placeholder="Juan"
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 {!fname && inputErrors.fname && (
                   <p className="font-roboto form-validation">You must input the first name</p>
@@ -185,7 +185,7 @@ export default function UserAssign(){
                   onChange={ev => setMname(capitalizeFirstLetter(ev.target.value))}
                   maxLength={2}
                   placeholder="A"
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 {!mname && inputErrors.mname && (
                   <p className="font-roboto form-validation">You must input the middle initial</p>
@@ -209,7 +209,7 @@ export default function UserAssign(){
                   value={lname}
                   onChange={ev => setLname(capitalizeFirstLetter(ev.target.value))}
                   placeholder="Dela Cruz"
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 {!lname && inputErrors.lname && (
                   <p className="font-roboto form-validation">You must input the last name</p>
@@ -230,7 +230,7 @@ export default function UserAssign(){
                   id="gender"
                   value={gender}
                   onChange={ev => setGender(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                   style={{ color: '#A9A9A9' }}
                 >
                   <option value="" disabled>Choose Gender</option>
@@ -256,7 +256,7 @@ export default function UserAssign(){
                   id="division"
                   value={division}
                   onChange={ev => setDivision(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                   style={{ color: '#A9A9A9' }}
                 >
                   <option value="" disabled>Choose Division</option>
@@ -290,7 +290,7 @@ export default function UserAssign(){
                   value={jobPosition}
                   onChange={ev => setJobPosition(capitalizeFirstLetter(ev.target.value))}
                   placeholder="Division Manager A"
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 {!jobPosition && inputErrors.position && (
                   <p className="font-roboto form-validation">You must input the position</p>
@@ -317,7 +317,7 @@ export default function UserAssign(){
                   type="text"
                   value={username}
                   onChange={ev => setUsername(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 {!username && inputErrors.username && (
                   <p className="font-roboto form-validation">You must input the username</p>
@@ -339,7 +339,7 @@ export default function UserAssign(){
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={ev => setPassword(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 <button
                   type="button"
@@ -366,7 +366,7 @@ export default function UserAssign(){
                   autoComplete="position"
                   value={passwordCorfirmation}
                   onChange={ev => setPasswordConfirmation(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200 input-placeholder"
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400 input-placeholder"
                 />
                 <button
                   type="button"

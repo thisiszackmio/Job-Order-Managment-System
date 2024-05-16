@@ -165,7 +165,7 @@ export default function Dashboard()
   },[currentUser]);
 
   return(
-    <PageComponent title="Dashboard">
+     <PageComponent title="Dashboard">
     {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
       <img

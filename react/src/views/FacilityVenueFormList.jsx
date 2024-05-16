@@ -176,7 +176,7 @@ export default function FacilityVenueRequestList() {
 
       {/* Facility / Venue List */}
       <div className="overflow-x-auto">
-        <table className="border-collapse font-roboto">
+        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
           <thead>
             <tr className="bg-gray-100">
               <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
@@ -191,7 +191,7 @@ export default function FacilityVenueRequestList() {
               ):null}
             </tr>   
           </thead>
-          <tbody>
+          <tbody style={{ backgroundColor: '#fff' }}>
           {currentFacility.length > 0 ? (
             currentFacility.map((FacDet) => (
               <tr key={FacDet.id}>

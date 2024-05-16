@@ -140,7 +140,7 @@ export default function UserList(){
                 <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Code CLR</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody style={{ backgroundColor: '#fff' }}>
             {currentUser.length > 0 ? (
               currentUser.map((UserDet) => (
               <tr key={UserDet.id}>

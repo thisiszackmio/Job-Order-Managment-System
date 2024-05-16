@@ -4,7 +4,7 @@ import { useUserStateContext  } from "../context/ContextProvider";
 import loadingAnimation from '../assets/loading.gif';
 
 export default function Login() {
-  const { setCurrentUser, setUserToken, setUserRole } = useUserStateContext ();
+  const { setCurrentUser, setUserToken, setUserRole, setCodeClearance } = useUserStateContext ();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 
@@ -29,7 +29,7 @@ export default function Login() {
 
       // Now you have the user's role; you can store it in state, context, or any state management solution you use.
       // For example, if you are using React state and setUserRole is a state update function:
-      return { userRole, data: response.data };
+      return { userRole, codeClearance, data: response.data };
     } catch (error) {
       // Handle login error
       if (error.response) {

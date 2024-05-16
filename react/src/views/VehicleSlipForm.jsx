@@ -916,13 +916,19 @@ export default function PrePostRepairForm(){
                                 <span>PASSENGERS/s:</span>
                               </div>
                               <div className="w-full">
-                                <div style={{ columnCount: 2 }}>
+                                {vehicleForms?.vehicleForm?.passengers != "N/A" ? (
+                                <>
+                                  <div style={{ columnCount: 2, borderBottom: '1px solid black', display: 'block', padding: '1px' }}>
                                   {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                                    <span key={index} className="text-xs" style={{ borderBottom: '1px solid black', display: 'block', padding: '1px' }}>
+                                    <span key={index} className="text-xs">
                                       {`${index + 1}. ${passenger}`}
                                     </span>
                                   ))}
-                                </div>
+                                  </div>
+                                </>
+                                ):(
+                                  <div style={{ columnCount: 2, borderBottom: '1px solid black', display: 'block', padding: '1px', height: '18px' }}></div>  
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1100,13 +1106,19 @@ export default function PrePostRepairForm(){
                               <span>PASSENGERS/s:</span>
                             </div>
                             <div className="w-full">
-                              <div style={{ columnCount: 2 }}>
+                              {vehicleForms?.vehicleForm?.passengers != "N/A" ? (
+                              <>
+                                <div style={{ columnCount: 2, borderBottom: '1px solid black', display: 'block', padding: '1px' }}>
                                 {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                                  <span key={index} className="text-xs" style={{ borderBottom: '1px solid black', display: 'block', padding: '1px' }}>
+                                  <span key={index} className="text-xs">
                                     {`${index + 1}. ${passenger}`}
                                   </span>
                                 ))}
-                              </div>
+                                </div>
+                              </>
+                              ):(
+                                <div style={{ columnCount: 2, borderBottom: '1px solid black', display: 'block', padding: '1px', height: '18px' }}></div>  
+                              )}
                             </div>
                           </div>
                         </div>

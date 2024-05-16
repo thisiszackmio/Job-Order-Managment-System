@@ -219,7 +219,7 @@ export default function MyRequest(){
               <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody style={{ backgroundColor: '#fff' }}>
           {displayRequest?.mappedData?.map((getData) => (
             <tr key={getData.id}>
               <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
@@ -270,7 +270,7 @@ export default function MyRequest(){
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody style={{ backgroundColor: '#fff' }}>
           {displayFacRequest.mappedData.map((getData) => (
             <tr key={getData.id}>
               <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
@@ -323,7 +323,7 @@ export default function MyRequest(){
               <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody style={{ backgroundColor: '#fff' }}>
           {displayRequestVehicle?.mappedData?.map((getData) => (
             <tr key={getData.id}>
               <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1 table-font">{getData.id}</td>

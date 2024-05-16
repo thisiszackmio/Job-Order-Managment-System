@@ -178,7 +178,7 @@ export default function PrePostRepairForm(){
     const filledVariablesCount = [propertyNo, acquisitionDate, acquisitionCost, BrandModel, SerialEngineNo].filter(Boolean).length;
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has updated ${InspectionData?.requestor?.r_name}'s request for Repair Inspection Part A (Control No: ${InspectionData?.getPartA?.id})`
 
-    if(filledVariablesCount !== 1){
+    if(filledVariablesCount == 0){
       setPopupContent('error');
       setShowPopup(true);
       setPopupMessage(
@@ -1466,130 +1466,130 @@ export default function PrePostRepairForm(){
               </div>
             </>  
             )}
-
-            {/* Button for GSO */}
-            {currentUser.code_clearance == 3 && (
-            <>
-
-              {/* Fillup Part B */}
-              {enablePartB ? (
-              <div className="flex mt-6">
-                {/* Submit */}
-                <button form='partB' type="submit"
-                  className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
-                  style={{ position: 'relative', top: '0px' }}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Submitting</span>
-                    </div>
-                  ) : (
-                    'Submit'
-                  )}
-                </button>
-                {/* Cancel */}
-                <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-                  Cancel
-                </button>
-              </div>
-              ):(
-              <>
-                {(currentUser.code_clearance == 3 && InspectionData?.getPartA?.admin_approval == 4) && (
-                  <div className="flex mt-6">
-                    <button onClick={handleFillupBDetails} className="px-6 py-2 btn-edit">
-                      Fill-up Part B
-                    </button>
-                  </div>
-                )}
-              </>
-              )}
-
-              {/* Edit Part B */}
-              {/* editPartB */}
-              {InspectionData?.getPartCD?.close != 1 ? (
-                InspectionData?.getPartA?.admin_approval == 3 || InspectionData?.getPartA?.admin_approval == 1 ? (
-                  editPartB ? (
-                    <div className="flex mt-6">
-                      {/* Validate */}
-                      <button type="button"
-                        onClick={SubmitPartBDetails}
-                        className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                        disabled={submitLoading}
-                      >
-                        {submitLoading ? (
-                          <div className="flex items-center justify-center">
-                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                            <span className="ml-2">Submitting</span>
-                          </div>
-                        ) : (
-                          'Submit'
-                        )}
-                      </button>
-                      {/* Cancel */}
-                      <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-                        Cancel
-                      </button>
-                    </div>
-                  ):(
-                    <div className="flex mt-6">
-                      <button onClick={handleEditBDetails} className="px-6 py-2 btn-edit">
-                        Edit Part B
-                      </button>
-                    </div>
-                  )
-                ):null
-              ):null}
             
-            </>  
+          </>
+          )}
+
+          {/* Button for GSO */}
+          {currentUser.code_clearance == 3 && (
+          <>
+
+            {/* Fillup Part B */}
+            {enablePartB ? (
+            <div className="flex mt-6">
+              {/* Submit */}
+              <button form='partB' type="submit"
+                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                style={{ position: 'relative', top: '0px' }}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Submitting</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+              {/* Cancel */}
+              <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
+                Cancel
+              </button>
+            </div>
+            ):(
+            <>
+              {(currentUser.code_clearance == 3 && InspectionData?.getPartA?.admin_approval == 4) && (
+                <div className="flex mt-6">
+                  <button onClick={handleFillupBDetails} className="px-6 py-2 btn-edit">
+                    Fill-up Part B
+                  </button>
+                </div>
+              )}
+            </>
             )}
 
-            {/* For Admin Button */}
-            {currentUser.code_clearance == 1 && InspectionData?.getPartA?.admin_approval == 3 && (
-            <>
-              {giveAdminReason ? (
-              <>
-                <div className="flex mt-6">
-                  {/* Admin Submit Reason */}
-                  {adminReason && (
-                    <button type="submit" onClick={() => submitAdminReason(InspectionData?.getPartA?.id)}
+            {/* Edit Part B */}
+            {/* editPartB */}
+            {InspectionData?.getPartCD?.close != 1 ? (
+              InspectionData?.getPartA?.admin_approval == 3 || InspectionData?.getPartA?.admin_approval == 1 ? (
+                editPartB ? (
+                  <div className="flex mt-6">
+                    {/* Validate */}
+                    <button type="button"
+                      onClick={SubmitPartBDetails}
                       className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
                       disabled={submitLoading}
                     >
                       {submitLoading ? (
                         <div className="flex items-center justify-center">
                           <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Processing</span>
+                          <span className="ml-2">Submitting</span>
                         </div>
                       ) : (
                         'Submit'
                       )}
                     </button>
-                  )}
-                  {/* Cancel */}
-                  <button onClick={() => handleCancelReason()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
-                    Cancel
+                    {/* Cancel */}
+                    <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
+                      Cancel
+                    </button>
+                  </div>
+                ):(
+                  <div className="flex mt-6">
+                    <button onClick={handleEditBDetails} className="px-6 py-2 btn-edit">
+                      Edit Part B
+                    </button>
+                  </div>
+                )
+              ):null
+            ):null}
+          
+          </>  
+          )}
+
+          {/* For Admin Button */}
+          {currentUser.code_clearance == 1 && InspectionData?.getPartA?.admin_approval == 3 && (
+          <>
+            {giveAdminReason ? (
+            <>
+              <div className="flex mt-6">
+                {/* Admin Submit Reason */}
+                {adminReason && (
+                  <button type="submit" onClick={() => submitAdminReason(InspectionData?.getPartA?.id)}
+                    className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Processing</span>
+                      </div>
+                    ) : (
+                      'Submit'
+                    )}
                   </button>
-                </div>
-              </>
-              ):(
-              <>
-                <div className="flex mt-6">
-                  {/* Approve */}
-                  <button onClick={() => handleApprovalRequestAdmin()} className="px-6 py-2 btn-submit" title="Admin Approve">
-                    Approve
-                  </button>
-                  {/* Disapprove */}
-                  <button onClick={() => handleAdminReason()} className="px-6 py-2 ml-2 btn-cancel" title="Admin Decline">
-                    Disapprove
-                  </button>
-                </div>
-              </>
-              )}
+                )}
+                {/* Cancel */}
+                <button onClick={() => handleCancelReason()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+                  Cancel
+                </button>
+              </div>
+            </>
+            ):(
+            <>
+              <div className="flex mt-6">
+                {/* Approve */}
+                <button onClick={() => handleApprovalRequestAdmin()} className="px-6 py-2 btn-submit" title="Admin Approve">
+                  Approve
+                </button>
+                {/* Disapprove */}
+                <button onClick={() => handleAdminReason()} className="px-6 py-2 ml-2 btn-cancel" title="Admin Decline">
+                  Disapprove
+                </button>
+              </div>
             </>
             )}
-            
           </>
           )}
 

@@ -7,4 +7,8 @@ export default defineConfig({
   env: {
     VITE_API_BASE_URL: process.env.VITE_API_BASE_URL,
   },
+  server: {
+    port: 80,
+    host: true,
+  },
 });

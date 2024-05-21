@@ -426,7 +426,9 @@ export default function RequestFormFacility(){
   return (
   <PageComponent title="Request for use of Facility / Venue Form">
 
-    <form id="fac-submit" onSubmit={SubmitFacilityForm}>
+    {currentUser.image !== "null" ? (
+    <>
+      <form id="fac-submit" onSubmit={SubmitFacilityForm}>
 
       {/* Title */}
       <div>
@@ -1271,93 +1273,63 @@ export default function RequestFormFacility(){
         </div>
       )}
 
-    </form>
-        
+      </form>
+          
+      {/* Button Validation */}
 
-    {/* Button Validation */}
-
-    {/* Check Availbility Button */}
-    {checkAvailabilityBtn ? (
-    <div className="mt-10 font-roboto">
-      <button type="submit" onClick={checkAvailability}
-        className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-        disabled={submitLoading}
-      >
-        {submitLoading ? (
-          <div className="flex items-center justify-center">
-            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-            <span className="ml-2">Checking</span>
-          </div>
-        ) : (
-          'Check Availability'
-        )}
-      </button>
-    </div>
-    ):null}
-
-    {/* Activate Facility */}
-    {(activateFacility && !activateDorm) && (
-      <div className="mt-10 font-roboto flex">
-        {checkedCount ? (
-        <>
-          {currentUser.code_clearance == 1 ? (
-          <>
-            {OprInstruct ? (
-              <button form="fac-submit" type="submit"
-                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Processing...</span>
-                  </div>
-                ) : 'Submit'}
-              </button>
-            ):(
-              <button onClick={() => handleClarification()}
-                className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Processing...</span>
-                  </div>
-                ) : 'Submit'}
-              </button>
-            )}
-          </> 
-          ):(
-            <button form="fac-submit" type="submit"
-              className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
-              disabled={submitLoading}
-            >
-              {submitLoading ? (
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Processing...</span>
-                </div>
-              ) : 'Submit'}
-            </button>
+      {/* Check Availbility Button */}
+      {checkAvailabilityBtn ? (
+      <div className="mt-10 font-roboto">
+        <button type="submit" onClick={checkAvailability}
+          className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+          disabled={submitLoading}
+        >
+          {submitLoading ? (
+            <div className="flex items-center justify-center">
+              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+              <span className="ml-2">Checking</span>
+            </div>
+          ) : (
+            'Check Availability'
           )}
-        </>    
-        ):null}
-        {/* Cancel */}
-        <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
-          Cancel
         </button>
       </div>
-    )}
+      ):null}
 
-    {/* Activate Dorm */}
-    {(!activateFacility && activateDorm) && (
-      <div className="mt-10 font-roboto flex">
-        {maleList || femaleList ? (
-        <>
-          {currentUser.code_clearance == 1 ? (
+      {/* Activate Facility */}
+      {(activateFacility && !activateDorm) && (
+        <div className="mt-10 font-roboto flex">
+          {checkedCount ? (
           <>
-            {OprInstruct ? (
+            {currentUser.code_clearance == 1 ? (
+            <>
+              {OprInstruct ? (
+                <button form="fac-submit" type="submit"
+                  className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : 'Submit'}
+                </button>
+              ):(
+                <button onClick={() => handleClarification()}
+                  className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : 'Submit'}
+                </button>
+              )}
+            </> 
+            ):(
               <button form="fac-submit" type="submit"
                 className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
                 disabled={submitLoading}
@@ -1369,8 +1341,51 @@ export default function RequestFormFacility(){
                   </div>
                 ) : 'Submit'}
               </button>
+            )}
+          </>    
+          ):null}
+          {/* Cancel */}
+          <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Activate Dorm */}
+      {(!activateFacility && activateDorm) && (
+        <div className="mt-10 font-roboto flex">
+          {maleList || femaleList ? (
+          <>
+            {currentUser.code_clearance == 1 ? (
+            <>
+              {OprInstruct ? (
+                <button form="fac-submit" type="submit"
+                  className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : 'Submit'}
+                </button>
+              ):(
+                <button onClick={() => handleClarification()}
+                  className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : 'Submit'}
+                </button>
+              )}
+            </> 
             ):(
-              <button onClick={() => handleClarification()}
+              <button form="fac-submit" type="submit"
                 className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
                 disabled={submitLoading}
               >
@@ -1382,25 +1397,18 @@ export default function RequestFormFacility(){
                 ) : 'Submit'}
               </button>
             )}
-          </> 
-          ):(
-            <button form="fac-submit" type="submit"
-              className={`px-6 py-2 btn-submit mr-2 ${ submitLoading && 'btn-submitting'}`}
-              disabled={submitLoading}
-            >
-              {submitLoading ? (
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Processing...</span>
-                </div>
-              ) : 'Submit'}
-            </button>
-          )}
-        </>
-        ):null}
-        <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
-          Cancel
-        </button>
+          </>
+          ):null}
+          <button onClick={() => handleCancelForm()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+            Cancel
+          </button>
+        </div>
+      )}
+    </>
+    ):(
+      <div>
+        <h2 className="text-xl font-bold leading-7 text-gray-900"> You cannot create a request because you don't have an e-signature. </h2>
+        <p className="text-xs text-red-500 font-bold">Please submit your e-signature to the developer so that you can create a request </p>
       </div>
     )}
 

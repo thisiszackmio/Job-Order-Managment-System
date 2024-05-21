@@ -70,7 +70,9 @@ class UserController extends Controller
             'division' => $getUser->division,
             'code' => $getUser->code_clearance,
             'username' => basename($getUser->username),
-            'signature' =>  URL::to('/storage/esignature/' . $getUser->image)
+            // 'signature' =>  URL::to('/storage/esignature/' . $getUser->image)
+            'signature' =>  ('http://20.20.2.1:81/storage/app/public/esignature/' . $getUser->image),
+            'image_name' => $getUser->image
         ];
 
         return response()->json($userData);

@@ -152,275 +152,179 @@ export default function RepairRequestForm(){
 
   return (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
-    <div className="font-roboto">
+    {currentUser.image !== "null" ? (
+      <div className="font-roboto">
 
-      <form onSubmit={SubmitInspectionForm}>
+        <form onSubmit={SubmitInspectionForm}>
 
-        {/* Part A */}
-        <div>
-          <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-          <p className="text-xs text-red-500 font-bold">Please double check the form before submitting </p>
-        </div>
-
-        {/* Form */}
-        <div className="grid grid-cols-2 gap-4">
-
-          {/* 1st Column */}
-          <div className="col-span-1">
-
-            {/* Date */}
-            <div className="flex items-center mt-6 ">
-              <div className="w-36">
-                <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                  Date:
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="date"
-                  name="rep_date"
-                  id="rep_date"
-                  defaultValue= {today}
-                  onChange={ev => setInspectionDate(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                  readOnly
-                />
-              </div>
-            </div>
-
-            {/* Property Number */}
-            <div className="flex items-center mt-4 ">
-              <div className="w-36">
-                <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
-                  Property No.:
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="rep_property_no"
-                  id="rep_property_no"
-                  autoComplete="rep_property_no"
-                  value={propertyNo}
-                  onChange={ev => setPropertyNo(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!propertyNo && inputErrors.property_number && (
-                  <p className="form-validation">You must input the Property Number</p>
-                )}
-              </div>
-            </div>
-
-            {/* Acquisition Date */}
-            <div className="flex items-center mt-4">
-              <div className="w-36">
-                <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-black">    
-                  Acquisition Date:
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="date"
-                  name="rep_acquisition_date"
-                  id="rep_acquisition_date"
-                  value={acquisitionDate}
-                  onChange={ev => setAcquisitionDate(ev.target.value)}
-                  max={currentDate}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!acquisitionDate && inputErrors.acq_date && (
-                  <p className="form-validation">You must input the Acquisition Date</p>
-                )}
-              </div>
-            </div>
-
-            {/* Acquisition Cost */}
-            <div className="flex items-center mt-4">
-              <div className="w-36">
-                <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-black">
-                  Acquisition Cost:
-                </label> 
-              </div>
-              <div className="w-64">
-                <div className="relative flex items-center">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
-                    ₱
-                  </span>
-                  <input
-                    type="text"
-                    name="rep_acquisition_cost"
-                    id="rep_acquisition_cost"
-                    autoComplete="rep_acquisition_cost"
-                    value={acquisitionCost}
-                    onChange={ev => {
-                      const inputVal = ev.target.value;
-                      // Allow only numeric input
-                      if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
-                        setAcquisitionCost(inputVal.replace(/,/g, ''));
-                      }
-                    }}
-                    className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                  />
-                </div>
-                {!acquisitionCost && inputErrors.acq_cost && (
-                  <p className="form-validation">You must input the Acquisition Cost</p>
-                )}
-              </div>
-            </div>
-
-            {/* Brand/Model */}
-            <div className="flex items-center mt-4">
-              <div className="w-36">
-                <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-black">
-                  Brand/Model:
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="brand_mrep_brand_modelodel"
-                  id="rep_brand_model"
-                  autoComplete="rep_brand_model"
-                  value={BrandModel}
-                  onChange={ev => setBrandModel(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!BrandModel && inputErrors.brand_model && (
-                  <p className="form-validation">You must input the Brand/Model</p>
-                )}
-              </div>
-            </div>
-
-            {/* Serial/Engine No */}
-            <div className="flex items-center mt-4">
-              <div className="w-36">
-                <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-black">                  
-                  Serial/Engine No.:
-                </label> 
-              </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="rep_serial_engine_no"
-                  id="rep_serial_engine_no"
-                  autoComplete="rep_serial_engine_no"
-                  value={SerialEngineNo}
-                  onChange={ev => setSerialEngineNo(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!SerialEngineNo && inputErrors.serial_engine_no && (
-                  <p className="form-validation">You must input the Serial/Engine No.</p>
-                )}
-              </div>
-            </div>
-
+          {/* Part A */}
+          <div>
+            <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
+            <p className="text-xs text-red-500 font-bold">Please double check the form before submitting </p>
           </div>
 
-          {/* 2nd Column */}
-          <div className="col-span-1">
+          {/* Form */}
+          <div className="grid grid-cols-2 gap-4">
 
-            {/* Type of Property */}
-            <div className="flex items-center mt-6">
-              <div className="w-60">
-                <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                  Type of Property:
-                </label> 
-              </div>
-              <div className="w-64">
-                <select 
-                name="rep_type_of_property" 
-                id="rep_type_of_property" 
-                autoComplete="rep_type_of_property"
-                value={typeOfProperty}
-                onChange={ev => {
-                  setTypeOfProperty(ev.target.value);
-                }}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                >
-                  <option value="" disabled>Select an option</option>
-                  <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                  <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
-                  <option value="Others">Others</option>
-                </select>
-                {!typeOfProperty && inputErrors.type_of_property && (
-                  <p className="form-validation">You must input the Type of Property</p>
-                )}
-              </div>
-            </div>
+            {/* 1st Column */}
+            <div className="col-span-1">
 
-            {/* Description */}
-            <div className="flex items-center mt-4">
-              <div className="w-60">
-                <label htmlFor="rep_description" className="block text-base font-medium leading-6 text-black">
-                  Description:
-                </label> 
+              {/* Date */}
+              <div className="flex items-center mt-6 ">
+                <div className="w-36">
+                  <label htmlFor="rep_date" className="block text-base leading-6 text-black">
+                    Date:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="date"
+                    name="rep_date"
+                    id="rep_date"
+                    defaultValue= {today}
+                    onChange={ev => setInspectionDate(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    readOnly
+                  />
+                </div>
               </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="rep_description"
-                  id="rep_description"
-                  value={propertyDescription}
-                  onChange={ev => setPropertyDescription(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!propertyDescription && inputErrors.property_description && (
-                  <p className="form-validation">You must input the Description</p>
-                )}
-              </div>
-            </div>
 
-            {/* Location */}
-            <div className="flex items-center mt-4">
-              <div className="w-60">
-                <label htmlFor="rep_location" className="block text-base font-medium leading-6 text-black">
-                  Location (Div/Section/Unit):
-                </label> 
+              {/* Property Number */}
+              <div className="flex items-center mt-4 ">
+                <div className="w-36">
+                  <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
+                    Property No.:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="rep_property_no"
+                    id="rep_property_no"
+                    autoComplete="rep_property_no"
+                    value={propertyNo}
+                    onChange={ev => setPropertyNo(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!propertyNo && inputErrors.property_number && (
+                    <p className="form-validation">You must input the Property Number</p>
+                  )}
+                </div>
               </div>
-              <div className="w-64">
-                <input
-                  type="text"
-                  name="rep_location"
-                  id="rep_location"
-                  value={propertyLocation}
-                  onChange={ev => setPropertyLocation(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-                />
-                {!propertyLocation && inputErrors.location && (
-                  <p className="form-validation">You must input the Location</p>
-                )}
-              </div>
-            </div>
 
-            {/* Complain / Defect */}
-            <div className="flex items-center mt-4">
-              <div className="w-60">
-                <label htmlFor="rep_complain" className="block text-base font-medium leading-6 text-black">
-                  Complain/Defect:
-                </label> 
-              </div>
-              <div className="w-64">
-              <textarea
-                id="rep_complain"
-                name="rep_complain"
-                rows={2}
-                value={ComplainDefect}
-                style={{ resize: 'none' }}
-                onChange={ev => setComplainDefect(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
-              />
-              {!ComplainDefect && inputErrors.complain && (
-                <p className="form-validation">You must input the Complain/Defect</p>
-              )}
-              </div>
-            </div>
-
-            {/* Supervisor */}
-            {(currentUser.code_clearance == 4 || currentUser.code_clearance == 1) ? null:(
+              {/* Acquisition Date */}
               <div className="flex items-center mt-4">
+                <div className="w-36">
+                  <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-black">    
+                    Acquisition Date:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="date"
+                    name="rep_acquisition_date"
+                    id="rep_acquisition_date"
+                    value={acquisitionDate}
+                    onChange={ev => setAcquisitionDate(ev.target.value)}
+                    max={currentDate}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!acquisitionDate && inputErrors.acq_date && (
+                    <p className="form-validation">You must input the Acquisition Date</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Acquisition Cost */}
+              <div className="flex items-center mt-4">
+                <div className="w-36">
+                  <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-black">
+                    Acquisition Cost:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <div className="relative flex items-center">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
+                      ₱
+                    </span>
+                    <input
+                      type="text"
+                      name="rep_acquisition_cost"
+                      id="rep_acquisition_cost"
+                      autoComplete="rep_acquisition_cost"
+                      value={acquisitionCost}
+                      onChange={ev => {
+                        const inputVal = ev.target.value;
+                        // Allow only numeric input
+                        if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
+                          setAcquisitionCost(inputVal.replace(/,/g, ''));
+                        }
+                      }}
+                      className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    />
+                  </div>
+                  {!acquisitionCost && inputErrors.acq_cost && (
+                    <p className="form-validation">You must input the Acquisition Cost</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Brand/Model */}
+              <div className="flex items-center mt-4">
+                <div className="w-36">
+                  <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-black">
+                    Brand/Model:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="brand_mrep_brand_modelodel"
+                    id="rep_brand_model"
+                    autoComplete="rep_brand_model"
+                    value={BrandModel}
+                    onChange={ev => setBrandModel(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!BrandModel && inputErrors.brand_model && (
+                    <p className="form-validation">You must input the Brand/Model</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Serial/Engine No */}
+              <div className="flex items-center mt-4">
+                <div className="w-36">
+                  <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-black">                  
+                    Serial/Engine No.:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="rep_serial_engine_no"
+                    id="rep_serial_engine_no"
+                    autoComplete="rep_serial_engine_no"
+                    value={SerialEngineNo}
+                    onChange={ev => setSerialEngineNo(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!SerialEngineNo && inputErrors.serial_engine_no && (
+                    <p className="form-validation">You must input the Serial/Engine No.</p>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* 2nd Column */}
+            <div className="col-span-1">
+
+              {/* Type of Property */}
+              <div className="flex items-center mt-6">
                 <div className="w-60">
                   <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                    Immediate Supervisor:
+                    Type of Property:
                   </label> 
                 </div>
                 <div className="w-64">
@@ -428,48 +332,151 @@ export default function RepairRequestForm(){
                   name="rep_type_of_property" 
                   id="rep_type_of_property" 
                   autoComplete="rep_type_of_property"
-                  value={getSupervisor}
-                  onChange={ev => { setGetSupervisor(ev.target.value)}}
+                  value={typeOfProperty}
+                  onChange={ev => {
+                    setTypeOfProperty(ev.target.value);
+                  }}
                   className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
                   >
-                    <option value="" disabled>Select your supervisor</option>
-                    {supervisor?.supervisorData?.map((Data) => (
-                      <option key={Data.id} value={Data.id}>
-                        {Data.name}
-                      </option>
-                    ))}
+                    <option value="" disabled>Select an option</option>
+                    <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
+                    <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
+                    <option value="Others">Others</option>
                   </select>
-                  {!getSupervisor && inputErrors.supervisor_name && (
-                    <p className="form-validation">You must input your supervisor</p>
+                  {!typeOfProperty && inputErrors.type_of_property && (
+                    <p className="form-validation">You must input the Type of Property</p>
                   )}
                 </div>
               </div>
-            )}          
+
+              {/* Description */}
+              <div className="flex items-center mt-4">
+                <div className="w-60">
+                  <label htmlFor="rep_description" className="block text-base font-medium leading-6 text-black">
+                    Description:
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="rep_description"
+                    id="rep_description"
+                    value={propertyDescription}
+                    onChange={ev => setPropertyDescription(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!propertyDescription && inputErrors.property_description && (
+                    <p className="form-validation">You must input the Description</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center mt-4">
+                <div className="w-60">
+                  <label htmlFor="rep_location" className="block text-base font-medium leading-6 text-black">
+                    Location (Div/Section/Unit):
+                  </label> 
+                </div>
+                <div className="w-64">
+                  <input
+                    type="text"
+                    name="rep_location"
+                    id="rep_location"
+                    value={propertyLocation}
+                    onChange={ev => setPropertyLocation(ev.target.value)}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  />
+                  {!propertyLocation && inputErrors.location && (
+                    <p className="form-validation">You must input the Location</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Complain / Defect */}
+              <div className="flex items-center mt-4">
+                <div className="w-60">
+                  <label htmlFor="rep_complain" className="block text-base font-medium leading-6 text-black">
+                    Complain/Defect:
+                  </label> 
+                </div>
+                <div className="w-64">
+                <textarea
+                  id="rep_complain"
+                  name="rep_complain"
+                  rows={2}
+                  value={ComplainDefect}
+                  style={{ resize: 'none' }}
+                  onChange={ev => setComplainDefect(ev.target.value)}
+                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                />
+                {!ComplainDefect && inputErrors.complain && (
+                  <p className="form-validation">You must input the Complain/Defect</p>
+                )}
+                </div>
+              </div>
+
+              {/* Supervisor */}
+              {(currentUser.code_clearance == 4 || currentUser.code_clearance == 1) ? null:(
+                <div className="flex items-center mt-4">
+                  <div className="w-60">
+                    <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                      Immediate Supervisor:
+                    </label> 
+                  </div>
+                  <div className="w-64">
+                    <select 
+                    name="rep_type_of_property" 
+                    id="rep_type_of_property" 
+                    autoComplete="rep_type_of_property"
+                    value={getSupervisor}
+                    onChange={ev => { setGetSupervisor(ev.target.value)}}
+                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    >
+                      <option value="" disabled>Select your supervisor</option>
+                      {supervisor?.supervisorData?.map((Data) => (
+                        <option key={Data.id} value={Data.id}>
+                          {Data.name}
+                        </option>
+                      ))}
+                    </select>
+                    {!getSupervisor && inputErrors.supervisor_name && (
+                      <p className="form-validation">You must input your supervisor</p>
+                    )}
+                  </div>
+                </div>
+              )}          
+
+            </div>
 
           </div>
 
-        </div>
+          {/* Submit Button */}
+          <div className="mt-10">
+            <button type="submit"
+              className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Processing</span>
+                </div>
+              ) : (
+                'Submit'
+              )}
+            </button>
+          </div> 
 
-        {/* Submit Button */}
-        <div className="mt-10">
-          <button type="submit"
-            className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-        </div> 
+        </form>
 
-      </form>
-
-    </div>
+      </div>
+    ):(
+      <div>
+        <h2 className="text-xl font-bold leading-7 text-gray-900"> You cannot create a request because you don't have an e-signature. </h2>
+        <p className="text-xs text-red-500 font-bold">Please submit your e-signature to the developer so that you can create a request </p>
+      </div>
+    )}
 
     {/* Show Popup */}
     {showPopup && (
@@ -531,6 +538,7 @@ export default function RepairRequestForm(){
       </div>
     )}
     {/* End Show Popup */}
+
   </PageComponent>
   );
 }

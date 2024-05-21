@@ -568,8 +568,15 @@ export default function UserDetails(){
       ):(
         <div className="w-full pl-1 text-lg">
           <div>
-            {user?.signature}
-              <img src={user?.signature} alt="User Signature" />
+              {user?.image_name == "null" ? (
+              <>
+                <div className="w-full pl-1 text-lg">No Signature</div>
+              </>
+              ):(
+              <>
+                <img src={user?.signature} alt="User Signature" />
+              </>
+              )}
           </div>
         </div>
       )}

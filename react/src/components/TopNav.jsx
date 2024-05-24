@@ -250,11 +250,15 @@ const TopNav = () => {
 
               {/* Display number of Notification */}
               <div>
-                <Menu.Button className="notification-icon">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </Menu.Button>
+                {currentUser.pwd_change != 1 && (
+                <>
+                  <Menu.Button className="notification-icon">
+                    <span className="absolute -inset-1.5" />
+                    <span className="sr-only">View notifications</span>
+                    <BellIcon className="h-6 w-6" aria-hidden="true" />
+                  </Menu.Button>
+                </>  
+                )}
 
                 {/* For Supervisor */}
                 {notification?.mappedInsSupData?.map((SupData) => (

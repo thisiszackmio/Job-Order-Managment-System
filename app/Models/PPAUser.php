@@ -24,6 +24,7 @@ class PPAUser extends Authenticatable
         'position',
         'code_clearance',
         'password',
+        'pwd_change',
         'image'
     ];
 

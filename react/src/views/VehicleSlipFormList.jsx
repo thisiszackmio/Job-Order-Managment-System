@@ -34,8 +34,16 @@ export default function VehicleSlipFormList(){
 
   const [loading, setLoading] = useState(true);
 
-  const { userRole } = useUserStateContext();
+  const { currentUser, userRole } = useUserStateContext();
   const [getVehicleSlip, setVehicleSlip] = useState([]);
+
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
 
   const fetchVehicleData = () => {
     setLoading(true);

@@ -19,6 +19,10 @@ export default function PrePostRepairForm(){
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date().toISOString().split('T')[0];
 
+  useEffect(() => {
+    
+  }, [currentUser]);
+
   //Date Format 
   function formatDate(dateString) {
     const options = { month: 'long', day: 'numeric', year: 'numeric' };
@@ -83,8 +87,14 @@ export default function PrePostRepairForm(){
   // Edit Part D
   const [updateRemark, setUpdateRemark] = useState('');
 
-  //Get All Data
   useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+
+    // Get All the Data
     const fetchData = async () => {
       try {
         const response = await axiosClient.get(`/inspectionform/${id}`);
@@ -129,7 +139,7 @@ export default function PrePostRepairForm(){
     };
   
     fetchData();
-  }, [id]);
+  }, [currentUser, id]);
 
   // Buttons Functions
   // Enable Edit Part A

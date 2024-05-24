@@ -65,22 +65,22 @@ class InspectionFormController extends Controller
         //Get the requestor data
         $ppaUser = $InspectionRequest->user;
         $reqUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
-        $reqSignature = URL::to('/storage/esignature/' . $ppaUser->image);
+        $reqSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $ppaUser->image);
 
         //Get the Supervisor data
         $supervisor = PPAUser::find($InspectionRequest->supervisor_name);
         $supervisorName = $supervisor->fname . ' ' . $supervisor->mname. '. ' . $supervisor->lname;
-        $supervisorSignature = URL::to('/storage/esignature/' . $supervisor->image);
+        $supervisorSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $supervisor->image);
 
         //Get the GSO data
         $gsoUser =  PPAUser::where('code_clearance', 3)->first();
         $gsoName = $gsoUser->fname . ' ' . $gsoUser->mname. '. ' . $gsoUser->lname;
-        $gsoSignature = URL::to('/storage/esignature/' . $gsoUser->image);
+        $gsoSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $gsoUser->image);
 
         //Get Admin Manager data
         $managerUser = PPAUser::where('code_clearance', 1)->first();
         $managerName = $managerUser->fname . ' ' . $managerUser->mname. '. ' . $managerUser->lname;
-        $managerSignature = URL::to('/storage/esignature/' . $managerUser->image);
+        $managerSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $managerUser->image);
 
         //Get Personnel data
         if ($AdminInspectionRequest !== null || $InspectorRequest !== null){
@@ -88,7 +88,7 @@ class InspectionFormController extends Controller
             $personnelUser =  PPAUser::where('id', $personnelfetch)->first();
             $personnelId = $personnelUser->id;
             $personnelName = $personnelUser->fname . ' ' . $personnelUser->mname. '. ' . $personnelUser->lname;
-            $personnelSignature = URL::to('/storage/esignature/' . $personnelUser->image);
+            $personnelSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $personnelUser->image);
         } else {
             $personnelfetch = null;
             $personnelUser =  null;

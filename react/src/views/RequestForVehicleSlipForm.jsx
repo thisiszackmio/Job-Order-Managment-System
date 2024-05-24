@@ -11,6 +11,14 @@ export default function VehicleSlipForm(){
   const {id} = useParams();
   const { currentUser } = useUserStateContext();
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   const today = new Date().toISOString().split('T')[0];
   const [DateArrival, setDateArrival] = useState(today);
   const [submitLoading, setSubmitLoading] = useState(false);

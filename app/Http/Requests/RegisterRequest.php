@@ -36,6 +36,7 @@ class RegisterRequest extends FormRequest
                 'confirmed',
                 Password::min(8)->mixedCase()->numbers()->symbols()
             ],
+            'pwd_change' => 'required|numeric',
             'image' => [
                 'required', 
                 'file', 

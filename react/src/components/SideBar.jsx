@@ -51,98 +51,103 @@ const Sidebar = () => {
             </div>
 
             {/* Nav */}
-            <ul className="mt-10 ppa-accordion">
+            {currentUser.pwd_change != 1 && (
+            <>
+              <ul className="mt-10 ppa-accordion">
 
-              {/* Dashboard */}
-              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
-                <Link to="/" className="flex items-center">
-                  <p className="text-base leading-4 text-lg">Dashboard</p>
-                </Link>
-              </li>
-
-              {/* My Request */}
-              <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
-                <Link to={`/myrequest/${currentUser.id}`} className="flex items-center">
-                  <p className="text-base leading-4 text-lg">My Request</p>
-                </Link>
-              </li>
-
-              {/* Request Forms */}
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
-                <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
-                <label for="toggle1" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
-                  <span>Request Forms</span>
-                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                </label>
-                <section>
-                  <ul id="menu1" className="pl-3 mt-4">
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">Pre/Post Repair Inspection Form</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">Facility / Venue Request Form</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                      <Link to="/vehiclesliprequestform">Vehicle Slip Form</Link>
-                    </li>
-                  </ul>
-                </section>
-              </li>
-
-              {restrictions && (
-              <>
-                {/* Request List */}
-                <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
-                  <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)}/>
-                  <label for="toggle2" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
-                    <span>Request List</span>
-                    <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                  </label>
-                  <section>
-                    <ul id="menu1" className="pl-3 mt-4">
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/facilityvenuerequestform">Facility / Venue Request Form</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                        <Link to="/vehiclesliprequestformlist">Vehicle Slip Form</Link>
-                      </li>
-                    </ul>
-                  </section>
+                {/* Dashboard */}
+                <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
+                  <Link to="/" className="flex items-center">
+                    <p className="text-base leading-4 text-lg">Dashboard</p>
+                  </Link>
                 </li>
-              </>
-              )}
 
-              {onlyNerd && (
-              <>
+                {/* My Request */}
+                <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+                  <Link to={`/myrequest/${currentUser.id}`} className="flex items-center">
+                    <p className="text-base leading-4 text-lg">My Request</p>
+                  </Link>
+                </li>
+
+                {/* Request Forms */}
                 <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
-                  <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
-                  <label for="toggle3" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
-                    <span>Personnel</span>
+                  <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
+                  <label for="toggle1" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                    <span>Request Forms</span>
                     <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
                   </label>
                   <section>
                     <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/ppauserlist">User List</Link>
+                        <Link to="/requestinspectionform">Pre/Post Repair Inspection Form</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/ppauserassign">Assign Personnel</Link>
+                        <Link to="/facilityrequestform">Facility / Venue Request Form</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                        <Link to="/pparegistration">User Registration</Link>
+                        <Link to="/vehiclesliprequestform">Vehicle Slip Form</Link>
                       </li>
                     </ul>
                   </section>
                 </li>
-              </>
-              )}
 
-            </ul>
+                {restrictions && (
+                <>
+                  {/* Request List */}
+                  <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+                    <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)}/>
+                    <label for="toggle2" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                      <span>Request List</span>
+                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                    </label>
+                    <section>
+                      <ul id="menu1" className="pl-3 mt-4">
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
+                        </li>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/facilityvenuerequestform">Facility / Venue Request Form</Link>
+                        </li>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                          <Link to="/vehiclesliprequestformlist">Vehicle Slip Form</Link>
+                        </li>
+                      </ul>
+                    </section>
+                  </li>
+                </>
+                )}
 
-            <ul className="buttom-nav">
+                {onlyNerd && (
+                <>
+                  <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+                    <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
+                    <label for="toggle3" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                      <span>Personnel</span>
+                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                    </label>
+                    <section>
+                      <ul id="menu1" className="pl-3 mt-4">
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/ppauserlist">User List</Link>
+                        </li>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/ppauserassign">Assign Personnel</Link>
+                        </li>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                          <Link to="/pparegistration">User Registration</Link>
+                        </li>
+                      </ul>
+                    </section>
+                  </li>
+                </>
+                )}
+
+              </ul>
+            </>
+            )}
+            
+
+            <ul className={`buttom-nav ${currentUser.pwd_change == 1 && 'pt-8'}`}>
               <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className="flex items-center">
                   <a onClick={logout} className="text-base leading-4 text-lg">Logout</a>

@@ -21,6 +21,14 @@ export default function RepairRequestList(){
 
   const [prePostRepair, setPrePostRepair] = useState([]);
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   // Get All the data
   const fetchTableData = () => {
     setLoading(true); // Set loading state to true when fetching data

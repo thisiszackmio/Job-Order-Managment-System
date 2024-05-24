@@ -119,14 +119,14 @@ class UserController extends Controller
         $getPersonnel = AssignPersonnel::all();
         $personnelIds = $getPersonnel->pluck('user_id');
 
-        $ppa = PPAUser::queryUserExcept($personnelIds);
+        $ppa = PPAUser::queryUserExcept($personnelIds)->where('image', '!=', 'null')->whereNotNull('image');
 
         $formattedUsers = $ppa->map(function ($user) {
             return [
                 'id' => $user->id,
                 'name' => $user->fname . ' ' . $user->mname . '. ' . $user->lname
             ];
-        });
+        })->values()->all();
 
         return response()->json($formattedUsers);
     }

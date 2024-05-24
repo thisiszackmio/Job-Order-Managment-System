@@ -26,6 +26,14 @@ export default function Dashboard()
 
   const { currentUser } = useUserStateContext();
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
@@ -101,7 +109,7 @@ export default function Dashboard()
       })
       :null
 
-      //console.log(InspectionData);
+      //console.log(FacPendingRequest);
       setPendingTask({
         InspendingRequest,
         FacPendingRequest,

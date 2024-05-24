@@ -14,6 +14,14 @@ export default function PrePostRepairForm(){
 
   const { currentUser, userRole } = useUserStateContext();
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   //Date Format
   function formatDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };

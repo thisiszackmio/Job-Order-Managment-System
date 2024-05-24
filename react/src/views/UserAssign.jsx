@@ -11,6 +11,14 @@ import { faChevronLeft, faChevronRight, faCheck, faTimes } from '@fortawesome/fr
 export default function UserAssign(){
 
   const { userRole, currentUser } = useUserStateContext();
+
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
   
   const [personnel, setPersonnel] = useState([]);
   const [assignPersonnel, setAssignPersonnel] = useState([]);
@@ -139,7 +147,7 @@ export default function UserAssign(){
         setPopupMessage(
           <div>
             <p className="popup-title">Done</p>
-            <p>Form submit successfully</p>
+            <p>Assign Personnel Successful!</p>
           </div>
         );    
         setSubmitLoading(false);

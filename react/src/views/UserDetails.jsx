@@ -46,14 +46,19 @@ export default function UserDetails(){
     axiosClient.get(`/userdetail/${id}`)
     .then(response => {
       const usersData = response.data;
+      const signature = usersData.signature;
+      const enctyptSig = btoa(signature);
+      const decodedUrl = atob(enctyptSig);
 
+      //console.log(decodedUrl);
+      usersData.signature = decodedUrl;
       getUser(usersData);
       setIsLoading(false);
     })
     .catch(error => {
       console.error('Error fetching data:', error);
     });
-  },[]);
+  },[id]);
 
   // Trigger Update Details Form
   const handleEditDetails = () => {
@@ -341,6 +346,10 @@ export default function UserDetails(){
     window.location.reload();
   }
 
+  const handleContextMenu = (event) => {
+    event.preventDefault();
+  };
+
   // Restrictions
   const Authorize = userRole == 'h4ck3rZ@1Oppa';
 
@@ -574,7 +583,7 @@ export default function UserDetails(){
               </>
               ):(
               <>
-                <img src={user?.signature} alt="User Signature" />
+                <img src={user?.signature} alt="User Signature" onContextMenu={handleContextMenu} />
               </>
               )}
           </div>

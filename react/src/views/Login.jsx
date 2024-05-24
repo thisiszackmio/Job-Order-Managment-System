@@ -4,7 +4,7 @@ import { useUserStateContext  } from "../context/ContextProvider";
 import loadingAnimation from '../assets/loading.gif';
 
 export default function Login() {
-  const { setCurrentUser, setUserToken, setUserRole, setCodeClearance } = useUserStateContext ();
+  const { setCurrentUser, setUserToken, setUserRole } = useUserStateContext ();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState("");
   const [error, setError] = useState({__html: ''}); 
@@ -25,11 +25,10 @@ export default function Login() {
       setCurrentUser(response.data.user);
       setUserToken(response.data.token);
       setUserRole(userRole);
-      
 
       // Now you have the user's role; you can store it in state, context, or any state management solution you use.
       // For example, if you are using React state and setUserRole is a state update function:
-      return { userRole, codeClearance, data: response.data };
+      return { userRole, data: response.data };
     } catch (error) {
       // Handle login error
       if (error.response) {
@@ -56,10 +55,16 @@ export default function Login() {
     handleLogin({ username, password }) // Call the handleLogin function with credentials
       .then(({userRole, data}) => {
         setCurrentUser(data.user);
-         setUserToken(data.token);
-         setUserRole(userRole);
-        //  window.location.href = '/';
-         window.location.href = '/dashboard';
+        setUserToken(data.token);
+        setUserRole(userRole);
+
+        if(data.user.pwd_change){
+          //alert('New Password');
+          window.location.href = '/newpassword';
+        }else{
+          //alert('Dashboard');
+          window.location.href = '/dashboard';
+        }; 
       })
       .catch((error) => {
         setIsLoading(false);

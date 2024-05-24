@@ -42,6 +42,14 @@ export default function FacilityVenueRequestList() {
   const { currentUser, userRole } = useUserStateContext();
   const [getFacilityDet, setFacilityDet] = useState([]);
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   const fetchFacilityData = () => {
     setLoading(true);
     axiosClient

@@ -15,6 +15,14 @@ export default function FacilityFormForm(){
   const {id} = useParams();
   const { currentUser, userRole } = useUserStateContext();
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   //Date
   function formatDate(dateString) {
     const options = { month: 'long', day: 'numeric', year: 'numeric' };

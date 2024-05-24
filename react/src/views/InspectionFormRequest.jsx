@@ -12,6 +12,14 @@ export default function RepairRequestForm(){
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date().toISOString().split('T')[0];
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   const [inputErrors, setInputErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
 

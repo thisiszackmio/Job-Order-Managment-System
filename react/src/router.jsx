@@ -26,6 +26,7 @@ import UsersList from './views/UserList';
 import UserDetails from './views/UserDetails';
 import UserAssign from './views/UserAssign';
 import UserRegistration from './views/UserRegistration';
+import NewPassword from './views/NewPassword';
 import Forbidden from './components/403';
 
 const routes = [
@@ -42,6 +43,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path:"/newpassword",
+        element: (
+          <ProtectedRoute>
+            <NewPassword />
           </ProtectedRoute>
         )
       },

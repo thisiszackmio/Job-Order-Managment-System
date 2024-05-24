@@ -14,6 +14,14 @@ export default function RequestFormFacility(){
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date();
 
+  useEffect(() => {
+    // Redirect to dashboard if pwd_change is not 1
+    if (currentUser && currentUser.pwd_change === 1) {
+      window.location.href = '/newpassword';
+      return null;
+    }
+  }, [currentUser]);
+
   function formatDate(date) {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed

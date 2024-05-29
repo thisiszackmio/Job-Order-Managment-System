@@ -1029,7 +1029,7 @@ p.sign-txt {
 }    
 .error h2
 {
-    color: #A2A2A2;
+    color: #000;
     font-weight: bold;
     padding-bottom: 20px;
 }

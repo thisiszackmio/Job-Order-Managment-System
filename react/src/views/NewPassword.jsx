@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useUserStateContext } from "../context/ContextProvider";
 import axiosClient from "../axios";
 import submitAnimation from '../assets/loading_nobg.gif';
@@ -22,7 +22,16 @@ export default function UserDetails(){
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
-  const { currentUser } = useUserStateContext();
+  const { currentUser, setCurrentUser, setUserToken } = useUserStateContext();
+
+  const navigate = useNavigate();
+
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p>There was a problem, please contact the developer. (Error 500)</p>
+    </div>
+  );
 
   useEffect(() => {
     // Redirect to dashboard if pwd_change is not 1
@@ -39,16 +48,100 @@ export default function UserDetails(){
   const changePass = (ev) => {
     ev.preventDefault();
 
-    if(password === passwordCorfirmation){
-      alert("Same");
+    setSubmitLoading(true);
+
+    const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has update the password`;
+
+    if(password != passwordCorfirmation){
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Invalid Password</p>
+          <p>Password and Confirm Password do not match.</p>
+        </div>
+      );
+      setSubmitLoading(false);
     }else{
-      alert("No")
+
+      axiosClient
+      .put(`changeuserpwd/${currentUser.id}`, {
+        password: password,
+        logs: logs
+      })
+      .then(() => { 
+        setShowPopup(true);
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p>Your password has been updated.</p> 
+            <p>Please log back into the system using your new password.</p>
+          </div>
+        );
+        setSubmitLoading(false);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 404) {
+          // User Not Found
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">User not Found!</p>
+              <p>You cannot update the user detail, please inform the developer (Error 404)</p>
+            </div>
+          );
+          setSubmitLoading(false);
+        } else if (error.response && error.response.status === 204){
+          // Something wrong on the submitting
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">There is something wrong</p>
+              <p>Please contact the developer on the issue (Error 204)</p>
+            </div>
+          );
+          setSubmitLoading(false);
+        } else if (error.response && error.response.status === 422){
+          // Password validation
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Invalid Password</p>
+              <p>Password must contain at least 8 characters, one uppercase letter, one number, and one symbol.</p>
+            </div>
+          );
+          setSubmitLoading(false);
+        } else {
+          // System Error
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(DevErrorText);
+          setSubmitLoading(false);
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
     }
   }
 
   //Close Popup on Error
   const justclose = () => {
     setShowPopup(false);
+  }
+
+  const closePopup = () => {
+    axiosClient.post('/logout').then((response) => {
+      setCurrentUser({});
+      setUserToken(null);
+
+      // Redirect to the login page using the navigate function
+      navigate('/login');
+    });
   }
 
   return (

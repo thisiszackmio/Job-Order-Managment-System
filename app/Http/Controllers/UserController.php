@@ -265,7 +265,8 @@ class UserController extends Controller
         }
 
         $updateResult = $getUser->update([
-            'password' => Hash::make($request->input('password'))
+            'password' => Hash::make($request->input('password')),
+            'pwd_change' => 1
         ]);
 
         if ($updateResult) {
@@ -278,6 +279,44 @@ class UserController extends Controller
         } else {
             return response()->json(['message' => 'There area some missing.'], 204);
         }
+    }
+
+    /**
+     * Update User's Password (their own password)
+     */
+    public function updateUserPassword(Request $request, $id){
+
+        $request->validate([
+            'password' => [
+                'required',
+                Password::min(8) // At least 8 characters
+                    ->mixedCase() // At least one uppercase and one lowercase character
+                    ->numbers()    // At least one number
+                    ->symbols()    // At least one symbol
+            ],
+        ]);
+
+        $getUser = PPAUser::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $updateResult = $getUser->update([
+            'password' => Hash::make($request->input('password')),
+            'pwd_change' => 0
+        ]);
+
+        if ($updateResult) {
+            // Creating logs
+            $logs = new Logs();
+            $logs->remarks = $request->input('logs');
+            $logs->save();
+
+           return response()->json(['message' => 'User details updated successfully.'], 200);
+       } else {
+           return response()->json(['message' => 'There area some missing.'], 204);
+       }
     }
 
     /**

@@ -28,6 +28,7 @@ import UserAssign from './views/UserAssign';
 import UserRegistration from './views/UserRegistration';
 import NewPassword from './views/NewPassword';
 import Forbidden from './components/403';
+import NotFound from './components/404';
 
 const routes = [
   {
@@ -217,7 +218,11 @@ const routes = [
   {
     path: '/forbidden',
     element: <Forbidden />,
-  }
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
 ];
 
 const router = createBrowserRouter(routes);

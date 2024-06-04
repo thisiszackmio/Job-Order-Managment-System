@@ -163,7 +163,7 @@ export default function FacilityVenueRequestList() {
     {Authorize ? (
     <PageComponent title="Facility / Venue Form Request List">
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-3">
         <div className="align-right">
           {/* For Search Field */}
           <input
@@ -184,18 +184,18 @@ export default function FacilityVenueRequestList() {
 
       {/* Facility / Venue List */}
       <div className="overflow-x-auto">
-        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+        <table className="ppa-table font-roboto" style={{ width: '100%' }}>
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start and End)</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase w-1">No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Title/Purpose of Activity</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date and Time of Activity (Start and End)</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type of Facility/Venue</th>  
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
               {Authorize ? (
-                <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Action</th>
               ):null}
             </tr>   
           </thead>
@@ -203,23 +203,23 @@ export default function FacilityVenueRequestList() {
           {currentFacility.length > 0 ? (
             currentFacility.map((FacDet) => (
               <tr key={FacDet.id}>
-                <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold table-font">{FacDet.id}</td>
-                <td className="px-1 py-2 align-top border border-custom w-40 table-font">{formatDate(FacDet.date)}</td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{FacDet.tite_of_activity}</td>
-                <td className="px-1 py-2 align-top border border-custom w-72 table-font">
+                <td className="px-3 py-3 text-center align-top w-1 font-bold table-font">{FacDet.id}</td>
+                <td className="px-3 py-3 align-top table-font">{formatDate(FacDet.date)}</td>
+                <td className="px-3 py-3 align-top table-font">{FacDet.tite_of_activity}</td>
+                <td className="px-3 py-3 align-top table-font">
                 {FacDet.date_start === FacDet.date_end ? (
                   `${formatDateAct(FacDet.date_start)} @ ${formatTimeAct(FacDet.time_start)} to ${formatTimeAct(FacDet.time_end)}`
                 ) : (
                   `${formatDateAct(FacDet.date_start)} @ ${formatTimeAct(FacDet.time_start)} to ${formatDateAct(FacDet.date_end)} @ ${formatTimeAct(FacDet.time_end)}`
                 )}
                 </td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font"> {FacDet.type_facility} </td>
-                <td className="px-1 py-2 align-top border border-custom w-56 table-font">{FacDet.name}</td>
-                <td className="px-1 py-2 align-top border border-custom table-font">
+                <td className="px-3 py-3 align-top table-font"> {FacDet.type_facility} </td>
+                <td className="px-3 py-3 align-top table-font">{FacDet.name}</td>
+                <td className="px-3 py-3 align-top table-font">
                   {FacDet.remarks}
                 </td>
                 {Authorize ? (
-                  <td className="px-1 py-2 align-top border border-custom w-1">
+                  <td className="px-3 py-3 align-top w-1">
                     <div className="flex justify-center">
                     <Link to={`/facilityvenueform/${FacDet.id}`}>
                       <button 

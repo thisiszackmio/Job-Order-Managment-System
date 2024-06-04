@@ -339,21 +339,21 @@ export default function Dashboard()
       {/* Logs */}
       <div className="col-span-1 request-sec" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
 
-        <div className="dashboard-title">Logs (Month of {currentMonthName}) </div>
+        <div className="dashboard-title mb-4">Logs (Month of {currentMonthName}) </div>
 
-        <table className="border-collapse w-full mb-4 mt-2">
+        <table className="ppa-table w-full mb-4">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom">Date and Time</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom">Activity</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase">Date and Time</th>
+                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase">Activity</th>
               </tr>
             </thead>
             <tbody>
               {isLogs.length > 0 ? (
                 isLogs.map((Logs) => (
                   <tr key={Logs.id}>
-                    <td className="px-1 py-2 align-top border border-custom table-font text-center">{Logs.createdAt}</td>
-                    <td className="px-1 py-2 align-top border border-custom table-font w-9/12 pl-3">{Logs.remarks}</td>
+                    <td className="px-1 py-2 align-top table-font text-center">{Logs.createdAt}</td>
+                    <td className="px-1 py-2 align-top table-font w-9/12 pl-3">{Logs.remarks}</td>
                   </tr>
                 ))
               ):(

@@ -387,7 +387,7 @@ export default function PrePostRepairForm(){
           Slip No:
           </label> 
         </div>
-        <div className="w-auto px-5 border-b border-black text-center font-bold">
+        <div className="w-auto px-5 text-center font-bold ppa-form-request">
         {vehicleForms?.vehicleForm?.id}
         </div>
       </div>
@@ -403,7 +403,7 @@ export default function PrePostRepairForm(){
               Date:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {formatDate(vehicleForms?.vehicleForm?.date_of_request)}
             </div>
           </div>
@@ -415,7 +415,7 @@ export default function PrePostRepairForm(){
               Purpose:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {vehicleForms?.vehicleForm?.purpose}
             </div>
           </div>
@@ -427,7 +427,7 @@ export default function PrePostRepairForm(){
               Place to be visited:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {vehicleForms?.vehicleForm?.place_visited}
             </div>
           </div>
@@ -439,7 +439,7 @@ export default function PrePostRepairForm(){
               Date/Time of Arrival:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {formatDate(vehicleForms?.vehicleForm?.date_arrival)} @ {formatTime(vehicleForms?.vehicleForm?.time_arrival)}
             </div>
           </div>
@@ -455,7 +455,7 @@ export default function PrePostRepairForm(){
               Type of Vehicle:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[0]}
             </div>
           </div>
@@ -467,7 +467,7 @@ export default function PrePostRepairForm(){
               Plate No:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {vehicleForms?.vehicleForm?.vehicle_type == 'None' ? vehicleForms?.vehicleForm?.vehicle_type : vehicleForms?.vehicleForm?.vehicle_type?.split('=')?.[1]}
             </div>
           </div>
@@ -479,7 +479,7 @@ export default function PrePostRepairForm(){
               Driver:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1">
+            <div className="w-1/2 ppa-form-request">
             {vehicleForms?.vehicleForm?.driver}
             </div>
           </div>
@@ -494,7 +494,7 @@ export default function PrePostRepairForm(){
               Requested by:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1 font-bold">
+            <div className="w-1/2 ppa-form-request font-bold">
             {vehicleForms?.requestor?.name}
             </div>
           </div>
@@ -506,7 +506,7 @@ export default function PrePostRepairForm(){
               Approved by:
               </label> 
             </div>
-            <div className="w-64 border-b border-black pl-1 font-bold">
+            <div className="w-1/2 ppa-form-request font-bold">
             {vehicleForms?.manager?.manager_name}
             </div>
           </div>
@@ -516,13 +516,13 @@ export default function PrePostRepairForm(){
         <div className="col-span-1">
 
           {/* Passengers */}
-          <div className="flex mt-4 font-roboto">
+          <div className="flex mt-4 font-roboto items-center">
             <div className="w-28">
               <label className="block text-base font-medium leading-6 text-gray-900">
               Passenger/s:
               </label> 
             </div>
-            <div className="w-1/2">
+            <div className="w-1/2 ppa-form-request">
               <div>
               {vehicleForms?.vehicleForm?.passengers == 'N/A' ? (
                 "No Passengers"
@@ -546,18 +546,18 @@ export default function PrePostRepairForm(){
 
       {/* Status */}
       <div className="flex items-center mt-8 font-roboto">
-        <div className="w-16">
-          <label className="block text-base font-bold leading-6 text-gray-900">
-          Status:
-          </label> 
-        </div>
-        <div className="w-96 font-bold">
-        {vehicleForms?.vehicleForm?.admin_approval == 5 && ("Waiting for vehicle and driver")}
-        {vehicleForms?.vehicleForm?.admin_approval == 4 && (currentUser.code_clearance == 1 ? "Waiting for your approval" : "Waiting for Admin Manager's approval")}
-        {vehicleForms?.vehicleForm?.admin_approval == 3 && ("Disapproved")}
-        {vehicleForms?.vehicleForm?.admin_approval == 2 && ("Approved")}
-        {vehicleForms?.vehicleForm?.admin_approval == 1 && ("Closed")}
-        </div>
+      <div className="w-16">
+        <label className="block text-base font-bold leading-6 text-gray-900">
+        Status:
+        </label> 
+      </div>
+      <div className="w-full ppa-form-request font-bold">
+      {vehicleForms?.vehicleForm?.admin_approval == 5 && ("Waiting for vehicle and driver")}
+      {vehicleForms?.vehicleForm?.admin_approval == 4 && (currentUser.code_clearance == 1 ? "Waiting for your approval" : "Waiting for Admin Manager's approval")}
+      {vehicleForms?.vehicleForm?.admin_approval == 3 && ("Disapproved")}
+      {vehicleForms?.vehicleForm?.admin_approval == 2 && ("Approved")}
+      {vehicleForms?.vehicleForm?.admin_approval == 1 && ("Closed")}
+      </div>
       </div>
 
       {/* Show Form */}
@@ -565,73 +565,77 @@ export default function PrePostRepairForm(){
       <>
         <form id="VehicleSlip" onSubmit={VehicleSlipForm}>
 
-          {/* Type of Vehicle */}
-          <div className="flex items-center mt-4 font-roboto">
-            <div className="w-44">
-              <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
-                Type of Vehicle:
-              </label> 
-            </div>
-            
-            <div className="w-full">
-              <select 
-                name="vr_vehicle" 
-                id="vr_vehicle" 
-                autoComplete="vr_vehicle"
-                value={VRVehicle}
-                onChange={handleVRVehicleChange}
-                className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              >
-                <option value="" disabled>Select a vehicle</option>
-                <option value="" disabled class="font-bold text-black"><b>Admin Vehicle</b></option>
-                <option value="Mitsubishi Adventure = SLF 432">Mitsubishi Adventure - SLF 432</option>
-                <option value="Toyota Hi-Ace = SAB 4362">Toyota Hi-Ace - SAB 4362</option>
-                <option value="Isuzu Van = SFT 545">Isuzu Van - SFT 545</option>
-                <option value="Toyota Hi-Lux = SFM 708">Toyota Hi-Lux - SFM 708</option>
-                <option value="Hyundai Sta Fe = Temp 101709">Hyundai Sta Fe - Temp 101709</option>
-                <option value="Toyota Hi-Lux/Fx CS = Temp SOF 880">Toyota Hi-Lux/Fx CS - Temp SOF 880</option>
-                <option value="" disabled class="font-bold text-black"><b>OPM Vehicle</b></option>
-                <option value="Toyota Hi-Lux = NBG 9724">Toyota Hi-Lux - NBG 9724</option>
-                <option value="Toyota Fortuner = D2S 454">Toyota Fortuner - D2S 454</option>
-                <option value="" disabled class="font-bold text-black"><b>Port Police Vehicle</b></option>
-                <option value="Mitsubishi Adventure = SLG 388">Mitsubishi Adventure - SLG 388</option>
-                <option value="Mitsubishi Adventure = SHL 594">Mitsubishi Adventure - SHL 594</option>
-                <option value="Toyota Hi-Lux Patrol = SAB 4394">Toyota Hi-Lux Patrol - SAB 4394</option>
-                <option value="Toyota Hi-Lux Patrol = S6 H167">Toyota Hi-Lux Patrol - S6 H167</option>
-                <option value="" disabled class="font-bold text-black"><b>TMO Tubod Vehicle</b></option>
-                <option value="Toyota Innova = SHX 195">Toyota Innova - SHX 195</option>
-              </select> 
-              {!VRVehicle && inputErrors.vehicle_type && (
-                <p className="form-validation">This field must be required</p>
-              )}
-            </div>
-          </div>
+          <div className="border-t border-gray-300 mt-6">
 
-          {/* Driver */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-44">
-              <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
-                Driver:
-              </label> 
+            {/* Type of Vehicle */}
+            <div className="flex items-center mt-4 font-roboto">
+              <div className="w-40">
+                <label htmlFor="vr_vehicle" className="block text-base font-medium leading-6 text-gray-900">
+                  Type of Vehicle:
+                </label> 
+              </div>
+              
+              <div className="w-1/4">
+                <select 
+                  name="vr_vehicle" 
+                  id="vr_vehicle" 
+                  autoComplete="vr_vehicle"
+                  value={VRVehicle}
+                  onChange={handleVRVehicleChange}
+                  className="block w-full ppa-form"
+                >
+                  <option value="" disabled>Select a vehicle</option>
+                  <option value="" disabled class="font-bold text-black"><b>Admin Vehicle</b></option>
+                  <option value="Mitsubishi Adventure = SLF 432">Mitsubishi Adventure - SLF 432</option>
+                  <option value="Toyota Hi-Ace = SAB 4362">Toyota Hi-Ace - SAB 4362</option>
+                  <option value="Isuzu Van = SFT 545">Isuzu Van - SFT 545</option>
+                  <option value="Toyota Hi-Lux = SFM 708">Toyota Hi-Lux - SFM 708</option>
+                  <option value="Hyundai Sta Fe = Temp 101709">Hyundai Sta Fe - Temp 101709</option>
+                  <option value="Toyota Hi-Lux/Fx CS = Temp SOF 880">Toyota Hi-Lux/Fx CS - Temp SOF 880</option>
+                  <option value="" disabled class="font-bold text-black"><b>OPM Vehicle</b></option>
+                  <option value="Toyota Hi-Lux = NBG 9724">Toyota Hi-Lux - NBG 9724</option>
+                  <option value="Toyota Fortuner = D2S 454">Toyota Fortuner - D2S 454</option>
+                  <option value="" disabled class="font-bold text-black"><b>Port Police Vehicle</b></option>
+                  <option value="Mitsubishi Adventure = SLG 388">Mitsubishi Adventure - SLG 388</option>
+                  <option value="Mitsubishi Adventure = SHL 594">Mitsubishi Adventure - SHL 594</option>
+                  <option value="Toyota Hi-Lux Patrol = SAB 4394">Toyota Hi-Lux Patrol - SAB 4394</option>
+                  <option value="Toyota Hi-Lux Patrol = S6 H167">Toyota Hi-Lux Patrol - S6 H167</option>
+                  <option value="" disabled class="font-bold text-black"><b>TMO Tubod Vehicle</b></option>
+                  <option value="Toyota Innova = SHX 195">Toyota Innova - SHX 195</option>
+                </select> 
+                {!VRVehicle && inputErrors.vehicle_type && (
+                  <p className="form-validation">This field must be required</p>
+                )}
+              </div>
             </div>
-            <div className="w-full">
-              <select
-                name="plate_number"
-                id="plate_number"
-                autoComplete="request-name"
-                value={selectedDriver}
-                onChange={handleDriverName}
-                className="block w-72 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              >
-                <option value="" disabled>Select a Driver</option>
-                {driverList.map(driver => (
-                  <option key={driver.driver_id} value={driver.driver_name}>{driver.driver_name}</option>
-                ))}
-              </select>
-              {!selectedDriver && inputErrors.driver && (
-                <p className="form-validation">This field must be required</p>
-              )}
+
+            {/* Driver */}
+            <div className="flex items-center mt-2 font-roboto">
+              <div className="w-40">
+                <label htmlFor="insp_date" className="block text-base font-medium leading-6 text-gray-900">
+                  Driver:
+                </label> 
+              </div>
+              <div className="w-1/4">
+                <select
+                  name="plate_number"
+                  id="plate_number"
+                  autoComplete="request-name"
+                  value={selectedDriver}
+                  onChange={handleDriverName}
+                  className="block w-full ppa-form"
+                >
+                  <option value="" disabled>Select a Driver</option>
+                  {driverList.map(driver => (
+                    <option key={driver.driver_id} value={driver.driver_name}>{driver.driver_name}</option>
+                  ))}
+                </select>
+                {!selectedDriver && inputErrors.driver && (
+                  <p className="form-validation">This field must be required</p>
+                )}
+              </div>
             </div>
+
           </div>
 
         </form>

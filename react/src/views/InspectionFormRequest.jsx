@@ -8,10 +8,6 @@ export default function RepairRequestForm(){
 
   const { currentUser } = useUserStateContext();
 
-  // Date
-  const today = new Date().toISOString().split('T')[0];
-  const currentDate = new Date().toISOString().split('T')[0];
-
   useEffect(() => {
     // Redirect to dashboard if pwd_change is not 1
     if (currentUser && currentUser.pwd_change === 1) {
@@ -20,13 +16,17 @@ export default function RepairRequestForm(){
     }
   }, [currentUser]);
 
-  const [inputErrors, setInputErrors] = useState({});
-  const [submitLoading, setSubmitLoading] = useState(false);
-
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
+
+  // Date
+  const today = new Date().toISOString().split('T')[0];
+  const currentDate = new Date().toISOString().split('T')[0];
+
+  const [inputErrors, setInputErrors] = useState({});
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   // Values
   const [propertyNo, setPropertyNo] = useState('');
@@ -44,7 +44,6 @@ export default function RepairRequestForm(){
 
   // Get Supervisor ID
   useEffect(()=>{ 
-
     axiosClient
     .get(`/getsupervisor`)
     .then((response) => {
@@ -74,7 +73,7 @@ export default function RepairRequestForm(){
     adminManager = 4;
     supervisorUser = 1;
     remarks = "Waiting for GSO to filled up the form";
-  } else { // default
+  } else {
     adminManager = 0;
     supervisorUser = 0;
     remarks = "Waiting for supervisor's approval";
@@ -160,6 +159,7 @@ export default function RepairRequestForm(){
 
   return (
   <PageComponent title="Request on Pre/Post Repair Inspection Form">
+    {/* Check if the user has a signature */}
     {currentUser.image !== "null" ? (
       <div className="font-roboto">
 
@@ -179,19 +179,19 @@ export default function RepairRequestForm(){
 
               {/* Date */}
               <div className="flex items-center mt-6 ">
-                <div className="w-36">
-                  <label htmlFor="rep_date" className="block text-base leading-6 text-black">
-                    Date:
+                <div className="w-40">
+                  <label htmlFor="rep_date" className="block text-base leading-6 text-black"> 
+                    Date: 
                   </label> 
                 </div>
-                <div className="w-64">
-                  <input
-                    type="date"
-                    name="rep_date"
-                    id="rep_date"
-                    defaultValue= {today}
+                <div className="w-1/2">
+                  <input 
+                    type="date" 
+                    name="rep_date" 
+                    id="rep_date" 
+                    defaultValue={today} 
                     onChange={ev => setInspectionDate(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     readOnly
                   />
                 </div>
@@ -199,12 +199,10 @@ export default function RepairRequestForm(){
 
               {/* Property Number */}
               <div className="flex items-center mt-4 ">
-                <div className="w-36">
-                  <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
-                    Property No.:
-                  </label> 
+                <div className="w-40">
+                  <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black"> Property No.: </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_property_no"
@@ -212,7 +210,7 @@ export default function RepairRequestForm(){
                     autoComplete="rep_property_no"
                     value={propertyNo}
                     onChange={ev => setPropertyNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!propertyNo && inputErrors.property_number && (
                     <p className="form-validation">You must input the Property Number</p>
@@ -222,12 +220,12 @@ export default function RepairRequestForm(){
 
               {/* Acquisition Date */}
               <div className="flex items-center mt-4">
-                <div className="w-36">
+                <div className="w-40">
                   <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-black">    
                     Acquisition Date:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="date"
                     name="rep_acquisition_date"
@@ -235,7 +233,7 @@ export default function RepairRequestForm(){
                     value={acquisitionDate}
                     onChange={ev => setAcquisitionDate(ev.target.value)}
                     max={currentDate}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!acquisitionDate && inputErrors.acq_date && (
                     <p className="form-validation">You must input the Acquisition Date</p>
@@ -245,12 +243,12 @@ export default function RepairRequestForm(){
 
               {/* Acquisition Cost */}
               <div className="flex items-center mt-4">
-                <div className="w-36">
+                <div className="w-40">
                   <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-black">
                     Acquisition Cost:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <div className="relative flex items-center">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">
                       ₱
@@ -268,7 +266,7 @@ export default function RepairRequestForm(){
                           setAcquisitionCost(inputVal.replace(/,/g, ''));
                         }
                       }}
-                      className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                      className="block w-full ppa-form cost"
                     />
                   </div>
                   {!acquisitionCost && inputErrors.acq_cost && (
@@ -279,12 +277,12 @@ export default function RepairRequestForm(){
 
               {/* Brand/Model */}
               <div className="flex items-center mt-4">
-                <div className="w-36">
+                <div className="w-40">
                   <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-black">
                     Brand/Model:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="brand_mrep_brand_modelodel"
@@ -292,7 +290,7 @@ export default function RepairRequestForm(){
                     autoComplete="rep_brand_model"
                     value={BrandModel}
                     onChange={ev => setBrandModel(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!BrandModel && inputErrors.brand_model && (
                     <p className="form-validation">You must input the Brand/Model</p>
@@ -302,12 +300,12 @@ export default function RepairRequestForm(){
 
               {/* Serial/Engine No */}
               <div className="flex items-center mt-4">
-                <div className="w-36">
+                <div className="w-40">
                   <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-black">                  
                     Serial/Engine No.:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_serial_engine_no"
@@ -315,7 +313,7 @@ export default function RepairRequestForm(){
                     autoComplete="rep_serial_engine_no"
                     value={SerialEngineNo}
                     onChange={ev => setSerialEngineNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!SerialEngineNo && inputErrors.serial_engine_no && (
                     <p className="form-validation">You must input the Serial/Engine No.</p>
@@ -335,7 +333,7 @@ export default function RepairRequestForm(){
                     Type of Property:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <select 
                   name="rep_type_of_property" 
                   id="rep_type_of_property" 
@@ -344,7 +342,7 @@ export default function RepairRequestForm(){
                   onChange={ev => {
                     setTypeOfProperty(ev.target.value);
                   }}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                   >
                     <option value="" disabled>Select an option</option>
                     <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
@@ -364,14 +362,14 @@ export default function RepairRequestForm(){
                     Description:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_description"
                     id="rep_description"
                     value={propertyDescription}
                     onChange={ev => setPropertyDescription(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!propertyDescription && inputErrors.property_description && (
                     <p className="form-validation">You must input the Description</p>
@@ -386,14 +384,14 @@ export default function RepairRequestForm(){
                     Location (Div/Section/Unit):
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_location"
                     id="rep_location"
                     value={propertyLocation}
                     onChange={ev => setPropertyLocation(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                   {!propertyLocation && inputErrors.location && (
                     <p className="form-validation">You must input the Location</p>
@@ -408,7 +406,7 @@ export default function RepairRequestForm(){
                     Complain/Defect:
                   </label> 
                 </div>
-                <div className="w-64">
+                <div className="w-1/2">
                 <textarea
                   id="rep_complain"
                   name="rep_complain"
@@ -416,7 +414,7 @@ export default function RepairRequestForm(){
                   value={ComplainDefect}
                   style={{ resize: 'none' }}
                   onChange={ev => setComplainDefect(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 {!ComplainDefect && inputErrors.complain && (
                   <p className="form-validation">You must input the Complain/Defect</p>
@@ -432,14 +430,14 @@ export default function RepairRequestForm(){
                       Immediate Supervisor:
                     </label> 
                   </div>
-                  <div className="w-64">
+                  <div className="w-1/2">
                     <select 
                     name="rep_type_of_property" 
                     id="rep_type_of_property" 
                     autoComplete="rep_type_of_property"
                     value={getSupervisor}
                     onChange={ev => { setGetSupervisor(ev.target.value)}}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     >
                       <option value="" disabled>Select your supervisor</option>
                       {supervisor?.supervisorData?.map((Data) => (
@@ -453,7 +451,7 @@ export default function RepairRequestForm(){
                     )}
                   </div>
                 </div>
-              )}          
+              )}  
 
             </div>
 
@@ -461,10 +459,7 @@ export default function RepairRequestForm(){
 
           {/* Submit Button */}
           <div className="mt-10">
-            <button type="submit"
-              className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-              disabled={submitLoading}
-            >
+            <button type="submit" className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`} disabled={submitLoading}>
               {submitLoading ? (
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
@@ -489,16 +484,12 @@ export default function RepairRequestForm(){
     {/* Show Popup */}
     {showPopup && (
       <div className="fixed inset-0 flex items-center justify-center z-50">
-
         {/* Semi-transparent black overlay */}
-        <div className="fixed inset-0 bg-black opacity-40"></div>
-
+        <div className="fixed inset-0 bg-black opacity-40 backdrop-blur"></div>
         {/* Popup content with background blur */}
         <div className="absolute p-6 rounded-lg shadow-md bg-white backdrop-blur-lg animate-fade-down" style={{ width: '350px' }}>
-          
           {/* Notification Icons */}
           <div class="f-modal-alert">
-
             {/* Error */}
             {popupContent == 'error' && (
               <div className="f-modal-icon f-modal-error animate">
@@ -508,7 +499,6 @@ export default function RepairRequestForm(){
                 </span>
               </div>
             )}
-            
             {/* Success */}
             {popupContent == 'success' && (
               <div class="f-modal-icon f-modal-success animate">
@@ -516,37 +506,29 @@ export default function RepairRequestForm(){
                 <span class="f-modal-line f-modal-long animateSuccessLong"></span>
               </div>
             )}
-
           </div>
-            
           {/* Popup Message */}
           <p className="text-lg text-center"> {popupMessage} </p>
-
           {/* Buttons */}
           <div className="flex justify-center mt-4">
-
             {/* Error */}
             {popupContent == 'error' && (
               <button onClick={justclose} className="w-full py-2 btn-error">
                 Close
               </button>
             )}
-
             {/* Success */}
             {popupContent == 'success' && (
               <button onClick={closePopup} className="w-full py-2 btn-success">
                 View My Request
               </button>
             )}
-
           </div>
-
         </div>
-
       </div>
     )}
     {/* End Show Popup */}
-
   </PageComponent>
   );
+
 }

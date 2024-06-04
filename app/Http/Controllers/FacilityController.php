@@ -339,7 +339,7 @@ class FacilityController extends Controller
         // Update the obr_instruct field
         $facility->update([
             'admin_approval' => 1,
-            'remarks' => "The request has been received by the GSO"
+            'remarks' => "The request is closed"
         ]);
 
         // Creating logs

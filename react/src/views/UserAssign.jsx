@@ -227,7 +227,7 @@ export default function UserAssign(){
       <div className="font-roboto">
 
         {/* Search Filter */}
-        <div className="mt-10 flex">
+        <div className="mt-10 mb-4 flex">
 
           {/* Search */}
           <div className="flex-grow">
@@ -249,23 +249,23 @@ export default function UserAssign(){
           
         </div>
 
-        <table className="border-collapse w-full mt-2">
+        <table className="ppa-table w-full mt-2">
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Name</th>
-              <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Assignment</th>
-              <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">No of Apperance</th>
-              <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Action</th>
+              <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
+              <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
+              <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">No of Apperance</th>
+              <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#fff' }}>
           {currentUsers.length > 0 ? (
             currentUsers.map((data) => (
               <tr key={data.id}>
-                <td className="px-1 py-2 align-top border border-custom w-3/12 table-font text-center">{data.name}</td>
-                <td className="px-1 py-2 align-top border border-custom w-3/12 table-font text-center">{data.type}</td>
-                <td className="px-1 py-2 align-top border border-custom w-1/5 table-font text-center">{data.count == 0 ? "No Apperance" : data.count}</td>
-                <td className="px-1 py-2 align-top border border-custom w-3/12 table-font text-center">
+                <td className="px-3 py-4 align-top border border-custom w-3/12 table-font text-center">{data.name}</td>
+                <td className="px-3 py-4 align-top border border-custom w-3/12 table-font text-center">{data.type}</td>
+                <td className="px-3 py-4 align-top border border-custom w-1/5 table-font text-center">{data.count == 0 ? "No Apperance" : data.count}</td>
+                <td className="px-3 py-4 align-top border border-custom w-3/12 table-font text-center">
                   <button
                     onClick={() => removePersonnel(data.id, data.name)}
                     className="py-1 px-6 btn-error"

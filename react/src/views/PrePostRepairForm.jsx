@@ -242,7 +242,7 @@ export default function PrePostRepairForm(){
 
     const filledVariablesCountB = [updateLastfilledDate, updateNatureRepair, updatePointPersonnel].filter(Boolean).length;
 
-    if(filledVariablesCountB !== 1){
+    if(filledVariablesCountB < 1){
       setPopupContent('error');
       setShowPopup(true);
       setPopupMessage(
@@ -790,7 +790,7 @@ export default function PrePostRepairForm(){
             Control No:
             </label> 
           </div>
-          <div className="w-auto px-5 border-b border-black text-center font-bold">
+          <div className="w-auto px-5 text-center font-bold ppa-form-request">
           {InspectionData?.getPartA?.id}
           </div>
         </div>
@@ -818,7 +818,7 @@ export default function PrePostRepairForm(){
                 Date:
                 </label> 
               </div>
-              <div className="w-64 border-b border-black pl-1">
+              <div className="w-1/2 ppa-form-request">
               {formatDate(InspectionData?.getPartA?.date_of_request)}
               </div>
             </div>
@@ -830,7 +830,7 @@ export default function PrePostRepairForm(){
               </div>
               {/* Field */}
               {editPartA ? (
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_property_no"
@@ -838,13 +838,13 @@ export default function PrePostRepairForm(){
                     autoComplete="rep_property_no"
                     value={propertyNo}
                     onChange={ev => setPropertyNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     placeholder={InspectionData?.getPartA?.property_number}
                   />
                   {(fieldMissing && !propertyNo) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                 </div>
               ):(
-                <div className="w-64 border-b border-black pl-1"> {InspectionData?.getPartA?.property_number} </div>
+                <div className="w-1/2 ppa-form-request"> {InspectionData?.getPartA?.property_number} </div>
               )}
             </div>
 
@@ -855,7 +855,7 @@ export default function PrePostRepairForm(){
               </div>
               {/* Field */}
               {editPartA ? (
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="date"
                     name="rep_acquisition_date"
@@ -863,13 +863,13 @@ export default function PrePostRepairForm(){
                     value={acquisitionDate}
                     onChange={ev => setAcquisitionDate(ev.target.value)}
                     max={currentDate}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     defaultValue={InspectionData?.getPartA?.acq_date}
                   />
                   {(fieldMissing && !acquisitionDate) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                 </div>
               ):(
-                <div className="w-64 border-b border-black pl-1"> {formatDate(InspectionData?.getPartA?.acq_date)} </div>
+                <div className="w-1/2 ppa-form-request"> {formatDate(InspectionData?.getPartA?.acq_date)} </div>
               )}
             </div>
 
@@ -880,7 +880,7 @@ export default function PrePostRepairForm(){
               </div>
               {/* Field */}
               {editPartA ? (
-                <div className="w-64">
+                <div className="w-1/2">
                   <div className="relative flex items-center">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-600">₱</span>
                     <input
@@ -895,14 +895,14 @@ export default function PrePostRepairForm(){
                           setAcquisitionCost(inputVal.replace(/,/g, ''));
                         }
                       }}
-                      className="block w-full rounded-md border-1 p-1.5 pl-5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                      className="block w-full ppa-form-cost"
                       placeholder={InspectionData?.getPartA?.acq_cost}
                     />
                   </div>
                   {(fieldMissing && !acquisitionCost) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                 </div>
               ):(
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                 {InspectionData?.getPartA?.acq_cost && (
                   new Intl.NumberFormat('en-PH', {
                     style: 'currency',
@@ -920,7 +920,7 @@ export default function PrePostRepairForm(){
               </div>
               {/* Field */}
               {editPartA ? (
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="brand_mrep_brand_modelodel"
@@ -928,13 +928,13 @@ export default function PrePostRepairForm(){
                     autoComplete="rep_brand_model"
                     value={BrandModel}
                     onChange={ev => setBrandModel(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     placeholder={InspectionData?.getPartA?.brand_model}
                   />
                   {(fieldMissing && !BrandModel) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                 </div>
               ):(
-                <div className="w-64 border-b border-black pl-1"> {InspectionData?.getPartA?.brand_model} </div>
+                <div className="w-1/2 ppa-form-request"> {InspectionData?.getPartA?.brand_model} </div>
               )}
             </div>
 
@@ -945,7 +945,7 @@ export default function PrePostRepairForm(){
               </div>
               {/* Field */}
               {editPartA ? (
-                <div className="w-64">
+                <div className="w-1/2">
                   <input
                     type="text"
                     name="rep_serial_engine_no"
@@ -953,13 +953,13 @@ export default function PrePostRepairForm(){
                     autoComplete="rep_serial_engine_no"
                     value={SerialEngineNo}
                     onChange={ev => setSerialEngineNo(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                     placeholder={InspectionData?.getPartA?.serial_engine_no}
                   />
                   {(fieldMissing && !SerialEngineNo) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                 </div>
               ):(
-                <div className="w-64 border-b border-black pl-1"> {InspectionData?.getPartA?.serial_engine_no} </div>
+                <div className="w-1/2 ppa-form-request"> {InspectionData?.getPartA?.serial_engine_no} </div>
               )}
             </div>
 
@@ -973,7 +973,7 @@ export default function PrePostRepairForm(){
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900"> Type of Property: </label> 
               </div>
-              <div className="w-64 border-b border-black pl-1">
+              <div className="w-1/2 ppa-form-request">
                 {InspectionData?.getPartA?.type_of_property}
               </div>
             </div>
@@ -983,7 +983,7 @@ export default function PrePostRepairForm(){
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900"> Description: </label> 
               </div>
-              <div className="w-64 border-b border-black pl-1">
+              <div className="w-1/2 ppa-form-request">
                 {InspectionData?.getPartA?.property_description}
               </div>
             </div>
@@ -993,7 +993,7 @@ export default function PrePostRepairForm(){
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900"> Location: </label> 
               </div>
-              <div className="w-64 border-b border-black pl-1">
+              <div className="w-1/2 ppa-form-request">
                 {InspectionData?.getPartA?.location}
               </div>
             </div>
@@ -1003,7 +1003,7 @@ export default function PrePostRepairForm(){
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900"> Requested By: </label> 
               </div>
-              <div className="w-64 font-bold border-b border-black pl-1">
+              <div className="w-1/2 font-bold ppa-form-request">
                 {InspectionData?.requestor?.r_name}
               </div>
             </div>
@@ -1013,7 +1013,7 @@ export default function PrePostRepairForm(){
               <div className="w-40">
                 <label className="block text-base font-medium leading-6 text-gray-900"> Noted By: </label> 
               </div>
-              <div className="w-64 font-bold border-b border-black pl-1">
+              <div className="w-1/2 font-bold ppa-form-request">
                 {InspectionData?.supervisor?.supName}
               </div>
             </div>
@@ -1029,7 +1029,7 @@ export default function PrePostRepairForm(){
             Complain:
             </label> 
           </div>
-          <div className="w-3/4 border-b border-black pl-1">
+          <div className="w-3/4 ppa-form-request">
           {InspectionData?.getPartA?.complain}
           </div>
         </div>
@@ -1041,7 +1041,7 @@ export default function PrePostRepairForm(){
             Status:
             </label> 
           </div>
-          <div className="w-full font-bold">
+          <div className="w-full font-bold ppa-form-request">
           {InspectionData?.getPartA?.supervisor_approval == 0 && ("Pending")}
           {InspectionData?.getPartA?.supervisor_approval == 1 && ("Approved")}
           {InspectionData?.getPartA?.supervisor_approval == 2 && (InspectionData?.getPartA?.remarks)}
@@ -1197,17 +1197,17 @@ export default function PrePostRepairForm(){
 
               {/* Date */}
               <div className="flex items-center mt-6">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                     Date:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black">
+                <div className="w-1/4">
                   <input
                     type="date"
                     name="date_filled"
                     id="date_filled"
-                    className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    className="block w-full ppa-form"
                     defaultValue={today}
                     readOnly
                   />
@@ -1221,7 +1221,7 @@ export default function PrePostRepairForm(){
                   Date of Last Repair:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black">
+                <div className="w-1/4">
                   <input
                     type="date"
                     name="last_date_filled"
@@ -1229,7 +1229,7 @@ export default function PrePostRepairForm(){
                     value={lastfilledDate}
                     onChange={ev => setLastFilledDate(ev.target.value)}
                     max={currentDate}
-                    className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    className="block w-full ppa-form"
                   />
                 </div>
               </div>
@@ -1237,12 +1237,12 @@ export default function PrePostRepairForm(){
 
               {/* Nature of Repair */}
               <div className="flex items-center mt-2">
-                <div className="w-44">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Nature of Repair:
                   </label> 
                 </div>
-                <div className="w-full">
+                <div className="w-1/4">
                   <textarea
                     id="nature_repair"
                     name="nature_repair"
@@ -1250,7 +1250,7 @@ export default function PrePostRepairForm(){
                     value={natureRepair}
                     onChange={ev => setNatureRepair(ev.target.value)}
                     style={{ resize: "none" }}  
-                    className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="block w-full ppa-form"
                   />
                 </div>
               </div>
@@ -1258,19 +1258,19 @@ export default function PrePostRepairForm(){
 
               {/* Assign Personnel */}
               <div className="flex items-center mt-2">
-                <div className="w-44">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Assign Personnel:
                   </label> 
                 </div>
-                <div className="w-full">
+                <div className="w-1/4">
                 <select 
                   name="plate_number" 
                   id="plate_number" 
                   autoComplete="request-name"
                   value={pointPersonnel}
                   onChange={ev => setPointPersonnel(ev.target.value)}
-                  className="block w-full rounded-md border-1 border-black py-1 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                  className="block w-full ppa-form"
                 > 
                   <option value="" disabled>Select an option</option>
                   {InspectionData?.getPersonnelData?.map(user => (
@@ -1300,8 +1300,8 @@ export default function PrePostRepairForm(){
                     </label> 
                   </div>
                   {InspectionData?.getPartB?.date_of_filling ? 
-                  <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartB?.date_of_filling)}</div>:
-                  <div className="w-64 border-b border-black pl-1 h-4"></div>}
+                  <div className="w-1/2 ppa-form-request">{formatDate(InspectionData?.getPartB?.date_of_filling)}</div>:
+                  <div className="w-1/2 ppa-form-request h-11"></div>}
                 </div>
 
                 {/* Date of Last Repair */}
@@ -1312,7 +1312,7 @@ export default function PrePostRepairForm(){
                     </label> 
                   </div>
                   {editPartB ? (
-                    <div className="w-64">
+                    <div className="w-1/2">
                       <input
                         type="date"
                         name="last_date_filled"
@@ -1320,14 +1320,14 @@ export default function PrePostRepairForm(){
                         value={updateLastfilledDate}
                         onChange={ev => setUpdateLastfilledDate(ev.target.value)}
                         max={currentDate}
-                        className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                        className="block w-full ppa-form"
                         defaultValue={InspectionData?.getPartB?.date_of_last_repair}
                       />
                     </div>
                   ):(
                     InspectionData?.personnel?.p_name ? 
-                    <div className="w-64 border-b border-black pl-1">{InspectionData?.getPartB?.date_of_last_repair ? (formatDate(InspectionData?.getPartB?.date_of_last_repair)):("N/A")}</div>:
-                    <div className="w-64 border-b border-black pl-1 h-4"></div>
+                    <div className="w-1/2 ppa-form-request">{InspectionData?.getPartB?.date_of_last_repair ? (formatDate(InspectionData?.getPartB?.date_of_last_repair)):("N/A")}</div>:
+                    <div className="w-1/2 ppa-form-request h-11"></div>
                   )}
                 </div>
 
@@ -1339,14 +1339,14 @@ export default function PrePostRepairForm(){
                     </label> 
                   </div>
                   {editPartB ? (
-                    <div className="w-64">
+                    <div className="w-1/2">
                       <select 
                         name="plate_number" 
                         id="plate_number" 
                         autoComplete="request-name"
                         value={updatePointPersonnel}
                         onChange={ev => setUpdatePointPersonnel(ev.target.value)}
-                        className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                        className="block w-full ppa-form"
                       > 
                         <option value="" disabled>Select an option</option>
                         {InspectionData?.getPersonnelData?.map(user => (
@@ -1356,8 +1356,8 @@ export default function PrePostRepairForm(){
                     </div>
                   ):(
                     InspectionData?.personnel?.p_name ?
-                    <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                    <div className="w-64 border-b border-black pl-1 h-4"></div>
+                    <div className="w-1/2 ppa-form-request font-bold">{InspectionData?.personnel?.p_name}</div>:
+                    <div className="w-1/2 ppa-form-request h-11"></div>
                   )}
                 </div>
 
@@ -1375,10 +1375,10 @@ export default function PrePostRepairForm(){
                   </div>           
                   {InspectionData?.getPartA?.admin_approval == 4 ? (
                   <>
-                    <div className="w-64 font-bold border-b border-black pl-1 h-4"></div>
+                    <div className="w-1/2 font-bold ppa-form-request h-11"></div>
                   </>  
                   ):(
-                    <div className="w-64 font-bold border-b border-black pl-1">
+                    <div className="w-1/2 font-bold ppa-form-request">
                       {InspectionData?.gso?.gsoName}
                     </div>
                   ) }
@@ -1393,10 +1393,10 @@ export default function PrePostRepairForm(){
                   </div>
                   {InspectionData?.getPartA?.admin_approval == 4 ? (
                   <>
-                    <div className="w-64 font-bold border-b border-black pl-1 h-4"></div>
+                    <div className="w-1/2 font-bold ppa-form-request h-11"></div>
                   </>  
                   ):(
-                    <div className="w-64 font-bold border-b border-black pl-1">
+                    <div className="w-1/2 font-bold ppa-form-request pl-1">
                       {InspectionData?.manager?.ad_name}
                     </div>
                   )}
@@ -1415,7 +1415,7 @@ export default function PrePostRepairForm(){
                 </label> 
               </div>
               {editPartB ? (
-                <div className="w-64">
+                <div className="w-1/4">
                   <textarea
                     id="nature_repair"
                     name="nature_repair"
@@ -1423,13 +1423,13 @@ export default function PrePostRepairForm(){
                     value={updateNatureRepair}
                     onChange={ev => setUpdateNatureRepair(ev.target.value)}
                     style={{ resize: "none" }}  
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                 </div>
               ):(
                 InspectionData?.personnel?.p_name ? 
-                <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartB?.nature_of_last_repair ? (InspectionData?.getPartB?.nature_of_last_repair):("N/A")}</div>:
-                <div className="w-3/4 border-b border-black pl-1 h-4"></div>
+                <div className="w-3/4 ppa-form-request">{InspectionData?.getPartB?.nature_of_last_repair ? (InspectionData?.getPartB?.nature_of_last_repair):("N/A")}</div>:
+                <div className="w-3/4 ppa-form-request pl-1 h-11"></div>
               )}
             </div>
 
@@ -1440,7 +1440,7 @@ export default function PrePostRepairForm(){
                 Status:
                 </label> 
               </div>
-              <div className="w-full font-bold">
+              <div className="w-full font-bold ppa-form-request">
               {InspectionData?.getPartB != null ? 
               (<>
               {InspectionData?.getPartA?.admin_approval == 1 && ("Approved")}
@@ -1625,17 +1625,17 @@ export default function PrePostRepairForm(){
 
                 {/* Date */}
                 <div className="flex items-center mt-6">
-                  <div className="w-36">
+                  <div className="w-40">
                     <label className="block text-base font-medium leading-6 text-gray-900">
                       Date Inspected:
                     </label> 
                   </div>
-                  <div className="w-64 border-b border-black">
+                  <div className="w-1/4">
                     <input
                       type="date"
                       name="date_filled"
                       id="date_filled"
-                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                       defaultValue={today}
                       readOnly
                     />
@@ -1649,7 +1649,7 @@ export default function PrePostRepairForm(){
                     Findings:
                     </label> 
                   </div>
-                  <div className="w-full">
+                  <div className="w-1/4">
                     <textarea
                       id="findings"
                       name="findings"
@@ -1657,12 +1657,12 @@ export default function PrePostRepairForm(){
                       style={{ resize: "none" }}
                       value= {finding}
                       onChange={ev => setFinding(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                     />
                   </div>
                 </div>
                 {!finding && inputErrors.findings && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Fidings</p>
+                  <p className="form-validation" style={{ marginLeft:'160px' }}>You must input the Fidings</p>
                 )}
 
                 {/* Recomendations */}
@@ -1672,7 +1672,7 @@ export default function PrePostRepairForm(){
                     Recomendations:
                     </label> 
                   </div>
-                  <div className="w-full">
+                  <div className="w-1/4">
                     <textarea
                       id="recomendations"
                       name="recomendations"
@@ -1680,12 +1680,12 @@ export default function PrePostRepairForm(){
                       style={{ resize: "none" }}
                       value= {recommendation}
                       onChange={ev => setRecommendation(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                     />
                   </div>
                 </div>
                 {!recommendation && inputErrors.recommendations && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Recommendations</p>
+                  <p className="form-validation" style={{ marginLeft:'160px' }}>You must input the Recommendations</p>
                 )}
 
               </form>
@@ -1696,14 +1696,14 @@ export default function PrePostRepairForm(){
 
               {/* Date Inspected */}
               <div className="flex items-center mt-6">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Date Inspected:
                   </label> 
                 </div>
                 {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartCD?.before_repair_date)}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
+                <div className="w-1/4 ppa-form-request">{formatDate(InspectionData?.getPartCD?.before_repair_date)}</div>:
+                <div className="w-1/4 ppa-form-request h-11"></div>}
               </div>
 
               {enablePartC ? (
@@ -1716,7 +1716,7 @@ export default function PrePostRepairForm(){
                       Findings:
                     </label>
                   </div>
-                  <div className="w-full">
+                  <div className="w-1/4">
                     <textarea
                       id="findings"
                       name="findings"
@@ -1725,7 +1725,7 @@ export default function PrePostRepairForm(){
                       value={updateFinding}
                       onChange={ev => setUpdateFinding(ev.target.value)}
                       placeholder={InspectionData?.getPartCD?.findings}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                     />
                     {(fieldMissing && !updateFinding) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                   </div>
@@ -1738,7 +1738,7 @@ export default function PrePostRepairForm(){
                       Recommendations:
                     </label>
                   </div>
-                  <div className="w-full">
+                  <div className="w-1/4">
                     <textarea
                       id="recommendations"
                       name="recommendations"
@@ -1747,7 +1747,7 @@ export default function PrePostRepairForm(){
                       value={updateRecommendation}
                       onChange={ev => setUpdateRecommendation(ev.target.value)}
                       placeholder={InspectionData?.getPartCD?.recommendations}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                     />
                     {(fieldMissing && !updateRecommendation) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
                   </div>
@@ -1759,26 +1759,26 @@ export default function PrePostRepairForm(){
                 {/* Display */}
                 {/* Findings */}
                 <div className="flex items-center mt-2">
-                  <div className="w-36">
+                  <div className="w-40">
                     <label className="block text-base font-medium leading-6 text-gray-900">
                     Findings:
                     </label> 
                   </div>
                   {InspectionData?.getPartCD?.findings != 'no data' ? 
-                  <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.findings}</div>:
-                  <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
+                  <div className="w-3/4 ppa-form-request">{InspectionData?.getPartCD?.findings}</div>:
+                  <div className="w-3/4 ppa-form-request h-11"></div>}
                 </div>
 
                 {/* Recomendations */}
                 <div className="flex items-center mt-2">
-                  <div className="w-36">
+                  <div className="w-40">
                     <label className="block text-base font-medium leading-6 text-gray-900">
                     Recomendations:
                     </label> 
                   </div>
                   {InspectionData?.getPartCD?.findings != 'no data' ? 
-                  <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.recommendations}</div>:
-                  <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
+                  <div className="w-3/4 ppa-form-request">{InspectionData?.getPartCD?.recommendations}</div>:
+                  <div className="w-3/4 ppa-form-request h-11"></div>}
                 </div>
 
               </>  
@@ -1786,14 +1786,14 @@ export default function PrePostRepairForm(){
 
               {/* Noted By */}
               <div className="flex items-center mt-2">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Noted By:
                   </label> 
                 </div>
                 {InspectionData?.getPartCD?.findings != 'no data' ? 
-                <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
+                <div className="w-1/4 ppa-form-request font-bold">{InspectionData?.personnel?.p_name}</div>:
+                <div className="w-1/4 ppa-form-request h-11"></div>}
               </div>
 
             </> 
@@ -1875,17 +1875,17 @@ export default function PrePostRepairForm(){
 
                 {/* Date */}
                 <div className="flex items-center mt-6">
-                  <div className="w-36">
+                  <div className="w-40">
                     <label className="block text-base font-medium leading-6 text-gray-900">
                       Date Inspected:
                     </label> 
                   </div>
-                  <div className="w-64 border-b border-black">
+                  <div className="w-1/4">
                     <input
                       type="date"
                       name="date_filled"
                       id="date_filled"
-                      className="block w-full rounded-md border-0 py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                       defaultValue={today}
                       readOnly
                     />
@@ -1899,7 +1899,7 @@ export default function PrePostRepairForm(){
                     Remarks:
                     </label> 
                   </div>
-                  <div className="w-full">
+                  <div className="w-1/4">
                     <textarea
                       id="remarks"
                       name="remarks"
@@ -1907,12 +1907,12 @@ export default function PrePostRepairForm(){
                       style={{ resize: "none" }}
                       value= {remarks}
                       onChange={ev => setRemarks(ev.target.value)}
-                      className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full ppa-form"
                   />
                   </div>
                 </div>
                 {!remarks && inputErrors.remarks && (
-                  <p className="form-validation" style={{ marginLeft:'140px' }}>You must input the Remarks</p>
+                  <p className="form-validation" style={{ marginLeft:'160px' }}>You must input the Remarks</p>
                 )}
 
               </form>
@@ -1923,14 +1923,14 @@ export default function PrePostRepairForm(){
 
               {/* Date Inspected */}
               <div className="flex items-center mt-6">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Date Inspected:
                   </label> 
                 </div>
                 {InspectionData?.getPartCD?.after_reapir_date != null ? 
-                <div className="w-64 border-b border-black pl-1">{formatDate(InspectionData?.getPartCD?.after_reapir_date)}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
+                <div className="w-1/4 ppa-form-request">{formatDate(InspectionData?.getPartCD?.after_reapir_date)}</div>:
+                <div className="w-1/4 ppa-form-request h-11"></div>}
               </div>
 
               {/* Remarks */}
@@ -1941,7 +1941,7 @@ export default function PrePostRepairForm(){
                   Remarks:
                   </label> 
                 </div>
-                <div className="w-full">
+                <div className="w-1/4">
                   <textarea
                     id="remarks"
                     name="remarks"
@@ -1949,7 +1949,7 @@ export default function PrePostRepairForm(){
                     style={{ resize: "none" }}
                     value= {updateRemark}
                     onChange={ev => setUpdateRemark(ev.target.value)}
-                    className="block w-80 rounded-md border-1 border-black py-0 text-gray-900 shadow-sm ring-0 ring-inset ring-gray-300 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="block w-full ppa-form"
                     placeholder={InspectionData?.getPartCD?.remarks}
                   />
                   {(fieldMissing && !updateRemark) && ( <p className="font-roboto form-validation">Input Text Missing</p> )}
@@ -1957,27 +1957,27 @@ export default function PrePostRepairForm(){
               </div>
               ):(
               <div className="flex items-center mt-2">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Remarks:
                   </label> 
                 </div>
                 {InspectionData?.getPartCD?.remarks != null ? 
-                <div className="w-3/4 border-b border-black pl-1">{InspectionData?.getPartCD?.remarks}</div>:
-                <div className="w-3/4 border-b border-black pl-1 h-4"></div>}
+                <div className="w-3/4 ppa-form-request">{InspectionData?.getPartCD?.remarks}</div>:
+                <div className="w-3/4 ppa-form-request h-11"></div>}
               </div>
               )}
 
               {/* Noted By */}
               <div className="flex items-center mt-2">
-                <div className="w-36">
+                <div className="w-40">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Noted By:
                   </label> 
                 </div>
                 {InspectionData?.getPartCD?.remarks ? 
-                <div className="w-64 border-b border-black pl-1 font-bold">{InspectionData?.personnel?.p_name}</div>:
-                <div className="w-64 border-b border-black pl-1 h-4"></div>}
+                <div className="w-1/4 ppa-form-request font-bold">{InspectionData?.personnel?.p_name}</div>:
+                <div className="w-1/4 ppa-form-request h-11"></div>}
               </div>
               
             </>
@@ -2074,7 +2074,7 @@ export default function PrePostRepairForm(){
       )}
 
       {/* Generate PDF */}
-      {InspectionData?.getPartCD?.close == 1 && currentUser.code_clearance == 3 && (
+      {InspectionData?.getPartCD?.close == 1 && (currentUser.code_clearance == 3 || currentUser.code_clearance == 10) && (
         <div className="flex mt-6">
           <button type="button" onClick={handleButtonClick}
             className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}

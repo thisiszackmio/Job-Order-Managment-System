@@ -141,7 +141,7 @@ export default function VehicleSlipFormList(){
   <>
     {Authorize ? (
       <PageComponent title="Vehicle Slip Request List">
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-3">
         <div className="align-right">
           {/* For Search Field */}
           <input
@@ -163,20 +163,20 @@ export default function VehicleSlipFormList(){
       {/* Vehicle Slip Form */}
       <div className="overflow-x-auto">
         
-          <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+          <table className="ppa-table font-roboto" style={{ width: '100%' }}>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border w-1 border-custom">No</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Visited Place</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date/Time of Arrival</th>   
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
-                <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+              <tr>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase w-1">No</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Purpose</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Visited Place</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date/Time of Arrival</th>   
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Vehicle</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Driver</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">No of Passengers</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Action</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
@@ -184,19 +184,19 @@ export default function VehicleSlipFormList(){
             <>
               {currentVehicleSlip.map((VehDet) => (
                 <tr key={VehDet.id}>
-                  <td className="px-1 py-2 align-top text-center border border-custom w-1 font-bold table-font">{VehDet.id}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-48 table-font">{VehDet.date}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.purpose}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.place_visited}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-60 table-font">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-96 table-font">{VehDet.vehicle_type}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.driver}</td>
-                  <td className="px-1 py-2 align-top text-center border border-custom w-20 table-font">{VehDet.passengersCount}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 table-font">{VehDet.requestor}</td>
-                  <td className="px-1 py-2 align-top border border-custom w-72 table-font">
+                  <td className="px-3 py-3 align-top text-center w-1 font-bold table-font">{VehDet.id}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.date}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.purpose}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.place_visited}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.date_arrival} @ {formatTime(VehDet.time_arrival)}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.vehicle_type}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.driver}</td>
+                  <td className="px-3 py-3 align-top text-center w-20 table-font">{VehDet.passengersCount}</td>
+                  <td className="px-3 py-3 align-top table-font">{VehDet.requestor}</td>
+                  <td className="px-3 py-3 align-top table-font">
                   {VehDet.remarks}
                   </td>
-                  <td className="px-3 py-2 align-top border border-custom w-12">
+                  <td className="px-3 py-3 align-top w-12">
                       <div className="flex justify-center">
                         <Link to={`/vehicleslipform/${VehDet.id}`}>
                           <button 

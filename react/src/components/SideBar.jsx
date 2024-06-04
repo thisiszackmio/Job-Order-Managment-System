@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 import ppaLogo from '/ppa_logo.png';
@@ -17,6 +17,12 @@ const Sidebar = () => {
   const handleToggle = (index) => {
     setActiveAccordion(index === activeAccordion ? null : index);
   };
+
+  useEffect(() => {
+    if (isSidebarMinimized) {
+      setActiveAccordion(null);
+    }
+  }, [isSidebarMinimized, setActiveAccordion]);
 
   const navigate = useNavigate();
 
@@ -38,7 +44,7 @@ const Sidebar = () => {
     <div className="w-full h-full font-roboto">
       <div>
         {/* Side Bar */}
-        <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className={`w-72 bg-ppa-themecolor shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
+        <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
           {/* <div className="px-8"> */}
           <div className={`transition-width duration-300 ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>        
             {/* Logo */}
@@ -214,7 +220,7 @@ const Sidebar = () => {
               <FontAwesomeIcon icon={faBars} className="ham-haha" />
             </button>
           </div>
-          <div style={{ minHeight: '100vh'}} className="w-full h-full">
+          <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
             <Outlet />
           </div>
         </div>

@@ -199,6 +199,7 @@ class VehicleFormController extends Controller
         $approveRequest = VehicleForm::find($id);
 
         $approveRequest->admin_approval = 3;
+        $approveRequest->remarks = 'The Admin Manager has disapproved the request';
 
         if ($approveRequest->save()) {
             // Creating logs
@@ -220,6 +221,7 @@ class VehicleFormController extends Controller
         $approveRequest = VehicleForm::find($id);
 
         $approveRequest->admin_approval = 1;
+        $approveRequest->remarks = "The request is closed";
 
         if ($approveRequest->save()) {
             // Creating logs

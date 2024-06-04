@@ -126,7 +126,7 @@ export default function RepairRequestList(){
     <PageComponent title="Pre/Post Repair Inspection Form Request List">
 
       {/* Top Layer */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-3">
         <div className="align-right">
           {/* For Search Field */}
           <input
@@ -146,37 +146,37 @@ export default function RepairRequestList(){
       </div>
 
       <div className="overflow-x-auto">
-        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+        <table className="ppa-table font-roboto" style={{ width: '100%' }}>
           <thead>    
-            <tr className="bg-gray-100">
-              <th className="px-2 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain</th>   
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Requestor</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
-              <th className="px-2 py-0.5 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Action</th>
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase w-1">No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Property No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type of Property</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Complain</th>   
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Action</th>
             </tr>
           </thead>
-          <thead style={{ backgroundColor: '#fff' }}>
+          <tbody style={{ backgroundColor: '#fff' }}>
           {currentRepair.length > 0 ? (
           currentRepair.map((repair) => (
           <tr key={repair.id}>
-            <td className="px-1 py-2 text-center align-top border border-custom w-1 font-bold table-font">{repair.id}</td>
-            <td className="px-1 py-2 align-top border border-custom table-font">{repair.date}</td>
-            <td className="px-1 py-2 align-top border border-custom table-font">{repair.property_number}</td>
+            <td className="px-3 py-3 text-center align-top w-1 font-bold table-font">{repair.id}</td>
+            <td className="px-3 py-3 align-top table-font">{repair.date}</td>
+            <td className="px-3 py-3 align-top table-font">{repair.property_number}</td>
               {repair.type_of_property === "Others" ? (
-            <td className="px-1 py-2 align-top border border-custom table-font">Others: <i>{repair.property_other_specific}</i></td>
+            <td className="px-3 py-3 align-top table-font">Others: <i>{repair.property_other_specific}</i></td>
             ):(
-            <td className="px-1 py-2 align-top border border-custom table-font">{repair.type_of_property}</td>
+            <td className="px-3 py-3 align-top table-font">{repair.type_of_property}</td>
             )}
-            <td className="px-1 py-2 align-top border border-custom table-font">{repair.complain}</td>
-            <td className="px-1 py-2 align-top border border-custom table-font">{repair.name}</td>
-            <td className="px-1 py-2 align-top border border-custom table-font">
+            <td className="px-3 py-3 align-top table-font">{repair.complain}</td>
+            <td className="px-3 py-3 align-top table-font">{repair.name}</td>
+            <td className="px-3 py-3 align-top table-font">
               {repair.remarks}
             </td>
-            <td className="px-1 py-2 text-center border border-custom w-1">
+            <td className="px-3 py-3 text-center w-1">
               <div className="flex justify-center">
                 <Link to={`/repairinspectionform/${repair.id}`}>
                   <button 
@@ -195,7 +195,7 @@ export default function RepairRequestList(){
             <td colSpan={8} className="px-6 py-4 text-center border-0 border-custom"> No data </td>
           </tr>
           )}
-          </thead>
+          </tbody>
         </table>
       </div>
       {displayPaginationRepair && (

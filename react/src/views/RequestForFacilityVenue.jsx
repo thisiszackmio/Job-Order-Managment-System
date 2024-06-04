@@ -452,31 +452,31 @@ export default function RequestFormFacility(){
 
           {/* Date */}
           <div className="flex items-center mt-6 font-roboto">
-            <div className="w-56">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Date:
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="date"
                 name="rep_date"
                 id="rep_date"
                 defaultValue= {today}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly
               />
             </div>
           </div>
 
           {/* Requesting Office/Division */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rf_request" className="block text-base leading-6 text-black">
                 Requesting Office/Division:
               </label>
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="text"
                 name="rf_request"
@@ -484,7 +484,7 @@ export default function RequestFormFacility(){
                 autoComplete="rf_request"
                 value={reqOffice}
                 onChange={ev => setRegOffice(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!reqOffice && fieldMissing) && (
@@ -494,13 +494,13 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Title/Purpose of Activity */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
               Title/Purpose of Activity:
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="text"
                 name="purpose"
@@ -508,7 +508,7 @@ export default function RequestFormFacility(){
                 autoComplete="purpose"
                 value={titleReq}
                 onChange={ev => setTitleReq(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!titleReq && fieldMissing) && (
@@ -518,13 +518,13 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Date Start */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Date of Activity (Start):
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="date"
                 name="date_start"
@@ -535,7 +535,7 @@ export default function RequestFormFacility(){
                   setDateEndMin(ev.target.value);
                 }}
                 min={today}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!DateStart && fieldMissing) && (
@@ -545,20 +545,20 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Time Start */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Time of Activity (Start):
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="time"
                 name="time_start"
                 id="time_start"
                 value={timeStart}
                 onChange={ev => setTimeStart(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!timeStart && fieldMissing) && (
@@ -568,13 +568,13 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Date End */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Date of Activity (End):
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="date"
                 name="date_end"
@@ -588,7 +588,7 @@ export default function RequestFormFacility(){
                   }
                 }}
                 min={DateEndMin}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!DateEnd && fieldMissing) && (
@@ -598,20 +598,20 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Time End */}
-          <div className="flex items-center mt-2 font-roboto">
-            <div className="w-56">
+          <div className="flex items-center mt-4 font-roboto">
+            <div className="w-60">
               <label htmlFor="rep_date" className="block text-base leading-6 text-black">
                 Time of Activity (End):
               </label> 
             </div>
-            <div className="w-64">
+            <div className="w-1/2">
               <input
                 type="time"
                 name="time_end"
                 id="time_end"
                 value={timeEnd}
                 onChange={ev => setTimeEnd(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
                 readOnly={activateFacility}
               />
               {(!timeEnd && fieldMissing) && (
@@ -662,7 +662,7 @@ export default function RequestFormFacility(){
                     }
                     setMphCheck(isChecked);
                   }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${mphCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  class={`focus:ring-gray-400 h-6 w-6 ${mphCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   disabled={activateFacility}
                 />
               </div>
@@ -702,7 +702,7 @@ export default function RequestFormFacility(){
                     }
                     setConfCheck(isChecked);
                   }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${confCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  class={`focus:ring-gray-400 h-6 w-6 ${confCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   disabled={activateFacility}
                 />
               </div>
@@ -725,7 +725,7 @@ export default function RequestFormFacility(){
                     handleCheckboxChange(setDormCheck, ev.target.checked, setOtherCheck, setMphCheck, setConfCheck);
                     setDormCheck(isChecked);
                   }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${dormCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  class={`focus:ring-gray-400 h-6 w-6 ${dormCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   disabled={activateFacility}
                 />
               </div>
@@ -765,7 +765,7 @@ export default function RequestFormFacility(){
                     }
                     setOtherCheck(isChecked);
                   }}
-                  class={`focus:ring-gray-400 h-5 w-5 ${otherCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  class={`focus:ring-gray-400 h-6 w-6 ${otherCheck ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   disabled={activateFacility}
                 />
               </div>
@@ -813,7 +813,7 @@ export default function RequestFormFacility(){
                       setCheckTable(!checkTable);
                       setInputFacErrors(null);
                     }}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -845,7 +845,7 @@ export default function RequestFormFacility(){
               )}
 
               {/* Chair */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="mph-checkchair"
@@ -856,7 +856,7 @@ export default function RequestFormFacility(){
                       setCheckChairs(!checkChairs);
                       setInputFacErrors(null);
                     }}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -888,14 +888,14 @@ export default function RequestFormFacility(){
               )}
 
               {/* Projector */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkProjector}
                     onChange={ev => setCheckProjector(!checkProjector)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -906,14 +906,14 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Projector Screen */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkProjectorScreen}
                     onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -924,14 +924,14 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Document Camera */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkDocumentCamera}
                     onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -954,7 +954,7 @@ export default function RequestFormFacility(){
                     type="checkbox"
                     checked={checkLaptop}
                     onChange={ev => setCheckLaptop(!checkLaptop)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -965,14 +965,14 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Television */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkTelevision}
                     onChange={ev => setCheckTelevision(!checkTelevision)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -983,14 +983,14 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Sound System */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkSoundSystem}
                     onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -1001,14 +1001,14 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Videoke */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="other-checkbox"
                     type="checkbox"
                     checked={checkVideoke}
                     onChange={ev => setCheckVideoke(!checkVideoke)}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -1019,7 +1019,7 @@ export default function RequestFormFacility(){
               </div>
 
               {/* Microphone */}
-              <div class="relative flex items-center mt-2">
+              <div class="relative flex items-center mt-3">
                 <div class="flex items-center h-5">
                   <input
                     id="mph-checkmicrophone"
@@ -1030,7 +1030,7 @@ export default function RequestFormFacility(){
                       setCheckMicrphone(!checkMicrphone);
                       setInputFacErrors(null);
                     }}
-                    class={`focus:ring-gray-400 h-5 w-5 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                    class={`focus:ring-gray-400 h-6 w-6 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
                   />
                 </div>
                 <div class="ml-3">
@@ -1066,7 +1066,7 @@ export default function RequestFormFacility(){
           </div>
 
           {/* Other */}
-          <div class="relative flex items-center mt-2">
+          <div class="relative flex items-center mt-3">
             <div class="flex items-center h-5">
               <input
                 id="mph-checkmicrophone"
@@ -1077,7 +1077,7 @@ export default function RequestFormFacility(){
                   setCheckOther(!checkOther);
                   setInputFacErrors(null);
                 }}
-                class={`focus:ring-gray-400 h-5 w-5 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                class={`focus:ring-gray-400 h-6 w-6 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
               />
             </div>
             <div class="ml-3">
@@ -1122,7 +1122,6 @@ export default function RequestFormFacility(){
                   </label> 
                 </div>
                 <div className="w-96 pl-1">
-
                   <textarea
                     id="findings"
                     name="findings"
@@ -1130,7 +1129,7 @@ export default function RequestFormFacility(){
                     style={{ resize: "none" }}
                     value= {OprInstruct}
                     onChange={ev => setOprInstruct(ev.target.value)}
-                    className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="w-full rounded-md ppa-form"
                   />
                   <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
 
@@ -1171,7 +1170,7 @@ export default function RequestFormFacility(){
                   value={maleList}
                   onChange={handleMaleTextChange}
                   style={{ resize: 'none' }}
-                  className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-10/12 ppa-form"
                 />
                 <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
 
@@ -1206,7 +1205,7 @@ export default function RequestFormFacility(){
                   value={femaleList}
                   onChange={handleFemaleTextChange}
                   style={{ resize: 'none' }}
-                  className="block w-10/12 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-10/12 ppa-form"
                 />
                 <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
 
@@ -1242,7 +1241,7 @@ export default function RequestFormFacility(){
                 style={{ resize: "none" }}
                 value={DormOtherField}
                 onChange={(ev) => setDormOtherField(ev.target.value)}
-                className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                className="block w-full ppa-form"
               />
               <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
             </div>  

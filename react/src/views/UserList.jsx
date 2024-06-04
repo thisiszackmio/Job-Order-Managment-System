@@ -92,7 +92,7 @@ export default function UserList(){
   <>
     {Authorize ? (
       <PageComponent title="User List">
-        <div className="font-roboto">
+        <div className="font-roboto content-here">
 
           {/* Legend */}
           <div>
@@ -106,7 +106,7 @@ export default function UserList(){
           </div>
 
           {/* Search Filter */}
-          <div className="mt-10 flex">
+          <div className="mt-10 mb-4 flex">
 
             {/* Search */}
             <div className="flex-grow">
@@ -120,7 +120,7 @@ export default function UserList(){
             </div>
 
             {/* Count */}
-            <div className="ml-4" style={{ position: "relative", bottom: "-25px" }}>
+            <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
               <div className="text-right text-sm/[17px]">
               Total of {users.length} user's list
               </div>
@@ -129,31 +129,31 @@ export default function UserList(){
           </div>
 
           {/* Table */}
-          <table className="border-collapse w-full mb-10 mt-2">
+          <table className="ppa-table w-full mb-10 mt-2">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Name</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Username</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">User ID</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Position</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Division</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase border border-custom border-header">Code CLR</th>
+                <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Name</th>
+                <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Username</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">User ID</th>
+                <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Position</th>
+                <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Division</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Code CLR</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
             {currentUser.length > 0 ? (
               currentUser.map((UserDet) => (
               <tr key={UserDet.id}>
-                <td className="px-1 py-2 align-top border border-custom w-64 table-font">
+                <td className="px-1 py-2 align-top w-64 table-font">
                   <Link to={`/ppauserdetails/${UserDet.id}`}>
                       {UserDet.name}
                   </Link>
                 </td>
-                <td className="px-1 py-2 align-top border border-custom w-40 table-font text-center">{UserDet.username}</td>
-                <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center italic">{UserDet.id}</td>
-                <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.position}</td>
-                <td className="px-1 py-2 align-top border border-custom w-60 table-font text-center">{UserDet.division}</td>
-                <td className="px-1 py-2 align-top border border-custom w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
+                <td className="px-3 py-2 align-top w-40 table-font text-left">{UserDet.username}</td>
+                <td className="px-3 py-2 align-top w-12 table-font text-center italic">{UserDet.id}</td>
+                <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.position}</td>
+                <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.division}</td>
+                <td className="px-3 py-2 align-top w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
               </tr>
               ))
             ):(

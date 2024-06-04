@@ -209,40 +209,40 @@ export default function MyRequest(){
       {/* Display Table */}
       <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto'}}>
       {displayRequest?.mappedData?.length > 0 ? (
-        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+        <table className="ppa-table font-roboto" style={{ width: '100%' }}>
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Property No</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Date</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Acquisition Cost</th> 
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Brand/Model</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Serial/Engine No</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Property</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Description </th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Location </th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Complain/Defect</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Approver</th>
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">No.</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Property No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Cost</th> 
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Brand/Model</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Serial/Engine No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type of Property</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Description </th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Location </th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Complain/Defect</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Approver</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#fff' }}>
           {displayRequest?.mappedData?.map((getData) => (
             <tr key={getData.id}>
-              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
-              <td className="px-1 py-2 align-top border border-custom w-32 table-font">{formatDate(getData.date_of_request)}</td>
-              <td className="px-1 py-2 align-top border border-custom table-font">{getData.property_number}</td>
-              <td className="px-1 py-2 align-top border border-custom table-font">{formatDate(getData.acq_date)}</td>
-              <td className="px-1 py-2 align-top border border-custom table-font">₱{getData.acq_cost}</td>
-              <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.brand_model}</td>
-              <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.serial_engine_no}</td>
-              <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.type_of_property}</td>
-              <td className="px-1 py-2 align-top border border-custom w-56 table-font">{getData.property_description}</td>
-              <td className="px-1 py-2 align-top text-center border border-custom table-font">{getData.location}</td>
-              <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.complain}</td>
-              <td className="px-1 py-2 align-top border border-custom w-80 table-font">{getData.supervisor_name}</td>
-              <td className="px-1 py-2 align-top border border-custom w-72 table-font">{getData.remarks}</td>
+              <td className="px-3 py-2 text-center align-top font-bold w-1 table-font">{getData.id}</td>
+              <td className="px-3 py-2 align-top table-font">{formatDate(getData.date_of_request)}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.property_number}</td>
+              <td className="px-3 py-2 align-top table-font">{formatDate(getData.acq_date)}</td>
+              <td className="px-3 py-2 align-top table-font">₱{getData.acq_cost}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.brand_model}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.serial_engine_no}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.type_of_property}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.property_description}</td>
+              <td className="px-3 py-2 align-top text-center table-font">{getData.location}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.complain}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.supervisor_name}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.remarks}</td>
             </tr>
           ))}
           </tbody>
@@ -251,7 +251,7 @@ export default function MyRequest(){
         <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
-      <div className="text-right text-sm/[17px]">
+      <div className="text-right mt-2 text-sm/[17px]">
         {displayRequest?.mappedData?.length > 0 ? (
           <i>Total of <b> {displayRequest.mappedData.length} </b> Pre/Post Repair Request</i>
         ) : null}
@@ -267,32 +267,32 @@ export default function MyRequest(){
       {/* Display table */}
       <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
       {displayFacRequest?.mappedData?.length > 0 ? (
-        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+        <table className="ppa-table font-roboto" style={{ width: '100%' }}>
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-1 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No.</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Title/Purpose of Activity</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date and Time of Activity (Start to End)</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Type of Facility/Venue</th>  
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">No.</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Title/Purpose of Activity</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date and Time of Activity (Start to End)</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type of Facility/Venue</th>  
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#fff' }}>
           {displayFacRequest.mappedData.map((getData) => (
             <tr key={getData.id}>
-              <td className="px-1 py-2 text-center align-top border font-bold border-custom w-1 table-font">{getData.id}</td>
-              <td className="px-1 py-2 align-top border border-custom table-font">{formatDate(getData.date_requested)}</td>
-              <td className="px-1 py-2 align-top border border-custom table-font">{getData.title_of_activity}</td>
-              <td className="px-1 py-2 align-top border border-custom w-1/4 table-font">
+              <td className="px-3 py-2 text-center align-top font-bold border-custom w-1 table-font">{getData.id}</td>
+              <td className="px-3 py-2 align-top table-font">{formatDate(getData.date_requested)}</td>
+              <td className="px-3 py-2 align-top table-font">{getData.title_of_activity}</td>
+              <td className="px-3 py-2 align-top w-1/4 table-font">
               {getData.date_start === getData.date_end ? (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatTime(getData.time_end)}`
               ) : (
                 `${formatDate(getData.date_start)} @ ${formatTime(getData.time_start)} to ${formatDate(getData.date_end)} @ ${formatTime(getData.time_end)}`
               )}
             </td>
-            <td className="px-1 py-2 w-10 align-top border border-custom w-1/5 table-font"> {getData.facility} </td>
-            <td className="px-1 py-2 align-top border border-custom w-1/5 table-font"> {getData.remarks} </td>
+            <td className="px-3 py-2 w-10 align-top w-1/5 table-font"> {getData.facility} </td>
+            <td className="px-3 py-2 align-top w-1/5 table-font"> {getData.remarks} </td>
             </tr>
           ))}
           </tbody>
@@ -301,7 +301,7 @@ export default function MyRequest(){
         <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
-      <div className="text-right text-sm/[17px]">
+      <div className="text-right mt-2 text-sm/[17px]">
         {displayFacRequest?.mappedData?.length > 0 ? (
         <i>Total of <b> {displayFacRequest?.mappedData?.length} </b> Facility / Venue Request</i>
         ):null}
@@ -317,42 +317,42 @@ export default function MyRequest(){
       {/* Display table */}
       <div className="mt-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
       {displayRequestVehicle?.mappedData?.length > 0 ? (
-        <table className="border-collapse font-roboto" style={{ width: '100%' }}>
+        <table className="ppa-table font-roboto" style={{ width: '100%' }}>
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Purpose</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Visited Place</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Date/Time of Arrival</th>   
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Vehicle</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Driver</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">No of Passengers</th>
-              <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase border border-custom">Remarks</th>
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">No</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Purpose</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Visited Place</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date/Time of Arrival</th>   
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Vehicle</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Driver</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">No of Passengers</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#fff' }}>
           {displayRequestVehicle?.mappedData?.map((getData) => (
             <tr key={getData.id}>
-              <td className="px-1 py-2 align-top border text-center font-bold border-custom text-base w-1 table-font">{getData.id}</td>
-              <td className="px-1 py-2 align-top border border-custom text-base table-font">{formatDate(getData.date_requested)}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base table-font">{getData.purpose}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base table-font">{getData.place_visit}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base table-font">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
-                  <td className="px-1 py-2 align-top border border-custom text-base table-font">
-                    <span dangerouslySetInnerHTML={{
-                      __html: getData.vehicle_type === 'None' 
-                        ? getData.vehicle_type 
-                        : `<b>${getData.vehicle_type.split('=')?.[0]}</b>${getData.vehicle_type.split('=')?.[1]}`
-                    }} />
-                  </td>
-                  <td className="px-1 py-2 align-top border border-custom w-56 text-base table-font"> {getData.driver} </td>
-                  <td className="px-1 py-2 align-top text-center border border-custom w-20 text-base table-font">
-                    {getData.passenger == 'N/A' ? (getData.passenger):(getData.passengerCount)}
-                  </td>
-                  <td className="px-1 py-2 align-top border border-custom w-auto text-base table-font">
-                    {getData.remarks}
-                  </td>
+              <td className="px-3 py-2 align-top text-center font-bold text-base w-1 table-font">{getData.id}</td>
+              <td className="px-3 py-2 align-top text-base table-font">{formatDate(getData.date_requested)}</td>
+              <td className="px-3 py-2 align-top text-base table-font">{getData.purpose}</td>
+              <td className="px-3 py-2 align-top text-base table-font">{getData.place_visit}</td>
+              <td className="px-3 py-2 align-top text-base table-font">{formatDate(getData.date_arrival)} @ {formatTime(getData.time_arrival)}</td>
+              <td className="px-3 py-2 align-top text-base table-font">
+                <span dangerouslySetInnerHTML={{
+                  __html: getData.vehicle_type === 'None' 
+                    ? getData.vehicle_type 
+                    : `<b>${getData.vehicle_type.split('=')?.[0]}</b>${getData.vehicle_type.split('=')?.[1]}`
+                }} />
+              </td>
+              <td className="px-3 py-2 align-top w-56 text-base table-font"> {getData.driver} </td>
+              <td className="px-3 py-2 align-top text-left w-20 text-base table-font">
+                {getData.passenger == 'N/A' ? (getData.passenger):(getData.passengerCount)}
+              </td>
+              <td className="px-3 py-2 align-top w-auto text-base table-font">
+                {getData.remarks}
+              </td>
             </tr>
           ))}
           </tbody>
@@ -361,7 +361,7 @@ export default function MyRequest(){
         <div className="px-6 py-6 text-center font-bold whitespace-nowrap border">No Request Yet</div>
       )}
       </div>
-      <div className="text-right text-sm/[17px]">
+      <div className="text-right mt-2 text-sm/[17px]">
         {displayRequestVehicle?.mappedData?.length > 0 ? (
           <i>Total of <b> {displayRequestVehicle?.mappedData?.length} </b> Vehicle Slip Request</i>
         ) : null}

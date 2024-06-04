@@ -107,12 +107,12 @@ export default function VehicleSlipForm(){
   
             {/* Date of Request */}
             <div className="flex items-center mt-6 font-roboto">
-              <div className="w-56">
+              <div className="w-60">
                 <label htmlFor="vr_date" className="block text-base font-medium leading-6 text-gray-900">
                   Date:
                 </label> 
               </div>
-              <div className="w-64">
+              <div className="w-1/2">
                 <input
                   type="date"
                   name="vr_date"
@@ -122,20 +122,20 @@ export default function VehicleSlipForm(){
                     setDateArrival(ev.target.value);
                     setVRDate(ev.target.value);
                   }}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                   readOnly
                 />
               </div>
             </div>
   
             {/* Purpose */}
-            <div className="flex items-center mt-2 font-roboto">
-              <div className="w-56">
+            <div className="flex items-center mt-4 font-roboto">
+              <div className="w-60">
                 <label htmlFor="vr_purpose" className="block text-base font-medium leading-6 text-gray-900">
                   Purpose:
                 </label> 
               </div>
-              <div className="w-64">
+              <div className="w-1/2">
                 <input
                   type="text"
                   name="vr_purpose"
@@ -143,7 +143,7 @@ export default function VehicleSlipForm(){
                   autoComplete="vr_purpose"
                   value={VRPurpose}
                   onChange={ev => setVRPurpose(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 {!VRPurpose && inputVechErrors.purpose && (
                   <p className="font-roboto form-validation">You must input the purpose</p>
@@ -152,13 +152,13 @@ export default function VehicleSlipForm(){
             </div>
   
             {/* Place */}
-            <div className="flex items-center mt-2 font-roboto">
-              <div className="w-56">
+            <div className="flex items-center mt-4 font-roboto">
+              <div className="w-60">
                 <label htmlFor="vr_place" className="block text-base font-medium leading-6 text-gray-900">
                   Place/s To Be Visited:
                 </label> 
               </div>
-              <div className="w-64">
+              <div className="w-1/2">
                 <input
                   type="text"
                   name="vr_place"
@@ -166,7 +166,7 @@ export default function VehicleSlipForm(){
                   autoComplete="vr_place"
                   value={VRPlace}
                   onChange={ev => setVRPlace(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 {!VRPlace && inputVechErrors.place_visited && (
                   <p className="font-roboto form-validation">You must input the place to be visited</p>
@@ -175,13 +175,13 @@ export default function VehicleSlipForm(){
             </div>
   
             {/* Date of Arrival */}
-            <div className="flex items-center mt-2 font-roboto">
-              <div className="w-56">
+            <div className="flex items-center mt-4 font-roboto">
+              <div className="w-60">
                 <label htmlFor="vr_datearrival" className="block text-base font-medium leading-6 text-gray-900">
                   Date of Arrival:
                 </label> 
               </div>
-              <div className="w-64">
+              <div className="w-1/2">
                 <input
                   type="date"
                   name="vr_datearrival"
@@ -189,7 +189,7 @@ export default function VehicleSlipForm(){
                   value= {VRDateArrival}
                   onChange={ev => setVRDateArrival(ev.target.value)}
                   min={DateArrival}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 {!VRDateArrival && inputVechErrors.date_arrival && (
                   <p className="font-roboto form-validation">You must input the date of arrival</p>
@@ -198,20 +198,20 @@ export default function VehicleSlipForm(){
             </div>
   
             {/* Time of Arrival */}
-            <div className="flex items-center mt-2 font-roboto">
-              <div className="w-56">
+            <div className="flex items-center mt-4 font-roboto">
+              <div className="w-60">
                 <label htmlFor="vr_timearrival" className="block text-base font-medium leading-6 text-gray-900">
                   Time of Arrival:
                 </label> 
               </div>
-              <div className="w-64">
+              <div className="w-1/2">
                 <input
                   type="time"
                   name="vr_timearrival"
                   id="vr_timearrival"
                   value= {VRTimeArrival}
                   onChange={ev => setVRTimeArrival(ev.target.value)}
-                  className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 {!VRTimeArrival && inputVechErrors.time_arrival && (
                   <p className="font-roboto form-validation">You must input the time of arrival</p>
@@ -230,7 +230,7 @@ export default function VehicleSlipForm(){
                   Passengers:
                 </label>
               </div>
-              <div className="w-full">
+              <div className="w-1/2">
                 <textarea
                   id="vr_passengers"
                   name="vr_passengers"
@@ -238,7 +238,7 @@ export default function VehicleSlipForm(){
                   value={VRPassenger}
                   onChange={ev => setVRPassenger(ev.target.value)}
                   style={{ resize: 'none' }}
-                  className="block w-96 rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                  className="block w-full ppa-form"
                 />
                 <p className="text-gray-500 text-xs mt-2">Separate name on next line (If no passengers just leave it blank)</p>
                 {!VRPassenger && inputVechErrors.passengers && (

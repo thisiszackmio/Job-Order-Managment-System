@@ -412,7 +412,7 @@ export default function FacilityFormForm(){
             Control No:
             </label> 
           </div>
-          <div className="w-auto px-4 border-b border-black text-center font-bold">
+          <div className="w-auto px-5 text-center font-bold ppa-form-request">
           {displayRequestFacility?.viewFacilityData?.id}
           </div>
         </div>
@@ -435,7 +435,7 @@ export default function FacilityFormForm(){
                   Date:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                 {formatDate(displayRequestFacility?.viewFacilityData?.date_requested)}
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function FacilityFormForm(){
                   Request Office/Division:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                 {displayRequestFacility?.viewFacilityData?.request_office}
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function FacilityFormForm(){
                   Title/Purpose of Activity:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                 {displayRequestFacility?.viewFacilityData?.title_of_activity}
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function FacilityFormForm(){
                   Date of Activity:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                   {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
                   <span> {formatDate(displayRequestFacility?.viewFacilityData?.date_start)} </span>
                   ):(
@@ -487,7 +487,7 @@ export default function FacilityFormForm(){
                   Time of Activity (START and END):
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1">
+                <div className="w-1/2 ppa-form-request">
                   {displayRequestFacility?.viewFacilityData?.date_start === displayRequestFacility?.viewFacilityData?.date_end ? (
                   <span> {formatTime(displayRequestFacility?.viewFacilityData?.time_start)} to {formatTime(displayRequestFacility?.viewFacilityData?.time_end)}</span>
                   ):(
@@ -512,7 +512,7 @@ export default function FacilityFormForm(){
               {/* Multi-Purpose Hall */}
               <div className="mt-2">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold"> 
+                  <div className="ppa-checklist font-bold"> 
                     {displayRequestFacility?.viewFacilityData?.mph == 1 || 
                     displayRequestFacility?.viewFacilityData?.mph == 2 || 
                     displayRequestFacility?.viewFacilityData?.mph == 3
@@ -525,7 +525,7 @@ export default function FacilityFormForm(){
               {/* Conference Room */}
               <div className="mt-2">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                  <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.conference == 1 || 
                     displayRequestFacility?.viewFacilityData?.conference == 2 ||
                     displayRequestFacility?.viewFacilityData?.conference == 3
@@ -538,7 +538,7 @@ export default function FacilityFormForm(){
               {/* Dormitory */}
               <div className="mt-2">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                  <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.dorm == 1 || 
                     displayRequestFacility?.viewFacilityData?.dorm == 2 ||
                     displayRequestFacility?.viewFacilityData?.dorm == 3
@@ -551,7 +551,7 @@ export default function FacilityFormForm(){
               {/* Others */}
               <div className="mt-2">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 border border-black mr-2 flex items-center justify-center text-black font-bold">
+                  <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.other == 1 || 
                     displayRequestFacility?.viewFacilityData?.other == 2 ||
                     displayRequestFacility?.viewFacilityData?.other == 3
@@ -581,11 +581,11 @@ export default function FacilityFormForm(){
                 
                 {/* Table */}
                 <div className="mt-4">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.table ? 'X':null}
                     </div>
-                    <div className="w-12 ml-1">
+                    <div className="w-12 ml-1 justify-center">
                       <span>Tables</span>
                     </div>
                     <div className="w-30 ml-2">
@@ -598,8 +598,8 @@ export default function FacilityFormForm(){
 
                 {/* Chair */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.chair ? 'X':null}
                     </div>
                     <div className="w-12 ml-1">
@@ -615,8 +615,8 @@ export default function FacilityFormForm(){
 
                 {/* Projector */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.projector ? 'X':null}
                     </div>
                     <div className="w-16 ml-1">
@@ -627,8 +627,8 @@ export default function FacilityFormForm(){
 
                 {/* Projector Screen */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.projector_screen ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -639,8 +639,8 @@ export default function FacilityFormForm(){
 
                 {/* Document Camera */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.document_camera ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -655,8 +655,8 @@ export default function FacilityFormForm(){
 
                 {/* Laptop */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.laptop ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -667,8 +667,8 @@ export default function FacilityFormForm(){
 
                 {/* Television */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.television ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -679,8 +679,8 @@ export default function FacilityFormForm(){
 
                 {/* Sound System */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.sound_system ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -691,8 +691,8 @@ export default function FacilityFormForm(){
 
                 {/* Videoke */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.videoke ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -703,8 +703,8 @@ export default function FacilityFormForm(){
 
                 {/* Microphone */}
                 <div className="mt-2">
-                  <div className="flex">
-                    <div className="w-20 border-b border-black pl-1 font-bold text-center">
+                  <div className="flex items-center">
+                    <div className="ppa-checklist font-bold">
                     {displayRequestFacility?.viewFacilityData?.microphone ? 'X':null}
                     </div>
                     <div className="w-26 ml-1">
@@ -724,8 +724,8 @@ export default function FacilityFormForm(){
 
             {/* Others */}
             <div className="mt-2">
-              <div className="flex">
-                <div className="w-20 border-b border-black pl-1 font-bold text-center">
+              <div className="flex items-center">
+                <div className="ppa-checklist font-bold">
                 {displayRequestFacility?.viewFacilityData?.others ? 'X':null}
                 </div>
                 <div className="w-26 ml-1">
@@ -734,7 +734,7 @@ export default function FacilityFormForm(){
                 <div className="w-28 ml-2">
                 please specify
                 </div>
-                <div className="w-1/2 border-b border-black px-5 font-bold text-center"> 
+                <div className="w-1/2 ppa-form-request h-11"> 
                   {displayRequestFacility?.viewFacilityData?.specify ? displayRequestFacility?.viewFacilityData?.specify:null} 
                 </div>
               </div>
@@ -759,7 +759,7 @@ export default function FacilityFormForm(){
                 {/* Male Guest Count */}
                 <div className="mt-0 mb-6">
                   <div className="flex items-center">
-                    <div className="w-24 border-b border-black font-bold text-center">
+                    <div className="w-10 ppa-form-request text-center font-bold">
                       <span>
                         {displayRequestFacility?.maleNamesString === "N/A" ? null : (
                           displayRequestFacility?.maleNamesArray?.length
@@ -782,9 +782,9 @@ export default function FacilityFormForm(){
                   <span className="font-meduim">No Male Guest</span>
                 ):(
                   displayRequestFacility?.maleNamesArray?.map((maleName, index) => (
-                    <div key={index} className="flex">
+                    <div key={index} className="flex items-center">
                       <span className="font-bold">{`${index + 1}.`}</span>
-                      <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
+                      <div className="w-1/2 ppa-form-request ml-3 mt-2">{`${maleName.replace(/^\d+\.\s*/, '')}`}</div>
                     </div>
                   ))
                 )}
@@ -797,7 +797,7 @@ export default function FacilityFormForm(){
                 {/* Female Guest Count */}
                 <div className="mt-0 mb-6">
                   <div className="flex items-center">
-                    <div className="w-24 border-b border-black font-bold text-center">
+                    <div className="w-10 ppa-form-request text-center font-bold">
                       <span>
                         {displayRequestFacility?.femaleNamesString === "N/A" ? null : (
                           displayRequestFacility?.femaleNamesArray?.length
@@ -820,9 +820,9 @@ export default function FacilityFormForm(){
                   <span className="font-meduim">No Female Guest</span>
                 ):(
                   displayRequestFacility?.femaleNamesArray?.map((femaleName, index) => (
-                    <div key={index} className="flex">
+                    <div key={index} className="flex items-center">
                       <span className="font-bold">{`${index + 1}.`}</span>
-                      <div className="w-1/2 border-b border-black pl-1 text-left ml-1 pl-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
+                      <div className="w-1/2 ppa-form-request ml-3 mt-2">{`${femaleName.replace(/^\d+\.\s*/, '')}`}</div>
                     </div>
                   ))
                 )}
@@ -860,7 +860,7 @@ export default function FacilityFormForm(){
                   Requested by:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1 font-bold">
+                <div className="w-1/2 ppa-form-request font-bold">
                 {displayRequestFacility?.requestor?.name}
                 </div>
               </div>
@@ -872,32 +872,17 @@ export default function FacilityFormForm(){
                   Approver:
                   </label> 
                 </div>
-                <div className="w-64 border-b border-black pl-1 font-bold">
+                <div className="w-1/2 ppa-form-request font-bold">
                 {displayRequestFacility?.manager?.name}
                 </div>
               </div>
-
-              {/* Status */}
-              <div className="flex items-center mt-8">
-                <div className="w-16">
-                  <label className="block text-base font-bold leading-6 text-gray-900">
-                  Status:
-                  </label> 
-                </div>
-                <div className="w-full font-bold">
-                {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
-                {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
-                {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && (displayRequestFacility?.viewFacilityData?.remarks)}
-                {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
-                </div>
-              </div> 
 
             </div>
 
             <div className="col-span-1">
 
               {/* For OPR Instruction */}
-              <div className="flex mt-6">
+              <div className="flex mt-6 items-center">
                 <div className="w-80">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   Instruction for the OPR for Action:
@@ -905,7 +890,7 @@ export default function FacilityFormForm(){
                 </div>
                 {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
                 <>
-                  <div className="w-96 pl-1 border-b border-black">
+                  <div className="w-1/2 ppa-form-request">
                     {displayRequestFacility?.viewFacilityData?.obr_instruct}
                   </div>
                 </>
@@ -924,7 +909,7 @@ export default function FacilityFormForm(){
                           style={{ resize: "none" }}
                           value= {OprInstruct}
                           onChange={ev => setOprInstruct(ev.target.value)}
-                          className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          className="w-full ppa-form"
                         />
                         <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
 
@@ -934,7 +919,7 @@ export default function FacilityFormForm(){
                   </>
                   ):(
                   <>
-                    <div className="w-96 pl-1 border-b border-black">
+                    <div className="w-1/2 ppa-form-request h-11">
                       {displayRequestFacility?.viewFacilityData?.obr_instruct}
                     </div>
                   </>
@@ -944,7 +929,7 @@ export default function FacilityFormForm(){
               </div>
 
               {/* OPR Action */}
-              <div className="flex mt-2">
+              <div className="flex mt-2 items-center">
                 <div className="w-80">
                   <label className="block text-base font-medium leading-6 text-gray-900">
                   OPR Action (Comment/Concerns):
@@ -952,7 +937,7 @@ export default function FacilityFormForm(){
                 </div>
                 {displayRequestFacility?.viewFacilityData?.obr_comment ? (
                 <>
-                  <div className="w-96 pl-1 border-b border-black">
+                  <div className="w-1/2 ppa-form-request">
                     {displayRequestFacility?.viewFacilityData?.obr_comment}
                   </div>
                 </>
@@ -970,7 +955,7 @@ export default function FacilityFormForm(){
                           style={{ resize: "none" }}
                           value= {OprAction}
                           onChange={ev => setOprAction(ev.target.value)}
-                          className="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-black focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          className="w-full ppa-form"
                         />
                         <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, type "none" please submit the form</p>
                       </form>
@@ -979,7 +964,7 @@ export default function FacilityFormForm(){
                   </>
                   ):(
                   <>
-                    <div className="w-96 pl-1 border-b border-black">
+                    <div className="w-1/2 ppa-form-request h-11">
                       {displayRequestFacility?.viewFacilityData?.obr_comment}
                     </div>
                   </>
@@ -991,6 +976,21 @@ export default function FacilityFormForm(){
             </div>
 
           </div>     
+
+          {/* Status */}
+          <div className="flex items-center mt-8">
+            <div className="w-16">
+              <label className="block text-base font-bold leading-6 text-gray-900">
+              Status:
+              </label> 
+            </div>
+            <div className="w-full font-bold ppa-form-request">
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && (displayRequestFacility?.viewFacilityData?.remarks)}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
+            </div>
+          </div> 
 
         </div>
 

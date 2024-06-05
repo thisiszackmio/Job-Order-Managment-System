@@ -30,11 +30,12 @@ export default function UserList(){
           username: users.username,
           division: users.division,
           position: users.position,
-          code: users.code_clearance
+          code: users.code_clearance,
+          esig: users.esig
         }
       })
       :null;
-
+      
       getUsers(getUser);
       setIsLoading(false);
     })
@@ -61,7 +62,8 @@ export default function UserList(){
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.division.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.code.toString().includes(searchTerm.toString())
+    user.code.toString().includes(searchTerm.toString()) ||
+    user.esig.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handlePageChange = ({ selected }) => {
@@ -138,6 +140,7 @@ export default function UserList(){
                 <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Position</th>
                 <th className="px-3 py-3 text-left text-sm font-medium text-gray-600 uppercase">Division</th>
                 <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Code CLR</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">E-sig</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
@@ -154,11 +157,12 @@ export default function UserList(){
                 <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.position}</td>
                 <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.division}</td>
                 <td className="px-3 py-2 align-top w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
+                <td className="px-3 py-2 align-top w-12 table-font text-center">{UserDet.esig == "null" ? ("No Esig"):("Yes")}</td>
               </tr>
               ))
             ):(
               <tr>
-                <td colSpan={6} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
+                <td colSpan={7} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
               </tr>
             )}
             </tbody>

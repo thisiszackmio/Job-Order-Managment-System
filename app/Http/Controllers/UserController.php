@@ -50,7 +50,8 @@ class UserController extends Controller
                 'username' => basename($user->username),
                 'division' => $user->division,
                 'position' => $user->position,
-                'code_clearance' => $user->code_clearance
+                'code_clearance' => $user->code_clearance,
+                'esig' => $user->image
             ];
         }
 

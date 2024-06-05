@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/getlogs', [DashboardController::class, 'getLogs']);
 
     //User Details
-    // Route::get('/users', [UserController::class, 'getAllUser']);
+    Route::get('/users', [UserController::class, 'getAllUser']);
     Route::get('/userdetail/{id}', [UserController::class, 'getUserDetails']);
     Route::get('/getpersonnel', [UserController::class, 'getPersonnel']);
     Route::get('/personnelname', [UserController::class, 'AssignPersonnel']);
@@ -113,4 +113,3 @@ Route::post('/login', [AuthController::class, 'login']);
 
 //Test area
 Route::get('/getpending/{id}', [DashboardController::class, 'getPendingRequest']);
-Route::get('/users', [UserController::class, 'getAllUser']);

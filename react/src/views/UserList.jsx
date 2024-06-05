@@ -152,12 +152,12 @@ export default function UserList(){
                       {UserDet.name}
                   </Link>
                 </td>
-                <td className="px-3 py-2 align-top w-40 table-font text-left">{UserDet.username}</td>
+                <td className="px-3 py-2 align-top table-font text-left">{UserDet.username}</td>
                 <td className="px-3 py-2 align-top w-12 table-font text-center italic">{UserDet.id}</td>
-                <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.position}</td>
-                <td className="px-3 py-2 align-top w-60 table-font text-left">{UserDet.division}</td>
+                <td className="px-3 py-2 align-top table-font text-left">{UserDet.position}</td>
+                <td className="px-3 py-2 align-top table-font text-left">{UserDet.division}</td>
                 <td className="px-3 py-2 align-top w-12 table-font text-center">{UserDet.code == 10 ? "8" : UserDet.code}</td>
-                <td className="px-3 py-2 align-top w-12 table-font text-center">{UserDet.esig == "null" ? ("No Esig"):("Yes")}</td>
+                <td className="px-3 py-2 align-top w-18 table-font text-center">{UserDet.esig == "null" ? ("No Esig"):("Yes")}</td>
               </tr>
               ))
             ):(

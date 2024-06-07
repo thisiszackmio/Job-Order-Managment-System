@@ -86,7 +86,7 @@ class VehicleFormController extends Controller
 
         $ppaUser = $vehicleForm->user;
         $endUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
-        $userSignature = URL::to('/storage/esignature/' . $ppaUser->image);
+        $userSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $ppaUser->image);
         $userPosition = $ppaUser->position;
 
         //For Admin Manager
@@ -97,7 +97,7 @@ class VehicleFormController extends Controller
         }
 
         $ManagerName = $ManagerUser->fname . ' ' . $ManagerUser->mname. '. ' . $ManagerUser->lname;
-        $ManagerSignature = URL::to('/storage/esignature/' . $ManagerUser->image);
+        $ManagerSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $ManagerUser->image);
 
         $respondData = [
             'vehicle_form' => $vehicleForm,

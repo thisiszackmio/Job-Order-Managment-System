@@ -56,11 +56,11 @@ class FacilityController extends Controller
         //Get the user details
         $ppaUser = $viewRequest->user;
         $endUser = $ppaUser->fname . ' ' . $ppaUser->mname. '. ' . $ppaUser->lname;
-        $userSignature = URL::to('/storage/esignature/' . $ppaUser->image);
+        $userSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $ppaUser->image);
 
         $ManagerUser = PPAUser::where('code_clearance', 1)->first();
         $ManagerName = $ManagerUser->fname . ' ' . $ManagerUser->mname. '. ' . $ManagerUser->lname;
-        $ManagerSignature = URL::to('/storage/esignature/' . $ManagerUser->image);
+        $ManagerSignature = ('http://20.20.2.1:81/storage/app/public/esignature/' . $ManagerUser->image);
 
         // Create the response data
         $respondData = [

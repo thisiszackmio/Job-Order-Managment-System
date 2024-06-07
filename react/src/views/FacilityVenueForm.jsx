@@ -1800,8 +1800,8 @@ export default function FacilityFormForm(){
                         <div className="relative">
                           <img
                             src={displayRequestFacility?.requestor?.signature}
-                            style={{ position: 'absolute', width: '180px', top: '-16px', left: '90px' }}
                             alt="Signature"
+                            className="ppa-esig-user-fvf"
                           />
                         </div>
                         <div className="text-center font-bold text-base relative mt-5">
@@ -1821,7 +1821,7 @@ export default function FacilityFormForm(){
                           <div className="relative">
                             <img
                               src={displayRequestFacility?.manager?.signature}
-                              style={{ position: 'absolute', width: '180px', top: '-16px', left: '98px' }}
+                              className="ppa-esig-admin-fvf"
                               alt="Signature"
                             />
                           </div>

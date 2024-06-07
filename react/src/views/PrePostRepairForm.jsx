@@ -2451,7 +2451,7 @@ export default function PrePostRepairForm(){
                                 <img 
                                   src={InspectionData?.requestor?.r_sign} 
                                   alt="User Signature" 
-                                  style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }} 
+                                  className="ppa-esignature-prf" 
                                 />
                                 </div>
                                 <span className="text-base font-bold">{InspectionData?.requestor?.r_name}</span>
@@ -2469,7 +2469,7 @@ export default function PrePostRepairForm(){
                                   <img
                                     src={InspectionData?.supervisor?.supSign}
                                     alt="User Signature"
-                                    style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }}
+                                    className="ppa-esig-sup-prf"
                                   />
                                   <span className="text-base font-bold">{InspectionData?.supervisor?.supName}</span>
                                 </div>
@@ -2544,7 +2544,7 @@ export default function PrePostRepairForm(){
                                 <img 
                                   src={InspectionData?.gso?.gsoSign} 
                                   alt="User Signature" 
-                                  style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }} 
+                                  className="ppa-esig-gso-prf"
                                 />
                                 </div>
                                 <span className="font-bold text-base">{InspectionData?.gso?.gsoName}</span>
@@ -2562,7 +2562,7 @@ export default function PrePostRepairForm(){
                                   <img
                                     src={InspectionData?.manager?.ad_sign}
                                     alt="User Signature"
-                                    style={{ position: 'absolute', width: '200px', top: '-40px', left: '30px' }}
+                                    className="ppa-esig-admin-prf"
                                   />
                                   <span className="font-bold text-base">{InspectionData?.manager?.ad_name}</span>
                                 </div>
@@ -2640,7 +2640,7 @@ export default function PrePostRepairForm(){
                                     <img
                                       src={InspectionData?.personnel?.p_sign}
                                       alt="User Signature"
-                                      style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
+                                      className="ppa-esig-inspector-prf"
                                     />
                                     <span className="text-base font-bold">{InspectionData?.personnel?.p_name}</span>
                                   </div>
@@ -2709,7 +2709,7 @@ export default function PrePostRepairForm(){
                                     <img
                                       src={InspectionData?.personnel?.p_sign}
                                       alt="User Signature"
-                                      style={{ position: 'absolute', width: '180px', top: '-36px', left: '42px' }}
+                                      className="ppa-esig-inspector-prf"
                                     />
                                     <span className="text-base font-bold">{InspectionData?.personnel?.p_name}</span>
                                   </div>

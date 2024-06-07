@@ -10,6 +10,15 @@
 .ppa-content { padding: 0px 0px 0px 288px; background-color: #F9F9F9; }
 .text-pdf { font-size: 13px; }
 
+/* Esig Form */
+.ppa-esignature-prf, 
+.ppa-esig-sup-prf, 
+.ppa-esig-gso-prf,
+.ppa-esig-admin-prf,
+.ppa-esig-inspector-prf { position: absolute; width: 200px; top: -40px; left: 30px; }
+.ppa-esig-user-fvf, .ppa-esig-admin-fvf { position: absolute; width: 200px; top: -20px; left: 75px; }
+.ppa-esig-user-vs, .ppa-esig-admin-vs { position: absolute; width: 200px; top: -13px; left: 30px; }
+
 /* Sidebar */
 .text-title { font-size: 30px; text-transform: uppercase; color: #fff; padding-bottom: 10px; border-bottom: 2px solid; }
 .ppa-hamburger { width: 24px; right: 80px; top: 31px; position: absolute; }
@@ -35,6 +44,13 @@ body::-webkit-scrollbar-track { border-radius: 10px; background-color: transpare
 body::-webkit-scrollbar { width: 10px; background-color: transparent; }
 body::-webkit-scrollbar-thumb { border-radius: 10px; background-color: transparent; transition: width 3s ease; }
 body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: width 3s ease; }
+
+/* Scroll for Logs and Pending */
+.request-sec::-webkit-scrollbar-track { border-radius: 10px; background-color: transparent; }
+.request-sec::-webkit-scrollbar { width: 10px; background-color: transparent; }
+.request-sec::-webkit-scrollbar-thumb { border-radius: 10px; background-color: transparent; transition: width 3s ease; }
+.request-sec:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: width 3s ease; }
+
 
 /* Footer */
 .footer { padding: 24px 0px; background-color: #F9F9F9; }

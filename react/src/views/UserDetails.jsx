@@ -353,7 +353,7 @@ export default function UserDetails(){
   // Restrictions
   const Authorize = userRole == 'h4ck3rZ@1Oppa';
 
-  return Authorize ? (
+  return (
   <PageComponent title="User Detail">
   {isLoading ? (
     <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
@@ -366,75 +366,411 @@ export default function UserDetails(){
     </div>
   ):(
     <div className="font-roboto">
+    {(id == currentUser.id) || Authorize ? (
+    <>
+      {/* For Button Only */}
+      {Authorize ? (
+        <div className="flex justify-between mb-10">
+          {/* Back button */}
+          <button className="px-6 py-2 btn-default">
+            <Link to="/ppauserlist">Back to User List</Link>
+          </button>
+          
+          {/* Delete Account */}
+          <button onClick={handleDeleteAccount} className="px-6 py-2 btn-error">
+            Delete Account
+          </button>
+        </div>
+      ):null}
 
-    <div className="flex justify-between mb-10">
-      {/* Back button */}
-      <button className="px-6 py-2 btn-default">
-        <Link to="/ppauserlist">Back to User List</Link>
-      </button>
-      
-      {/* Delete Account */}
-      <button onClick={handleDeleteAccount} className="px-6 py-2 btn-error">
-        Delete Account
-      </button>
-    </div>
-
-    {/* User ID */}
-    <div className="flex items-center">
-      <div className="w-56">
-        <label className="block text-lg font-bold leading-6 text-gray-900">
-          User ID:
-        </label> 
+      {/* User ID */}
+      <div className="flex items-center">
+        <div className="w-56">
+          <label className="block text-lg font-bold leading-6 text-gray-900">
+            User ID:
+          </label> 
+        </div>
+        <div className="w-full pl-1 text-lg">
+        {user?.id}
+        </div>
       </div>
-      <div className="w-full pl-1 text-lg">
-      {user?.id}
-      </div>
-    </div>
 
-    {/* Name */}
-    <div className="flex items-center mt-5">
-      <div className="w-56">
-        <label className="block text-lg font-bold leading-6 text-gray-900">
-          Name:
-        </label> 
-      </div>
-      <div className="w-full pl-1 text-lg">
-      {user?.name}
-      </div>
-    </div>
-
-    <form id="user_details" onSubmit={SubmitUserDetails} enctype="multipart/form-data">
-
-      {/* Code Clearance */}
+      {/* Name */}
       <div className="flex items-center mt-5">
         <div className="w-56">
           <label className="block text-lg font-bold leading-6 text-gray-900">
-            Code Clearance:
+            Name:
           </label> 
         </div>
-        {showUpdateForm ? (
-          <div className="w-full">
-            <select 
-              name="code_clearance" 
-              id="code_clearance"
-              value={code}
-              onChange={ev => setCode(ev.target.value)}
-              className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-            >
-              <option value="" disabled>Choose Code Clearance</option>
-              <option value="1">1 - Admin Division Manager</option>
-              <option value="2">2 - Port Manager</option>
-              <option value="3">3 - General Service Officer</option>
-              <option value="4">4 - Division Manager/Supervisor</option>
-              <option value="5">5 - Regular and COS Employee</option>
-              <option value="6">6 - Assign Personnel</option>
-              <option value="7">7 - System Administration</option>
-              {currentUser.code_clearance == 10 && (
-              <option value="10">Super Administration</option>
-              )}
-            </select>
+        <div className="w-full pl-1 text-lg">
+        {user?.name}
+        </div>
+      </div>
+
+      {Authorize ? (
+      <>
+        <form id="user_details" onSubmit={SubmitUserDetails} enctype="multipart/form-data">
+
+          {/* Code Clearance */}
+          <div className="flex items-center mt-5">
+            <div className="w-56">
+              <label className="block text-lg font-bold leading-6 text-gray-900">
+                Code Clearance:
+              </label> 
+            </div>
+            {showUpdateForm ? (
+              <div className="w-full">
+                <select 
+                  name="code_clearance" 
+                  id="code_clearance"
+                  value={code}
+                  onChange={ev => setCode(ev.target.value)}
+                  className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                >
+                  <option value="" disabled>Choose Code Clearance</option>
+                  <option value="1">1 - Admin Division Manager</option>
+                  <option value="2">2 - Port Manager</option>
+                  <option value="3">3 - General Service Officer</option>
+                  <option value="4">4 - Division Manager/Supervisor</option>
+                  <option value="5">5 - Regular and COS Employee</option>
+                  <option value="6">6 - Assign Personnel</option>
+                  <option value="7">7 - System Administration</option>
+                  {currentUser.code_clearance == 10 && (
+                  <option value="10">Super Administration</option>
+                  )}
+                </select>
+              </div>
+            ):(
+              <div className="w-full pl-1 text-lg">
+                {user?.code === 1 && `${user?.code} - Admin Manager`}
+                {user?.code === 2 && `${user?.code} - Port Manager`}
+                {user?.code === 3 && `${user?.code} - General Service Officer`}
+                {user?.code === 4 && `${user?.code} - Division Manager / Supervisor`}
+                {user?.code === 5 && `${user?.code} - Regular and Contract of Service`}
+                {user?.code === 6 && `${user?.code} - Assign Personnel`}
+                {user?.code === 7 && `${user?.code} - System Administrator`}
+                {user?.code === 10 && `Super Admin`}
+              </div>
+            )}
           </div>
-        ):(
+
+          {/* Position */}
+          <div className="flex items-center mt-5">
+            <div className="w-56">
+              <label className="block text-lg font-bold leading-6 text-gray-900">
+              Position:
+              </label> 
+            </div>
+            {showUpdateForm ? (
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="user_position"
+                  id="user_position"
+                  value={position}
+                  onChange={ev => setPosition(ev.target.value)}
+                  placeholder={user?.position}
+                  className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                />
+              </div>
+            ):(
+              <div className="w-full pl-1 text-lg">
+                {user?.position}
+              </div>
+            )}
+          </div>
+
+          {/* Division */}
+          <div className="flex items-center mt-5">
+            <div className="w-56">
+              <label className="block text-lg font-bold leading-6 text-gray-900">
+              Division:
+              </label> 
+            </div>
+            {showUpdateForm ? (
+              <div className="w-full">
+
+                <select 
+                  name="division" 
+                  id="division"
+                  value={division}
+                  onChange={ev => setDivision(ev.target.value)}
+                  className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                >
+                  <option value="" disabled>Select Here (Leave it if same Division)</option>
+                  <option value="Administrative Division">Administrative Division</option>
+                  <option value="Finance Division">Finance Division</option>
+                  <option value="Office of the Port Manager">Office of the Port Manager</option>
+                  <option value="Port Service Division">Port Service Division</option>
+                  <option value="Port Police Division">Port Police Division</option>
+                  <option value="Engineering Service Division">Engineering Service Division</option>
+                  <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
+                </select>
+              </div>
+            ):(
+              <div className="w-full pl-1 text-lg">
+                {user?.division}
+              </div>
+            )}
+          </div>
+
+          {/* Username */}
+          <div className="flex items-center mt-5">
+            <div className="w-56">
+              <label className="block text-lg font-bold leading-6 text-gray-900">
+              Username:
+              </label> 
+            </div>
+            {showUpdateForm ? (
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="firetruck_purpose"
+                  id="firetruck_purpose"
+                  autoComplete="firetruck_purpose"
+                  value={username}
+                  onChange={ev => setUername(ev.target.value)}
+                  placeholder={user?.username}
+                  className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                />
+              </div>
+            ):(
+              <div className="w-full pl-1 text-lg">
+                {user?.username}
+              </div>
+            )}
+          </div>
+
+        </form>
+
+        {/* Signature */}
+        <div className="flex items-center mt-5">
+          <div className="w-56">
+            <label className="block text-lg font-bold leading-6 text-gray-900">
+            Signature:
+            </label> 
+          </div>
+          {changeEsig ? (
+            <form id="change-esig" onSubmit={changeSignature} method="POST" action="#" enctype="multipart/form-data">
+              <div>
+                <div className="flex">
+                  <div class="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                    <div class="text-center">
+                      <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                      </svg>
+                      <div class="mt-4 text-sm leading-6 text-gray-600">
+                        <label for="esignature" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                          <span>Upload your new E-sig here</span>
+                          <input 
+                            id="esignature" 
+                            name="esignature" 
+                            type="file" 
+                            accept=".png"
+                            class="sr-only" 
+                            onChange={handleFileChange} 
+                            required 
+                          />
+                        </label>
+                      </div>
+                      <p class="pl-1 text-sm">PNG only up to 2MB</p>
+                      {uploadedUpdateFileName &&  <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedUpdateFileName}</label> }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          ):(
+            <div className="w-full pl-1 text-lg">
+              <div>
+                  {user?.image_name == "null" ? (
+                  <>
+                    <div className="w-full pl-1 text-lg">No Signature</div>
+                  </>
+                  ):(
+                  <>
+                    <img src={user?.signature} alt="User Signature" onContextMenu={handleContextMenu} />
+                  </>
+                  )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Password */}
+        {changePassword ? (
+          <form id="change-pwd" onSubmit={changePass} className="mt-6">
+
+          <div>
+            <h2 className="text-base font-bold leading-7 font-roboto"> Update Password </h2>
+          </div>
+
+            {/* New Password */}
+            <div className="flex items-center mt-5">
+              <div className="w-56">
+                <label className="block text-lg font-bold leading-6 text-gray-900">
+                New Password:
+                </label> 
+              </div>
+                <div className="w-full">
+                  <input
+                    id="password"
+                    name="password"
+                    type="text"
+                    required
+                    value={UpdatePassword}
+                    onChange={ev => setUpdatePassword(ev.target.value)}
+                    className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
+                  />
+                  <p className="lower-text">At least 8 characters, one uppercase, number and symbbol</p>
+                </div>
+            </div>
+
+          </form>
+        ):null}
+
+        {/* View Signature on Different Request */}
+        {user?.image_name != "null" ? (
+        <>
+          <div className="flex mt-6">
+            <div>
+              <h2 className="text-base font-bold leading-7 text-gray-900"> Preview </h2>
+            </div>
+          </div>
+
+          {/* For Post Repair form */}
+          <div className="mt-4">
+            <div className="grid grid-cols-2 gap-4">
+
+              {/* For Requestor Signature */}
+              <div className="col-span-1">
+                <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> REQUESTED BY:</label>
+                <div className="mt-4">
+                  <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
+                    <div>
+                    <img 
+                      src={user?.signature}
+                      alt="User Signature" 
+                      className="ppa-esignature-prf"
+                    />
+                    </div>
+                    <span className="text-base font-bold">{user?.name}</span>
+                  </div>
+                  <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> End-User </label>
+                </div>
+              </div>
+
+              {/* For Supervisor Signature */}
+              <div className="col-span-1">
+              </div>
+
+            </div>
+          </div>
+        </>
+        ):null}
+
+        {/* Buttons */}
+        <div className="flex mt-10">
+
+          {/* Edit User Details */}
+          {showUpdateForm ? (
+            <div>
+              {/* Cancel */}
+              <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
+                Cancel
+              </button>
+              {/* Submit */}
+              <button onClick={handleCheckForms} className="px-6 py-2 ml-2 btn-submit">
+                Submit
+              </button>
+            </div>
+          ):(
+            <button onClick={handleEditDetails} className="px-6 py-2 ml-2 btn-default" disabled={changePassword || changeEsig}>
+              Edit User Details
+            </button>
+          )}
+
+          {/* Change E-Sig */}
+          {changeEsig ? (
+            <div>
+
+              {/* Cancel */}
+              <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
+                Cancel
+              </button>
+
+              {/* Submit */}
+              <button
+                form="change-esig"
+                type="submit"
+                className={`px-6 py-2 ml-2 btn-submit ${
+                  submitLoading && 'btn-submitting'
+                }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+
+            </div>
+          ):(
+            <button onClick={handleChangeESig} className="px-6 py-2 ml-2 btn-default" disabled={changePassword || showUpdateForm}>
+              Change E-Sig
+            </button>
+          )}
+
+          {/* Change Password */}
+          {changePassword ? (
+            <div>
+
+              {/* Cancel */}
+              <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
+                Cancel
+              </button>
+
+              {/* Submit */}
+              <button
+                form="change-pwd"
+                type="submit"
+                className={`px-6 py-2 ml-2 btn-submit ${
+                  submitLoading && 'btn-submitting'
+                }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Processing</span>
+                  </div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+
+            </div>
+          ):(
+            <button onClick={handleChangePwd} className="px-6 py-2 ml-2 btn-default" disabled={changeEsig || showUpdateForm}>
+              Change Password
+            </button>
+          )}
+          
+        </div>
+      </>  
+      ):(
+      <>
+        {/* Code Clearance */}
+        <div className="flex items-center mt-5">
+          <div className="w-56">
+            <label className="block text-lg font-bold leading-6 text-gray-900">
+              Code Clearance:
+            </label> 
+          </div>
           <div className="w-full pl-1 text-lg">
             {user?.code === 1 && `${user?.code} - Admin Manager`}
             {user?.code === 2 && `${user?.code} - Port Manager`}
@@ -445,276 +781,74 @@ export default function UserDetails(){
             {user?.code === 7 && `${user?.code} - System Administrator`}
             {user?.code === 10 && `Super Admin`}
           </div>
-        )}
-      </div>
-
-      {/* Position */}
-      <div className="flex items-center mt-5">
-        <div className="w-56">
-          <label className="block text-lg font-bold leading-6 text-gray-900">
-          Position:
-          </label> 
         </div>
-        {showUpdateForm ? (
-          <div className="w-full">
-            <input
-              type="text"
-              name="user_position"
-              id="user_position"
-              value={position}
-              onChange={ev => setPosition(ev.target.value)}
-              placeholder={user?.position}
-              className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-            />
-          </div>
-        ):(
-          <div className="w-full pl-1 text-lg">
-            {user?.position}
-          </div>
-        )}
-      </div>
 
-      {/* Division */}
-      <div className="flex items-center mt-5">
-        <div className="w-56">
-          <label className="block text-lg font-bold leading-6 text-gray-900">
-          Division:
-          </label> 
-        </div>
-        {showUpdateForm ? (
-          <div className="w-full">
-
-            <select 
-              name="division" 
-              id="division"
-              value={division}
-              onChange={ev => setDivision(ev.target.value)}
-              className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-            >
-              <option value="" disabled>Select Here (Leave it if same Division)</option>
-              <option value="Administrative Division">Administrative Division</option>
-              <option value="Finance Division">Finance Division</option>
-              <option value="Office of the Port Manager">Office of the Port Manager</option>
-              <option value="Port Service Division">Port Service Division</option>
-              <option value="Port Police Division">Port Police Division</option>
-              <option value="Engineering Service Division">Engineering Service Division</option>
-              <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
-            </select>
-          </div>
-        ):(
-          <div className="w-full pl-1 text-lg">
-            {user?.division}
-          </div>
-        )}
-      </div>
-
-      {/* Username */}
-      <div className="flex items-center mt-5">
-        <div className="w-56">
-          <label className="block text-lg font-bold leading-6 text-gray-900">
-          Username:
-          </label> 
-        </div>
-        {showUpdateForm ? (
-          <div className="w-full">
-            <input
-              type="text"
-              name="firetruck_purpose"
-              id="firetruck_purpose"
-              autoComplete="firetruck_purpose"
-              value={username}
-              onChange={ev => setUername(ev.target.value)}
-              placeholder={user?.username}
-              className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-            />
-          </div>
-        ):(
-          <div className="w-full pl-1 text-lg">
-            {user?.username}
-          </div>
-        )}
-      </div>
-
-    </form>
-
-    {/* Signature */}
-    <div className="flex items-center mt-5">
-      <div className="w-56">
-        <label className="block text-lg font-bold leading-6 text-gray-900">
-        Signature:
-        </label> 
-      </div>
-      {changeEsig ? (
-        <form id="change-esig" onSubmit={changeSignature} method="POST" action="#" enctype="multipart/form-data">
-          <div>
-            <div className="flex">
-              <div class="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div class="text-center">
-                  <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
-                  </svg>
-                  <div class="mt-4 text-sm leading-6 text-gray-600">
-                    <label for="esignature" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                      <span>Upload your new E-sig here</span>
-                      <input 
-                        id="esignature" 
-                        name="esignature" 
-                        type="file" 
-                        accept=".png"
-                        class="sr-only" 
-                        onChange={handleFileChange} 
-                        required 
-                      />
-                    </label>
-                  </div>
-                  <p class="pl-1 text-sm">PNG only up to 2MB</p>
-                  {uploadedUpdateFileName &&  <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedUpdateFileName}</label> }
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      ):(
-        <div className="w-full pl-1 text-lg">
-          <div>
-              {user?.image_name == "null" ? (
-              <>
-                <div className="w-full pl-1 text-lg">No Signature</div>
-              </>
-              ):(
-              <>
-                <img src={user?.signature} alt="User Signature" onContextMenu={handleContextMenu} />
-              </>
-              )}
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* Password */}
-    {changePassword ? (
-      <form id="change-pwd" onSubmit={changePass} className="mt-6">
-
-      <div>
-        <h2 className="text-base font-bold leading-7 font-roboto"> Update Password </h2>
-      </div>
-
-        {/* New Password */}
+        {/* Position */}
         <div className="flex items-center mt-5">
           <div className="w-56">
             <label className="block text-lg font-bold leading-6 text-gray-900">
-            New Password:
+            Position:
             </label> 
           </div>
-            <div className="w-full">
-              <input
-                id="password"
-                name="password"
-                type="text"
-                required
-                value={UpdatePassword}
-                onChange={ev => setUpdatePassword(ev.target.value)}
-                className="block w-80 rounded-md border-1 p-1.5 form-text text-lg border-gray-300 focus:ring-0 focus:border-gray-400 bg-gray-200"
-              />
-              <p className="lower-text">At least 8 characters, one uppercase, number and symbbol</p>
+          <div className="w-full pl-1 text-lg">
+            {user?.position}
+          </div>
+        </div>
+
+        {/* Division */}
+        <div className="flex items-center mt-5">
+          <div className="w-56">
+            <label className="block text-lg font-bold leading-6 text-gray-900">
+            Division:
+            </label> 
+          </div>
+          <div className="w-full pl-1 text-lg">
+            {user?.division}
+          </div>
+        </div>
+
+        {/* Username */}
+        <div className="flex items-center mt-5">
+          <div className="w-56">
+            <label className="block text-lg font-bold leading-6 text-gray-900">
+            Username:
+            </label> 
+          </div>
+          <div className="w-full pl-1 text-lg">
+            {user?.username}
+          </div>
+        </div>
+
+        {/* Signature */}
+        <div className="flex items-center mt-5">
+          <div className="w-56">
+            <label className="block text-lg font-bold leading-6 text-gray-900">
+            Signature:
+            </label> 
+          </div>
+          <div className="w-full pl-1 text-lg">
+            <div>
+                {user?.image_name == "null" ? (
+                <>
+                  <div className="w-full pl-1 text-lg">No Signature</div>
+                </>
+                ):(
+                <>
+                  <img src={user?.signature} alt="User Signature" onContextMenu={handleContextMenu} />
+                </>
+                )}
             </div>
+          </div>
         </div>
-
-      </form>
-    ):null}
-
-    {/* Buttons */}
-    <div className="flex mt-10">
-
-      {/* Edit User Details */}
-      {showUpdateForm ? (
-        <div>
-          {/* Cancel */}
-          <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-            Cancel
-          </button>
-          {/* Submit */}
-          <button onClick={handleCheckForms} className="px-6 py-2 ml-2 btn-submit">
-            Submit
-          </button>
-        </div>
-      ):(
-        <button onClick={handleEditDetails} className="px-6 py-2 ml-2 btn-default" disabled={changePassword || changeEsig}>
-          Edit User Details
-        </button>
+      </>
       )}
 
-      {/* Change E-Sig */}
-      {changeEsig ? (
-        <div>
-
-          {/* Cancel */}
-          <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-            Cancel
-          </button>
-
-          {/* Submit */}
-          <button
-            form="change-esig"
-            type="submit"
-            className={`px-6 py-2 ml-2 btn-submit ${
-              submitLoading && 'btn-submitting'
-            }`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-
-        </div>
-      ):(
-        <button onClick={handleChangeESig} className="px-6 py-2 ml-2 btn-default" disabled={changePassword || showUpdateForm}>
-          Change E-Sig
-        </button>
-      )}
-
-      {/* Change Password */}
-      {changePassword ? (
-        <div>
-
-          {/* Cancel */}
-          <button onClick={handleDisableEdit} className="px-6 py-2 btn-cancel">
-            Cancel
-          </button>
-
-          {/* Submit */}
-          <button
-            form="change-pwd"
-            type="submit"
-            className={`px-6 py-2 ml-2 btn-submit ${
-              submitLoading && 'btn-submitting'
-            }`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Processing</span>
-              </div>
-            ) : (
-              'Submit'
-            )}
-          </button>
-
-        </div>
-      ):(
-        <button onClick={handleChangePwd} className="px-6 py-2 ml-2 btn-default" disabled={changeEsig || showUpdateForm}>
-          Change Password
-        </button>
-      )}
-      
-    </div>
+    </>
+    ):(
+      <div>
+        <h2 className="text-xl font-bold leading-7 text-gray-900"> You are not authorize to view other's account due to data privacy </h2>
+      </div>
+    )}    
 
   </div>
   )}
@@ -818,12 +952,7 @@ export default function UserDetails(){
   {/* End Show Popup */}
 
   </PageComponent>
-  ):(
-    (() => {
-      window.location = '/forbidden';
-      return null; 
-    })()
-  )
+  );
 
 
 }

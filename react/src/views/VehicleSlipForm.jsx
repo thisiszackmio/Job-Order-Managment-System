@@ -529,7 +529,7 @@ export default function PrePostRepairForm(){
               ):(
               <>
                 {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                  <span key={index} style={{ borderBottom: '1px solid black', display: 'block', padding: '2px' }}>
+                  <span key={index}>
                     {`${index + 1}. ${passenger}`}
                   </span>
                 ))}
@@ -1018,7 +1018,7 @@ export default function PrePostRepairForm(){
                           <div className="relative pt-2">
                             <img
                               src={vehicleForms?.requestor?.signature}
-                              style={{ position: 'absolute', width: '200px', top: '-15px', left: '30px' }}
+                              className="ppa-esig-user-vs"
                               alt="Signature"
                             />
                           </div>
@@ -1045,7 +1045,7 @@ export default function PrePostRepairForm(){
                             {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
                               <img
                                 src={vehicleForms?.manager?.manager_signature}
-                                style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                                className="ppa-esig-admin-vs"
                                 alt="Signature"
                               />
                             )}
@@ -1208,7 +1208,7 @@ export default function PrePostRepairForm(){
                         <div className="relative pt-2">
                           <img
                             src={vehicleForms?.requestor?.signature}
-                            style={{ position: 'absolute', width: '200px', top: '-15px', left: '30px' }}
+                            className="ppa-esig-user-vs"
                             alt="Signature"
                           />
                         </div>
@@ -1235,7 +1235,7 @@ export default function PrePostRepairForm(){
                           {(vehicleForms?.vehicleForm?.admin_approval == 1 || vehicleForms?.vehicleForm?.admin_approval == 2) && (
                             <img
                               src={vehicleForms?.manager?.manager_signature}
-                              style={{ position: 'absolute', width: '200px', top: '-10px', left: '30px' }}
+                              className="ppa-esig-admin-vs"
                               alt="Signature"
                             />
                           )}
@@ -1251,7 +1251,7 @@ export default function PrePostRepairForm(){
                       </td>
                     </tr>
 
-</table>
+                  </table>
 
                   </div>
 

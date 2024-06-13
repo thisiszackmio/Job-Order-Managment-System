@@ -3,9 +3,11 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import GuestLayout from './components/GuestLayout';
 import JLMSLayout from './components/JLMSLayout';
+import JOMSLayout from './components/JOMSLayout';
 
 import Login from './views/Login';
 import DashboardJLMS from './views/DashboardJLMS';
+import DashboardJOMS from './views/DashboardJOMS';
 
 // import Dashboard from './views/Dashboard';
 
@@ -218,6 +220,16 @@ const routes = [
       {
         path: '/',
         element: <DashboardJLMS />
+      }
+    ]
+  },
+  {
+    path: '/',
+    element: <JOMSLayout />,
+    children: [
+      {
+        path: '/joms',
+        element: <DashboardJOMS />
       }
     ]
   },

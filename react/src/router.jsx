@@ -8,6 +8,7 @@ import JOMSLayout from './components/JOMSLayout';
 import Login from './views/Login';
 import DashboardJLMS from './views/DashboardJLMS';
 import DashboardJOMS from './views/DashboardJOMS';
+import AddEmployee from './views/AddEmployee';
 
 // import Dashboard from './views/Dashboard';
 
@@ -220,6 +221,10 @@ const routes = [
       {
         path: '/',
         element: <DashboardJLMS />
+      },
+      {
+        path: '/addemployee',
+        element: <AddEmployee />
       }
     ]
   },

@@ -55,7 +55,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="asset.png" alt="Your Company"/>  
               AMS
             </div>
 
@@ -73,7 +73,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '50px', top: '5px', left: '40px' }} src="checklist.png" alt="Your Company"/>  
               JOMS
             </div>
 
@@ -91,7 +91,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="groups.png" alt="Your Company"/>  
               PPS
             </div>
 
@@ -109,7 +109,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto image-icon" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="paper.png" alt="Your Company"/>  
               DTS
             </div>
 
@@ -127,7 +127,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="fill.png" alt="Your Company"/>  
               DIS
             </div>
 

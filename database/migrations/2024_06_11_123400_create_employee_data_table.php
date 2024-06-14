@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('fname');
             $table->string('mname');
             $table->string('lname');
-            $table->date('birthdate');
             $table->string('sex');
-            $table->string('civil_status');
+            $table->string('division');
+            $table->string('position');
             $table->string('display_picture');
             $table->string('esig');
             $table->timestamps();

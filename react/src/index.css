@@ -2,8 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Button Style */
+.login-btn { background-color: #132E51; width: 100%; color: #fff; font-size: 20px; padding: 8px; border-radius: 5px; transition: 300ms; }
+.login-btn:hover { background-color: #4A6589; transition: 300ms; }
+.btn-submit { background-color: #00FFFF; padding: 8px 30px; border-radius: 5px; margin-left: 10px; margin-bottom: 15px; transition: 300ms; }
+.btn-submit:hover { background-color: #00B6B6; transition: 300ms; }
+
+/* Notifaction*/
+.notifications { color: #ffff; background-color: #ff0000; border-radius: 25px; padding: 12px 4px; line-height: 0px; font-size: 14px; position: absolute; left: 15px; top: -6px; }
+.noti-type { color: #808080; font-style: italic; padding-bottom: 5px; }
+.noti-message { font-size: 18px; line-height: 22px; padding-bottom: 5px; }
+span.noti-requestor { font-weight: 700; }
+
 /* PPA Theme */
 .ppa-content { padding: 0px 0px 0px 288px; background-color: #F9F9F9; }
+
+/* Footer */
+.footer { padding: 24px 0px; background-color: #F9F9F9; }
+.footer p { font-size: 14px; margin-right: 30px; font-weight: 700; }
 
 /* Login Page */
 .ppa-cover { background-size: 120% 220%; background-repeat: no-repeat; background-position: 82% 16%; }
@@ -19,8 +35,15 @@
 .text-title { font-size: 30px; text-transform: uppercase; color: #fff; padding-bottom: 10px; border-bottom: 2px solid; }
 .first-letter { font-size: 40px; font-weight: 900; }
 .logout-area { position: absolute; bottom: 0; }
-.ppa-hamburger { width: 24px; right: 80px; top: 31px; position: absolute; }
+.ppa-hamburger { width: 24px; right: 90px; top: 31px; position: absolute; }
 .ham-haha { font-size: 20px; color: #000; }
+.ppa-accordion { min-height: 45vh; }
+.ppa-accordion > li > .accordion-toggle { position: absolute; opacity: 0; display: none; }
+.ppa-accordion > li > section{ height: 0; transition: .8s all; overflow: hidden; }
+.ppa-accordion > li > .accordion-toggle:checked ~ label > span.icon-arrow{ transform: rotate(90deg); transition: .3s all; }
+.ppa-accordion > li > .accordion-toggle:not(:checked) ~ label > span.icon-arrow{ transform: rotate(0deg); transition: .3s all; }
+.ppa-accordion > li > .accordion-toggle:checked ~ section{ height: 150px; }
+.ppa-accordion > li > section p { margin: 15px 0; padding: 0 20px; font-size: 12px; line-height: 1.5; }
 
 /* Forms */
 input:focus, textarea:focus {
@@ -35,6 +58,8 @@ input:focus, textarea:focus {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow) !important;
   border-color: #4A6589 !important;
 }
+.ppa-form-box { border: 1px solid #cecece; }
+.ppa-form-header { background-color: #132E51; color: #fff; padding: 10px; font-size: 20px; }
 .form-label { font-size: 20px; }
 .ppa-form { border: 1px solid #808080; border-radius: 5px; padding: 10px; }
 
@@ -45,9 +70,7 @@ input:focus, textarea:focus {
 /* Widgets Icons */
 .ppa-system-abbr { position: relative; font-size: 40px; font-weight: 900; text-align: center; margin-top: 10px; }
 .ppa-system-text { text-align: center; font-size: 20px; }
-.image-icon { position: absolute; width: auto; height: 60px; left: 40px; }
 .ppa-system-link { background-color: rgba(0, 0, 0, .1); text-align: center; margin-top: 10px; padding: 5px 0px; font-weight: 900;}
-
 
 /* Scroll for widgets */
 .ppa-div-table::-webkit-scrollbar-track { border-radius: 10px; background-color: transparent; }
@@ -58,3 +81,11 @@ input:focus, textarea:focus {
 /* Table */
 .ppa-table tbody tr:nth-child(odd) { background-color: #ebf3f9; }
 .ppa-div-table { padding: 10px; }
+
+/* JOMS CSS */
+.joms-dashboard-title { background-color: #132E51; color: #fff; padding: 5px; font-size: 18px; font-weight: 600; }
+.joms-count { font-size: 3rem; font-weight: 600; padding-left: 10px; color: #272727; }
+.joms-word-count { position: relative; top: -10px; left: 10px; font-family: cursive; font-weight: 100; }
+
+/* Joms Pending Style */
+.pending-title { font-size: 20px; font-weight: 900; }

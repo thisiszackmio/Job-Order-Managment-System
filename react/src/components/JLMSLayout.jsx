@@ -3,7 +3,8 @@ import { Menu, Transition } from '@headlessui/react';
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faSignOutAlt, faFlag } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faSignOutAlt, faFlag, faUserPlus, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import Footer from "./Footer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -51,15 +52,48 @@ export default function JLMSLayout() {
 
           {/* Nav */}
           <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
-            {/* Dashboard */}
+
+            {/* Report Issue */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <Link to="/" className="flex items-center">
                   <FontAwesomeIcon icon={faFlag} />
-                  {!isSidebarMinimized && <p className="ml-4 text-lg">Report Issue</p>}
+                  {!isSidebarMinimized && <p className="ml-5 text-lg">Report Issue</p>}
                 </Link>
               </div>
             </li>
+
+            {/* Employee Details */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <FontAwesomeIcon icon={faUserPlus} />
+              {!isSidebarMinimized && 
+                <>
+                  <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
+                  <label htmlFor="toggle1" className="w-full justify-between text-white cursor-pointer items-center text-lg">
+                    <span className="ml-4">Employees</span>
+                    <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                  </label>
+                </>
+              }
+
+              {(activeAccordion === 1 || !isSidebarMinimized) && (
+                <section>
+                  <ul id="menu1" className="pl-3 mt-4">
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/requestinspectionform">All Employee Lists</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/addemployee">Add Employee Data</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/requestinspectionform">Add Employee Account</Link>
+                    </li>
+                  </ul>
+                </section>
+              )}
+              
+            </li>
+
           </ul>
 
           {/* Logout */}
@@ -85,6 +119,9 @@ export default function JLMSLayout() {
           <Outlet />
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

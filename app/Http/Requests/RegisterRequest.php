@@ -32,12 +32,14 @@ class RegisterRequest extends FormRequest
             'display_picture' => [
                 'required', 
                 'file', 
-                'mimes:png'
+                'mimes:png,jpeg,jpg',
+                'max:2048'
             ],
             'esig' => [
                 'required', 
                 'file', 
-                'mimes:png'
+                'mimes:png',
+                'max:2048'
             ],
         ];
     }

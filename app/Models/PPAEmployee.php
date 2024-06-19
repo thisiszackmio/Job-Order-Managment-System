@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class PPAEmplpoyee extends Model
+class PPAEmployee extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 

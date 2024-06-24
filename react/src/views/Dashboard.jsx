@@ -194,54 +194,55 @@ export default function Dashboard()
       <div className="grid grid-cols-5 gap-4 mt-10">
 
         {/* For Inspection */}
-        <div className="col-span-1 request-sec">
-
-          <div className="dashboard-title">Total Repair Inspection Request</div>
-
-          <div className="flex">
-            <div className="count-det">{isStatus.totalInspectionReq}</div>
-          </div>
-
+        <div className="col-span-1 ppa-widget">
+          <div className="joms-dashboard-title"> Pre/Post Repair Inspection Form </div>
+          <div className="joms-count">{isStatus.totalInspectionReq}</div>
+          <div className="joms-word-count">Total Count</div> 
+          <Link to="/requestinspectionform">
+            <div className="ppa-system-link">
+              Request Form
+            </div> 
+          </Link> 
         </div>
 
         {/* For Facility */}
-        <div className="col-span-1 request-sec">
-
-          <div className="dashboard-title">Total Facility/Venue Request</div>
-
-          <div className="flex">
-            <div className="count-det">{isStatus.totalFacilityReq}</div>
-          </div>
-
+        <div className="col-span-1 ppa-widget">
+          <div className="joms-dashboard-title"> Facility / Venue Form </div>
+          <div className="joms-count">{isStatus.totalFacilityReq}</div>
+          <div className="joms-word-count">Total Count</div>
+          <Link to="/facilityrequestform">
+            <div className="ppa-system-link">
+              Request Form
+            </div> 
+          </Link> 
         </div>
 
         {/* For Vehicle */}
-        <div className="col-span-1 request-sec">
-
-          <div className="dashboard-title">Total Vehicle Slip Request</div>
-
-          <div className="flex">
-            <div className="count-det">{isStatus.totalVehicleReq}</div>
-          </div>
-
+        <div className="col-span-1 ppa-widget">
+          <div className="joms-dashboard-title"> Vehicle Slip </div>
+          <div className="joms-count">{isStatus.totalVehicleReq}</div>
+          <div className="joms-word-count">Total Count</div>
+          <Link to="/vehiclesliprequestform">
+            <div className="ppa-system-link">
+              Request Form
+            </div>  
+          </Link>  
         </div>
 
         {/* For Equipment */}
-        <div className="col-span-1 request-sec">
-
-          <div className="dashboard-title">Total Equipment Request</div>
-
-          <div className="text-2xl font-bold text-black"> Coming Soon!</div>
-
+        <div className="col-span-1 ppa-widget">
+          <div className="joms-dashboard-title"> Equipment Form </div>
+          <div className="joms-count">0</div>
+          <div className="joms-word-count">Total Count</div>
+          <div className="ppa-system-link"> (Coming Soon) </div>
         </div>
 
         {/* For Other */}
-        <div className="col-span-1 request-sec">
-
-          <div className="dashboard-title">Other Request</div>
-
-          <div className="text-2xl font-bold text-black"> Coming Soon! </div>
-
+        <div className="col-span-1 ppa-widget">
+          <div className="joms-dashboard-title"> Other Form Request </div>
+          <div className="joms-count">0</div>
+          <div className="joms-word-count">Total Count</div>
+          <div className="ppa-system-link"> (Coming Soon) </div>
         </div>
 
       </div>
@@ -249,14 +250,15 @@ export default function Dashboard()
       <div className="grid grid-cols-2 gap-4 mt-10">
 
       {/* Pending Request */}
-      <div className="col-span-1 request-sec" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
+      <div className="col-span-1 ppa-widget" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
 
-        <div className="dashboard-title">Pending Request</div>
+        <div className="ppa-widget-title">Pending Request</div>
 
+        <div className="pending-request">
         {isPendingTask?.InspendingRequest?.length > 0 || isPendingTask?.FacPendingRequest?.length > 0 || isPendingTask?.VehPendingRequest?.length > 0 ?
         (
         <>
-          <table style={{ width: '100%' }}>
+          <table className="pending-request" style={{ width: '100%' }}>
             <tbody>
 
               {/* Inspection */}
@@ -333,36 +335,31 @@ export default function Dashboard()
             No Pending Request
           </div>
         )}
+        </div>
 
       </div>
 
       {/* Logs */}
-      <div className="col-span-1 request-sec" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
+      <div className="col-span-1 ppa-widget" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto' }}>
 
-        <div className="dashboard-title mb-4">Logs (Month of {currentMonthName}) </div>
+        <div className="ppa-widget-title">Logs (Month of {currentMonthName}) </div>
 
         <table className="ppa-table w-full mb-4">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase">Date and Time</th>
-                <th className="px-1 py-1 text-center text-sm font-medium text-gray-600 uppercase">Activity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLogs.length > 0 ? (
-                isLogs.map((Logs) => (
-                  <tr key={Logs.id}>
-                    <td className="px-1 py-2 align-top table-font text-center">{Logs.createdAt}</td>
-                    <td className="px-1 py-2 align-top table-font w-9/12 pl-3">{Logs.remarks}</td>
-                  </tr>
-                ))
-              ):(
-                <tr>
-                  <td colSpan={6} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
+          <tbody>
+            {isLogs.length > 0 ? (
+              isLogs.map((Logs) => (
+                <tr key={Logs.id}>
+                  <td className="px-1 py-2 align-top table-font text-center">{Logs.createdAt}</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">{Logs.remarks}</td>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              ))
+            ):(
+              <tr>
+                <td colSpan={6} className="px-6 py-2 text-center border-0 border-custom"> No data </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
       </div>
 

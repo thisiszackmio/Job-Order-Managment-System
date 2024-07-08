@@ -111,5 +111,6 @@ Route::get('/notif/{id}', [GetNotificationController::class, 'NewNotification'])
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-//Test area
 Route::get('/getpending/{id}', [DashboardController::class, 'getPendingRequest']);
+
+//Test area

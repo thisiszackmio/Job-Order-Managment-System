@@ -388,7 +388,6 @@ class InspectionFormController extends Controller
             'before_repair_date' => '1970/01/01',
             'findings' => 'no data',
             'recommendations' => 'no data',
-            'close' => 0
         ]);
 
         // After creating the related model, update the admin_approval to 2
@@ -433,7 +432,6 @@ class InspectionFormController extends Controller
                 'before_repair_date' => $request->input('before_repair_date'),
                 'findings' => $validatedData['findings'],
                 'recommendations' => $validatedData['recommendations'],
-                'close' => 3,
             ]);
         }
 
@@ -469,7 +467,6 @@ class InspectionFormController extends Controller
             $record->update([
                 'after_reapir_date' => $request->input('after_reapir_date'),
                 'remarks' => $validatedData['remarks'],
-                'close' => 2,
             ]);
         }
 
@@ -504,7 +501,7 @@ class InspectionFormController extends Controller
         // Update the approval status and remarks of the Inspection_Form record
         $approveRequest->supervisor_approval = 1;
         $approveRequest->admin_approval = 4;
-        $approveRequest->remarks = "The supervisor has approved the request";
+        $approveRequest->remarks = "Approved by Supervisor";
 
         // Save the updated Inspection_Form record to the database
         if ($approveRequest->save()) {
@@ -530,6 +527,7 @@ class InspectionFormController extends Controller
         $disapproveRequest = Inspection_Form::find($id);
 
         $disapproveRequest->supervisor_approval = 2;
+        $disapproveRequest->form_status = 1;
         $reason = $request->input('reason');
         if($reason == 'Others'){
             $disapproveRequest->remarks = "Disapproved by Supervisor (Reason: " .$request->input('other_reason'). ")";
@@ -560,13 +558,9 @@ class InspectionFormController extends Controller
 
         if ($approveAdminRequest) {
             $approveAdminRequest->admin_approval = 1;
-            $approveAdminRequest->remarks = "The Admin Manager has approved the request";
+            $approveAdminRequest->remarks = "Approved by Admin Manager";
 
             if ($approveAdminRequest->save()) {
-                if ($getInspectorStat) {
-                    $getInspectorStat->close = 4;
-                    $getInspectorStat->save();
-                }
 
                 // Create a new Logs record with the remarks from the request
                 $logs = new Logs();
@@ -608,12 +602,8 @@ class InspectionFormController extends Controller
      */
     public function closeRequest(Request $request, $id)
     {
-        // Find the Inspector_Form records associated with the Inspection_Form
-        $inspectorForms = Inspector_Form::where('inspection__form_id', $id)->first();
-        $inspectorForms->close = 1;
-        $inspectorForms->save();
-
         $inspectionRequest = Inspection_Form::find($id);
+        $inspectionRequest->form_status = 1;
         $inspectionRequest->remarks = "The request is closed";
         $inspectionRequest->save();
 

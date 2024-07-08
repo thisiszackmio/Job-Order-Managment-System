@@ -103,6 +103,7 @@ export default function RepairRequestForm(){
       supervisor_approval: supervisorUser,
       admin_approval: adminManager,
       inspector_status: 0,
+      form_status: 0,
       remarks: remarks,
       // Logs
       logs: logs,

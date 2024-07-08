@@ -205,8 +205,8 @@ const Sidebar = () => {
               <li className="flex w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className="flex items-center">
                 {!isSidebarMinimized ? 
-                  <p className="text-base leading-4 text-sm">User: 
-                    <Link to={`/ppauserdetails/${currentUser.id}`}>{currentUser.fname} {currentUser.mname}. {currentUser.lname}</Link>
+                  <p className="text-base leading-4 text-sm">User:  
+                    <Link to={`/ppauserdetails/${currentUser.id}`}> {currentUser.fname} {currentUser.mname}. {currentUser.lname} </Link>
                   </p> 
                 : null }  
                 </div>

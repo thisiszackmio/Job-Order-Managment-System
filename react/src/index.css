@@ -106,13 +106,13 @@ p.lower-text { font-size: 12px; color: #848884; }
 
 /* Buttons */
 .btn-process { background-color: #6495ED; color: #fff; border-radius: 20px; }
-.btn-submitting { background-color: #40E0D0 !important; cursor: no-drop; position: relative; top: 3px; }
+.btn-submitting { background-color: #40E0D0 !important; cursor: no-drop; position: relative; }
 .btn-error { background-color: #C41E3A; color: #fff; border-radius: 20px; }
 .btn-error:hover { background-color: #f26f85; transition: 250ms; }
 .btn-success { background-color: #0096FF; color: #fff; border-radius: 20px; }
 .btn-success:hover { background-color: #4ab1f9; transition: 250ms; }
-.btn-submit{ background-color: #7393B3; color: #fff; border-radius: 20px; }
-.btn-submit:hover { background-color: #819ebb !important; transition: 250ms; }
+.btn-submit{ background-color: #4169E1; color: #fff; border-radius: 20px; }
+.btn-submit:hover { background-color: #557ae9 !important; transition: 250ms; }
 .btn-cancel { background-color: #C41E3A; color: #fff; border-radius: 20px; }
 .btn-cancel:hover { background-color: rgb(204, 101, 118); transition: 250ms; }
 .btn-close { background-color: #C41E3A; color: #fff; border-radius: 20px; }
@@ -121,7 +121,7 @@ p.lower-text { font-size: 12px; color: #848884; }
 .btn-pdf { background-color: #50C878; color: #fff; border-radius: 20px; }
 .btn-pdf:hover { background-color: #52aa6f; transition: 250ms; }
 .btn-genpdf { background-color: #52aa6f; cursor: no-drop; position: relative; top: 3px; }
-.btn-default { background-color: #4A6589; color: #fff; border-radius: 20px; }
+.btn-default { background-color: #132E51; color: #fff; border-radius: 20px; }
 .btn-default:hover { background-color: rgb(102, 123, 190); transition: 250ms; }
 .btn-default:disabled { display: none; }
 .btn-edit { background-color: #87CEEB; border-radius: 20px; position: relative; top: -2px; }

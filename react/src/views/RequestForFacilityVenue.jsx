@@ -299,7 +299,7 @@ export default function RequestFormFacility(){
           setPopupMessage(
             <div>
               <p className="popup-title">Invalid Date</p>
-              <p>The date you entered is before today's date.</p>
+              <p>Please input the correct date and time of activity</p>
             </div>
           );
           setNototifications("error"); 

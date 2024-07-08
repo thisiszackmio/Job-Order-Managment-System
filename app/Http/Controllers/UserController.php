@@ -20,7 +20,7 @@ class UserController extends Controller
      * Get Supervisor on (Inspection For,\m)
      */
     public function getSupervisor(){
-        $getUser = PPAUser::whereIn('code_clearance',[1,2,4])->get();
+        $getUser = PPAUser::where('code_clearance', 4)->get();
 
         $filteredUsers = $getUser->map(function ($user){
             $id = $user->id;

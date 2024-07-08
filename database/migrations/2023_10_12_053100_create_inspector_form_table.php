@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('recommendations');
             $table->date('after_reapir_date')->nullable();
             $table->string('remarks')->nullable();
-            $table->integer('close')->default(0);
             $table->timestamps();
         });
     }

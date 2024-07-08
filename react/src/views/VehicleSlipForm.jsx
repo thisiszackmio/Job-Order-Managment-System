@@ -519,23 +519,22 @@ export default function PrePostRepairForm(){
           <div className="flex mt-4 font-roboto items-center">
             <div className="w-28">
               <label className="block text-base font-medium leading-6 text-gray-900">
-              Passenger/s:
+                Passenger/s:
               </label> 
             </div>
             <div className="w-1/2 ppa-form-request">
               <div>
-              {vehicleForms?.vehicleForm?.passengers == 'N/A' ? (
-                "No Passengers"
-              ):(
-              <>
-                {vehicleForms?.vehicleForm?.passengers?.split('\n')?.map((passenger, index) => (
-                  <span key={index}>
-                    {`${index + 1}. ${passenger}`}
-                  </span>
-                ))}
-              </>
-              )}
-                
+                {vehicleForms?.vehicleForm?.passengers === 'N/A' ? (
+                  "No Passengers"
+                ) : (
+                  <>
+                    {vehicleForms?.vehicleForm?.passengers?.split('\n').map((passenger, index) => (
+                      <div key={index}>
+                        {`${index + 1}. ${passenger}`}
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -561,7 +560,7 @@ export default function PrePostRepairForm(){
       </div>
 
       {/* Show Form */}
-      {vehicleForms?.vehicleForm?.vehicle_type == 'None' && vehicleForms?.vehicleForm?.driver == 'None' && currentUser.code_clearance == 3 ? (
+      {vehicleForms?.vehicleForm?.vehicle_type == 'None' && vehicleForms?.vehicleForm?.driver == 'None' && currentUser.code_clearance == 3 && vehicleForms?.vehicleForm?.admin_approval != 1 ? (
       <>
         <form id="VehicleSlip" onSubmit={VehicleSlipForm}>
 
@@ -654,7 +653,7 @@ export default function PrePostRepairForm(){
             <button
               type="submit"
               form="VehicleSlip"
-              className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+              className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
               disabled={submitLoading}
             >
               {submitLoading ? (
@@ -670,7 +669,7 @@ export default function PrePostRepairForm(){
           )}
 
           {/* Close the Request */}
-          {vehicleForms?.vehicleForm?.admin_approval == 2 && (
+          {vehicleForms?.vehicleForm?.admin_approval != 1 && (
           <>
             <button
               onClick={() => handleCloseClick(vehicleForms?.vehicleForm?.id)}
@@ -684,6 +683,25 @@ export default function PrePostRepairForm(){
                 </div>
               ) : (
                 'Close Request'
+              )}
+            </button>
+          </>
+          )}
+
+          {/* Generate PDF */}
+          {vehicleForms?.vehicleForm?.admin_approval == 1 && (
+          <>
+            <button type="button" onClick={handleButtonClick}
+              className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex items-center justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-2">Generating</span>
+                </div>
+              ) : (
+                'Get PDF'
               )}
             </button>
           </>
@@ -709,25 +727,6 @@ export default function PrePostRepairForm(){
           </div>
           )}
         </>  
-        )}
-
-        {/* Generate PDF */}
-        {vehicleForms?.vehicleForm?.admin_approval == 1 && (
-        <>
-          <button type="button" onClick={handleButtonClick}
-            className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-            disabled={submitLoading}
-          >
-            {submitLoading ? (
-              <div className="flex items-center justify-center">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Generating</span>
-              </div>
-            ) : (
-              'Get PDF'
-            )}
-          </button>
-        </>
         )}
 
       </div>

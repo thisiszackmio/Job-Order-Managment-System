@@ -51,6 +51,7 @@ export default function FacilityFormForm(){
   }
 
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [generatePDFLoad, setGeneratePDFLoad] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [displayRequestFacility, setDisplayRequestFacility] = useState([]);
@@ -67,6 +68,19 @@ export default function FacilityFormForm(){
   //OPR
   const [OprInstruct, setOprInstruct] = useState('');
   const [OprAction, setOprAction] = useState('');
+
+  //OPR Field
+  const [enableOprInstruct, setEnableOprInstruct] = useState(false);
+  const [enableOprAction, setEnableOprAction] = useState(false);
+
+  const handleOPRInstruct = () => { setEnableOprInstruct(true); }
+  const handleOPRAction = () => { setEnableOprAction(true); }
+
+  // Disable OPR Field
+  const handleDisableEdit = () => { 
+    setEnableOprInstruct(false); 
+    setEnableOprAction(false);
+  }
 
   //Show Data List
   const fetchFacilityForm = () => {
@@ -124,7 +138,7 @@ export default function FacilityFormForm(){
     setSubmitLoading(true);
 
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has filled-up the OPR Comments on ${displayRequestFacility?.requestor?.name}'s request for Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
-
+    
     axiosClient
     .put(`facilityopr/${id}`,{
       obr_comment: oprActionValue,
@@ -153,18 +167,6 @@ export default function FacilityFormForm(){
       setSubmitLoading(false);
     });
 
-  }
-
-  //For OPR Instruction confirmation
-  function handleOPRInstructionClick(){
-    setPopupContent("warning");
-    setShowPopup(true);
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Warning</p>
-        <p>Would you like to continue even if there's no OPR instruction?</p>
-      </div>
-    );
   }
 
   //Submit OPR Instruction
@@ -288,9 +290,20 @@ export default function FacilityFormForm(){
     });
   }
 
+  // Close Request
+  function handleClosure() {
+    setPopupContent("close");
+    setShowPopup(true);
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure</p>
+        <p>If you close this request, it cannot be reopen.</p>
+      </div>
+    );
+  }
+
   //Close the request
   function handleCloseRequest(id){
-
     setSubmitLoading(true);
 
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has closed the request on Facility/Venue (Control No: ${displayRequestFacility?.viewFacilityData?.id})`
@@ -316,7 +329,6 @@ export default function FacilityFormForm(){
       setShowPopup(true);   
       setSubmitLoading(false);
     });
-
   }
 
   const justclose = () => {
@@ -344,10 +356,10 @@ export default function FacilityFormForm(){
   const handleButtonClick = () => {
     setIsVisible(true); 
     setSeconds(3);
-    setSubmitLoading(true);
+    setGeneratePDFLoad(true);
     setTimeout(() => {
       generatePDF();
-      setSubmitLoading(false);
+      setGeneratePDFLoad(false);
       setIsVisible(false); 
     }, 1000);
   };
@@ -888,44 +900,62 @@ export default function FacilityFormForm(){
                   Instruction for the OPR for Action:
                   </label> 
                 </div>
-                {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+
+                {currentUser.code_clearance == 1 && (displayRequestFacility?.viewFacilityData?.admin_approval == 4 || displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
                 <>
-                  <div className="w-1/2 ppa-form-request">
-                    {displayRequestFacility?.viewFacilityData?.obr_instruct}
-                  </div>
-                </>
-                ):(
-                <>
-                  {currentUser.code_clearance == 1 ? (
+                  {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
                   <>
-                    <div className="w-96 pl-1">
+                    {enableOprInstruct ? (
+                      <div className="w-96 pl-1">
 
-                      <form id="opr-form-admin" onSubmit={SubmitOPRInstruct}>
-
-                        <textarea
-                          id="findings"
-                          name="findings"
-                          rows={3}
-                          style={{ resize: "none" }}
-                          value= {OprInstruct}
-                          onChange={ev => setOprInstruct(ev.target.value)}
-                          className="w-full ppa-form"
-                        />
-                        <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, please submit the form</p>
-
+                        <form id="opr-form-admin" onSubmit={SubmitOPRInstruct}>
+      
+                          <textarea
+                            id="findings"
+                            name="findings"
+                            rows={3}
+                            style={{ resize: "none" }}
+                            value= {OprInstruct}
+                            placeholder={displayRequestFacility?.viewFacilityData?.obr_instruct}
+                            onChange={ev => setOprInstruct(ev.target.value)}
+                            className="block w-full ppa-form"
+                          />
+      
                         </form>
-
-                    </div>
+      
+                      </div>
+                    ):(
+                      <div className="w-1/2 ppa-form-request h-11">
+                        {displayRequestFacility?.viewFacilityData?.obr_instruct}
+                      </div>
+                    )}
                   </>
                   ):(
-                  <>
-                    <div className="w-1/2 ppa-form-request h-11">
-                      {displayRequestFacility?.viewFacilityData?.obr_instruct}
-                    </div>
-                  </>
+                  <div className="w-96 pl-1">
+
+                    <form id="opr-form-admin" onSubmit={SubmitOPRInstruct}>
+
+                      <textarea
+                        id="findings"
+                        name="findings"
+                        rows={3}
+                        style={{ resize: "none" }}
+                        value= {OprInstruct}
+                        onChange={ev => setOprInstruct(ev.target.value)}
+                        className="block w-full ppa-form"
+                      />
+
+                    </form>
+
+                  </div>
                   )}
                 </>
+                ):(
+                  <div className="w-1/2 ppa-form-request h-11">
+                    {displayRequestFacility?.viewFacilityData?.obr_instruct}
+                  </div>
                 )}
+
               </div>
 
               {/* OPR Action */}
@@ -935,42 +965,52 @@ export default function FacilityFormForm(){
                   OPR Action (Comment/Concerns):
                   </label> 
                 </div>
-                {displayRequestFacility?.viewFacilityData?.obr_comment ? (
-                <>
-                  <div className="w-1/2 ppa-form-request">
-                    {displayRequestFacility?.viewFacilityData?.obr_comment}
-                  </div>
-                </>
-                ):(
-                <>
-                  {currentUser.code_clearance == 3 ? (
+                
+                {currentUser.code_clearance == 3 ? (
+                <> 
+                  {(displayRequestFacility?.viewFacilityData?.admin_approval == 4 || displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
                   <>
-                    <div className="w-96 pl-1">
-
-                      <form id="opr-form-gso" onSubmit={SubmitOPRAction}>
-                        <textarea
-                          id="findings"
-                          name="findings"
-                          rows={3}
-                          style={{ resize: "none" }}
-                          value= {OprAction}
-                          onChange={ev => setOprAction(ev.target.value)}
-                          className="w-full ppa-form"
-                        />
-                        <p className="text-gray-500 text-xs mt-0 mb-2">If you have no instructions, type "none" please submit the form</p>
-                      </form>
-
-                    </div>
-                  </>
-                  ):(
-                  <>
+                    {displayRequestFacility?.viewFacilityData?.obr_comment ? (
                     <div className="w-1/2 ppa-form-request h-11">
                       {displayRequestFacility?.viewFacilityData?.obr_comment}
                     </div>
+                    ):(
+                    <>
+                      {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+                        <div className="w-96 pl-1">
+                          <form id="opr-form-gso" onSubmit={SubmitOPRAction}>
+                            <textarea
+                              id="findings"
+                              name="findings"
+                              rows={3}
+                              style={{ resize: "none" }}
+                              value={OprAction}
+                              onChange={ev => setOprAction(ev.target.value)}
+                              className="w-full ppa-form"
+                              required
+                            />
+                          </form>
+                        </div>
+                      ):(
+                        <div className="w-1/2 ppa-form-request h-11">
+                          {displayRequestFacility?.viewFacilityData?.obr_comment}
+                        </div>
+                      )}
+                    </>
+                    )}
                   </>
-                  )} 
+                  ):(
+                    <div className="w-1/2 ppa-form-request h-11">
+                      {displayRequestFacility?.viewFacilityData?.obr_instruct}
+                    </div>
+                  )}
                 </>
+                ):(
+                <div className="w-1/2 ppa-form-request h-11">
+                  {displayRequestFacility?.viewFacilityData?.obr_comment}
+                </div>
                 )}
+
               </div>
 
             </div>
@@ -985,7 +1025,7 @@ export default function FacilityFormForm(){
               </label> 
             </div>
             <div className="w-full font-bold ppa-form-request">
-            {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Approved/Closed")}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && ("Request Closed")}
             {displayRequestFacility?.viewFacilityData?.admin_approval == 2 && ("Approved")}
             {displayRequestFacility?.viewFacilityData?.admin_approval == 3 && (displayRequestFacility?.viewFacilityData?.remarks)}
             {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && ("Pending")}
@@ -1001,7 +1041,7 @@ export default function FacilityFormForm(){
             </div>
             <div className="ml-5">
               <div className="flex items-center">
-                <div className="w-64">
+                <div className="w-96">
                   <textarea
                     name="reason"
                     id="reason"
@@ -1009,7 +1049,7 @@ export default function FacilityFormForm(){
                     style={{ resize: 'none' }}
                     value={adminReason}
                     onChange={ev => setAdminReason(ev.target.value)}
-                    className="block w-full rounded-md border-1 p-1.5 form-text border-gray-300 focus:ring-0 focus:border-gray-400"
+                    className="block w-full ppa-form"
                   />
                 </div>
               </div>
@@ -1018,39 +1058,14 @@ export default function FacilityFormForm(){
         ):null}
 
         {/* Buttons */}
-        <div className="flex mt-4 font-roboto">
-
-          {/* Generate PDF */}
-          {displayRequestFacility?.viewFacilityData?.admin_approval == 1 && (
-          <>
-            <button type="button" onClick={handleButtonClick}
-              className={`px-6 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-              disabled={submitLoading}
-            >
-              {submitLoading ? (
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Generating</span>
-                </div>
-              ) : (
-                'Get PDF'
-              )}
-            </button>
-          </>
-          )}
+        <div className="flex mt-6 font-roboto">
 
           {/* For Admin */}
-          {currentUser.code_clearance == 1 && (
+          {currentUser.code_clearance == 1 && (displayRequestFacility?.viewFacilityData?.admin_approval == 4 || displayRequestFacility?.viewFacilityData?.admin_approval == 2) && (
           <>
-            {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+            {giveAdminReason ? (
             <>
-              {displayRequestFacility?.viewFacilityData?.admin_approval == 4 ? (
-              <>
-                {giveAdminReason ? (
-                <>
-                  {/* Admin Submit Reason */}
-                  {adminReason && (
-                    <button type="submit" onClick={() => submitAdminReason(displayRequestFacility?.viewFacilityData?.id)}
+              <button type="submit" onClick={() => submitAdminReason(displayRequestFacility?.viewFacilityData?.id)}
                       className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
                       disabled={submitLoading}
                     >
@@ -1063,35 +1078,46 @@ export default function FacilityFormForm(){
                         'Submit'
                       )}
                     </button>
-                  )}
+
                   {/* Cancel */}
                   <button onClick={() => handleCancelReason()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
                     Cancel
                   </button>
-                
-                </>  
-                ):(
-                <>
-                  {/* Approve */}
-                  <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-submit" title="Admin Approve">
-                    Approve
-                  </button>
-
-                  {/* Decline */}
-                  <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
-                    Decline
-                  </button>
-                </>
-                )}
-                
-              </>
-              ):null}
             </>
             ):(
             <>
-              {OprInstruct ? (
+              {displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+              <>
+                {/* Edit */}
+                {enableOprInstruct ? null:(
+                  <button onClick={handleOPRInstruct} className="px-6 py-2 mr-2 btn-edit">
+                    Edit OPR Instruction
+                  </button>
+                )}
+              </>
+              ):(
+              <>
                 <button form='opr-form-admin' type="submit"
-                  className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                  style={{ position: 'relative', top: '0px' }}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : (
+                    'Submit OPR'
+                  )}
+                </button>
+              </>
+              )}
+
+              {enableOprInstruct && (
+              <>
+                <button form='opr-form-admin' type="submit"
+                  className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
                   style={{ position: 'relative', top: '0px' }}
                   disabled={submitLoading}
                 >
@@ -1104,58 +1130,93 @@ export default function FacilityFormForm(){
                     'Submit'
                   )}
                 </button>
-              ):(
-                <button onClick={() => handleOPRInstructionClick()} className="px-6 py-2 btn-submit" title="Admin Approve">
-                  Submit
+
+                {/* Cancel */}
+                <button onClick={() => handleDisableEdit()} className="px-6 py-2 btn-cancel" title="Supervisor Decline">
+                  Cancel
                 </button>
+              </>
               )}
               
+              {displayRequestFacility?.viewFacilityData?.admin_approval == 4 && (
+              <>
+                {enableOprInstruct ? null:(
+                <>
+                  {/* Approve */}
+                  <button  onClick={() => handleAdminApproveConfirmation()} className="px-6 py-2 btn-default" title="Admin Approve">
+                    Approve
+                  </button>
+
+                  {/* Decline */}
+                  <button onClick={() => handleDisapproveConfirmation()} className="px-6 py-2 btn-cancel ml-2" title="Admin Decline">
+                    Decline
+                  </button>
+                  </>
+                )}
+              </>
+              )}
             </>
             )}
-
-          </>
+            
+          </>  
           )}
 
           {/* For GSO */}
-          {(displayRequestFacility?.viewFacilityData?.obr_comment == null) &&
-          currentUser.code_clearance == 3 && (
+          {currentUser.code_clearance == 3 && (
           <>
-            {OprAction ? (
-              <button form='opr-form-gso' type="submit"
-                className={`px-6 py-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
-                style={{ position: 'relative', top: '0px' }}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Processing...</span>
-                  </div>
-                ) : (
-                  'Submit'
-                )}
+            {displayRequestFacility?.viewFacilityData?.admin_approval == 4 || displayRequestFacility?.viewFacilityData?.admin_approval == 2 ? (
+            <>
+              <button onClick={() => handleClosure()} className="px-6 py-2 mr-2 btn-close">
+                Close Request
               </button>
-            ):null}
+
+              {!displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.obr_instruct ? (
+              <>
+                {!displayRequestFacility?.viewFacilityData?.obr_comment && (
+                  <button form="opr-form-gso" type="submit"
+                    className={`px-6 py-2 mr-2 btn-submit ${ submitLoading && 'btn-submitting'}`}
+                    style={{ position: 'relative', top: '0px' }}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Processing...</span>
+                      </div>
+                    ) : (
+                      'Submit OPR'
+                    )}
+                  </button>
+                )}
+              </>
+              ):null}
+
+            </>
+            ):(
+            <>
+              {displayRequestFacility?.viewFacilityData?.admin_approval != 3 ? (
+              <>
+                {/* Generate PDF */}
+                <button type="button" onClick={handleButtonClick}
+                  className={`px-6 py-2 mr-2  btn-pdf ${ generatePDFLoad && 'btn-genpdf'}`}
+                  disabled={generatePDFLoad}
+                >
+                  {generatePDFLoad ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Generating</span>
+                    </div>
+                  ) : (
+                    'Get PDF'
+                  )}
+                </button>
+              </>
+              ):null}
+            </>
+            )}
+            
           </>
           )}
-
-          {/* Close the request */}
-          {(displayRequestFacility?.viewFacilityData?.obr_comment && displayRequestFacility?.viewFacilityData?.admin_approval == 2) ? (
-            <button 
-              onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)}
-              className={`px-6 py-2 btn-close ${ submitLoading && 'btn-closing'}`}
-              disabled={submitLoading}
-            >
-              {submitLoading ? (
-                <div className="flex items-center justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Closing</span>
-                </div>
-              ) : (
-                'Close Request'
-              )}
-            </button>
-          ):null}
 
         </div>
 
@@ -1185,7 +1246,7 @@ export default function FacilityFormForm(){
               )}
 
               {/* Warning */}
-              {(popupContent == "warning" || popupContent == "warningD") && (
+              {(popupContent == "warning" || popupContent == "warningD" || popupContent == "close") && (
               <>
                 <div class="f-modal-icon f-modal-warning scaleWarning">
                   <span class="f-modal-body pulseWarningIns"></span>
@@ -1219,66 +1280,9 @@ export default function FacilityFormForm(){
             <>
               {currentUser.code_clearance == 1 && (
               <>
-                {displayRequestFacility?.viewFacilityData?.obr_instruct == null ? (
-                <>
-                  {!submitLoading && (
-                    <button onClick={SubmitOPRInstruct} className="w-1/2 py-2 popup-confirm">
-                      <FontAwesomeIcon icon={faCheck} /> Confirm
-                    </button>
-                  )}
-
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
-                      <FontAwesomeIcon icon={faTimes} /> Cancel
-                    </button>
-                  )}
-
-                  {submitLoading && (
-                    <button className="w-full cursor-not-allowed py-2 btn-process">
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    </button>
-                  )}
-                </>
-                ):(
-                <>
-                  {!submitLoading && (
-                    <button onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
-                      <FontAwesomeIcon icon={faCheck} /> Confirm
-                    </button>
-                  )}
-
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
-                      <FontAwesomeIcon icon={faTimes} /> Cancel
-                    </button>
-                  )}
-
-                  {submitLoading && (
-                    <button className="w-full cursor-not-allowed py-2 btn-process">
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    </button>
-                  )}
-                </> 
-                )}
-
-              </>
-              )}
-            </>
-            )}
-
-            {/* Warning Decline */}
-            {popupContent == "warningD" && (
-            <>
-            {currentUser.code_clearance == 1 && (
-              <>
+                
                 {!submitLoading && (
-                  <button onClick={() => handleDisapproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
+                  <button onClick={() => handleApproveClick(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
                     <FontAwesomeIcon icon={faCheck} /> Confirm
                   </button>
                 )}
@@ -1297,8 +1301,36 @@ export default function FacilityFormForm(){
                     </div>
                   </button>
                 )}
-              </> 
+
+              </>
+              )}
+            </>
             )}
+
+            {/* Closure */}
+            {popupContent == "close" && (
+            <>
+              {/* Yes */}
+              {!submitLoading && (
+                <button onClick={() => handleCloseRequest(displayRequestFacility?.viewFacilityData?.id)} className="w-1/2 py-2 popup-confirm">
+                  <FontAwesomeIcon icon={faCheck} /> Confirm
+                </button>
+              )}
+              {/* No */}
+              {!submitLoading && (
+                <button onClick={justclose} className="w-1/2 py-2 popup-cancel">
+                  <FontAwesomeIcon icon={faTimes} /> Cancel
+                </button>
+              )}
+              {/* Loading */}
+              {submitLoading && (
+                <button className="w-full cursor-not-allowed py-2 btn-process">
+                  <div className="flex items-center justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Please Wait</span>
+                  </div>
+                </button>
+              )}
             </>
             )}
 

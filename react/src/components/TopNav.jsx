@@ -83,7 +83,8 @@ const TopNav = () => {
       : null;
 
       // GSO Function //
-      // -- Inspection Request -- //
+
+      //-- Inspection Request -- //
       const mappedInsGSOData = gsoRepairDet
       ? gsoRepairDet.map((GInspItem) => {
           return {
@@ -130,7 +131,6 @@ const TopNav = () => {
         return {
           type: 'Pre-Repair/Post Repair Inspect Form',
           id: GsoClose.id,
-          insp_id: GsoClose.insp_id,
           datetimerequest:formatTimeDifference(GsoClose.date_update),
         }
       }): null;
@@ -182,14 +182,14 @@ const TopNav = () => {
             type: 'Pre-Repair/Post Repair Inspect Form',
             id: PInspItem.repair_id,
             datetimerequest: formatTimeDifference(PInspItem.repair_date),
-            status: PInspItem.close,
+            status: PInspItem.status,
             assign: PInspItem.assign_personnel,
             requestor: PInspItem.requestor,
           }
       })
       : null;
 
-      //console.log(mappedVehAdminData);
+      //console.log(mappedVehGSOData);
       setNotification({
         supNotiCount,
         mappedInsSupData,
@@ -384,13 +384,13 @@ const TopNav = () => {
                         notification?.closeRequestData?.map((CloseReq) => (
                           <div key={CloseReq.id}>
                             <Link 
-                            to={`/repairinspectionform/${CloseReq.insp_id}`}
+                            to={`/repairinspectionform/${CloseReq.id}`}
                             onClick={handleLinkClick} 
                             className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
                             >
                               <h4 className="text-sm text-gray-400"> {CloseReq.type} </h4>
                               <h3 className="text-l font-normal leading-6 text-gray-900">
-                                Hello {currentUser.gender == 'Female' ? ("Ma'am"):("Sir")} {currentUser.fname}. <strong>(Control No. {CloseReq.insp_id})</strong> is complete and ready for closure.
+                                Hello {currentUser.gender == 'Female' ? ("Ma'am"):("Sir")} {currentUser.fname}. <strong>(Control No. {CloseReq.id})</strong> is complete and ready for closure.
                               </h3>
                               <h4 className="text-sm text-blue-500 font-bold">{CloseReq.datetimerequest}</h4>
                             </Link>
@@ -556,12 +556,12 @@ const TopNav = () => {
                           className="hover:bg-gray-100 p-4 block p-4 transition duration-300"
                           >
                             <h4 className="text-sm text-gray-400"> {PersonnelData.type} </h4>
-                            {PersonnelData.status == 4 && (
+                            {PersonnelData.status == 3 && (
                               <h3 className="text-l font-normal leading-6 text-gray-900">
                                 There is a assign for you on {PersonnelData.requestor}'s request (Control No: {PersonnelData.id})
                               </h3>
                             )}
-                            {PersonnelData.status == 3 && (
+                            {PersonnelData.status == 2 && (
                               <h3 className="text-l font-normal leading-6 text-gray-900">
                                 Hello <strong>{currentUser.fname}</strong>, you still need to fill up PART D (Control No: {PersonnelData.id})
                               </h3>

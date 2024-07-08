@@ -16,6 +16,5 @@ class Inspector_Form extends Model
         'recommendations',
         'after_reapir_date',
         'remarks',
-        'close'
     ];
 }

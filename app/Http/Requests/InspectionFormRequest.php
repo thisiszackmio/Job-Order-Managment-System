@@ -37,6 +37,7 @@ class InspectionFormRequest extends FormRequest
             'supervisor_approval' => 'required|numeric',
             'admin_approval' => 'required|numeric',
             'inspector_status' => 'required|numeric',
+            'form_status' => 'required|numeric',
             'remarks' => 'nullable|string'
         ];
     }

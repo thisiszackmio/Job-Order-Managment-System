@@ -25,6 +25,7 @@ class Inspection_Form extends Model
         'supervisor_approval',
         'admin_approval',
         'inspector_status',
+        'form_status',
         'remarks'
     ];
 

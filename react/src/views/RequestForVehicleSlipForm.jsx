@@ -20,6 +20,20 @@ export default function VehicleSlipForm(){
   }, [currentUser]);
 
   const today = new Date().toISOString().split('T')[0];
+  const currentDate = new Date();
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+    const hours = date.getHours().toString().padStart(2, '0'); // Add leading zero if needed
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // Add leading zero if needed
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
+  
+  const currentDateFormatted = formatDate(currentDate);
+
   const [DateArrival, setDateArrival] = useState(today);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -28,6 +42,7 @@ export default function VehicleSlipForm(){
   //Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [notifications, setNototifications] = useState('');
 
   //Vehicle Request
   const [VRPurpose, setVRPurpose] = useState('');
@@ -53,40 +68,56 @@ export default function VehicleSlipForm(){
     const logs = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has submit a request on Vehicle Slip`;
     const remarks = 'Pending';
 
-    axiosClient
-      .post("vehicleformrequest", {
-      date_of_request: today,
-      purpose: VRPurpose,
-      passengers: output ? output : "N/A",
-      place_visited: VRPlace,
-      date_arrival: VRDateArrival,
-      time_arrival: VRTimeArrival,
-      vehicle_type: 'None',
-      driver: 'None',
-      admin_approval: 5,
-      remarks: remarks,
-      logs: logs
-    })
-    .then((response) => { 
+    if(`${VRDateArrival} ${VRTimeArrival}` >= currentDateFormatted ){
+      axiosClient
+        .post("vehicleformrequest", {
+        date_of_request: today,
+        purpose: VRPurpose,
+        passengers: output ? output : "N/A",
+        place_visited: VRPlace,
+        date_arrival: VRDateArrival,
+        time_arrival: VRTimeArrival,
+        vehicle_type: 'None',
+        driver: 'None',
+        admin_approval: 5,
+        remarks: remarks,
+        logs: logs
+      })
+      .then((response) => { 
+        setNototifications("success");   
+        setShowPopup(true);
+        setPopupMessage(
+          <div>
+            <p className="popup-title"><strong>Success</strong></p>
+            <p>Form submit successfully</p>
+          </div>
+        );    
+        setSubmitLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        const responseErrors = error.response.data.errors;
+        setInputVechErrors(responseErrors);
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }else{
       setShowPopup(true);
       setPopupMessage(
         <div>
-          <p className="popup-title"><strong>Success</strong></p>
-          <p>Form submit successfully</p>
+          <p className="popup-title">Oops..</p>
+          <p>You have a input a invalid date</p>
         </div>
-      );    
-      setSubmitLoading(false);
-    })
-    .catch((error) => {
-      console.error(error);
-      const responseErrors = error.response.data.errors;
-      setInputVechErrors(responseErrors);
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
+      );
+      setNototifications("error"); 
+    }
 
   }
+
+  const closeError = () => {
+    setShowPopup(false);
+  };
 
   return (
   <PageComponent title="Request on Vehicle Slip Form">
@@ -284,10 +315,25 @@ export default function VehicleSlipForm(){
   
             {/* Notification Icons */}
             <div class="f-modal-alert">
+
+              {/* Error */}
+              {notifications == "error" && (
+              <div className="f-modal-icon f-modal-error animate">
+                <span className="f-modal-x-mark">
+                  <span className="f-modal-line f-modal-left animateXLeft"></span>
+                  <span className="f-modal-line f-modal-right animateXRight"></span>
+                </span>
+              </div>
+              )}
+
+              {/* Success */}
+              {notifications == "success" && (
               <div class="f-modal-icon f-modal-success animate">
                 <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
                 <span class="f-modal-line f-modal-long animateSuccessLong"></span>
               </div>
+              )}
+            
             </div>
   
             {/* Message */}
@@ -295,6 +341,18 @@ export default function VehicleSlipForm(){
   
             {/* Button */}
             <div className="flex justify-center mt-4">
+
+              {/* Error / Warning*/}
+              {notifications == "error" && (
+              <>
+                <button onClick={() => (closeError())} className="w-full py-2 btn-error">
+                  Close
+                </button>
+              </>
+              )}
+
+              {/* Success */}
+              {notifications == "success" && (
               <button
                 onClick={() => {
                   window.location.href = `/myrequest/${currentUser.id}`;
@@ -303,6 +361,7 @@ export default function VehicleSlipForm(){
               >
                 View My Request
               </button>
+              )}
             </div>
   
           </div>

@@ -54,11 +54,7 @@ class DashboardController extends Controller
     public function getPendingRequest($id){
 
         // Inspection Request
-        $inspection = Inspection_Form::where(function($query) use ($id) {
-            $query->where('supervisor_approval', '0')
-                  ->orWhere('admin_approval', 3)
-                  ->orWhere('admin_approval', 4);
-        })->where('user_id', $id)->get();
+        $inspection = Inspection_Form::where('form_status', 0)->where('user_id', $id)->get();
         $inspDet = $inspection->map(function ($inspectionForm) {
             return [
                 'repair_id' => $inspectionForm->id,

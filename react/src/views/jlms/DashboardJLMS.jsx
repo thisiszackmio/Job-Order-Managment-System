@@ -1,4 +1,4 @@
-import PageComponent from "../components/PageComponent";
+import PageComponent from "../../components/PageComponent";
 
 export default function DashboardJLMS(){
   return (
@@ -70,9 +70,9 @@ export default function DashboardJLMS(){
           </div>
 
           {/* For JOMS */}
-          <div className="col-span-1 ppa-widget">
+          <div className="col-span-1 ppa-widget relative">
 
-            <div className="ppa-system-abbr">
+            <div className="ppa-system-abbr joms">
               <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '50px', top: '5px', left: '40px' }} src="checklist.png" alt="Your Company"/>  
               JOMS
             </div>
@@ -139,6 +139,70 @@ export default function DashboardJLMS(){
               (Coming Soon)
             </div>
 
+          </div>
+
+        </div>
+
+        {/* Logs and Members */}
+        <div className="grid grid-cols-2 gap-4 mt-10">
+
+          {/* For Logs */}
+          <div className="col-span-1 ppa-widget">
+            <div className="ppa-widget-title">Logs</div>
+            <div className="ppa-div-table" style={{ minHeight: '200px', maxHeight: '400px', overflowY: 'auto' }}>
+              <table className="ppa-table w-full mb-4">
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+                {/* Hehe */}
+                <tr>
+                  <td className="px-1 py-2 align-top table-font text-center">Jun 1, 1990</td>
+                  <td className="px-1 py-2 align-top table-font w-9/12 pl-3">This is test</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          {/* For Members */}
+          <div className="col-span-1 ppa-widget">
+            <div className="ppa-widget-title">PMO Members</div>
           </div>
 
         </div>

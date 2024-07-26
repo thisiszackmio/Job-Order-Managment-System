@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu, Transition } from '@headlessui/react';
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/ppa_logo.png';
+import defaultImage from '/default/default-avatar.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faSignOutAlt, faFlag, faUserPlus, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Footer from "./Footer";
@@ -80,13 +81,10 @@ export default function JLMSLayout() {
                 <section>
                   <ul id="menu1" className="pl-3 mt-4">
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">All Employee Lists</Link>
+                      <Link to="/userlist">All Employee Lists</Link>
                     </li>
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                       <Link to="/addemployee">Add Employee Data</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">Add Employee Account</Link>
                     </li>
                   </ul>
                 </section>
@@ -96,15 +94,27 @@ export default function JLMSLayout() {
 
           </ul>
 
-          {/* Logout */}
-          <ul className='logout-area'>
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+          <ul>
+            {/* Logout */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-3 mt-3">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <FontAwesomeIcon icon={faSignOutAlt} />
                 {!isSidebarMinimized && <a className="text-base  ml-4 leading-4 text-lg">Logout</a>}
               </div>
             </li>
+            {/* Account */}
+            <li className="flex w-full justify-between text-white cursor-pointer items-center pb-3">
+              <div className="flex items-center">
+              <img src={defaultImage} className="ppa-display-picture" alt="" />
+              {!isSidebarMinimized ? 
+                <p className="text-base leading-4 text-sm">
+                  <Link to={`/`}> Zack-Mio A. Sermon </Link>
+                </p> 
+              : null }  
+              </div>
+            </li>
           </ul>
+          
         </div>
       </div>
 

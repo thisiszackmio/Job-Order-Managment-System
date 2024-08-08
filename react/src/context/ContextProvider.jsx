@@ -1,24 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StateContext = createContext({
-  currentUser: {},
+  currentUserId: null,
   userToken: null,
-  userRole: 'member',
-  setCurrentUser: () => {},
+  userCode: null,
+  setCurrentId: () => {},
   setUserToken: () => {},
-  setUserRole: () => {},
+  setUserCode: () => {},
 });
 
 export const ContextProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentUserId, setCurrentId] = useState(null);
   const [userToken, setUserToken] = useState(localStorage.getItem('TOKEN') || '');
-  const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'member');
+  const [userCode, setUserCode] = useState(localStorage.getItem('USER_CODE') || '');
 
   // Use useEffect to set the initial user data from localStorage
   useEffect(() => {
-    const storedUserData = JSON.parse(localStorage.getItem('USER'));
-    if (storedUserData) {
-      setCurrentUser(storedUserData);
+    const storedUserId = JSON.parse(localStorage.getItem('USER_ID'));
+    if (storedUserId) {
+      setCurrentId(storedUserId);
     }
   }, []);
 
@@ -33,28 +33,28 @@ export const ContextProvider = ({ children }) => {
 
   // Create a function to update both the context and localStorage
   useEffect(() => {
-    localStorage.setItem('userRole', userRole);
-  }, [userRole]);
+    localStorage.setItem('USER_CODE', userCode);
+  }, [userCode]);
 
-  const updateUserRole = (role) => {
-    setUserRole(role);
+  const updateUserCode = (code) => {
+    setUserCode(code);
   };
 
   // Create a function to update both the context and localStorage
-  const updateCurrentUser = (userData) => {
-    localStorage.setItem('USER', JSON.stringify(userData));
-    setCurrentUser(userData);
+  const updateCurrentUserId = (id) => {
+    localStorage.setItem('USER_ID', JSON.stringify(id));
+    setCurrentId(id);
   };
 
   return (
     <StateContext.Provider
       value={{
-        currentUser,
-        setCurrentUser: updateCurrentUser,
+        currentUserId,
+        setCurrentId: updateCurrentUserId,
         userToken,
         setUserToken: setUserTokenAndLocalStorage,
-        userRole,
-        setUserRole: updateUserRole,
+        userCode,
+        setUserCode: updateUserCode,
       }}
     >
       {children}

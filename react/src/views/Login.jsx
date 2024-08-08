@@ -1,9 +1,39 @@
 import axiosClient from "../axios";
 import { useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
-import loadingAnimation from '../assets/loading.gif';
+import submitAnimation from '../assets/loading_nobg.gif';
 
 export default function Login() {
+
+  const { setCurrentId, setUserToken, setUserCode } = useUserStateContext();
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Variable
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Submit the login
+  const onSubmit = (ev) => {
+    ev.preventDefault();
+
+    setSubmitLoading(true);
+
+    axiosClient.post("/login", {
+      username,
+      password
+    })
+    .then((response) => {
+      //const getResponse = response.data.message;
+      setCurrentId(response.data.userid);
+      setUserToken(response.data.token);
+      setUserCode(response.data.code);
+      window.location.href = '/';
+
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
 
   return (
     <>
@@ -25,7 +55,7 @@ export default function Login() {
           </div>
 
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST">
+            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
 
               {/* Username */}
               <div>
@@ -37,8 +67,8 @@ export default function Login() {
                     autoComplete="username"
                     required
                     placeholder="Username"
-                    // value={username}
-                    // onChange={(ev) => setUsername(ev.target.value)}
+                    value={username}
+                    onChange={(ev) => setUsername(ev.target.value)}
                     className="block w-full ppa-form"
                   />
                 </div>
@@ -58,19 +88,26 @@ export default function Login() {
                     id="password"
                     name="password"
                     type="password"
-                    autoComplete="current-password"
                     required
                     placeholder="Password"
-                    // value={password}
-                    // onChange={(ev) => setPassword(ev.target.value)}
+                    value={password}
+                    onChange={(ev) => setPassword(ev.target.value)}
                     className="block w-full ppa-form"
                   />
                 </div>
               </div>
 
+              {/* Login Button */}
               <div>
-                <button type="submit" className="w-full login-btn" >
-                  Log in
+                <button type="submit" className={`px-6 py-2 w-full login-btn ${ submitLoading && 'login-btn'}`} disabled={submitLoading}>
+                  {submitLoading ? (
+                    <div className="flex w-full items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Processing</span>
+                    </div>
+                  ) : (
+                    'Login'
+                  )}
                 </button>
               </div>
             </form>

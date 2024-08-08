@@ -8,11 +8,12 @@ const Logout = ({ setCurrentUser, setUserToken }) => {
   useEffect(() => {
     // Perform the logout logic
     axiosClient.post('/logout').then((response) => {
-      setCurrentUser({});
+      setCurrentId({});
+      localStorage.removeItem('TOKEN');
       setUserToken(null);
 
       // Redirect to the login page
-      navigate('/login');
+      navigate('/');
     });
   }, [navigate, setCurrentUser, setUserToken]);
 

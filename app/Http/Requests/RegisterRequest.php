@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
 {
@@ -22,25 +23,31 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'PPA_No' => 'required|string',
-            'fname' => 'required|string',
-            'mname' => 'required|string',
-            'lname' => 'required|string',
-            'sex' => 'required|string',
+            'firstname' => 'required|string',
+            'middlename' => 'required|string',
+            'lastname' => 'required|string',
+            'gender' => 'required|string',
             'division' => 'required|string',
             'position' => 'required|string',
-            'display_picture' => [
-                'required', 
-                'file', 
-                'mimes:png,jpeg,jpg',
-                'max:2048'
-            ],
+            'code_clearance' => 'required|string',
+            'username' => 'required|string',
             'esig' => [
                 'required', 
                 'file', 
                 'mimes:png',
                 'max:2048'
             ],
+            'avatar' => [
+                'required', 
+                'file', 
+                'mimes:png,jpeg,jpg',
+                'max:2048'
+            ],
+            'password' => [
+                'required',
+                Password::min(8)->mixedCase()->numbers()->symbols()
+            ],
+            'status' => 'required|numeric',
         ];
     }
 }

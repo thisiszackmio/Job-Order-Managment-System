@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ppa_account', function (Blueprint $table) {
+        Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employee_data');
-            $table->string('userrole');
-            $table->string('username');
-            $table->string('password');
-            $table->string('status');
+            $table->string('category');
+            $table->string('message', 500);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ppa_account');
+        Schema::dropIfExists('logs');
     }
 };

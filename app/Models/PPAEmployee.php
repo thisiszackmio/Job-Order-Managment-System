@@ -7,23 +7,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class PPAEmployee extends Model
+class PPAEmployee extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'PPA_No',
-        'fname',
-        'mname',
-        'lname',
-        'sex',
+        'firstname',
+        'middlename',
+        'lastname',
+        'gender',
         'division',
         'position',
-        'display_picture',
-        'esig'
+        'code_clearance',
+        'esign',
+        'avatar',
+        'username',
+        'password',
+        'status',
     ];
 
-    protected $table = 'employee_data';
+    protected $table = 'ppa_user';
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
 
 }

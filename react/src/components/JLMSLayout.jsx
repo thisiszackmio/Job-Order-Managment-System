@@ -198,7 +198,7 @@ export default function JLMSLayout() {
               <img src={currentUserId?.avatar} className="ppa-display-picture" alt="" />
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
-                  <Link to={`/userinfo/${currentUserId?.id}`}> {currentUserId?.name} </Link>
+                  {currentUserId?.name} 
                 </p> 
               : null }  
               </div>

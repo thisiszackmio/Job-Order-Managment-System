@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PPAEmployee;
+use App\Models\InspectionModel;
 use App\Models\LogsModel;
+use App\Models\AssignPersonnelModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -37,6 +39,25 @@ class UserController extends Controller
         }
         
         return response()->json($userData);
+    }
+
+    /**
+     * Get Supervisor
+     */
+    public function getSupervisor(){
+
+        $getDM = 'DM';
+
+        $data = PPAEmployee::where('code_clearance', 'LIKE', "%{$getDM}%")->get();
+
+        $filteredManagers = $data->map(function ($dm) {
+            return[
+                'id' => $dm->id,
+                'name' => $dm->firstname. ' ' .$dm->middlename. '. ' .$dm->lastname,
+            ];
+        });
+
+        return response()->json($filteredManagers);
     }
 
     /**
@@ -276,4 +297,167 @@ class UserController extends Controller
         return response()->json(['message' => 'Remove successfully'], 200);
     }
 
+    /**
+     * Get User's Request Form on JOMS
+     */
+    public function GetMyInspRequestJOMS($id){
+
+        // For Inspection Form
+        $getInspectionFormData = InspectionModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+
+        $inspDet = $getInspectionFormData->map(function ($inspectionForm) {
+            return[
+                'repair_id' => $inspectionForm->id,
+                'repair_property_number' => $inspectionForm->property_number,
+                'repair_type' => $inspectionForm->type_of_property,
+                'repair_description' => $inspectionForm->property_description,
+                'repair_complain' => $inspectionForm->complain,
+                'repair_supervisor_name' => $inspectionForm->supervisor_name,
+                'repair_remarks' => $inspectionForm->form_remarks
+            ];
+        });
+
+        $responseData = [
+            'inspection' => $inspDet->isEmpty() ? null : $inspDet
+        ];
+        
+
+        return response()->json($responseData);
+
+    }
+
+    /**
+     * Show Assigned Personnel
+     */
+    public function showPersonnel(){
+
+        // Get all assigned personnel data
+        $assignedPersonnel = AssignPersonnelModel::all();
+
+        // Extract personnel IDs
+        $personnelIds = $assignedPersonnel->pluck('personnel_id');
+
+        // Map personnel information along with the inspection count
+        $result = $assignedPersonnel->map(function ($personnel) {
+            // Count inspections for each personnel_id
+            $inspectionCount = InspectionModel::where('personnel_id', $personnel->personnel_id)->count();
+        
+            return [
+                'personnel_id' => $personnel->id,
+                'personnel_name' => $personnel->personnel_name,
+                'assignment' => $personnel->assignment,
+                'inspection_count' => $inspectionCount
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    /**
+     * Display Assigned Personnel on select tag (PART B)
+     */
+    public function displayPersonnel($id){
+
+        $inspection = InspectionModel::find($id);
+
+        if (!$inspection) {
+            // Return a 404 error if the inspection request is not found
+            return response()->json(['error' => 'Inspection not found'], 404);
+        }
+
+        // Extract the type_of_property from the inspection
+        $typeOfProperty = $inspection->type_of_property;
+
+        // Define the filter conditions for personnel assignments
+        $assignedPersonnel = [];
+
+        if ($typeOfProperty === 'IT Equipment & Related Materials') {
+            $assignedPersonnel = AssignPersonnelModel::whereIn('assignment', ['IT Service', 'Electronics', 'Electrical Works', 'Engeneering Services'])->get();
+        }
+        elseif ($typeOfProperty === 'Vehicle Supplies & Materials') {
+            $assignedPersonnel = AssignPersonnelModel::where('assignment', 'Driver/Mechanic')->get();
+        }
+        elseif ($typeOfProperty === 'Others') {
+            $assignedPersonnel = AssignPersonnelModel::all();
+        }
+
+        // Map personnel information
+        $result = $assignedPersonnel->map(function ($personnel) {
+            return [
+                'personnel_id' => $personnel->personnel_id,
+                'personnel_name' => $personnel->personnel_name,
+                'assignment' => $personnel->assignment
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    /**
+     * Get Personnel
+     */
+    public function getPersonnel(){
+        
+        $data = AssignPersonnelModel::all();
+        $getIds = $data->pluck('personnel_id');
+
+        $employee = PPAEmployee::queryUserExcept($getIds)->whereNotIn('code_clearance', ['AM, MEM', 'PM, MEM', 'DM, MEM', 'GSO, MEM']);
+
+        $userData = $employee->map(function ($user){
+            return [
+                'id' => $user->id,
+                'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname
+            ];
+        })->values()->all();
+        
+        return response()->json($userData);
+    }
+
+    /**
+     * Assign Personnel
+     */
+    public function storePersonnel(Request $request){
+
+        //Validate
+        $personnelData = $request->validate([
+            'personnel_id' => 'required|numeric',
+            'personnel_name' => 'required|string',
+            'assignment' => 'required|string',
+        ]);
+
+        $deploymentData = AssignPersonnelModel::create($personnelData);
+
+        if (!$deploymentData) {
+            return response()->json(['error' => 'Data Error'], 500);
+        } else {
+                // Creating logs
+                $logs = new LogsModel();
+                $logs->category = 'User';
+                $logs->message = $request->input('logs');
+                $logs->save();
+            }
+
+        return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
+
+    /**
+     * Remove Assign Personnel
+     */
+    public function removePersonnel(Request $request, $id){
+        $data = AssignPersonnelModel::find($id);
+
+        if (!$data) {
+            return response()->json(['message' => 'Personnel not found'], 404);
+        }
+
+        $data->delete();
+
+        // Creating logs
+        $logs = new LogsModel();
+        $logs->category = 'User';
+        $logs->message = $request->input('logs');
+        $logs->save();
+        
+        return response()->json(['message' => 'Personnel deleted successfully'], 200);
+    }
 }

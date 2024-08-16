@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 import { Menu, Transition } from '@headlessui/react';
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/ppa_logo.png';
-import defaultImage from '/default/default-avatar.jpg'
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faTableList, faClipboardUser } from '@fortawesome/free-solid-svg-icons';
+import { useUserStateContext } from "../context/ContextProvider";
+import axiosClient from "../axios";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function JOMSLayout() {
+
+  const { currentUserId, setCurrentId, setUserToken, userCode } = useUserStateContext();
 
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
@@ -25,6 +28,18 @@ export default function JOMSLayout() {
       setActiveAccordion(null);
     }
   }, [isSidebarMinimized, setActiveAccordion]);
+
+  // Logout Area
+  const logout = () => {
+    // Perform the logout logic
+    axiosClient.post('/logout').then((response) => {
+      setCurrentId({});
+      setUserToken(null);
+
+      // Redirect to the login page using the navigate function
+      navigate('/login');
+    });
+  };
 
   return (
     <div className="w-full h-full font-roboto">
@@ -54,10 +69,20 @@ export default function JOMSLayout() {
           {/* Nav */}
           <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
 
-            {/* Dashboard */}
+            {/* Back to JLMS */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <Link to="/" className="flex items-center">
+                  <FontAwesomeIcon icon={faHouse} />
+                  {!isSidebarMinimized && <p className="ml-4 text-lg">Back to JLMS</p>}
+                </Link>
+              </div>
+            </li>
+
+            {/* Dashboard */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
+                <Link to="/joms" className="flex items-center">
                   <FontAwesomeIcon icon={faTachometerAlt} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">Dashboard</p>}
                 </Link>
@@ -67,35 +92,109 @@ export default function JOMSLayout() {
             {/* My Request */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to={`/myrequest/`} className="flex items-center">
-                  <FontAwesomeIcon icon={faList} />
+                <Link to={`/joms/myrequest`} className="flex items-center">
+                  <FontAwesomeIcon icon={faTableList} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">My Request</p>}
+                </Link>
+              </div>
+            </li>
+
+            {/* Request Forms */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6"> 
+              
+              <FontAwesomeIcon icon={faList} />
+              {!isSidebarMinimized && 
+              <>
+                <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
+                <label htmlFor="toggle1" className="w-full justify-between text-white cursor-pointer items-center text-lg">
+                  <span className="ml-4">Request Forms</span>
+                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                </label>
+              </>
+              }
+              
+              {(activeAccordion === 1 || !isSidebarMinimized) && (
+                <section>
+                  <ul id="menu1" className="pl-3 mt-4">
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="/joms/inspection/form">Pre/Post Repair Inspection Form</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                      <Link to="">Facility / Venue Request Form</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                      <Link to="">Vehicle Slip Form</Link>
+                    </li>
+                  </ul>
+                </section>
+              )}
+            </li>
+            
+            {/* Request List */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              
+              <FontAwesomeIcon icon={faList} />
+              {!isSidebarMinimized && 
+              <>
+                <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)}/>
+                <label htmlFor="toggle2" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
+                  <span className="ml-4">Request List</span>
+                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                </label>
+              </>
+              }
+              
+              {(activeAccordion === 2 || !isSidebarMinimized) && (
+                  <section>
+                    <ul id="menu2" className="pl-3 mt-4">
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/facilityvenuerequestform">Facility / Venue Request Form</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                        <Link to="/vehiclesliprequestformlist">Vehicle Slip Form</Link>
+                      </li>
+                    </ul>
+                  </section>
+                )}
+            </li>
+            
+            {/* Personnel */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
+                <Link to="/joms/personnel" className="flex items-center">
+                  <FontAwesomeIcon icon={faClipboardUser} />
+                  {!isSidebarMinimized && <p className="ml-4 text-lg">Personnel</p>}
                 </Link>
               </div>
             </li>
 
           </ul>
 
-          <ul>
+          {/* Logout Area */}
+          <ul className="logout-position">
             {/* Logout */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-3 mt-3">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <FontAwesomeIcon icon={faSignOutAlt} />
-                {!isSidebarMinimized && <a className="text-base  ml-4 leading-4 text-lg">Logout</a>}
+                {!isSidebarMinimized && <a onClick={logout} className="text-base  ml-4 leading-4 text-lg">Logout</a>}
               </div>
             </li>
             {/* Account */}
             <li className="flex w-full justify-between text-white cursor-pointer items-center pb-3">
               <div className="flex items-center">
-              <img src={defaultImage} className="ppa-display-picture" alt="" />
+              <img src={currentUserId?.avatar} className="ppa-display-picture" alt="" />
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
-                  <Link to={`/`}> Zack-Mio A. Sermon </Link>
+                  {currentUserId?.name} 
                 </p> 
               : null }  
               </div>
             </li>
           </ul>
+
         </div>
       </div>
 

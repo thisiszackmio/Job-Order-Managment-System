@@ -3,6 +3,7 @@ import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
 import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
+import { Link } from "react-router-dom";
 
 export default function DashboardJLMS(){
 
@@ -216,7 +217,7 @@ export default function DashboardJLMS(){
             </div>
 
             <div className="ppa-system-link">
-              Go to the System
+              <Link to={`/joms`}> Go to the System </Link>
             </div>
 
           </div>
@@ -288,7 +289,7 @@ export default function DashboardJLMS(){
                 <thead>
                   <tr className="bg-gray-100">
                     <th className="px-1 py-1 w-28 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
-                    <th className="px-1 py-1 w-32 text-left text-xs font-medium text-gray-600 uppercase">Category</th>
+                    <th className="px-1 py-1 w-22 text-left text-xs font-medium text-gray-600 uppercase">Category</th>
                     <th className="px-1 py-1 text-left text-xs font-medium text-gray-600 uppercase">Message</th>
                   </tr>
                 </thead>
@@ -314,7 +315,7 @@ export default function DashboardJLMS(){
           {/* For Members */}
           <div className="col-span-1 ppa-widget">
             <div className="ppa-widget-title">PMO Members</div>
-            <div className="members-container p-4">
+            <div className="members-container p-4 ppa-div-table" style={{ minHeight: 'auto', maxHeight: '400px', overflowY: 'auto' }}>
               {teams?.TeamData?.map((TeamData)=>(
               <div key={TeamData.id} className="member-info">
                 <div className="team-avatar"><img src={TeamData.avatar} alt="Team" /></div>

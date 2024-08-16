@@ -49,5 +49,9 @@ class PPAEmployee extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public static function queryUserExcept($ids){
+        return static::whereNotIn('id', $ids)->get();
+    }
+
 
 }

@@ -11,7 +11,32 @@
 .btn-cancel:hover { background-color: #da5a5a; transition: 300ms; }
 .btn-add { background: #00A36C; color: #fff; border-radius: 5px; transition: 300ms; }
 .btn-add:hover { background: #0fbe84; transition: 300ms; }
+.btn-edit { background-color: #50C878; color: #fff; border-radius: 5px; transition: 300ms; }
+.btn-edit:hover { background-color: #74db96; transition: 300ms; }
 .btn-submitLoading { background-color: #848884; color: #fff; border-radius: 5px; }
+.ppa-system-link:hover { background-color: rgb(0 0 0 / 32%); transition: 0.3s; }
+.btn-pdf { background-color: #50C878; border-radius: 5px; color: #fff; transition: 0.3s; }
+.btn-pdf:hover { background-color: #5fc782; transition: 0.3s;}
+
+/* Pagination */
+.pagination { display: flex; list-style: none; padding: 0; margin: 0; user-select: none; margin-top: 10px; }
+.pagination li {
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #D3D3D3;
+  padding: 0px 7px;
+  border-radius: 5px;
+}
+.pagination li.active {
+  background-color: #4A6589 !important;
+  color: #FFF;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 5px;
+}
+.pagination a.page-link {
+  font-size: 12px;
+}
 
 /* Team CSS */
 .logout-position { position: absolute; bottom: 0; }
@@ -52,6 +77,7 @@
 }
 .user-image { object-fit: cover; height: 2in; width: 2in; object-position: top; border: 3px solid #132E51; }
 .ppa-esignature-prf { width: 200px; }
+.loading-table { font-weight: bold; }
 .ppa-user-name { margin-top: -50px; }
 img.ppa-display-picture { object-fit: cover; object-position: top; width: 35px; height: 35px; border-radius: 35px; margin-right: 10px; }
 
@@ -94,6 +120,8 @@ img.img-minimize { width: auto; height: 40px; }
 .ppa-accordion > li > section p { margin: 15px 0; padding: 0 20px; font-size: 12px; line-height: 1.5; }
 
 /* Forms */
+.cost { padding-left: 20px !important; }
+.ppa-form-view { border-bottom: 1px solid; }
 input:focus, textarea:focus {
   outline: 2px solid transparent !important;
   outline-offset: 2px !important;
@@ -109,8 +137,19 @@ input:focus, textarea:focus {
 .ppa-form-box { border: 1px solid #cecece; }
 .ppa-form-header { background-color: #132E51; color: #fff; padding: 10px; font-size: 20px; }
 .form-label { font-size: 20px; }
-.ppa-form { border: 1px solid #808080; border-radius: 5px; padding: 10px; }
+.ppa-form { border: 1px solid #808080; border-radius: 5px; padding: 7px; }
 .form-validation { color: #ff0000; font-weight: 900; font-size: 12px; }
+.ppa-form-remarks {
+  border: 1px solid #808080;
+  border-radius: 5px;
+  height: auto;
+  padding: 5px;
+}
+.ppa-form-edit {
+  padding: 3px 5px;
+  border-radius: 5px;
+  background-color: #F9F6EE;
+}
 
 /* Widgets */
 .ppa-widget { border: 1px solid #cecece; }
@@ -701,6 +740,16 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 p.description {
   font-size: 24px;
   padding: 20px 20px;
+}
+
+/* PDF Area */
+.title-area{ font-size: 11px; }
+.text-pdf { font-size: 13px; }
+img.ppa-esignature-form {
+  width: 200px;
+  position: absolute;
+  top: -40px;
+  left: 30px;
 }
 
 /* Media Query */

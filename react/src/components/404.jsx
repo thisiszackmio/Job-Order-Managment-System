@@ -51,7 +51,7 @@ const NotFound = () => {
   }, []);
 
   return (
-    <div className="error" style={{ backgroundImage: "url('ppa_bg.png')" }}>
+    <div className="error" style={{ backgroundImage: "url('/ppa_bg.png')" }}>
       <div className="container-floud">
         <div className="col-xs-12 ground-color text-center">
           <div className="container-error-404">

@@ -18,7 +18,7 @@ import UserListJLMS from './views/jlms/UserList';
 import UserDetailsJLMS from './views/jlms/UserDetails';
 
 // -- AMS -- //
-// import AMSLayout from './components/AMSLayout';
+import AMSLayout from './components/AMSLayout';
 // import DashboardAMS from './views/ams/Dashboard';
 // import AccountableOfficerAMS from './views/ams/AccountableOfficer';
 // import AddAccountableOfficerAMS from './views/ams/AddAccountableOfficer';
@@ -27,7 +27,11 @@ import UserDetailsJLMS from './views/jlms/UserDetails';
 
 // -- JOMS -- //
 import JOMSLayout from './components/JOMSLayout';
-import DashboardJOMS from './views/DashboardJOMS';
+import DashboardJOMS from './views/joms/DashboardJOMS';
+import MyRequest from './views/joms/MyRequestList';
+import InspectionRepairFormRequest from './views/joms/InspectionForms/InpectionFormRequest';
+import InspectionRepairForm from './views/joms/InspectionForms/InspectionForm';
+import AddPersonnel from './views/joms/Personnel/AddPersonnel';
 
 // import Dashboard from './views/Dashboard';
 
@@ -65,18 +69,11 @@ const routes = [
     element: <ProtectedRoute><JLMSLayout /></ProtectedRoute>,
     children: [
       { path: '/dashboard', element: <Navigate to="/" /> },
-      // Dashboard
       { path: '/', element:  <DashboardJLMS /> },
-      // Add Announcement
       { path: '/addannouncement', element: <AddAnnouncements /> },
-      // All Announce
-      { path: '/allannouncement',
-        element: <AllAnnouncements /> },
-      // Add Employee
+      { path: '/allannouncement', element: <AllAnnouncements /> },
       { path: '/addemployee', element: <UserRegistrationJLMS /> },
-      // User List
       { path: '/userlist', element: <UserListJLMS /> },
-      // User Details
       { path: '/userdetails/:id', element: <UserDetailsJLMS /> }
     ]
   },
@@ -86,14 +83,12 @@ const routes = [
     path: '/joms',
     element: <ProtectedRoute><JOMSLayout /></ProtectedRoute>,
     children: [
-      {
-        path: '/joms',
-        element: <Navigate to="/joms/dashboard" />
-      },
-      {
-        path: '/joms/dashboard',
-        element: <DashboardJOMS />
-      }
+      { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
+      { path: '/joms/dashboard', element: <DashboardJOMS /> },
+      { path: '/joms/myrequest', element: <MyRequest /> },
+      { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
+      { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
+      { path: '/joms/personnel', element:<AddPersonnel /> }
     ]
   },
 

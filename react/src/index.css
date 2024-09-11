@@ -82,10 +82,58 @@
 img.ppa-display-picture { object-fit: cover; object-position: top; width: 35px; height: 35px; border-radius: 35px; margin-right: 10px; }
 
 /* Notifaction*/
-.notifications { color: #ffff; background-color: #ff0000; border-radius: 25px; padding: 12px 4px; line-height: 0px; font-size: 14px; position: absolute; left: 15px; top: -6px; }
-.noti-type { color: #808080; font-style: italic; padding-bottom: 5px; }
-.noti-message { font-size: 18px; line-height: 22px; padding-bottom: 5px; }
+.notifications {
+  color: #ffff;
+  background-color: #ff0000;
+  border-radius: 25px;
+  padding: 12px 5px;
+  line-height: 2px;
+  font-size: 14px;
+  position: absolute;
+  left: 15px;
+  top: -6px;
+  width: 25px;
+  text-align: center;
+}
+.noti-type {
+  color: #202020;
+  font-style: italic;
+  padding-bottom: 5px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.noti-message {
+  font-size: 16px;
+  line-height: 25px;
+  padding-bottom: 5px;
+}
+
 span.noti-requestor { font-weight: 700; }
+.notification_avatar {
+  object-fit: cover;
+  height: 70px;
+  width: 70px;
+  object-position: top;
+  border-radius: 40px;
+}
+.notification_icon {
+  object-fit: cover;
+  height: 35px;
+  width: 35px;
+  object-position: top;
+  border-radius: 40px;
+  position: absolute;
+  top: 45px;
+  left: 38px;
+  background-color: #132E51;
+  border: 5px solid #132E51;
+}
+.notification-container { align-items: start; }
+.notification-container:hover {
+  background: #E5E4E2;
+  cursor: pointer;
+  transition: 40ms;
+}
 
 /* PPA Theme */
 .ppa-content { padding: 0px 0px 0px 288px; background-color: #F9F9F9; }
@@ -150,6 +198,9 @@ input:focus, textarea:focus {
   border-radius: 5px;
   background-color: #F9F6EE;
 }
+.disable-ppa-form { background: #ede6e6; }
+.ppa-checklist { border: 1px solid #272727; padding: 3px 8px; margin-right: 15px; border-radius: 5px; height: 30px; width: 28px;}
+.ppa-form-list { border-bottom: 1px solid #000; }
 
 /* Widgets */
 .ppa-widget { border: 1px solid #cecece; }
@@ -162,7 +213,7 @@ input:focus, textarea:focus {
 
 /* Scroll for widgets */
 .ppa-div-table::-webkit-scrollbar-track { border-radius: 10px; background-color: transparent; }
-.ppa-div-table::-webkit-scrollbar { width: 10px; background-color: transparent; }
+.ppa-div-table::-webkit-scrollbar { width: 10px; height: 10px; background-color: transparent; }
 .ppa-div-table::-webkit-scrollbar-thumb { border-radius: 10px; background-color: transparent; transition: width 3s ease; }
 .ppa-div-table:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: width 3s ease; }
 
@@ -745,11 +796,17 @@ p.description {
 /* PDF Area */
 .title-area{ font-size: 11px; }
 .text-pdf { font-size: 13px; }
-img.ppa-esignature-form {
+.ppa-esignature-form {
   width: 200px;
   position: absolute;
   top: -40px;
   left: 30px;
+}
+.ppa-esignature-form-fac {
+  width: 200px;
+  position: absolute;
+  top: -20px;
+  left: 75px;
 }
 
 /* Media Query */

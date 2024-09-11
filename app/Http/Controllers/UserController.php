@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PPAEmployee;
 use App\Models\InspectionModel;
+use App\Models\FacilityVenueModel;
 use App\Models\LogsModel;
 use App\Models\AssignPersonnelModel;
 use Illuminate\Http\Request;
@@ -58,6 +59,24 @@ class UserController extends Controller
         });
 
         return response()->json($filteredManagers);
+    }
+
+    /**
+     * Get GSO
+     */
+    public function getGSO(){
+
+        $getGSO = 'GSO';
+
+        $data = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
+
+
+        $getGSO = [
+            'id' => $data->id,
+            'name' => $data->firstname. ' ' .$data->middlename. '. ' .$data->lastname,
+        ];
+
+        return response()->json($getGSO);
     }
 
     /**
@@ -308,6 +327,7 @@ class UserController extends Controller
         $inspDet = $getInspectionFormData->map(function ($inspectionForm) {
             return[
                 'repair_id' => $inspectionForm->id,
+                'repair_date_request' => $inspectionForm->created_at,
                 'repair_property_number' => $inspectionForm->property_number,
                 'repair_type' => $inspectionForm->type_of_property,
                 'repair_description' => $inspectionForm->property_description,
@@ -317,8 +337,30 @@ class UserController extends Controller
             ];
         });
 
+        // For Facility Form
+        $getFacilityFormData = FacilityVenueModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+
+        $facDet = $getFacilityFormData->map(function ($facilityForm) {
+            return[
+                'fac_id' => $facilityForm->id,
+                'fac_date_request' => $facilityForm->created_at,
+                'fac_request_office' => $facilityForm->	request_office,
+                'fac_title_of_activity' => $facilityForm->title_of_activity,
+                'fac_date_start' => $facilityForm->date_start,
+                'fac_time_start' => $facilityForm->time_start,
+                'fac_date_end' => $facilityForm->date_end,
+                'fac_time_end' => $facilityForm->time_end,
+                'mph' => $facilityForm->mph,
+                'conference' => $facilityForm->conference,
+                'dorm' => $facilityForm->dorm,
+                'other' => $facilityForm->other,
+                'fac_remarks' => $facilityForm->remarks,
+            ];
+        });
+
         $responseData = [
-            'inspection' => $inspDet->isEmpty() ? null : $inspDet
+            'inspection' => $inspDet->isEmpty() ? null : $inspDet,
+            'facility' => $facDet->isEmpty() ? null : $facDet,
         ];
         
 
@@ -430,11 +472,30 @@ class UserController extends Controller
         if (!$deploymentData) {
             return response()->json(['error' => 'Data Error'], 500);
         } else {
-                // Creating logs
-                $logs = new LogsModel();
-                $logs->category = 'User';
-                $logs->message = $request->input('logs');
-                $logs->save();
+                // Find the Personnel ID for adding 'AP' on Code Clearance
+                $findPersonnel = PPAEmployee::find($personnelData['personnel_id']);
+
+                $currentClearances = explode(', ', $findPersonnel->code_clearance); // Convert to array
+
+                // Add 'AP' to the array if it's not already present
+                if (!in_array('AP', $currentClearances)) {
+                    $currentClearances[] = 'AP';
+                }
+
+                // Convert back to a comma-separated string
+                $updatedClearances = implode(', ', $currentClearances);
+
+                // Save the updated clearances back to the model
+                $findPersonnel->code_clearance = $updatedClearances;
+
+                if($findPersonnel->save()) {
+                    // Creating logs
+                    $logs = new LogsModel();
+                    $logs->category = 'User';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+
             }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -443,21 +504,54 @@ class UserController extends Controller
     /**
      * Remove Assign Personnel
      */
-    public function removePersonnel(Request $request, $id){
+    public function removePersonnel(Request $request, $id) {
+        // Find the personnel assignment
         $data = AssignPersonnelModel::find($id);
-
+    
         if (!$data) {
             return response()->json(['message' => 'Personnel not found'], 404);
         }
-
-        $data->delete();
-
-        // Creating logs
+    
+        // Find the associated personnel
+        $findPersonnel = PPAEmployee::find($data->personnel_id);
+    
+        if (!$findPersonnel) {
+            return response()->json(['message' => 'Associated personnel not found.'], 404);
+        }
+    
+        // Update the code clearance by removing 'AP'
+        $currentClearances = explode(',', $findPersonnel->code_clearance); // Convert to array
+    
+        // Trim each clearance value to avoid spaces issues
+        $currentClearances = array_map('trim', $currentClearances);
+    
+        // Remove 'AP' from the array
+        $currentClearances = array_filter($currentClearances, function($clearance) {
+            return $clearance !== 'AP';
+        });
+    
+        // Convert back to a comma-separated string
+        $updatedClearances = implode(', ', $currentClearances);
+        $findPersonnel->code_clearance = $updatedClearances;
+    
+        if (!$findPersonnel->save()) {
+            return response()->json(['message' => 'Failed to update code clearance.'], 500);
+        }
+    
+        // Delete the personnel assignment
+        $deleted = $data->delete();
+    
+        if (!$deleted) {
+            return response()->json(['message' => 'Failed to delete personnel'], 500);
+        }
+    
+        // Creating logs only if both operations are successful
         $logs = new LogsModel();
         $logs->category = 'User';
         $logs->message = $request->input('logs');
         $logs->save();
-        
-        return response()->json(['message' => 'Personnel deleted successfully'], 200);
+    
+        return response()->json(['message' => 'Personnel deleted and code clearance updated successfully.'], 200);
     }
+    
 }

@@ -120,7 +120,7 @@ export default function JOMSLayout() {
                       <Link to="/joms/inspection/form">Pre/Post Repair Inspection Form</Link>
                     </li>
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="">Facility / Venue Request Form</Link>
+                      <Link to="/joms/facilityvenue/form">Facility / Venue Request Form</Link>
                     </li>
                     <li className="flex w-full justify-between text-white cursor-pointer items-center">
                       <Link to="">Vehicle Slip Form</Link>
@@ -148,10 +148,10 @@ export default function JOMSLayout() {
                   <section>
                     <ul id="menu2" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/repairrequestform">Pre/Post Repair Inspection Form</Link>
+                        <Link to="/joms/inspection">Pre/Post Repair Inspection Form</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/facilityvenuerequestform">Facility / Venue Request Form</Link>
+                        <Link to="/joms/facilityvenue">Facility / Venue Request Form</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center">
                         <Link to="/vehiclesliprequestformlist">Vehicle Slip Form</Link>

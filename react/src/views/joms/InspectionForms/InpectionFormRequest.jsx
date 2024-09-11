@@ -6,7 +6,16 @@ import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
 
 export default function RepairRequestForm(){
-  const { currentUserId } = useUserStateContext();
+  const { currentUserId, userCode } = useUserStateContext();
+
+  // Get the avatar
+  const dp = currentUserId?.avatar;
+  const dpname = dp ? dp.substring(dp.lastIndexOf('/') + 1) : null;
+
+  const ucode = userCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const Admin = codes.includes("AM");
+  const DivisionManager = codes.includes("DM");
 
   const [loading, setLoading] = useState(true);
 
@@ -70,6 +79,7 @@ export default function RepairRequestForm(){
   const [selectedSupervisor, setSelectedSupervisor] = useState({ id: '', name: '' });
 
   const [supervisor, setSupervisor] = useState([]);
+  const [gso, getGSO] = useState([]);
   const [inputErrors, setInputErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -95,6 +105,21 @@ export default function RepairRequestForm(){
     });
   },[]);
 
+  // Get GSO for notification
+  useEffect(()=>{
+    axiosClient
+    .get(`/getgso`)
+    .then((response) => {
+      const gsoID = response.data.id;
+      const gsoName = response.data.name;
+
+      getGSO({gsoID, gsoName});
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  },[]);
+
   // Dev Error Text
   const DevErrorText = (
     <div>
@@ -109,8 +134,9 @@ export default function RepairRequestForm(){
 
     setSubmitLoading(true);
 
-    const remarks = 'Waiting for supervisor approval.';
-
+    let remarks = Admin || DivisionManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
+    const notification = Admin || DivisionManager ? `${currentUserId.name} has submitted a request. Please check it here.` : `${currentUserId.name} has submitted a request and is waiting for your approval.`;
+    
     const formData = {
       user_id: currentUserId.id,
       user_name: currentUserId.name,
@@ -123,13 +149,23 @@ export default function RepairRequestForm(){
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-      supervisor_id: selectedSupervisor.id,
-      supervisor_name: selectedSupervisor.name,
-      supervisor_status: 0,
+      supervisor_id: Admin || DivisionManager ? currentUserId.id : selectedSupervisor.id,
+      supervisor_name: Admin || DivisionManager ? currentUserId.name : selectedSupervisor.name,
+      supervisor_status: Admin || DivisionManager ? 1 : 0,
       admin_status: 0,
       inspector_status: 0,
-      form_status: 0,
-      form_remarks: remarks
+      form_status: DivisionManager ? 4 : Admin ? 5 : 0,
+      form_remarks: remarks,
+      
+      //Notifications
+      sender_avatar: dpname,
+      sender_id: currentUserId.id,
+      sender_name: currentUserId.name,
+      notif_message: notification,
+      receiver_id: Admin || DivisionManager ? gso.gsoID: selectedSupervisor.id,
+      receiver_name: Admin || DivisionManager ? gso.gsoName : selectedSupervisor.name,
+      joms_type: "Request For Pre/Post Inspection Repair",
+      notif_status: 2,
     };
 
     axiosClient
@@ -140,7 +176,10 @@ export default function RepairRequestForm(){
       setPopupMessage(
         <div>
           <p className="popup-title">Submission Complete!</p>
+          {Admin || DivisionManager ? 
+          <p className="popup-message">Form submitted successfully. Waiting for the GSO to fill up the Part B form.</p> : 
           <p className="popup-message">Form submitted successfully. Please wait for the supervisor's approval.</p>
+          }
         </div>
       );
     })
@@ -189,9 +228,9 @@ export default function RepairRequestForm(){
     ):(
       <PageComponent title="Request Form">
         {/* Main Content */}
-        <div className="font-roboto ppa-form-box">
+        <div className="font-roboto ppa-form-box bg-white">
           <div className="ppa-form-header"> Request For Pre/Post Inspection Repair </div>
-          <div style={{ padding: '6px 10px 50px 10px' }}>
+          <div className="p-4">
 
             <form onSubmit={SubmitInspectionForm}>
 
@@ -453,37 +492,39 @@ export default function RepairRequestForm(){
                   </div>
                   
                   {/* Supervisor */}
-                  <div className="flex items-center mt-4">
-                    <div className="w-40">
-                      <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                        Immediate <br /> Supervisor:
-                      </label> 
+                  {Admin || DivisionManager ? null : (
+                    <div className="flex items-center mt-4">
+                      <div className="w-40">
+                        <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                          Immediate <br /> Supervisor:
+                        </label> 
+                      </div>
+                      <div className="w-3/5">
+                        <select 
+                        name="rep_supervisor" 
+                        id="rep_supervisor" 
+                        value={selectedSupervisor.id}
+                        onChange={ev => {
+                          const supervisorId = ev.target.value;
+                          const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
+                          
+                          setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
+                        }}
+                        className="block w-full ppa-form"
+                        >
+                          <option value="" disabled>Select your supervisor</option>
+                          {supervisor?.supervisorData?.map((Data) => (
+                            <option key={Data.id} value={Data.id}>
+                              {Data.name}
+                            </option>
+                          ))}
+                        </select>
+                        {!selectedSupervisor.id && inputErrors.supervisor_id && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="w-3/5">
-                      <select 
-                      name="rep_supervisor" 
-                      id="rep_supervisor" 
-                      value={selectedSupervisor.id}
-                      onChange={ev => {
-                        const supervisorId = ev.target.value;
-                        const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
-                        
-                        setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
-                      }}
-                      className="block w-full ppa-form"
-                      >
-                        <option value="" disabled>Select your supervisor</option>
-                        {supervisor?.supervisorData?.map((Data) => (
-                          <option key={Data.id} value={Data.id}>
-                            {Data.name}
-                          </option>
-                        ))}
-                      </select>
-                      {!selectedSupervisor.id && inputErrors.supervisor_id && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </div>
-                  </div>
+                  )}
 
                 </div>
 

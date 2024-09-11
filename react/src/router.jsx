@@ -31,6 +31,10 @@ import DashboardJOMS from './views/joms/DashboardJOMS';
 import MyRequest from './views/joms/MyRequestList';
 import InspectionRepairFormRequest from './views/joms/InspectionForms/InpectionFormRequest';
 import InspectionRepairForm from './views/joms/InspectionForms/InspectionForm';
+import InspectionFormList from './views/joms/InspectionForms/InspectionFormList';
+import FacilityVenueForm from './views/joms/FacilityForms/FacilityForRequest';
+import FacilityForm from './views/joms/FacilityForms/FacilityForm';
+import FacilityVenueList from './views/joms/FacilityForms/FacilityFormList';
 import AddPersonnel from './views/joms/Personnel/AddPersonnel';
 
 // import Dashboard from './views/Dashboard';
@@ -86,9 +90,15 @@ const routes = [
       { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
       { path: '/joms/dashboard', element: <DashboardJOMS /> },
       { path: '/joms/myrequest', element: <MyRequest /> },
+      // Inspection
+      { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
       { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
-      { path: '/joms/personnel', element:<AddPersonnel /> }
+      // Facility
+      { path: '/joms/facilityvenue/form', element: <FacilityVenueForm /> },
+      { path: '/joms/facilityvenue/form/:id', element: <FacilityForm /> },
+      { path: '/joms/facilityvenue', element: <FacilityVenueList /> },
+      { path: '/joms/personnel', element: <AddPersonnel /> },
     ]
   },
 
@@ -136,6 +146,7 @@ const routes = [
   // --- Other Pages --- //
   { path: '/unauthorize', element: <Unauthorize /> },
   { path: '*', element: <FileNotFound /> },
+  { path: '/404', element: <FileNotFound /> },
 ];
 
 const router = createBrowserRouter(routes);

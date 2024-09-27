@@ -172,12 +172,18 @@ export default function DashboardJLMS(){
           <div style={{ minHeight: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
             <table className="ppa-table w-full">
               <tbody>
-              {announceList?.mappedData?.map((getData)=>(
-                <tr key={getData.id}>
-                  <td className="px-4 py-3 text-left table-font">{getData.details}</td>
-                  <td className="px-4 py-3 text-center align-top w-1/4 table-font">{getData.date_of_request}</td>
+              {announceList?.mappedData.length > 0 ? (
+                announceList?.mappedData?.map((getData)=>(
+                  <tr key={getData.id}>
+                    <td className="px-4 py-3 text-left table-font">{getData.details}</td>
+                    <td className="px-4 py-3 text-center align-top w-1/4 table-font">{getData.date_of_request}</td>
+                  </tr>
+                ))
+              ):(
+                <tr>
+                  <td colSpan={2} className="px-3 py-2 text-center table-font"> No Announcement </td>
                 </tr>
-              ))}
+              )}
               </tbody>
             </table>
           </div>
@@ -230,7 +236,7 @@ export default function DashboardJLMS(){
               PPS
             </div>
 
-            <div className="ppa-system-text">
+            <div className="ppa-system-text px-4">
               Personnel Profiling System
             </div>
 

@@ -101,7 +101,7 @@ export default function UserListJLMS(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("HACK");
+  const Authorize = codes.includes("HACK") || codes.includes("GSO");
 
   return(
     Authorize ? (
@@ -127,23 +127,23 @@ export default function UserListJLMS(){
             {/* Search Filter */}
             <div className="mt-5 mb-4 flex">
 
-            {/* Search */}
-            <div className="flex-grow">
-              <input
-                type="text"
-                placeholder="Search Here"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-96 p-2 border border-gray-300 rounded text-sm"
-              />
-            </div>
-
-            {/* Count */}
-            <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
-              <div className="text-right text-sm/[17px]">
-                Total of {currentUser.length} user's list
+              {/* Search */}
+              <div className="flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search Here"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-96 p-2 border border-gray-300 rounded text-sm"
+                />
               </div>
-            </div>
+
+              {/* Count */}
+              <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
+                <div className="text-right text-sm/[17px]">
+                  Total of {currentUser.length} user's list
+                </div>
+              </div>
 
             </div>
 
@@ -177,7 +177,9 @@ export default function UserListJLMS(){
                 ))
               ):(
                 <tr>
-                  <td colSpan={8} className="px-3 py-2 text-center table-font"> No Logs </td>
+                  <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
+                    No records found.
+                  </td>
                 </tr>
               )}
               </tbody>

@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\FacilityVenueController;
+use App\Http\Controllers\VehicleSlipController;
+use App\Http\Controllers\JOMSDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,12 +26,15 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- Logout --- //
   Route::post('/logout', [AuthController::class, 'logout']);
 
+  // --- Dashboard --- //
+  Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
+
   // --- Team List --- //
   Route::get('/teams', [AnnounceController::class, 'teamList']);
 
   // --- Notification --- //
   Route::put('/read/{id}', [NotificationController::class, 'readNotifications']);
-  Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
+  // Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
 
   // --- Announcement --- //
   Route::post('/addannouncements', [AnnounceController::class, 'storeAnnouncements']);
@@ -82,9 +87,24 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/oprinstruct/{id}', [FacilityVenueController::class, 'submitOPRInstruction']); // Input OPR Instruction
   Route::put('/opraction/{id}', [FacilityVenueController::class, 'submitOPRAction']); // Input OPR Action
   Route::put('/adminfacapproval/{id}', [FacilityVenueController::class, 'adminApproval']); // Admin Approve
+  Route::put('/adminfacdisapproval/{id}', [FacilityVenueController::class, 'adminDisapproval']); 
   Route::get('/showfacvenrequest/{id}', [FacilityVenueController::class, 'showFacilityVenueForm']); // Show Facility / Venue Form Details
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 
+  // --- JOMS Vehicle Slip Request --- //
+  Route::get('/allvehicleslip', [VehicleSlipController::class, 'index']);
+  Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
+  Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
+  Route::put('/admindecline/{id}', [VehicleSlipController::class, 'submitAdminDeclineRequest']);
+  Route::get('/getvehdet', [VehicleSlipController::class, 'getVehicleDetails']);
+  Route::get('/getdriverdet', [VehicleSlipController::class, 'getDriverDetails']);
+  Route::put('/storevehinfo/{id}', [VehicleSlipController::class, 'storeVehicleInformation']);
+  Route::put('/vehreqapprove/{id}', [VehicleSlipController::class, 'approveRequest']);
+  Route::put('/forceclose/{id}', [VehicleSlipController::class, 'forceCloseRequest']);
+  Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
+  Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
+  Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
+  
 });
 
 // --- Login --- //
@@ -94,3 +114,4 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/getlogs', [AnnounceController::class, 'dashboardLogs']);
 
 // --- Test --- //
+Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);

@@ -53,10 +53,12 @@ export default function FacilityForm(){
   const [submitLoading, setSubmitLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [facData, setFacData] = useState([]);
+  const [enableAdminDecline, setEnableAdminDecline] = useState(false)
 
   // Variable
   const [oprInstruct, setOprInstruct] = useState('');
   const [oprAction, setOprAction] = useState('');
+  const [declineReason, setDeclineReason] = useState('');
   const [oprInstructError, setOprInstructError] = useState(false);
   const [oprActionError, setOprActionError] = useState(false);
 
@@ -278,6 +280,69 @@ export default function FacilityForm(){
     });
   }
 
+  // Decline Popup
+  const handleAdminDeclineConfirmation = () => {
+    setShowPopup(true);
+    setPopupContent('admin_decline');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">Do you want to disapprove {facData?.form?.user_name}'s request? It cannot be undone.</p>
+      </div>
+    );
+  }
+
+  // Enable Decline Reason
+  function submitAdminDecline(event){
+    event.preventDefault();
+
+    setSubmitLoading(true);
+
+    const logs = `${currentUserId.name} has disapproved the request on the Facility / Venue Request Form (Control No. ${facData?.form?.id}).`;
+    const notification = `Your request has been disapproved by ${currentUserId.name}. Please click to see the reason`;
+
+    if(!declineReason){
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Invalid</p>
+          <p className="popup-message">Please input the reason of your disapproval</p>
+        </div>
+      );
+      setSubmitLoading(false);
+    }else{
+      axiosClient
+      .put(`/adminfacdisapproval/${facData?.form?.id}`, {
+        remarks: declineReason,
+        logs:logs,
+        // Notification
+        sender_avatar: dpname,
+        sender_id: currentUserId.id,
+        sender_name: currentUserId.name,
+        notif_message: notification
+      })
+      .then(() => {
+        setPopupContent("success");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success!</p>
+            <p className="popup-message">The form has been disapproved</p>
+          </div>
+        );
+        setShowPopup(true);
+      })
+      .catch(() => {
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
+  }
+
   //Close Popup on Error
   function justclose() {
     setShowPopup(false);
@@ -361,21 +426,19 @@ export default function FacilityForm(){
 
         {/* Form Content */}
         <div className="font-roboto ppa-form-box bg-white">
-          <div className="ppa-form-header h-11"></div>
+          {/* <div className="ppa-form-header h-11"></div> */}
+          <div className="ppa-form-header text-base flex justify-between items-center">
+            <span>Control No: <span className="px-2 ppa-form-view">{facData?.form?.id}</span></span>
+
+            {facData?.form?.admin_approval === 3 ? (
+              GSO && (
+                "BTN"
+                // <button onClick={() => handleRemovalConfirmation()} className="py-1.5 px-3 text-base btn-cancel"> Close Form </button>
+              )
+            ):null}
+          </div>
 
           <div className="p-2">
-
-            {/* Control No */}
-            <div className="flex items-center mt-6 mb-10">
-              <div className="w-24">
-                <label className="block text-base font-bold leading-6 text-gray-900">
-                  Control No:
-                </label> 
-              </div>
-              <div className="w-auto px-5 text-center font-bold ppa-form-view">
-                {facData?.form?.id}
-              </div>
-            </div>
 
             {/* Part A */}
             <div>
@@ -450,6 +513,16 @@ export default function FacilityForm(){
                   {facData?.form?.conference ? ("Conference Room"):null}
                   {facData?.form?.dorm ? ("Dormitory"):null}
                   {facData?.form?.other ? ("Other"):null}
+                </div>
+              </div>
+
+              {/* Requestor */}
+              <div className="flex items-center mt-2">
+                <div className="w-40">
+                  <label className="block text-base font-bold leading-6 text-gray-900"> Requestor: </label> 
+                </div>
+                <div className="w-1/2 ppa-form-view"> 
+                  {facData?.form?.user_name}
                 </div>
               </div>
 
@@ -700,7 +773,7 @@ export default function FacilityForm(){
                     Instruction for the OPR for Action:
                     </label> 
                   </div>
-                  {!facData?.form?.obr_instruct && Admin ? (
+                  {(!facData?.form?.obr_instruct && facData?.form?.admin_approval == 1) && Admin ? (
                     <form 
                       id="oprinstruct" 
                       className="mt-2" 
@@ -740,7 +813,7 @@ export default function FacilityForm(){
                     OPR Action:
                     </label> 
                   </div>
-                  {GSO && !facData?.form?.obr_comment ? (
+                  {GSO && (!facData?.form?.obr_comment && facData?.form?.admin_approval == 1) ? (
                     <form 
                     id="opraction" 
                     className="mt-2" 
@@ -788,16 +861,35 @@ export default function FacilityForm(){
             </div>
 
             {/* Remarks */}
-            <div className="w-full ppa-form-remarks mt-2">
-              {facData?.form?.remarks}
-            </div>
+            {enableAdminDecline ? (
+              <div className="mt-3">
+                <form id="adminDecline" onSubmit={submitAdminDecline} action="">
+                  <div className="w-full">
+                    <input
+                      type="text"
+                      name="reason"
+                      id="reason"
+                      value={declineReason}
+                      onChange={ev => setDeclineReason(ev.target.value)}
+                      placeholder="Input your reasons"
+                      className="block w-full ppa-form"
+                    />
+                  </div>
+                </form>
+              </div>
+            ):(
+              <div className="w-full ppa-form-remarks mt-2">
+                {facData?.form?.remarks}
+              </div>
+            )}
+            
 
             {/* Button */}
             {/* For Admin and OPR Instructions */}
             {facData?.form?.admin_approval === 3 && Admin && (
             <>
               {Admin && !facData?.form?.obr_instruct ? (
-                <div className="mt-8">
+                <div className="mt-4">
                   <button 
                     type="submit"
                     form="oprinstruct"
@@ -815,22 +907,36 @@ export default function FacilityForm(){
                   </button>
                 </div>
               ):(
-                <div className="mt-8">
-                  {/* Approve */}
-                  <button
-                    onClick={() => handleApprovalConfirmation()} 
-                    className="py-2 px-4 btn-default"
-                  >
-                    Approve
-                  </button>
+                <div className="mt-4">
+                  {/* For Decline */}
+                  {enableAdminDecline ? (
+                  <>
+                    {/* Confirmation */}
+                    <button onClick={() => handleAdminDeclineConfirmation()} className="py-2 px-4 btn-default">
+                      Submit
+                    </button>
+                    {/* Cancel */}
+                    <button onClick={() => { setEnableAdminDecline(false); setDeclineReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
+                      Cancel
+                    </button>
+                  </>
+                  ):(
+                  <>
+                    {/* Approve */}
+                      <button onClick={() => handleApprovalConfirmation()} 
+                      className="py-2 px-4 btn-default"
+                    >
+                      Approve
+                    </button>
 
-                  {/* Decline */}
-                  <button
-                    // onClick={() => setEnableSupDecline(true)} 
-                    className="ml-2 py-2 px-4 btn-cancel"
-                  >
-                    Decline
-                  </button>
+                    {/* Decline */}
+                    <button onClick={() => setEnableAdminDecline(true)} 
+                      className="ml-2 py-2 px-4 btn-cancel"
+                    >
+                      Decline
+                    </button>
+                  </>
+                  )}
                 </div>
               )}
             </>
@@ -838,7 +944,7 @@ export default function FacilityForm(){
 
             {/* For GSO  */}
             {facData?.form?.admin_approval === 1 && GSO && !facData?.form?.obr_comment && (
-              <div className="mt-8">
+              <div className="mt-4">
               <button 
                 type="submit"
                 form="opraction"
@@ -859,7 +965,7 @@ export default function FacilityForm(){
 
             {/* Generate PDF */}
             {GSO && facData?.form?.admin_approval === 1 && facData?.form?.obr_comment && (
-              <div className="mt-8">
+              <div className="mt-4">
                 <button type="button" onClick={handleButtonClick}
                   className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
                   disabled={submitLoading}
@@ -1451,7 +1557,7 @@ export default function FacilityForm(){
                   </div>
                 )}
                 {/* Warning */}
-                {popupContent == "warning" && (
+                {(popupContent == "warning" || popupContent == "admin_decline") && (
                   <div class="f-modal-icon f-modal-warning scaleWarning">
                     <span class="f-modal-body pulseWarningIns"></span>
                     <span class="f-modal-dot pulseWarningIns"></span>
@@ -1469,6 +1575,34 @@ export default function FacilityForm(){
                   <button 
                     type="submit"
                     onClick={() => handlelAdminApproval(facData?.form?.id)}
+                    className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Loading</span>
+                      </div>
+                    ):(
+                      'Confirm'
+                    )}
+                  </button>
+
+                  {/* Cancel */}
+                  {!submitLoading && (
+                    <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
+                      Close
+                    </button>
+                  )}
+                </>
+                )}
+
+                {(popupContent == "admin_decline") && (
+                <>
+                  {/* Submit */}
+                  <button 
+                    type="submit"
+                    form="adminDecline"
                     className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
                     disabled={submitLoading}
                   >

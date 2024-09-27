@@ -56,6 +56,7 @@ export default function JLMSLayout() {
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");
+  const GSOOnly = codes.includes("GSO");
   const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK");
 
   return (
@@ -112,19 +113,19 @@ export default function JLMSLayout() {
             </li>
 
             {/* Report Issue */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+            {/* <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <Link className="flex items-center">
                   <FontAwesomeIcon icon={faFlag} />
                   {!isSidebarMinimized && <p className="ml-5 text-lg">Report Issue</p>}
                 </Link>
               </div>
-            </li>
+            </li> */}
 
             {/* Employee Details */}
-            {SuperAdmin && (
+            {(SuperAdmin || GSOOnly || Authorize) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
-                <FontAwesomeIcon icon={faUserPlus} />
+                <FontAwesomeIcon icon={faUserPlus} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`}/>
                 {!isSidebarMinimized && 
                   <>
                     <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
@@ -141,9 +142,11 @@ export default function JLMSLayout() {
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/userlist">All Employee Lists</Link>
                       </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/addemployee">Add Employee Data</Link>
-                      </li>
+                      {SuperAdmin && (
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/addemployee">Add Employee Data</Link>
+                        </li>
+                      )}
                     </ul>
                   </section>
                 )}
@@ -154,7 +157,7 @@ export default function JLMSLayout() {
             {/* Announcements */}
             {Authorize && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
-                <FontAwesomeIcon icon={faScroll} />
+                <FontAwesomeIcon icon={faScroll} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
                   <>
                     <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)} />
@@ -186,19 +189,19 @@ export default function JLMSLayout() {
           {/* Logout Area */}
           <ul className="logout-position">
             {/* Logout */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-3 mt-3">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 mt-3`}>
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <FontAwesomeIcon icon={faSignOutAlt} />
                 {!isSidebarMinimized && <a onClick={logout} className="text-base  ml-4 leading-4 text-lg">Logout</a>}
               </div>
             </li>
             {/* Account */}
-            <li className="flex w-full justify-between text-white cursor-pointer items-center pb-3">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 ${isSidebarMinimized ? 'mt-5':'mt-3'}`}>
               <div className="flex items-center">
               <img src={currentUserId?.avatar} className="ppa-display-picture" alt="" />
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
-                  {currentUserId?.name} 
+                  <Link to="/user">{currentUserId?.name}</Link>
                 </p> 
               : null }  
               </div>

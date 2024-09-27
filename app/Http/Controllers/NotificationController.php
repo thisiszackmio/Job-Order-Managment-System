@@ -66,6 +66,19 @@ class NotificationController extends Controller
 
     }
 
+    public function updateOldNotifications() {
+        // Calculate the date 6 days ago
+        $sixDaysAgo = Carbon::now()->subDays(6);
+    
+        // Find notifications that are older than 6 days and have status 2
+        $updatedCount = NotificationModel::where('created_at', '<', $sixDaysAgo)
+                                        ->where('status', 2)
+                                        ->update(['status' => 1]);
+    
+        // Return a response indicating how many records were updated
+        return response()->json(['message' => "$updatedCount old notifications updated successfully."], 200);
+    }
+
     public function deleteOldNotifications() {
         // Calculate the date 6 months ago
         $sixMonthsAgo = Carbon::now()->subMonths(6);

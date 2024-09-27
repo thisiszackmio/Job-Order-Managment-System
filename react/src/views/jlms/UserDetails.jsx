@@ -449,7 +449,8 @@ export default function UserDetailsJLMS(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("HACK");
+  const Authorize = codes.includes("HACK") || codes.includes("GSO") || codes.includes("AM") || codes.includes("PM") || codes.includes("DM");
+  const SuperAdmin = codes.includes("HACK");
 
   return(
     Authorize ? (
@@ -480,7 +481,7 @@ export default function UserDetailsJLMS(){
                 <Link to="/userlist">Back to User List</Link>
               </button>
 
-              {userDet?.status == 1 ? (
+              {(userDet?.status == 1 && SuperAdmin) ? (
               <>
                 {/* Update Details */}
                 <button 
@@ -531,12 +532,14 @@ export default function UserDetailsJLMS(){
                 </button>
 
                 {/* Delete Account User */}
-                <button
-                  onClick={() => handleDeleteConfirmation()} 
-                  className="ml-2 py-2 px-4 btn-cancel"
-                >
-                  Delete User
-                </button>
+                {userDet.id === 1 ? null : (
+                  <button
+                    onClick={() => handleDeleteConfirmation()} 
+                    className="ml-2 py-2 px-4 btn-cancel"
+                  >
+                    Delete User
+                  </button>
+                )}
               </>
               ):null}
 
@@ -961,11 +964,11 @@ export default function UserDetailsJLMS(){
                 <div className="col-span-1 flex flex-col items-center">
                   {/* Avatar */}
                   <div>
-                    <img src={userDet.avatar} className="user-image" alt="" />
+                    <img src={userDet.avatar} onContextMenu={(e) => e.preventDefault()} draggable="false" className="user-image" alt="" />
                   </div>
                   {/* Esig */}
                   <div className="esig-area flex flex-col items-center border-b border-black relative">
-                    <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" />
+                    <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" onContextMenu={(e) => e.preventDefault()} draggable="false" />
                     <span className="text-base font-bold ppa-user-name">{userDet.name}</span>
                   </div>
                 </div>

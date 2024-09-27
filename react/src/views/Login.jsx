@@ -12,6 +12,8 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const [inputErrors, setInputErrors] = useState('');
+
   // Submit the login
   const onSubmit = (ev) => {
     ev.preventDefault();
@@ -29,6 +31,9 @@ export default function Login() {
       setUserCode(response.data.code);
       window.location.href = '/';
 
+    })
+    .catch((error)=>{
+      setInputErrors(error.response.data.error);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -51,6 +56,12 @@ export default function Login() {
               <div>Joint Local</div>
               <div>Management System</div>
             </div>
+
+            {inputErrors && (
+              <div className="login-error">
+                {inputErrors}
+              </div>
+            )}
 
           </div>
 

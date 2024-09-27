@@ -5,6 +5,7 @@ import GuestLayout from './components/GuestLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorize from './components/403';
 import FileNotFound from './components/404';
+import ViewUser from './views/jlms/ViewUser';
 import Login from './views/Login';
 import Logout from './views/Logout';
 
@@ -29,13 +30,20 @@ import AMSLayout from './components/AMSLayout';
 import JOMSLayout from './components/JOMSLayout';
 import DashboardJOMS from './views/joms/DashboardJOMS';
 import MyRequest from './views/joms/MyRequestList';
+import AddPersonnel from './views/joms/Personnel/AddPersonnel';
+import AddVehicleType from './views/joms/VehicleSlip/VehicleType';
+import VehicleSlipFormRequest from './views/joms/VehicleSlip/VehicleSlipRequest';
+import VehicleSlipForm from './views/joms/VehicleSlip/VehicleSlip'; 
+import VehicleSlipList from './views/joms/VehicleSlip/VehicleSlipList';
 import InspectionRepairFormRequest from './views/joms/InspectionForms/InpectionFormRequest';
 import InspectionRepairForm from './views/joms/InspectionForms/InspectionForm';
 import InspectionFormList from './views/joms/InspectionForms/InspectionFormList';
-import FacilityVenueForm from './views/joms/FacilityForms/FacilityForRequest';
-import FacilityForm from './views/joms/FacilityForms/FacilityForm';
+import FacilityVenueFormRequest from './views/joms/FacilityForms/FacilityForRequest';
+import FacilityVenueForm from './views/joms/FacilityForms/FacilityForm';
 import FacilityVenueList from './views/joms/FacilityForms/FacilityFormList';
-import AddPersonnel from './views/joms/Personnel/AddPersonnel';
+
+
+
 
 // import Dashboard from './views/Dashboard';
 
@@ -78,7 +86,8 @@ const routes = [
       { path: '/allannouncement', element: <AllAnnouncements /> },
       { path: '/addemployee', element: <UserRegistrationJLMS /> },
       { path: '/userlist', element: <UserListJLMS /> },
-      { path: '/userdetails/:id', element: <UserDetailsJLMS /> }
+      { path: '/userdetails/:id', element: <UserDetailsJLMS /> },
+      { path: '/user', element: <ViewUser /> }
     ]
   },
 
@@ -90,15 +99,20 @@ const routes = [
       { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
       { path: '/joms/dashboard', element: <DashboardJOMS /> },
       { path: '/joms/myrequest', element: <MyRequest /> },
+      { path: '/joms/personnel', element: <AddPersonnel /> },
+      { path: '/joms/vehicletype', element: <AddVehicleType /> },
       // Inspection
       { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
       { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
       // Facility
-      { path: '/joms/facilityvenue/form', element: <FacilityVenueForm /> },
-      { path: '/joms/facilityvenue/form/:id', element: <FacilityForm /> },
+      { path: '/joms/facilityvenue/form', element: <FacilityVenueFormRequest /> },
+      { path: '/joms/facilityvenue/form/:id', element: <FacilityVenueForm /> },
       { path: '/joms/facilityvenue', element: <FacilityVenueList /> },
-      { path: '/joms/personnel', element: <AddPersonnel /> },
+      // Vehicle
+      { path: '/joms/vehicle/form', element: <VehicleSlipFormRequest /> },
+      { path: '/joms/vehicle/form/:id', element: <VehicleSlipForm /> },
+      { path: '/joms/vehicle', element: <VehicleSlipList /> },
     ]
   },
 

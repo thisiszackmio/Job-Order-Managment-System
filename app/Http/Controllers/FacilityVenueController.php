@@ -130,25 +130,46 @@ class FacilityVenueController extends Controller
         $getAdmin = 'AM';
         $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAdmin}%")->first();
 
-        $noti = new NotificationModel();
-        $noti->type_of_jlms = "JOMS";
-        $noti->sender_avatar = $request->input('sender_avatar');
-        $noti->sender_id = $request->input('sender_id');
-        $noti->sender_name = $request->input('sender_name');
-        $noti->message = $request->input('sender_name') . ' has submitted a request and is waiting for your approval.';
-        $noti->receiver_id = $dataAM->id;
-        $noti->receiver_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-        $noti->joms_type = $request->input('joms_type');
-        $noti->status = $request->input('notif_status');
-        $noti->joms_id = $deploymentData->id; 
-        $noti->save();
+        // Get GSO
+        $getGSO = 'GSO';
+        $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
+
+        if($dataAM->id === $deploymentData->user_id){
+            // Send to the Admin
+            $noti = new NotificationModel();
+            $noti->type_of_jlms = "JOMS";
+            $noti->sender_avatar = $request->input('sender_avatar');
+            $noti->sender_id = $request->input('sender_id');
+            $noti->sender_name = $request->input('sender_name');
+            $noti->message = $request->input('sender_name') . ' has submitted a request.';
+            $noti->receiver_id = $dataGSO->id;
+            $noti->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+            $noti->joms_type = 'JOMS_Facility';
+            $noti->status = 2;
+            $noti->joms_id = $deploymentData->id; 
+            $noti->save();
+        }else{
+            // Send to the Admin
+            $noti = new NotificationModel();
+            $noti->type_of_jlms = "JOMS";
+            $noti->sender_avatar = $request->input('sender_avatar');
+            $noti->sender_id = $request->input('sender_id');
+            $noti->sender_name = $request->input('sender_name');
+            $noti->message = $request->input('sender_name') . ' has submitted a request and is waiting for your approval.';
+            $noti->receiver_id = $dataAM->id;
+            $noti->receiver_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
+            $noti->joms_type = 'JOMS_Facility';
+            $noti->status = 2;
+            $noti->joms_id = $deploymentData->id; 
+            $noti->save();
+        }
 
         // Save the notification and create logs if successful
         if ($noti->save()) {
             // Create logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $data['user_name'] . ' has submitted the request for Facility / Venue Request Form. (Control No. '.$deploymentData->id.')';
+            $logs->message = $data['user_name']. ' has submitted the request for Facility/Venue Request Form (Control No. '.$deploymentData->id.')';
             $logs->save();
         } else {
             return response()->json(['error' => 'Failed to save notification'], 500);
@@ -221,7 +242,7 @@ class FacilityVenueController extends Controller
             // Create logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname . ' has entered the OPR instruction on the Facility/Venue Request Form. (Control No. '.$facilityRequest->id.')';
+            $logs->message = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname . ' has entered the OPR instruction on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').  ';
             $logs->save();
 
             return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
@@ -255,7 +276,7 @@ class FacilityVenueController extends Controller
             // Create logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form. (Control No. '.$facilityRequest->id.')';
+            $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.')';
             $logs->save();
 
             return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
@@ -283,26 +304,19 @@ class FacilityVenueController extends Controller
             // Check if the Requestor is a GSO to avoid double notifications
             if($facilityRequest->user_id === $dataGSO->id){
                 
+                // Send to the GSO
                 $noti1 = new NotificationModel();
                 $noti1->type_of_jlms = "JOMS";
                 $noti1->sender_avatar = $request->input('sender_avatar');
                 $noti1->sender_id = $request->input('sender_id');
                 $noti1->sender_name = $request->input('sender_name');
-                $noti1->message = 'Your request has been approved by the Admin Manager (Control No. '.$facilityRequest->id.')';
+                $noti1->message = 'Your request has been approved by the Admin Manager.';
                 $noti1->receiver_id = $dataGSO->id;
                 $noti1->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $noti1->joms_type = 'Facility / Venue Request Form';
+                $noti1->joms_type = 'JOMS_Facility';
                 $noti1->status = 2;
                 $noti1->joms_id = $facilityRequest->id;
-
-                if($noti1->save()){
-                    $logs = new LogsModel();
-                    $logs->category = 'JOMS';
-                    $logs->message = $request->input('sender_name') . ' has approved the request on the Facility/Venue Request Form. (Control No. '.$facilityRequest->id.')';
-                    $logs->save();
-                
-                    return response()->json(['message' => 'Approve'], 200);
-                }
+                $noti1->save();
 
             } else {
 
@@ -312,12 +326,13 @@ class FacilityVenueController extends Controller
                 $noti->sender_avatar = $request->input('sender_avatar');
                 $noti->sender_id = $request->input('sender_id');
                 $noti->sender_name = $request->input('sender_name');
-                $noti->message = 'Your request has been approved by the Admin Manager (Control No. '.$facilityRequest->id.')';
+                $noti->message = 'Your request has been approved by the Admin Manager';
                 $noti->receiver_id = $facilityRequest->user_id;
                 $noti->receiver_name = $facilityRequest->user_name;
-                $noti->joms_type = 'Facility / Venue Request Form';
+                $noti->joms_type = 'JOMS_Facility';
                 $noti->status = 2;
                 $noti->joms_id = $facilityRequest->id;
+                $noti->save();
                 
                 // Send to the GSO
                 $noti2 = new NotificationModel();
@@ -325,27 +340,103 @@ class FacilityVenueController extends Controller
                 $noti2->sender_avatar = $request->input('sender_avatar');
                 $noti2->sender_id = $request->input('sender_id');
                 $noti2->sender_name = $request->input('sender_name');
-                $noti2->message = 'This request has been approved by the Admin Manager (Control No. '.$facilityRequest->id.')';
+                $noti2->message = 'This request has been approved by the Admin Manager';
                 $noti2->receiver_id = $dataGSO->id;
                 $noti2->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $noti2->joms_type = 'Facility / Venue Request Form';
+                $noti2->joms_type = 'JOMS_Facility';
                 $noti2->status = 2;
                 $noti2->joms_id = $facilityRequest->id;
-
-                if($noti->save() && $noti2->save()){
-                    $logs = new LogsModel();
-                    $logs->category = 'JOMS';
-                    $logs->message = $request->input('sender_name') . ' has approved the request on the Facility/Venue Request Form. (Control No. '.$facilityRequest->id.')';
-                    $logs->save();
-                
-                    return response()->json(['message' => 'Approve'], 200);
-                }
+                $noti2->save();  
 
             }
+
+            $logs = new LogsModel();
+            $logs->category = 'JOMS';
+            $logs->message = $request->input('sender_name') . ' has approved the request on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').';
+            $logs->save();
+        
+            return response()->json(['message' => 'Approve'], 200);
             
         }else{
             return response()->json(['message' => 'There is something wrong.'], 500);
         }
     }
-    
+
+    /**
+     *  Admin Disapproval
+     */
+    public function adminDisapproval(Request $request, $id){
+        $facilityRequest = FacilityVenueModel::find($id);
+
+        $facilityRequest->admin_approval = 2;
+        $facilityRequest->date_approve = today();
+        $facilityRequest->remarks = "Disapproved (Reason: ".$request->input('remarks'). ")";
+        
+        if($facilityRequest->save()){
+
+            // Get Admin Manager
+            $getGSO = 'GSO';
+            $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
+
+            // Check if the Requestor is a GSO to avoid double notifications
+            if($facilityRequest->user_id === $dataGSO->id){
+                
+                // Send to the GSO
+                $noti1 = new NotificationModel();
+                $noti1->type_of_jlms = "JOMS";
+                $noti1->sender_avatar = $request->input('sender_avatar');
+                $noti1->sender_id = $request->input('sender_id');
+                $noti1->sender_name = $request->input('sender_name');
+                $noti1->message = 'Your request has been disapproved by the Admin Manager.';
+                $noti1->receiver_id = $dataGSO->id;
+                $noti1->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+                $noti1->joms_type = 'JOMS_Facility';
+                $noti1->status = 2;
+                $noti1->joms_id = $facilityRequest->id;
+                $noti1->save();
+
+            } else {
+
+                // Send to the Requestor
+                $noti = new NotificationModel();
+                $noti->type_of_jlms = "JOMS";
+                $noti->sender_avatar = $request->input('sender_avatar');
+                $noti->sender_id = $request->input('sender_id');
+                $noti->sender_name = $request->input('sender_name');
+                $noti->message = 'Your request has been disapproved by the Admin Manager';
+                $noti->receiver_id = $facilityRequest->user_id;
+                $noti->receiver_name = $facilityRequest->user_name;
+                $noti->joms_type = 'JOMS_Facility';
+                $noti->status = 2;
+                $noti->joms_id = $facilityRequest->id;
+                $noti->save();
+                
+                // Send to the GSO
+                $noti2 = new NotificationModel();
+                $noti2->type_of_jlms = "JOMS";
+                $noti2->sender_avatar = $request->input('sender_avatar');
+                $noti2->sender_id = $request->input('sender_id');
+                $noti2->sender_name = $request->input('sender_name');
+                $noti2->message = 'This request has been disapproved by the Admin Manager';
+                $noti2->receiver_id = $dataGSO->id;
+                $noti2->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+                $noti2->joms_type = 'JOMS_Facility';
+                $noti2->status = 2;
+                $noti2->joms_id = $facilityRequest->id;
+                $noti2->save();  
+
+            }
+
+            $logs = new LogsModel();
+            $logs->category = 'JOMS';
+            $logs->message = $request->input('logs');
+            $logs->save();
+        
+            return response()->json(['message' => 'Approve'], 200);
+            
+        }else{
+            return response()->json(['message' => 'There is something wrong.'], 500);
+        }
+    }
+
 }

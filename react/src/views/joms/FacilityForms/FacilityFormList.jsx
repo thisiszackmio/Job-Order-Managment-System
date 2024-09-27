@@ -199,7 +199,9 @@ export default function FacilityVenueFormList(){
                 ))
               ):(
                 <tr>
-                  <td colSpan={8} className="px-3 py-2 text-center table-font"> No Data </td>
+                  <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
+                    No records found.
+                  </td>
                 </tr>
               )
             )}

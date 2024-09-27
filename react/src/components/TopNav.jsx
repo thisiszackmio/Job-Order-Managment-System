@@ -1,11 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom';
 import axiosClient from '../axios';
-import loading_table from "/public/load_hehe.gif"
+import loading_table from "/public/load_hehe.gif";
+import VehicleSlip from "/public/Vehicle_Slip.png";
 import repair from "/public/mechanic.png"
-import facilityicon from "/public/request.png"
+import facilityicon from "/public/schedule.png"
+
 import { useUserStateContext } from '../context/ContextProvider';
 
 const TopNav = () =>{
@@ -73,11 +74,15 @@ const TopNav = () =>{
     axiosClient
       .put(`/read/${id}`)
       .then(() => {
-        if (type === 'Request For Pre/Post Inspection Repair') {
+        if (type === 'JOMS_Inspection') {
           window.location.href = `/joms/inspection/form/${redirect_id}`;
         }
-        
-        if (type === 'Facility / Venue Request Form') {
+      
+        if (type === 'JOMS_Vehicle') {
+          window.location.href = `/joms/vehicle/form/${redirect_id}`;
+        }
+
+        if (type === 'JOMS_Facility') {
           window.location.href = `/joms/facilityvenue/form/${redirect_id}`;
         }
       })
@@ -104,9 +109,11 @@ const TopNav = () =>{
                 <BellIcon className="h-7 w-7" aria-hidden="true" />
               </Menu.Button>
 
-              {count.count ? 
-                <span className="notifications">{count.count}</span> : 
-              null}
+              {count.count ? (
+                <span className="notifications">
+                    {count.count > 9 ? '9+' : count.count}
+                </span>
+              ) : null}
 
             </div>
 
@@ -121,7 +128,7 @@ const TopNav = () =>{
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute font-arial right-0 z-10 mt-2 w-[450px] max-h-[445px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute font-arial right-0 z-10 mt-2 w-[500px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <p className="text-xs font-bold text-center leading-7 text-red-500 ml-2">Notifications</p>
 
                   {loadingNotifications ? (
@@ -135,24 +142,31 @@ const TopNav = () =>{
                     <>
                       {/* Display "New" title only once */}
                       {notifications.some((NofiData) => NofiData.status === 2) && (
-                        <p className="text-base font-bold text-left leading-7 p-4">Unread</p>
+                        <p className="text-base font-bold text-left px-4">Unread</p>
                       )}
 
-                      {notifications.map((NofiData, index) => (
+                      {notifications.map((NofiData) => (
                         <div key={NofiData.id} className="notification-item">
                           {NofiData.status === 2 && (
                             <a onClick={() => OpenLink(NofiData.id, NofiData.joms_id, NofiData.joms_type)} className="noti-link">
-                              <div className="flex notification-container p-4">
+                              <div className="flex notification-container p-3">
+                                {/* Icon */}
                                 <div className="w-32 items-center relative">
-                                  <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
-                                  <img src={
-                                    NofiData.joms_type == "Request For Pre/Post Inspection Repair" ? repair : 
-                                    NofiData.joms_type == "Facility / Venue Request Form" ? facilityicon :
-                                    null 
-                                    } className="notification_icon" alt={`${NofiData.sender_name}'s avatar`} /> 
+                                 <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
+                                 <img src={
+                                  NofiData.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                  NofiData.joms_type == "JOMS_Inspection" ? repair : 
+                                  NofiData.joms_type == "JOMS_Facility" ? facilityicon : 
+                                  null
+                                  } className="notification_icon" alt={`${NofiData.sender_name}'s avatar`} /> 
                                 </div>
+                                {/* Message */}
                                 <div className="w-full">
-                                  <h4 className="noti-type">{NofiData.joms_type}</h4>
+                                  <h4 className="noti-type">
+                                    {NofiData.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData.joms_id})`}
+                                    {NofiData.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData.joms_id})`}
+                                    {NofiData.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData.joms_id})`}
+                                  </h4>
                                   <h3 className="noti-message">{NofiData.message}</h3>
                                   <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData.date_request)}</h4>
                                 </div>
@@ -164,24 +178,31 @@ const TopNav = () =>{
 
                       {/* Display "Recent" title only once */}
                       {notifications.some((NofiData) => NofiData.status === 1) && (
-                        <p className="text-base font-bold text-left leading-7 p-4">Recent</p>
+                        <p className="text-base font-bold text-left px-4">Recent</p>
                       )}
 
-                      {notifications.map((NofiData, index) => (
+                      {notifications.map((NofiData) => (
                         <div key={NofiData.id} className="notification-item">
                           {NofiData.status === 1 && (
-                            <a onClick={() => window.location.href = `/joms/inspection/form/${NofiData.joms_id}`}className="noti-link">
-                              <div className="flex notification-container p-4">
+                            <a onClick={() => OpenLink(NofiData.id, NofiData.joms_id, NofiData.joms_type)} className="noti-link">
+                              <div className="flex notification-container p-3">
+                                {/* Icon */}
                                 <div className="w-32 items-center relative">
-                                  <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
-                                  <img src={
-                                    NofiData.joms_type == "Request For Pre/Post Inspection Repair" ? repair : 
-                                    NofiData.joms_type == "Facility / Venue Request Form" ? facilityicon :
-                                    null
+                                <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
+                                <img src={
+                                  NofiData.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                  NofiData.joms_type == "JOMS_Inspection" ? repair : 
+                                  NofiData.joms_type == "JOMS_Facility" ? facilityicon : 
+                                  null
                                   } className="notification_icon" alt={`${NofiData.sender_name}'s avatar`} /> 
                                 </div>
+                                {/* Message */}
                                 <div className="w-full">
-                                  <h4 className="noti-type">{NofiData.joms_type}</h4>
+                                  <h4 className="noti-type">
+                                    {NofiData.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request: (Vehicle Slip No ${NofiData.joms_id})`}
+                                    {NofiData.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData.joms_id})`}
+                                    {NofiData.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData.joms_id})`}
+                                  </h4>
                                   <h3 className="noti-message">{NofiData.message}</h3>
                                   <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData.date_request)}</h4>
                                 </div>
@@ -194,7 +215,7 @@ const TopNav = () =>{
                     </>
                     ):(
                     <>
-                      <p className="text-base font-bold text-center leading-7">No Notifications</p>
+                      <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
                     </>
                     )}
                     </div>

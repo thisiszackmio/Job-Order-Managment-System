@@ -218,98 +218,106 @@ export default function AllAnnouncements(){
           </div>
         ):(
         <>
-        {/* Main Content */}
-        <div className="font-roboto ppa-form-box">
-          <div className="ppa-form-header"> Announcement List </div>
-          <div style={{ padding: '6px 10px 50px 10px' }}>
-            {/* Table */}
-            <table className="ppa-table w-full mb-10 mt-2">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Date</th>
-                  <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">Message</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-                </tr>
-              </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {announceList?.mappedData?.map((getData)=>(
-                  <tr key={getData.id}>
-                    <td className="px-4 py-3 text-center align-top w-1/4 table-font">{getData.date_of_request}</td>
-                    <td className="px-4 py-3 text-left table-font">
-                      {editingId === getData.id ? (
-                      <>
-                        <textarea
-                          className="w-full ppa-form"
-                          style={{ resize: "none" }}
-                          type="text"
-                          rows={5}
-                          value={editedDetails}
-                          onChange={handleChange}
-                          maxLength={maxCharacters}
-                        />
-                        <p className="text-sm text-gray-500"> {maxCharacters - editedDetails.length} characters remaining </p>
-                      </>
-                      ):(
-                        getData.details
-                      )}
-                    </td>
-                    <td className="w-1/4">
-                      <div className="flex justify-center">
-                        {editingId === getData.id ? (
-                        <>
-                          {/* Submit */}
-                          <button 
-                            type="submit"
-                            onClick={() => handleSaveClick(event, getData.id)}
-                            className={`ml-2 py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
-                            disabled={submitLoading}
-                          >
-                            {submitLoading ? (
-                              <div className="flex">
-                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-2">Loading</span>
-                              </div>
-                            ):(
-                              'Submit'
-                            )}
-                          </button>
-                          {/* Cancel */}
-                          <button
-                            className="px-3 py-2 btn-cancel ml-2"
-                            onClick={handleCancelClick}
-                          >
-                            Cancel
-                          </button>
-                        </>
-                        ):(
-                        <>
-                          {/* Edit Button */}
-                          <button 
-                            className="px-3 py-2 btn-default mr-2"
-                            onClick={() => handleEditClick(getData.id, getData.details)}
-                          >
-                            Edit
-                          </button>
-                          {/* Cancel Button */}
-                          <button 
-                            className="px-3 py-2 btn-cancel"
-                            onClick={() => handleDeleteConfirmation(getData.id)}
-                          >
-                            Delete
-                          </button>
-                        </>
-                        )}
-                      </div>
-                    </td>
+          {/* Main Content */}
+          <div className="font-roboto ppa-form-box">
+            <div className="ppa-form-header"> Announcement List </div>
+            <div style={{ padding: '6px 10px 10px 10px' }}>
+              {/* Table */}
+              <table className="ppa-table w-full mb-10 mt-2">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Date</th>
+                    <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">Message</th>
+                    <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody style={{ backgroundColor: '#fff' }}>
+                  {announceList?.mappedData?.length > 0 ? (
+                    announceList?.mappedData?.map((getData)=>(
+                      <tr key={getData.id}>
+                        <td className="px-4 py-3 text-center align-top w-1/4 table-font">{getData.date_of_request}</td>
+                        <td className="px-4 py-3 text-left table-font">
+                          {editingId === getData.id ? (
+                          <>
+                            <textarea
+                              className="w-full ppa-form"
+                              style={{ resize: "none" }}
+                              type="text"
+                              rows={5}
+                              value={editedDetails}
+                              onChange={handleChange}
+                              maxLength={maxCharacters}
+                            />
+                            <p className="text-sm text-gray-500"> {maxCharacters - editedDetails.length} characters remaining </p>
+                          </>
+                          ):(
+                            getData.details
+                          )}
+                        </td>
+                        <td className="w-1/4">
+                          <div className="flex justify-center">
+                            {editingId === getData.id ? (
+                            <>
+                              {/* Submit */}
+                              <button 
+                                type="submit"
+                                onClick={() => handleSaveClick(event, getData.id)}
+                                className={`ml-2 py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-2">Loading</span>
+                                  </div>
+                                ):(
+                                  'Submit'
+                                )}
+                              </button>
+                              {/* Cancel */}
+                              <button
+                                className="px-3 py-2 btn-cancel ml-2"
+                                onClick={handleCancelClick}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                            ):(
+                            <>
+                              {/* Edit Button */}
+                              <button 
+                                className="px-3 py-2 btn-default mr-2"
+                                onClick={() => handleEditClick(getData.id, getData.details)}
+                              >
+                                Edit
+                              </button>
+                              {/* Cancel Button */}
+                              <button 
+                                className="px-3 py-2 btn-cancel"
+                                onClick={() => handleDeleteConfirmation(getData.id)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={3} className="px-2 py-2 text-center text-sm text-gray-600">
+                        No records found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
         </>
         )}
-
+        
         {/* Popup */}
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50">

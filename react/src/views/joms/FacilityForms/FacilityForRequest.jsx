@@ -332,7 +332,7 @@ export default function FacilityVenueForm(){
   const Admin = codes.includes("AM");
 
   // Submit the form
-  const SubmitFacilityForm = (event) => {
+  function SubmitFacilityForm(event){
     event.preventDefault();
 
     setSubmitLoading(true);
@@ -378,8 +378,6 @@ export default function FacilityVenueForm(){
       sender_avatar: dpname,
       sender_id: currentUserId.id,
       sender_name: currentUserId.name,
-      joms_type: "Facility / Venue Request Form",
-      notif_status: 2,
     };
 
     if(enableFacility){
@@ -472,7 +470,20 @@ export default function FacilityVenueForm(){
     window.location.href = '/joms/myrequest';
   }
 
-  return(
+  return loading ? (
+    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
+      <img
+        className="mx-auto h-44 w-auto"
+        src={loadingAnimation}
+        alt="Your Company"
+      />
+      <span className="loading-text loading-animation">
+      {Array.from("Loading...").map((char, index) => (
+        <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
+      ))}
+      </span>
+    </div>
+  ):(
     <PageComponent title="Request Form">
 
       {/* Form Content */}
@@ -507,7 +518,7 @@ export default function FacilityVenueForm(){
                       type="date"
                       name="rep_date"
                       id="rep_date"
-                      defaultValue= {today}
+                      defaultValue={today}
                       className="block w-full ppa-form"
                       readOnly
                     />
@@ -529,7 +540,7 @@ export default function FacilityVenueForm(){
                       autoComplete="rf_request"
                       value={reqOffice}
                       onChange={ev => setRegOffice(ev.target.value)}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!reqOffice && fieldMissing.request_office && (
@@ -553,7 +564,7 @@ export default function FacilityVenueForm(){
                       autoComplete="rep_title"
                       value={titleReq}
                       onChange={ev => setTitleReq(ev.target.value)}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!titleReq && fieldMissing.title_of_activity && (
@@ -580,7 +591,7 @@ export default function FacilityVenueForm(){
                         setDateEndMin(ev.target.value);
                       }}
                       min={today}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!DateStart && fieldMissing.date_start && (
@@ -603,7 +614,7 @@ export default function FacilityVenueForm(){
                       id="time_start"
                       value={timeStart}
                       onChange={ev => setTimeStart(ev.target.value)}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!timeStart && fieldMissing.time_start && (
@@ -633,7 +644,7 @@ export default function FacilityVenueForm(){
                         }
                       }}
                       min={DateEndMin}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!DateEnd && fieldMissing.date_end && (
@@ -656,7 +667,7 @@ export default function FacilityVenueForm(){
                       id="time_end"
                       value={timeEnd}
                       onChange={ev => setTimeEnd(ev.target.value)}
-                      className={`block w-full ppa-form ${disableForm ? '' : 'disable-ppa-form'}`}
+                      className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
                       readOnly={disableForm}
                     />
                     {!timeEnd && fieldMissing.time_end && (
@@ -1274,7 +1285,6 @@ export default function FacilityVenueForm(){
                 </div>
               </div>
             )}
-
 
           </form>
 

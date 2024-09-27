@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\PPAEmployee;
 use App\Models\InspectionModel;
 use App\Models\FacilityVenueModel;
+use App\Models\VehicleSlipModel;
 use App\Models\LogsModel;
 use App\Models\AssignPersonnelModel;
+use App\Models\NotificationModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -227,6 +229,10 @@ class UserController extends Controller
             // Update the user's avatar field in the database
             $getUser->update(['avatar' => $avatarName]);
 
+            // Update Notification
+            NotificationModel::where('sender_id', $getUser->id)->update(['sender_avatar' => $avatarName]);
+
+
             // Logs
             $logs = new LogsModel();
             $logs->category = 'User';
@@ -358,9 +364,34 @@ class UserController extends Controller
             ];
         });
 
+        // For Vehicle Slip
+        $getVehicleSlipData = VehicleSlipModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+
+        $vehDet = $getVehicleSlipData->map(function ($vehicleForm) {
+            $passengerArray = ($vehicleForm->passengers && $vehicleForm->passengers !== 'None') 
+                ? explode("\n", $vehicleForm->passengers) 
+                : [];
+            $passengerCount = count($passengerArray);
+
+            return[
+                'veh_id' => $vehicleForm->id,
+                'veh_date_req' => $vehicleForm->created_at,
+                'veh_purpose' => $vehicleForm->purpose,
+                'veh_place' => $vehicleForm->place_visited,
+                'veh_date' => $vehicleForm->date_arrival,
+                'veh_time' => $vehicleForm->time_arrival,
+                'veh_vehicle' => $vehicleForm->vehicle_type,
+                'veh_driver' => $vehicleForm->driver,
+                'veh_passengers' => $passengerCount,
+                'status' => $vehicleForm->admin_approval,
+                'remarks' => $vehicleForm->remarks
+            ];
+        });
+
         $responseData = [
             'inspection' => $inspDet->isEmpty() ? null : $inspDet,
             'facility' => $facDet->isEmpty() ? null : $facDet,
+            'vehicle' => $vehDet->isEmpty() ? null : $vehDet,
         ];
         
 
@@ -381,14 +412,11 @@ class UserController extends Controller
 
         // Map personnel information along with the inspection count
         $result = $assignedPersonnel->map(function ($personnel) {
-            // Count inspections for each personnel_id
-            $inspectionCount = InspectionModel::where('personnel_id', $personnel->personnel_id)->count();
         
             return [
                 'personnel_id' => $personnel->id,
                 'personnel_name' => $personnel->personnel_name,
                 'assignment' => $personnel->assignment,
-                'inspection_count' => $inspectionCount
             ];
         });
 

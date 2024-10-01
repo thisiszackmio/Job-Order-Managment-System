@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Anton|Passion+One|PT+Sans+Caption');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -691,9 +692,6 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 }
 
 /* For 404 Page */
-/* src/ErrorPage.css */
-@import url('https://fonts.googleapis.com/css?family=Anton|Passion+One|PT+Sans+Caption');
-
 
 /* Error Page */
 .error {

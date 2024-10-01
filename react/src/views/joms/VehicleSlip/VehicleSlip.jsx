@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 import submitAnimation from '../../../assets/loading_nobg.gif';
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";

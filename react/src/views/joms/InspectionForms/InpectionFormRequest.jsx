@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import submitAnimation from '../../../assets/loading_nobg.gif';
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";

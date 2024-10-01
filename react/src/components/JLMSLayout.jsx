@@ -5,7 +5,7 @@ import ppaLogo from '/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt, faBars, faSignOutAlt, faFlag, faUserPlus, faChevronRight, faScroll } from '@fortawesome/free-solid-svg-icons';
 import Footer from "./Footer";
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
 import { useNavigate } from 'react-router-dom';
 

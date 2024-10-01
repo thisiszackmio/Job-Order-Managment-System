@@ -1,11 +1,8 @@
 import PageComponent from "../../components/PageComponent";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye } from '@fortawesome/free-solid-svg-icons';
-import { Link } from "react-router-dom";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 
 export default function DashboardJOMS(){
 

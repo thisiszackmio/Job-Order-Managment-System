@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
 import submitAnimation from '../../assets/loading_nobg.gif';
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 
 export default function AllAnnouncements(){

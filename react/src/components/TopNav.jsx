@@ -2,10 +2,10 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline'
 import axiosClient from '../axios';
-import loading_table from "/public/load_hehe.gif";
-import VehicleSlip from "/public/Vehicle_Slip.png";
-import repair from "/public/mechanic.png"
-import facilityicon from "/public/schedule.png"
+import loading_table from "/load_hehe.gif";
+import VehicleSlip from "/Vehicle_Slip.png";
+import repair from "/mechanic.png"
+import facilityicon from "/schedule.png"
 
 import { useUserStateContext } from '../context/ContextProvider';
 

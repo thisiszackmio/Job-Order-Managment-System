@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import submitAnimation from '../../../assets/loading_nobg.gif';
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';

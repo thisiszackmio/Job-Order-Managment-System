@@ -4,7 +4,7 @@ import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import moment from 'moment-timezone';
-import loadingAnimation from '/public/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/ppa_logo_animationn_v4.gif';
 
 export default function FacilityVenueForm(){
   const { currentUserId, userCode } = useUserStateContext();

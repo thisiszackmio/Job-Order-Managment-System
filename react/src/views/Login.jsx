@@ -15,30 +15,38 @@ export default function Login() {
   const [inputErrors, setInputErrors] = useState('');
 
   // Submit the login
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
     ev.preventDefault();
-
     setSubmitLoading(true);
+    setInputErrors(''); // Clear previous errors
 
-    axiosClient.post("/login", {
-      username,
-      password
-    })
-    .then((response) => {
-      //const getResponse = response.data.message;
-      setCurrentId(response.data.userid);
-      setUserToken(response.data.token);
-      setUserCode(response.data.code);
-      window.location.href = '/';
+    try {
+        const response = await axiosClient.post("/login", {
+            username,
+            password,
+        });
 
-    })
-    .catch((error)=>{
-      setInputErrors(error.response.data.error);
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-  }
+        // Assuming the response contains these fields
+        const { userid, token, code } = response.data;
+
+        // Set the user state or context
+        setCurrentId(userid);
+        setUserToken(token);
+        setUserCode(code);
+
+        // Redirect to home page or dashboard
+        window.location.href = '/';
+    } catch (error) {
+        // Handle errors from the response
+        if (error.response && error.response.data) {
+            setInputErrors(error.response.data.error || 'Login failed. Please try again.');
+        } else {
+            setInputErrors('An unexpected error occurred. Please try again later.');
+        }
+    } finally {
+        setSubmitLoading(false);
+    }
+  };
 
   return (
     <>

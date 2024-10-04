@@ -3,11 +3,18 @@ import router from "./router";
 
 const axiosClient = axios.create({
     baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
   });
 
-axiosClient.interceptors.request.use((config) => {
-    config.headers.Authorization = `Bearer ${localStorage.getItem('TOKEN')}`
-    return config
+  axiosClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('TOKEN');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
 });
 
 axiosClient.interceptors.response.use(response => {

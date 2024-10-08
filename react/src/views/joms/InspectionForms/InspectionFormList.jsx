@@ -26,7 +26,7 @@ export default function InspectionFormList(){
   // Get User Employee's Data
   useEffect(() => {  
     axiosClient
-    .get('/allinspection/')
+    .get('/allinspection')
     .then((response) => {
       const InspectionFormList = response.data;
 

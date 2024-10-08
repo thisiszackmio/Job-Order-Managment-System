@@ -43,7 +43,7 @@ export default function FacilityVenueFormList(){
   // Get User Employee's Data
   useEffect(() => {  
     axiosClient
-    .get('/allfacility/')
+    .get('/allfacility')
     .then((response) => {
       const FacilityFormList = response.data;
 

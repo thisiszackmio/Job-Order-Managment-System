@@ -75,7 +75,7 @@ export default function AllAnnouncements(){
   // Retrieve Data on DB
   useEffect(()=>{
     axiosClient
-    .get('/showannouncements/')
+    .get('/showannouncements')
     .then((response) => {
       const responseData = response.data;
 

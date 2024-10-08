@@ -46,7 +46,7 @@ export default function UserListJLMS(){
   // Get User Employee's Data
   useEffect(() => {  
     axiosClient
-    .get('/showusers/')
+    .get('/showusers')
     .then((response) => {
       const responseData = response.data;
 

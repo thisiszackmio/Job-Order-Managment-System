@@ -57,7 +57,7 @@ export default function DashboardJLMS(){
   // Get All the Data on Announcements
   const fetchAnnounce = async () => {
     axiosClient
-    .get('/showannouncements/')
+    .get('/showannouncements')
     .then((response) => {
       const responseData = response.data;
 
@@ -172,7 +172,7 @@ export default function DashboardJLMS(){
           <div style={{ minHeight: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
             <table className="ppa-table w-full">
               <tbody>
-              {announceList?.mappedData.length > 0 ? (
+              {announceList?.mappedData?.length > 0 ? (
                 announceList?.mappedData?.map((getData)=>(
                   <tr key={getData.id}>
                     <td className="px-4 py-3 text-left table-font">{getData.details}</td>

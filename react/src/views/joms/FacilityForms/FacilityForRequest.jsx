@@ -241,6 +241,16 @@ export default function FacilityVenueForm(){
           setDisableForm(true);
         }
       }
+      else if(responseData === "Pending"){
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Sorry</p>
+            <p className="popup-message">This schedule request is pending approval.</p>
+          </div>
+        );
+      }
       else{
         setShowPopup(true);
         setPopupContent('error');

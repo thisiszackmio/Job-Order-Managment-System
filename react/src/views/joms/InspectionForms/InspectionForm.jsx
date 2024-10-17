@@ -943,7 +943,7 @@ export default function InspectionForm(){
             {/* Header */}
             <div className="ppa-form-header text-base flex justify-between items-center">
               <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
-              {(inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1112' || inspectionData?.form?.status === '2023' || inspectionData?.form?.status === '2001') ? null : (
+              {(inspectionData?.form?.status === '0000' || inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1112' || inspectionData?.form?.status === '2023' || inspectionData?.form?.status === '2001') ? null : (
                 GSO && (<button onClick={() => handleCloseForm()} className="py-1.5 px-3 text-base btn-cancel"> Close Form </button>)
               )}
             </div>

@@ -127,8 +127,7 @@ export default function UserRegistrationJLMS(){
     axiosClient.post("/register", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        // "x-rapidapi-host": "file-upload8.p.rapidapi.com",
-        // "x-rapidapi-key": "your-rapidapi-key-here",
+        "Custom-Header": "value"
       },
     })
     .then(() => {

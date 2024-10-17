@@ -773,7 +773,7 @@ export default function FacilityForm(){
                     Instruction for the OPR for Action:
                     </label> 
                   </div>
-                  {(!facData?.form?.obr_instruct && facData?.form?.admin_approval == 1) && Admin ? (
+                  {(!facData?.form?.obr_instruct && facData?.form?.admin_approval == 3) && Admin ? (
                     <form 
                       id="oprinstruct" 
                       className="mt-2" 

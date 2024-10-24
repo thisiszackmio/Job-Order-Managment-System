@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
-import loading_table from "/load_hehe.gif"
+import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
 
 export default function MyRequest(){

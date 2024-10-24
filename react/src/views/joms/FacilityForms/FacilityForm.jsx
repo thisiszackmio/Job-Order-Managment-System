@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
-import submitAnimation from '../../../assets/loading_nobg.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
+import Popup from "../../../components/Popup";
 
 export default function FacilityForm(){
 
@@ -138,11 +139,12 @@ export default function FacilityForm(){
       const codes = ucode.split(',').map(code => code.trim());
       const Admin = codes.includes("AM");
       const GSO = codes.includes("GSO");
+      const DivisionManager = codes.includes("DM");
       const SuperAdmin = codes.includes("HACK");
       const myAccess = form?.user_id == currentUserId?.id;
 
       // Create A condition for access
-      setAccess(myAccess || GSO || Admin || SuperAdmin);
+      setAccess(myAccess || GSO || Admin || DivisionManager || SuperAdmin);
 
     })
     .finally(() => {
@@ -184,7 +186,7 @@ export default function FacilityForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Success!</p>
-            <p className="popup-message">The OPR instruction has been stored in the database.</p>
+            <p className="popup-message">The OPR instruction is now stored in the database.</p>
           </div>
         );
         setShowPopup(true);
@@ -239,7 +241,7 @@ export default function FacilityForm(){
   // Approve Popup
   function handleApprovalConfirmation(){
     setShowPopup(true);
-    setPopupContent('warning');
+    setPopupContent('adf');
     setPopupMessage(
       <div>
         <p className="popup-title">Confirmation</p>
@@ -283,7 +285,7 @@ export default function FacilityForm(){
   // Decline Popup
   const handleAdminDeclineConfirmation = () => {
     setShowPopup(true);
-    setPopupContent('admin_decline');
+    setPopupContent('amif');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -344,7 +346,7 @@ export default function FacilityForm(){
   }
 
   //Close Popup on Error
-  function justclose() {
+  function justClose() {
     setShowPopup(false);
   }
 
@@ -893,13 +895,13 @@ export default function FacilityForm(){
                   <button 
                     type="submit"
                     form="oprinstruct"
-                    className={`py-2 px-3 ${submitLoading ? 'btn-submitLoading' : 'btn-default'}`}
+                    className={`py-2 px-3 ${submitLoading ? 'process-btn' : 'btn-default'}`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
                       <div className="flex">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
+                        <span className="ml-1">Loading</span>
                       </div>
                     ) : (
                       'Submit'
@@ -948,13 +950,13 @@ export default function FacilityForm(){
               <button 
                 type="submit"
                 form="opraction"
-                className={`py-2 px-3 ${submitLoading ? 'btn-submitLoading' : 'btn-default'}`}
+                className={`py-2 px-3 ${submitLoading ? 'process-btn' : 'btn-default'}`}
                 disabled={submitLoading}
               >
                 {submitLoading ? (
                   <div className="flex">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Loading</span>
+                    <span className="ml-1">Loading</span>
                   </div>
                 ) : (
                   'Submit'
@@ -973,7 +975,7 @@ export default function FacilityForm(){
                   {submitLoading ? (
                     <div className="flex items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Generating</span>
+                      <span className="ml-1">Generating</span>
                     </div>
                   ) : (
                     'Get PDF'
@@ -985,6 +987,21 @@ export default function FacilityForm(){
           </div>
 
         </div>
+
+        {/* Popup */}
+        {showPopup && (
+          <Popup 
+            popupContent={popupContent}
+            popupMessage={popupMessage}
+            justClose={justClose}
+            closePopup={closePopup}
+            facility={facData?.form?.id}
+            handlelAdminApproval={handlelAdminApproval}
+            submitLoading={submitLoading}
+            submitAnimation={submitAnimation}
+            form={"adminDecline"}
+          />
+        )}
 
         {/* PDF Area */}
         {isVisible && (
@@ -1529,116 +1546,6 @@ export default function FacilityForm(){
             </div>
           </div>
         </div>
-        )}
-
-        {/* Popup */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            {/* Semi-transparent black overlay with blur effect */}
-            <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-            {/* Popup content */}
-            <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-              {/* Notification Icons */}
-              <div className="f-modal-alert">
-                {/* Error */}
-                {popupContent == 'error' && (
-                  <div className="f-modal-icon f-modal-error animate">
-                    <span className="f-modal-x-mark">
-                      <span className="f-modal-line f-modal-left animateXLeft"></span>
-                      <span className="f-modal-line f-modal-right animateXRight"></span>
-                    </span>
-                  </div>
-                )}
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <div class="f-modal-icon f-modal-success animate">
-                    <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                    <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                  </div>
-                )}
-                {/* Warning */}
-                {(popupContent == "warning" || popupContent == "admin_decline") && (
-                  <div class="f-modal-icon f-modal-warning scaleWarning">
-                    <span class="f-modal-body pulseWarningIns"></span>
-                    <span class="f-modal-dot pulseWarningIns"></span>
-                  </div>
-                )}
-              </div>
-              {/* Popup Message */}
-              <p className="text-lg text-center"> {popupMessage} </p>
-              {/* Buttons */}
-              <div className="flex justify-center mt-4">
-                {/* Admin Approval Button */}
-                {(popupContent == 'warning') && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    type="submit"
-                    onClick={() => handlelAdminApproval(facData?.form?.id)}
-                    className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                      Close
-                    </button>
-                  )}
-                </>
-                )}
-
-                {(popupContent == "admin_decline") && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    type="submit"
-                    form="adminDecline"
-                    className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                      Close
-                    </button>
-                  )}
-                </>
-                )}
-                {/* Error Button */}
-                {popupContent == 'error' && (
-                  <button onClick={justclose} className="w-full py-2 btn-cancel">
-                    Close
-                  </button>
-                )}
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <button onClick={closePopup} className="w-full py-2 btn-default">
-                    Close
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
         )}
 
       </PageComponent>      

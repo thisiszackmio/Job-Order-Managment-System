@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
-import submitAnimation from '../../../assets/loading_nobg.gif';
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import submitAnimation from '/default/ring-loading.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Popup from "../../../components/Popup";
 
 export default function AddVehicleType(){
 
@@ -152,7 +153,7 @@ export default function AddVehicleType(){
   const handleRemovalConfirmation = (id) => {
     setSelectedId(id);
     setShowPopup(true);
-    setPopupContent('warning');
+    setPopupContent('vdd');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -195,7 +196,7 @@ export default function AddVehicleType(){
 
   // Popup Button Function
   //Close Popup on Error
-  const justclose = () => {
+  const justClose = () => {
     setShowPopup(false);
   }
 
@@ -294,13 +295,13 @@ export default function AddVehicleType(){
             <button 
               type="submit"
               form="submitVehicle"
-              className={`ml-3 py-1.5 px-3 text-base ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+              className={`ml-3 py-1.5 px-3 text-base ${ submitLoading ? 'process-btn' : 'btn-default' }`}
               disabled={submitLoading}
             >
             {submitLoading ? (
               <div className="flex">
                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-2">Loading</span>
+                <span className="ml-1">Loading</span>
               </div>
             ):(
             'Submit'
@@ -372,91 +373,15 @@ export default function AddVehicleType(){
 
       {/* Popup */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Semi-transparent black overlay with blur effect */}
-          <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-          {/* Popup content */}
-          <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-            {/* Notification Icons */}
-            <div className="f-modal-alert">
-
-              {/* Error */}
-              {popupContent == 'error' && (
-                <div className="f-modal-icon f-modal-error animate">
-                  <span className="f-modal-x-mark">
-                    <span className="f-modal-line f-modal-left animateXLeft"></span>
-                    <span className="f-modal-line f-modal-right animateXRight"></span>
-                  </span>
-                </div>
-              )}
-
-              {/* Warning */}
-              {popupContent == "warning" && (
-                <div class="f-modal-icon f-modal-warning scaleWarning">
-                  <span class="f-modal-body pulseWarningIns"></span>
-                  <span class="f-modal-dot pulseWarningIns"></span>
-                </div>
-              )}
-
-              {/* Success */}
-              {popupContent == 'success' && (
-                <div class="f-modal-icon f-modal-success animate">
-                  <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                  <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                </div>
-              )}
-              
-            </div>
-            {/* Popup Message */}
-            <p className="text-lg text-center"> {popupMessage} </p>
-            {/* Buttons */}
-            <div className="flex justify-center mt-4">
-
-              {(popupContent == 'warning') && (
-              <>
-                {/* Submit */}
-                <button 
-                  type="submit"
-                  onClick={removeVehicleDet}
-                  className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Loading</span>
-                    </div>
-                  ):(
-                    'Confirm'
-                  )}
-                </button>
-
-                {/* Cancel */}
-                {!submitLoading && (
-                  <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                    Close
-                  </button>
-                )}
-              </>
-              )}
-
-              {/* Error Button */}
-              {popupContent == 'error' && (
-                <button onClick={justclose} className="w-full py-2 btn-cancel">
-                  Close
-                </button>
-              )}
-
-              {/* Success */}
-              {popupContent == 'success' && (
-                <button onClick={closePopup} className="w-full py-2 btn-default">
-                  Close
-                </button>
-              )}
-
-            </div>
-          </div>
-        </div>
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          justClose={justClose}
+          closePopup={closePopup}
+          removeVehicleDet={removeVehicleDet}
+        />
       )}
 
     </PageComponent>

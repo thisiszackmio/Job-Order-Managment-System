@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -101,7 +101,7 @@ export default function UserListJLMS(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("HACK") || codes.includes("GSO");
+  const Authorize = codes.includes("HACK") || codes.includes("GSO") || codes.includes("DM") || codes.includes("AM") || codes.includes("PM");
 
   return(
     Authorize ? (

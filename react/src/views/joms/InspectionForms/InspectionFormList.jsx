@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
-import loading_table from "/load_hehe.gif"
+import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -79,7 +79,8 @@ export default function InspectionFormList(){
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
   const SuperAdmin = codes.includes("HACK");
-  const Access = Admin || GSO || SuperAdmin;
+  const DivisionManager = codes.includes("DM");
+  const Access = Admin || GSO || DivisionManager || SuperAdmin;
 
   return Access ? (
     <PageComponent title="Request List">
@@ -136,7 +137,7 @@ export default function InspectionFormList(){
               <tr>
                 <td colSpan={13} className="px-2 py-2 text-center table-font">
                   <div className="flex justify-center items-center">
-                    <img className="h-10 w-auto mr-2" src={loading_table} alt="Loading" />
+                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
                     <span className="loading-table">Loading</span>
                   </div>
                 </td>

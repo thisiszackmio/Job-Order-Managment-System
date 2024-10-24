@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
-import submitAnimation from '../../../assets/loading_nobg.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
+import Popup from "../../../components/Popup";
 
 export default function InspectionForm(){
   // Get the ID
@@ -194,7 +195,7 @@ export default function InspectionForm(){
   // Supervisor Approvel Popup 
   const handleSupApprovalConfirmation = () => {
     setShowPopup(true);
-    setPopupContent('sup_warning');
+    setPopupContent('dma');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -244,7 +245,7 @@ export default function InspectionForm(){
   // Supervisor Decline Popup 
   const handleSupDeclineConfirmation = () => {
     setShowPopup(true);
-    setPopupContent('sup_warning_dec');
+    setPopupContent('dmd');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -255,7 +256,6 @@ export default function InspectionForm(){
 
   // Submit Supervisor Reason
   function SubmitSupReason(id){
-
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has disapproved the request on the Pre/Post Repair Inspection Form (Control No. ${inspectionData?.form?.id}).`;
@@ -312,7 +312,7 @@ export default function InspectionForm(){
   // Admin Approval Popup 
   const handleAdminApprovalConfirmation = () => {
     setShowPopup(true);
-    setPopupContent('admin_warning');
+    setPopupContent('ama');
     setPopupMessage(
       <div>
         <p className="popup-title">Confirmation</p>
@@ -364,11 +364,11 @@ export default function InspectionForm(){
   // GSO Submit Popup 
   const handleGSOSubmitConfirmation = () => {
     setShowPopup(true);
-    setPopupContent('gso_warning');
+    setPopupContent('gsoi');
     setPopupMessage(
       <div>
         <p className="popup-title">Confirmation</p>
-        <p className="popup-message">Do you want to proceed even though there is no data for the Date of Last Repair or the Nature of Last Repair?</p>
+        <p className="popup-message">Do you want to proceed without data for the Date of Last Repair or the Nature of Last Repair?</p>
       </div>
     );
   }
@@ -775,7 +775,7 @@ export default function InspectionForm(){
   // Close Form Popup 
   const handleCloseForm = () => {
     setShowPopup(true);
-    setPopupContent('closeForm');
+    setPopupContent('gsofc');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -785,7 +785,7 @@ export default function InspectionForm(){
   }
 
   // Force Close Request Function
-  function CloseFormRequest(id){
+  function CloseForceRequest(id){
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has force-closed this form (Control Number: ${inspectionData?.form?.id}).`;
@@ -817,7 +817,7 @@ export default function InspectionForm(){
   // Close Request Popup 
   const handleCloseRequest = () => {
     setShowPopup(true);
-    setPopupContent('close');
+    setPopupContent('gsocr');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -827,7 +827,7 @@ export default function InspectionForm(){
   }
 
   // Close Request Function
-  function CloseForm(id){
+  function handleCloseFormRequest(id){
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has closed the request on the Pre/Post Repair Inspection Form (Control No. ${inspectionData?.form?.id}).`;
@@ -858,7 +858,7 @@ export default function InspectionForm(){
 
   // Popup Button Function
   //Close Popup on Error
-  function justclose() {
+  function justClose() {
     setShowPopup(false);
   }
 
@@ -1169,13 +1169,13 @@ export default function InspectionForm(){
                     <button 
                       type="submit"
                       form="EditPartA"
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                      className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                       disabled={submitLoading}
                     >
                       {submitLoading ? (
                         <div className="flex">
                           <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
+                          <span className="ml-1">Loading</span>
                         </div>
                       ):(
                         'Submit'
@@ -1495,13 +1495,13 @@ export default function InspectionForm(){
                     <div className="mt-8">
                       {/* Submit */}
                       <button type="submit" form="EditPartB"
-                        className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                        className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                         disabled={submitLoading}
                       >
                         {submitLoading ? (
                           <div className="flex">
                             <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                            <span className="ml-2">Loading</span>
+                            <span className="ml-1">Loading</span>
                           </div>
                         ):(
                           'Submit'
@@ -1623,13 +1623,13 @@ export default function InspectionForm(){
                           {/* Check if the data is empty */}
                           {!pointPersonnel.pid ? (
                             <button type="submit" form="partBForm"
-                              className={`py-2 px-3 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                              className={`py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                               disabled={submitLoading}
                             >
                             {submitLoading ? (
                               <div className="flex">
                                 <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-2">Loading</span>
+                                <span className="ml-1">Loading</span>
                               </div>
                             ):(
                             'Submit'
@@ -1842,13 +1842,13 @@ export default function InspectionForm(){
                     <div className="mt-5">
                       {/* Submit */}
                       <button type="submit" form="editPartC"
-                        className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                        className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                         disabled={submitLoading}
                       >
                         {submitLoading ? (
                           <div className="flex">
                             <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                            <span className="ml-2">Loading</span>
+                            <span className="ml-1">Loading</span>
                           </div>
                         ):(
                           'Submit'
@@ -1945,13 +1945,13 @@ export default function InspectionForm(){
                       <div className="mt-5">
                         {/* Check if the data is empty */}
                         <button type="submit" form="partCForm"
-                          className={`py-2 px-3 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                          className={`py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                           disabled={submitLoading}
                         >
                         {submitLoading ? (
                           <div className="flex">
                             <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                            <span className="ml-2">Loading</span>
+                            <span className="ml-1">Loading</span>
                           </div>
                         ):(
                         'Submit'
@@ -2076,13 +2076,13 @@ export default function InspectionForm(){
                       <div className="mt-5">
                         {/* Submit */}
                         <button type="submit"
-                          className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                          className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                           disabled={submitLoading}
                         >
                           {submitLoading ? (
                             <div className="flex">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-2">Loading</span>
+                              <span className="ml-1">Loading</span>
                             </div>
                           ):(
                             'Submit'
@@ -2158,13 +2158,13 @@ export default function InspectionForm(){
                         <div className="mt-5">
                           {/* Check if the data is empty */}
                           <button type="submit" form="partDForm"
-                            className={`py-2 px-3 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                            className={`py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                             disabled={submitLoading}
                           >
                           {submitLoading ? (
                             <div className="flex">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-2">Loading</span>
+                              <span className="ml-1">Loading</span>
                             </div>
                           ):(
                           'Submit'
@@ -2338,7 +2338,7 @@ export default function InspectionForm(){
               {/* For the GSO */}
               {inspectionData?.form?.status === '1112' && GSO && (
                 <div className="mt-5">
-                  {/* Approve */}
+                  {/* Close */}
                   <button
                     onClick={() => handleCloseRequest()} 
                     className="py-2 px-4 btn-default"
@@ -2358,7 +2358,7 @@ export default function InspectionForm(){
                     {submitLoading ? (
                       <div className="flex items-center justify-center">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Generating</span>
+                        <span className="ml-1">Generating</span>
                       </div>
                     ) : (
                       'Get PDF'
@@ -2373,227 +2373,21 @@ export default function InspectionForm(){
 
           {/* Popup */}
           {showPopup && (
-            <div className="fixed inset-0 flex items-center justify-center z-50">
-              {/* Semi-transparent black overlay with blur effect */}
-              <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-              {/* Popup content */}
-              <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-                {/* Notification Icons */}
-                <div className="f-modal-alert">
-                  {/* Error */}
-                  {popupContent == 'error' && (
-                    <div className="f-modal-icon f-modal-error animate">
-                      <span className="f-modal-x-mark">
-                        <span className="f-modal-line f-modal-left animateXLeft"></span>
-                        <span className="f-modal-line f-modal-right animateXRight"></span>
-                      </span>
-                    </div>
-                  )}
-                  {/* Warning */}
-                  {(popupContent == "sup_warning" || 
-                  popupContent == "sup_warning_dec" || 
-                  popupContent == "gso_warning" || 
-                  popupContent == "admin_warning" || 
-                  popupContent == "close" || 
-                  popupContent == "closeForm") 
-                  && (
-                    <div class="f-modal-icon f-modal-warning scaleWarning">
-                      <span class="f-modal-body pulseWarningIns"></span>
-                      <span class="f-modal-dot pulseWarningIns"></span>
-                    </div>
-                  )}
-                  {/* Success */}
-                  {popupContent == 'success' && (
-                    <div class="f-modal-icon f-modal-success animate">
-                      <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                      <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                    </div>
-                  )}
-                </div>
-                {/* Popup Message */}
-                <p className="text-lg text-center"> {popupMessage} </p>
-                {/* Buttons */}
-                <div className="flex justify-center mt-4">
-                  {/* Supervisor Button */}
-                  {(popupContent == 'sup_warning') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      onClick={() => handlelSupervisorApproval(inspectionData?.form?.id)}
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {(popupContent == 'sup_warning_dec') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      onClick={() => SubmitSupReason(inspectionData?.form?.id)}
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {/* GSO */}
-                  {(popupContent == 'gso_warning') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      form="partBForm"
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {(popupContent == 'close') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      onClick={() => CloseForm(inspectionData?.form?.id)}
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {(popupContent == 'closeForm') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      onClick={() => CloseFormRequest(inspectionData?.form?.id)}
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {/* Admin */}
-                  {(popupContent == 'admin_warning') && (
-                  <>
-                    {/* Submit */}
-                    <button 
-                      type="submit"
-                      onClick={() => handlelAdminApproval(inspectionData?.form?.id)}
-                      className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                      disabled={submitLoading}
-                    >
-                      {submitLoading ? (
-                        <div className="flex justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Loading</span>
-                        </div>
-                      ):(
-                        'Confirm'
-                      )}
-                    </button>
-
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                        Close
-                      </button>
-                    )}
-                  </>
-                  )}
-                  {/* Error Button */}
-                  {popupContent == 'error' && (
-                    <button onClick={justclose} className="w-full py-2 btn-cancel">
-                      Close
-                    </button>
-                  )}
-                  {/* Success */}
-                  {popupContent == 'success' && (
-                    <button onClick={closePopup} className="w-full py-2 btn-default">
-                      Close
-                    </button>
-                  )}
-
-                </div>
-              </div>
-            </div>
+            <Popup 
+              popupContent={popupContent}
+              popupMessage={popupMessage}
+              SubmitSupReason={SubmitSupReason}
+              handlelSupervisorApproval={handlelSupervisorApproval}
+              handlelAdminApproval={handlelAdminApproval}
+              handleCloseFormRequest={handleCloseFormRequest}
+              CloseForceRequest={CloseForceRequest}
+              inspectionData={inspectionData?.form?.id}
+              justClose={justClose}
+              closePopup={closePopup}
+              submitLoading={submitLoading}
+              submitAnimation={submitAnimation}
+              form={"partBForm"}
+            />
           )}
 
           {/* PDF Area */}

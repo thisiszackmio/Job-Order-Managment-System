@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 
 export default function UserDetails(){

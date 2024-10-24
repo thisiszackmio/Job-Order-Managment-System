@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PageComponent from "../../components/PageComponent";
-import submitAnimation from '../../assets/loading_nobg.gif';
+import Popup from "../../components/Popup";
+import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../axios";
 import { useUserStateContext } from "../../context/ContextProvider";
 
@@ -64,34 +65,47 @@ export default function AddAnnouncements(){
       details: details
     }
 
-    axiosClient
-    .post('/addannouncements', FormData)
-    .then(() => { 
+    if(!details){
       setShowPopup(true);
-      setPopupContent('success');
+      setPopupContent('error');
       setPopupMessage(
         <div>
-          <p className="popup-title">Success</p>
-          <p className="popup-message">The data has been store on the database</p>
+          <p className="popup-title">Invalid</p>
+          <p className="popup-message">Please input the Details</p>
         </div>
       );
-      fetchNotification();    
-    })
-    .catch((error) => {
-      if (error.response.status === 500) {
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }  
-    })
-    .finally(() => {
       setSubmitLoading(false);
-    });
+    } else {
+      axiosClient
+      .post('/addannouncements', FormData)
+      .then(() => { 
+        setShowPopup(true);
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p className="popup-message">Your announcement is being posted</p>
+          </div>
+        );
+        fetchNotification();    
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(DevErrorText);
+        }  
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
+
   }
 
   // Popup Button Function
   //Close Popup on Error
-  const justclose = () => {
+  const justClose = () => {
     setShowPopup(false);
   }
 
@@ -105,7 +119,7 @@ export default function AddAnnouncements(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK");
+  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
 
   return (
     Authorize ? (
@@ -153,7 +167,6 @@ export default function AddAnnouncements(){
                       maxLength={maxCharacters}
                       style={{ resize: "none" }} 
                       className="block w-full ppa-form"
-                      required
                     />
                     <p className="text-sm text-gray-500"> {maxCharacters - details.length} characters remaining </p>
                   </div>
@@ -165,13 +178,13 @@ export default function AddAnnouncements(){
                 {/* Submit */}
                 <button 
                   type="submit"
-                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
                     <div className="flex">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Loading</span>
+                      <span className="ml-1">Loading</span>
                     </div>
                   ):(
                     'Submit'
@@ -186,55 +199,12 @@ export default function AddAnnouncements(){
 
         {/* Popup */}
         {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            {/* Semi-transparent black overlay with blur effect */}
-            <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-            {/* Popup content */}
-            <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-              {/* Notification Icons */}
-              <div className="f-modal-alert">
-
-                {/* Error */}
-                {popupContent == 'error' && (
-                  <div className="f-modal-icon f-modal-error animate">
-                    <span className="f-modal-x-mark">
-                      <span className="f-modal-line f-modal-left animateXLeft"></span>
-                      <span className="f-modal-line f-modal-right animateXRight"></span>
-                    </span>
-                  </div>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <div class="f-modal-icon f-modal-success animate">
-                    <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                    <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                  </div>
-                )}
-                
-              </div>
-              {/* Popup Message */}
-              <p className="text-lg text-center"> {popupMessage} </p>
-              {/* Buttons */}
-              <div className="flex justify-center mt-4">
-
-                {/* Error Button */}
-                {popupContent == 'error' && (
-                  <button onClick={justclose} className="w-full py-2 btn-cancel">
-                    Close
-                  </button>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <button onClick={closePopup} className="w-full py-2 btn-default">
-                    Close
-                  </button>
-                )}
-
-              </div>
-            </div>
-          </div>
+          <Popup
+            popupContent={popupContent}
+            popupMessage={popupMessage}
+            justClose={justClose}
+            closePopup={closePopup}
+          />
         )}
       </PageComponent>
     ):(

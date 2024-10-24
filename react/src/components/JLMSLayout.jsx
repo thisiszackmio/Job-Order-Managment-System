@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import axiosClient from '../axios';
 import { Link, Outlet } from "react-router-dom";
-import ppaLogo from '/ppa_logo.png';
+import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt, faBars, faSignOutAlt, faFlag, faUserPlus, faChevronRight, faScroll } from '@fortawesome/free-solid-svg-icons';
 import Footer from "./Footer";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
 import { useNavigate } from 'react-router-dom';
 
@@ -57,7 +57,7 @@ export default function JLMSLayout() {
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");
   const GSOOnly = codes.includes("GSO");
-  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK");
+  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
 
   return (
     <div className="w-full h-full font-roboto">

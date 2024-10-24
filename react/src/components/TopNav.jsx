@@ -2,10 +2,10 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline'
 import axiosClient from '../axios';
-import loading_table from "/load_hehe.gif";
-import VehicleSlip from "/Vehicle_Slip.png";
-import repair from "/mechanic.png"
-import facilityicon from "/schedule.png"
+import loading_table from "/default/ring-loading.gif";
+import VehicleSlip from "/default/Vehicle_Slip.png";
+import repair from "/default/mechanic.png"
+import facilityicon from "/default/schedule.png"
 
 import { useUserStateContext } from '../context/ContextProvider';
 
@@ -133,7 +133,7 @@ const TopNav = () =>{
 
                   {loadingNotifications ? (
                     <div className="flex p-8 justify-center items-center">
-                      <img className="h-10 w-auto mr-2" src={loading_table} alt="Loading" />
+                      <img className="h-7 w-auto mr-1" src={loading_table} alt="Loading" />
                       <span className="loading-table">Loading Notification</span>
                     </div>
                   ):(

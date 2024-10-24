@@ -4,20 +4,22 @@
 @tailwind utilities;
 
 /* Button Style */
-.login-btn { background-color: #132E51; color: #fff; border-radius: 5px; transition: 300ms; }
-.login-btn:hover { background-color: #4A6589; transition: 300ms; }
-.btn-default { background-color: #4169E1; color: #fff; border-radius: 5px; transition: 300ms; }
-.btn-default:hover { background-color: #6c89e2; transition: 300ms; }
-.btn-cancel { background-color: #D22B2B; color: #fff; border-radius: 5px; transition: 300ms; }
-.btn-cancel:hover { background-color: #da5a5a; transition: 300ms; }
+.process-btn { background-color: #B2BEB5; color: #132E51; border-radius: 5px; }
+.login-btn { background-color: #132E51; color: #fff; border-radius: 5px; }
+.login-btn:hover { background-color: #051B37; }
+.btn-default { background-color: #4169E1; color: #fff; border-radius: 5px; }
+.btn-default:hover { background-color: #1D4CD8; }
+.btn-cancel { background-color: #D22B2B; color: #fff; border-radius: 5px; }
+.btn-cancel:hover { background-color: #A91515; }
+.btn-pdf { background-color: #50C878; border-radius: 5px; color: #fff; }
+.btn-pdf:hover { background-color: #32B45E; }
+.btn-edit { background-color: #50C878; color: #fff; border-radius: 5px; }
+.btn-edit:hover { background-color: #32B45E; }
+
 .btn-add { background: #00A36C; color: #fff; border-radius: 5px; transition: 300ms; }
 .btn-add:hover { background: #0fbe84; transition: 300ms; }
-.btn-edit { background-color: #50C878; color: #fff; border-radius: 5px; transition: 300ms; }
-.btn-edit:hover { background-color: #74db96; transition: 300ms; }
-.btn-submitLoading { background-color: #848884; color: #fff; border-radius: 5px; }
 .ppa-system-link:hover { background-color: rgb(0 0 0 / 32%); transition: 0.3s; }
-.btn-pdf { background-color: #50C878; border-radius: 5px; color: #fff; transition: 0.3s; }
-.btn-pdf:hover { background-color: #5fc782; transition: 0.3s;}
+
 
 /* Pagination */
 .login-error {
@@ -74,6 +76,8 @@
 }
 
 /* CSS */
+.jlms-icons { width: 50%; }
+
 .ppa-avatar {
   object-fit: cover;
   -o-object-position: top;
@@ -89,6 +93,7 @@
 .ppa-user-name { margin-top: -50px; }
 .minimized .ppa-display-picture { margin: auto; }
 img.ppa-display-picture { object-fit: cover; object-position: top; width: 35px; height: 35px; border-radius: 35px; margin-right: 10px; }
+.joms-icons { position: absolute; width: 30%; right: 10px; }
 
 /* Notifaction*/
 .notifications {
@@ -829,11 +834,10 @@ p.description {
   .sidebar-close { width: 6%; }
   .minimized > .ppa-accordion { text-align: center; }
   .ppa-system-abbr img { position: relative !important; left: 0 !important; }
-  .ppa-system-abbr.joms img { height: 60px !important; }
   .members-container { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (min-width: 1368px) {
-  .ppa-accordion { min-height: 400px; }
+  .ppa-accordion { min-height: 40vh; }
   .logout-position { position: unset; }
 }

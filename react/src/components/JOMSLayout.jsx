@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import ppaLogo from '/ppa_logo.png';
+import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faTableList, faClipboardUser, faVanShuttle } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
@@ -45,7 +45,8 @@ export default function JOMSLayout() {
   const SuperAdmin = codes.includes("HACK");
   const GSOOnly = codes.includes("GSO");
   const AssignPersonnel = codes.includes("AP");
-  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK");
+  const DivisionManager = codes.includes("DM");
+  const Authorize = codes.includes("AM") || codes.includes("HACK");
 
   return (
     <div className="w-full h-full font-roboto">
@@ -137,7 +138,7 @@ export default function JOMSLayout() {
             </li>
             
             {/* Request List */}
-            {(Authorize || GSOOnly || SuperAdmin || AssignPersonnel) && (
+            {(Authorize || GSOOnly || SuperAdmin || AssignPersonnel || DivisionManager) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />

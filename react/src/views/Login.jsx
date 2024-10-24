@@ -1,7 +1,7 @@
 import axiosClient from "../axios";
 import { useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
-import submitAnimation from '../assets/loading_nobg.gif';
+import submitAnimation from '/default/ring-loading.gif';
 
 export default function Login() {
 
@@ -50,14 +50,14 @@ export default function Login() {
 
   return (
     <>
-    <div className="flex min-h-screen flex-1 flex-col lg:flex-row ppa-cover font-roboto" style={{ backgroundImage: "url('ppa_bg.png')" }}>
+    <div className="flex min-h-screen flex-1 flex-col lg:flex-row ppa-cover font-roboto" style={{ backgroundImage: "url('default/ppa_bg.png')" }}>
       <div className="lg:w-3/4 order-2 lg:order-1"></div>
       <div className="lg:w-1/4 order-1 lg:order-2 bg-white px-6 py-10 lg:px-8 ppa-col">
         
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
               className="login-logo"
-              src="ppa_logo.png"
+              src="default/ppa_logo.png"
               alt="Your Company"
             />     
             <div className="mb-10 login-title">
@@ -118,11 +118,11 @@ export default function Login() {
 
               {/* Login Button */}
               <div>
-                <button type="submit" className={`px-6 py-2 w-full login-btn ${ submitLoading && 'login-btn'}`} disabled={submitLoading}>
+                <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn' : 'login-btn'}`} disabled={submitLoading}>
                   {submitLoading ? (
                     <div className="flex w-full items-center justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Processing</span>
+                      <span className="ml-1">Processing</span>
                     </div>
                   ) : (
                     'Login'

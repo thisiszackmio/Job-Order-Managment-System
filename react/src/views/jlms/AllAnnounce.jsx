@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef  } from "react";
 import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
-import submitAnimation from '../../assets/loading_nobg.gif';
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import Popup from "../../components/Popup";
+import submitAnimation from '/default/ring-loading.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 
 export default function AllAnnouncements(){
@@ -17,6 +18,7 @@ export default function AllAnnouncements(){
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
   const [selectedIdForDelete, setSelectedIdForDelete] = useState(null);
+  const textareaRef = useRef(null);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -127,7 +129,7 @@ export default function AllAnnouncements(){
       setPopupMessage(
         <div>
           <p className="popup-title">Success</p>
-          <p className="popup-message">Announcement update successfully</p>
+          <p className="popup-message">Announcement updated successfully.</p>
         </div>
       ); 
     })
@@ -156,8 +158,9 @@ export default function AllAnnouncements(){
   } 
 
   // Delete Announcement
-  const handleDeleteClick = () => {
+  const handleDelete = () => {
     if (selectedIdForDelete === null) return;
+    
     setSubmitLoading(true);
 
     axiosClient
@@ -184,7 +187,7 @@ export default function AllAnnouncements(){
 
   // Popup Button Function
   //Close Popup on Error
-  const justclose = () => {
+  const justClose = () => {
     setShowPopup(false);
   }
 
@@ -198,7 +201,7 @@ export default function AllAnnouncements(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK");
+  const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
 
   return(
     Authorize ? (
@@ -226,9 +229,9 @@ export default function AllAnnouncements(){
               <table className="ppa-table w-full mb-10 mt-2">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Date</th>
-                    <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">Message</th>
-                    <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
+                    <th className="px-1.5 py-1.5 text-center text-sm font-medium text-gray-600 uppercase">Date</th>
+                    <th className="px-1.5 py-1.5 text-center text-sm w-1 font-medium text-gray-600 uppercase">Message</th>
+                    <th className="px-1.5 py-1.5 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#fff' }}>
@@ -240,10 +243,11 @@ export default function AllAnnouncements(){
                           {editingId === getData.id ? (
                           <>
                             <textarea
+                              ref={textareaRef}
                               className="w-full ppa-form"
-                              style={{ resize: "none" }}
+                              style={{ resize: "none",  overflow: "hidden" }}
                               type="text"
-                              rows={5}
+                              rows={3}
                               value={editedDetails}
                               onChange={handleChange}
                               maxLength={maxCharacters}
@@ -262,7 +266,7 @@ export default function AllAnnouncements(){
                               <button 
                                 type="submit"
                                 onClick={() => handleSaveClick(event, getData.id)}
-                                className={`ml-2 py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                                className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                                 disabled={submitLoading}
                               >
                                 {submitLoading ? (
@@ -275,12 +279,14 @@ export default function AllAnnouncements(){
                                 )}
                               </button>
                               {/* Cancel */}
-                              <button
-                                className="px-3 py-2 btn-cancel ml-2"
-                                onClick={handleCancelClick}
-                              >
-                                Cancel
-                              </button>
+                              {!submitLoading && (
+                                <button
+                                  className="px-3 py-2 btn-cancel ml-2"
+                                  onClick={handleCancelClick}
+                                >
+                                  Cancel
+                                </button>
+                              )}
                             </>
                             ):(
                             <>
@@ -320,92 +326,17 @@ export default function AllAnnouncements(){
         
         {/* Popup */}
         {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            {/* Semi-transparent black overlay with blur effect */}
-            <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-            {/* Popup content */}
-            <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-              {/* Notification Icons */}
-              <div className="f-modal-alert">
-
-                {/* Error */}
-                {popupContent == 'error' && (
-                  <div className="f-modal-icon f-modal-error animate">
-                    <span className="f-modal-x-mark">
-                      <span className="f-modal-line f-modal-left animateXLeft"></span>
-                      <span className="f-modal-line f-modal-right animateXRight"></span>
-                    </span>
-                  </div>
-                )}
-
-                {/* Warning */}
-                {(popupContent == "warning") && (
-                  <div class="f-modal-icon f-modal-warning scaleWarning">
-                    <span class="f-modal-body pulseWarningIns"></span>
-                    <span class="f-modal-dot pulseWarningIns"></span>
-                  </div>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <div class="f-modal-icon f-modal-success animate">
-                    <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                    <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                  </div>
-                )}
-                
-              </div>
-              {/* Popup Message */}
-              <p className="text-lg text-center"> {popupMessage} </p>
-              {/* Buttons */}
-              <div className="flex justify-center mt-4">
-
-                {/* Warning */}
-                {(popupContent == "warning") && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    type="submit"
-                    onClick={handleDeleteClick}
-                    className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                      Close
-                    </button>
-                  )}
-                </>
-                )}
-
-                {/* Error Button */}
-                {popupContent == 'error' && (
-                  <button onClick={justclose} className="w-full py-2 btn-cancel">
-                    Close
-                  </button>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <button onClick={closePopup} className="w-full py-2 btn-default">
-                    Close
-                  </button>
-                )}
-
-              </div>
-            </div>
-          </div>
+          <Popup
+            popupContent={popupContent}
+            popupMessage={popupMessage}
+            handleDelete={handleDelete}
+            justClose={justClose}
+            closePopup={closePopup}
+            submitLoading={submitLoading}
+            submitAnimation={submitAnimation}
+          />
         )}
+        
       </PageComponent>
     ):(
       (() => { window.location = '/unauthorize'; return null; })()

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import submitAnimation from '../../../assets/loading_nobg.gif';
+import submitAnimation from '/default/ring-loading.gif';
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import moment from 'moment-timezone';
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import Popup from "../../../components/Popup";
 
 export default function FacilityVenueForm(){
   const { currentUserId, userCode } = useUserStateContext();
@@ -234,7 +235,7 @@ export default function FacilityVenueForm(){
 
   // Popup Button Function
   //Close Popup on Error
-  function justclose() {
+  function justClose() {
     setShowPopup(false);
   }
 
@@ -472,13 +473,13 @@ export default function FacilityVenueForm(){
             <button
               type="submit"
               form="vehicleslip"
-              className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
               disabled={submitLoading}
             >
               {submitLoading ? (
                 <div className="flex items-center justify-center">
                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-2">Processing...</span>
+                  <span className="ml-1">Processing...</span>
                 </div>
               ) : (
                 'Submit'
@@ -492,53 +493,14 @@ export default function FacilityVenueForm(){
 
       {/* Popup */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Semi-transparent black overlay with blur effect */}
-          <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-          {/* Popup content */}
-          <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-            {/* Notification Icons */}
-            <div className="f-modal-alert">
-
-              {/* Error */}
-              {popupContent == 'error' && (
-                <div className="f-modal-icon f-modal-error animate">
-                  <span className="f-modal-x-mark">
-                    <span className="f-modal-line f-modal-left animateXLeft"></span>
-                    <span className="f-modal-line f-modal-right animateXRight"></span>
-                  </span>
-                </div>
-              )}
-
-              {/* Success */}
-              {popupContent == 'success' && (
-                <div class="f-modal-icon f-modal-success animate">
-                  <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                  <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                </div>
-              )}
-
-            </div>
-            {/* Popup Message */}
-            <p className="text-lg text-center"> {popupMessage} </p>
-            {/* Buttons */}
-            <div className="flex justify-center mt-4">
-              {/* Error Button */}
-              {popupContent == 'error' && (
-                <button onClick={justclose} className="w-full py-2 btn-cancel">
-                  Close
-                </button>
-              )}
-
-              {/* Success */}
-              {popupContent == 'success' && (
-                <button onClick={closePopup} className="w-full py-2 btn-default">
-                  Close
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          justClose={justClose}
+          closePopup={closePopup}
+        />
       )}
 
     </PageComponent>

@@ -2,7 +2,8 @@ import PageComponent from "../../components/PageComponent";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import { Link } from "react-router-dom";
 
 export default function DashboardJOMS(){
 
@@ -89,27 +90,30 @@ export default function DashboardJOMS(){
         <div className="grid grid-cols-3 gap-4 mt-10">
 
           {/* For Repair */}
-          <div className="col-span-1 ppa-widget">
+          <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Pre/Post Repair Inspection Form </div>
+            <img className="mx-auto joms-icons" src="/default/technician-unscreen.gif" alt="Your Company"/>
             <div className="joms-count">{inspectionForm}</div>
             <div className="joms-word-count">Total Count</div>
-            <div className="ppa-system-link"> Request Form </div>
+            <div className="ppa-system-link"> <Link to={`/joms/inspection/form`}> Go to Request Form </Link> </div>
           </div>
 
           {/* For Facility */}
-          <div className="col-span-1 ppa-widget">
+          <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Facility / Venue Form </div>
+            <img className="mx-auto joms-icons" src="/default/form-unscreen.gif" alt="Your Company"/>
             <div className="joms-count">{facilityForm}</div>
             <div className="joms-word-count">Total Count</div>
-            <div className="ppa-system-link"> Request Form </div>
+            <div className="ppa-system-link"> <Link to={`/joms/facilityvenue/form`}> Go to Request Form </Link> </div>
           </div>
 
           {/* For Vehicle Slip */}
-          <div className="col-span-1 ppa-widget">
+          <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Vehicle Slip </div>
+            <img className="mx-auto joms-icons" src="/default/formother-unscreen.gif" alt="Your Company"/>
             <div className="joms-count">{vehicleForm}</div>
             <div className="joms-word-count">Total Count</div>
-            <div className="ppa-system-link"> Request Slip </div>
+            <div className="ppa-system-link"> <Link to={`/joms/vehicle/form`}> Go to Request Form </Link> </div>
           </div>
 
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
-import loadingAnimation from '/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import { Link } from "react-router-dom";
 
@@ -196,7 +196,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="asset.png" alt="Your Company"/>  
+              <img className="mx-auto jlms-icons" src="default/asset.gif" alt="Your Company"/>  
               AMS
             </div>
 
@@ -214,7 +214,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget relative">
 
             <div className="ppa-system-abbr joms">
-              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '50px', top: '5px', left: '40px' }} src="checklist.png" alt="Your Company"/>  
+              <img className="mx-auto jlms-icons" src="default/task-unscreen.gif" alt="Your Company"/>  
               JOMS
             </div>
 
@@ -232,7 +232,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="groups.png" alt="Your Company"/>  
+              <img className="mx-auto jlms-icons" src="default/personnel-unscreen.gif" alt="Your Company"/>  
               PPS
             </div>
 
@@ -250,7 +250,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto image-icon" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="paper.png" alt="Your Company"/>  
+              <img className="mx-auto jlms-icons" src="default/folder-unscreen.gif" alt="Your Company"/>  
               DTS
             </div>
 
@@ -268,7 +268,7 @@ export default function DashboardJLMS(){
           <div className="col-span-1 ppa-widget">
 
             <div className="ppa-system-abbr">
-              <img className="mx-auto" style={{ position: 'absolute', width: 'auto', height: '60px', left: '40px' }} src="fill.png" alt="Your Company"/>  
+              <img className="mx-auto jlms-icons" src="default/file-info-unscreen.gif" alt="Your Company"/>  
               DIS
             </div>
 

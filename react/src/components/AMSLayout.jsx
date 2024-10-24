@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import ppaLogo from '/ppa_logo.png';
-import defaultImage from '/default/default-avatar.jpg'
+import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faPlus, faChevronRight, faHouse, faTachometerAlt, faLayerGroup, faUserPlus, faTrash, faWarehouse, faBoxesStacked, faLandmark, faList, faTruck, faMapLocation, faFilePen, faFile, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 

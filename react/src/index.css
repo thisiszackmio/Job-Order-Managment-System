@@ -840,4 +840,5 @@ p.description {
 @media (min-width: 1368px) {
   .ppa-accordion { min-height: 40vh; }
   .logout-position { position: unset; }
+  .joms-icons { width: 20%; }
 }

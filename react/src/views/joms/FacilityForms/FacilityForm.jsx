@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import submitAnimation from '/default/ring-loading.gif';
+import ppa_logo from '/default/ppa_logo.png'
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
@@ -1026,7 +1027,7 @@ export default function FacilityForm(){
                   {/* Title and Logo */}
                   <tr>
                     <td className="border border-black w-32 p-2 text-center">
-                      <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
+                      <img src={ppa_logo} alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
                     </td>
                     <td className="border text-lg w-3/5 border-black font-arial text-center">
                       <b>REQUEST FOR THE USE OF FACILITY / VENUE</b>

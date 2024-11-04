@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import submitAnimation from '/default/ring-loading.gif';
+import ppa_logo from '/default/ppa_logo.png'
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
@@ -2410,7 +2411,7 @@ export default function InspectionForm(){
 
                       {/* Title and Logo */}
                       <td className="border border-black p-1 text-center" style={{ width: '100px' }}>
-                        <img src="/ppa_logo.png" alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
+                        <img src={ppa_logo} alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
                       </td>
                       <td className="border text-lg w-7/12 border-black font-arial text-center">
                         <b>PRE-REPAIR/POST REPAIR INSPECTION FORM</b>

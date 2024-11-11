@@ -17,14 +17,21 @@ const axiosClient = axios.create({
     return config;
 });
 
-axiosClient.interceptors.response.use(response => {
-    return response
-}, error =>{
-    if(error.response && error.response.status === 401){
-        router.navigate('/login')
-        return error;
+axiosClient.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if (error.response && error.response.status === 401) {
+        // Handle session invalidation or token expiration here
+        // If session is invalidated due to login from another device or expired token
+        localStorage.clear();  // Clear the session data
+        // Optionally, you can add a logout endpoint in Laravel to invalidate all sessions on the backend:
+        // await axios.post('/logout');  // If you want to notify the backend and log out from all devices
+  
+        // Redirect to the login page
+        router.navigate('/login');
+      }
+      return Promise.reject(error);
     }
-    throw error;
-});
+  );
 
 export default axiosClient;

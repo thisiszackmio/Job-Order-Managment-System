@@ -141,7 +141,7 @@ export default function UserListJLMS(){
               {/* Count */}
               <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
                 <div className="text-right text-sm/[17px]">
-                  Total of {currentUser.length} user's list
+                  Total of {userList.length} user's list
                 </div>
               </div>
 

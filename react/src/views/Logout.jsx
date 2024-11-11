@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import axiosClient from '../axios';
 import { useNavigate } from 'react-router-dom';
 
-const Logout = ({ setCurrentUser, setUserToken }) => {
+const Logout = ({ setCurrentId, setUserToken }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const Logout = ({ setCurrentUser, setUserToken }) => {
       // Redirect to the login page
       navigate('/');
     });
-  }, [navigate, setCurrentUser, setUserToken]);
+  }, [navigate, setCurrentId, setUserToken]);
 
   return (
     <div>

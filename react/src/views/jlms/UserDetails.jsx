@@ -6,6 +6,8 @@ import axiosClient from "../../axios";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import Popup from "../../components/Popup";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 
 
 export default function UserDetailsJLMS(){
@@ -96,6 +98,7 @@ export default function UserDetailsJLMS(){
   const [uploadedEsigName, setUploadedEsigName] = useState('');
   const [uploadEsig, setUploadEsig] = useState('');
   const [selectedRoles, setSelectedRoles] = useState([]);
+  const [getpassword, setPassword] = useState('');
 
   // Function
   const [actionInProgress, setActionInProgress] = useState(false);
@@ -104,12 +107,16 @@ export default function UserDetailsJLMS(){
   const [enableCC, setChangeCC] = useState(false);
   const [enableAvatar, setChangeAvatar] = useState(false);
   const [enableEsig, setChangeEsig] = useState(false);
+  const [enablePassword, setChangePassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Cancel Form
   const handleCancel = () => {
     setEditUser(false);
     setChangeCC(false);
+    setChangeEsig(false);
     setChangeAvatar(false);
+    setChangePassword(false);
     setActionInProgress(false);
   };
 
@@ -161,6 +168,17 @@ export default function UserDetailsJLMS(){
     </div>
   );
 
+  // Divisions
+  const divisions = [
+    "Administrative Division",
+    "Finance Division",
+    "Office of the Port Manager",
+    "Port Service Division",
+    "Port Police Division",
+    "Engineering Service Division",
+    "Terminal Management Office - Tubod"
+  ];
+
   //Submit Button on Update User Details
   function SubmitUserDetails(e){
     e.preventDefault();
@@ -179,49 +197,64 @@ export default function UserDetailsJLMS(){
       logs : logs
     }
 
-    axiosClient
-    .put(`updatedetail/${id}`, updateUserData)
-    .then(() => {
+    const checkInputFields = [fname, mname, lname, position, division, username].some(Boolean);
+
+    if(!checkInputFields){
       setShowPopup(true);
-      setPopupContent('success');
+      setPopupContent('error');
       setPopupMessage(
         <div>
-          <p className="popup-title">Success</p>
-          <p className="popup-message">The user information has been updated</p>
+          <p className="popup-title">Field is required</p>
+          <p className="popup-message">You have left a field empty. A value must be entered.</p>
         </div>
       );
-    })
-    .catch((error) => {
-      if (error.response && error.response.status === 404) {
-        // User not found
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">User not Found!</p>
-            <p className="popup-message">You cannot update the user detail, please inform the developer (Error 404)</p>
-          </div>
-        );
-      } else if (error.response && error.response.status === 204){
-        // Something wrong on submitting
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">There is something wrong</p>
-            <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
-          </div>
-        );
-      } else {
-        // System Error
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }
-    })
-    .finally(() => {
       setSubmitLoading(false);
-    });
+    }else{
+      axiosClient
+      .put(`updatedetail/${id}`, updateUserData)
+      .then(() => {
+        setShowPopup(true);
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p className="popup-message">The user information has been updated</p>
+          </div>
+        );
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 404) {
+          // User not found
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">User not Found!</p>
+              <p className="popup-message">You cannot update the user detail, please inform the developer (Error 404)</p>
+            </div>
+          );
+        } else if (error.response && error.response.status === 204){
+          // Something wrong on submitting
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">There is something wrong</p>
+              <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
+            </div>
+          );
+        } else {
+          // System Error
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(DevErrorText);
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
+
   }
 
   //Submit Button on Update Code Clearance
@@ -266,6 +299,16 @@ export default function UserDetailsJLMS(){
           <div>
             <p className="popup-title">There is something wrong</p>
             <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
+          </div>
+        );
+      } else if (error.response && error.response.status === 422) {
+        // Empty Fields
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Field is required</p>
+            <p className="popup-message">You have left a field empty. A value must be entered.</p>
           </div>
         );
       } else {
@@ -330,6 +373,16 @@ export default function UserDetailsJLMS(){
             <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
           </div>
         );
+      } else if (error.response && error.response.status === 422) {
+        // Empty Fields
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Field is required</p>
+            <p className="popup-message">You have left a field empty. A value must be entered.</p>
+          </div>
+        );
       } else {
         // System Error
         setShowPopup(true);
@@ -342,7 +395,7 @@ export default function UserDetailsJLMS(){
     });
   }
 
-  // Submit Button on Update Avatar
+  // Submit Button on Update Esig
   function SubmitEsig(e){
     e.preventDefault();
 
@@ -392,6 +445,16 @@ export default function UserDetailsJLMS(){
             <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
           </div>
         );
+      } else if (error.response && error.response.status === 422) {
+        // Empty Fields
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Field is required</p>
+            <p className="popup-message">You have left a field empty. A value must be entered.</p>
+          </div>
+        );
       } else {
         // System Error
         setShowPopup(true);
@@ -402,6 +465,13 @@ export default function UserDetailsJLMS(){
     .finally(() => {
       setSubmitLoading(false);
     });
+  }
+
+  // Submit Button on Update Password
+  function SubmitPwd(e){
+    e.preventDefault();
+
+    alert("Hi")
   }
 
   // Delete the account
@@ -520,7 +590,7 @@ export default function UserDetailsJLMS(){
                   Change Avatar
                 </button>
 
-                {/* Change Avatar */}
+                {/* Change Esig */}
                 <button 
                   onClick={() => {
                     setChangeEsig(true);
@@ -530,6 +600,18 @@ export default function UserDetailsJLMS(){
                   disabled={actionInProgress}
                 >
                   Change Esig
+                </button>
+
+                {/* Change Password */}
+                <button 
+                  onClick={() => {
+                    setChangePassword(true);
+                    setActionInProgress(true);
+                  }} 
+                  className="ml-2 py-2 px-4 btn-default"
+                  disabled={actionInProgress}
+                >
+                  Change Password
                 </button>
 
                 {/* Delete Account User */}
@@ -691,13 +773,12 @@ export default function UserDetailsJLMS(){
                             className="block w-full ppa-form"
                           >
                             <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
-                            <option value="Administrative Division">Administrative Division</option>
-                            <option value="Finance Division">Finance Division</option>
-                            <option value="Office of the Port Manager">Office of the Port Manager</option>
-                            <option value="Port Service Division">Port Service Division</option>
-                            <option value="Port Police Division">Port Police Division</option>
-                            <option value="Engineering Service Division">Engineering Service Division</option>
-                            <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
+                            {divisions
+                              .filter(div => div !== userDet.division)
+                              .map(div => (
+                                <option key={div} value={div}>{div}</option>
+                              ))
+                            }
                           </select>
                         </div>
                       ):(
@@ -910,7 +991,6 @@ export default function UserDetailsJLMS(){
                                 accept=".png, .jpg, .jpeg"
                                 className="sr-only" 
                                 onChange={handleAvatarChange} 
-                                required 
                               />
                             </label>
                           </div>
@@ -958,6 +1038,36 @@ export default function UserDetailsJLMS(){
                   </form>
                 )}
 
+                {/* Password */}
+                {enablePassword && (
+                  <form id="user_pwd" onSubmit={SubmitPwd} action="#" method="POST">
+                    <div className="flex items-center mt-10">
+                      <div className="w-36">
+                        <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
+                          Password:
+                        </label> 
+                      </div>
+                      <div className="w-full relative">
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={getpassword}
+                        onChange={ev => setPassword(ev.target.value)}
+                        className="block w-full ppa-form input-placeholder"
+                      />
+                      <button
+                        type="button"
+                        className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                      </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
+
               </div>
 
               {/* User Avatar and E-sig */}
@@ -988,7 +1098,7 @@ export default function UserDetailsJLMS(){
                   <button 
                     form="user_details"
                     type="submit"
-                    className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -1020,7 +1130,7 @@ export default function UserDetailsJLMS(){
                   <button 
                     form="user_code"
                     type="submit"
-                    className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -1051,7 +1161,7 @@ export default function UserDetailsJLMS(){
                   <button 
                     form="user_avatar"
                     type="submit"
-                    className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -1082,7 +1192,38 @@ export default function UserDetailsJLMS(){
                   <button 
                     form="user_esig"
                     type="submit"
-                    className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-1">Loading</span>
+                      </div>
+                    ):(
+                      'Submit'
+                    )}
+                  </button>
+                  
+                  {/* Delete Account User */}
+                  {!submitLoading && (
+                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                      Cancel
+                    </button>
+                  )}
+                </>
+                )}
+              </div>
+
+              {/* Submit button on Password */}
+              <div>
+                {enablePassword && (
+                <>
+                  {/* Submit */}
+                  <button 
+                    form="user_pwd"
+                    type="submit"
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (

@@ -11,6 +11,7 @@ use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -99,21 +100,26 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
+        // Get the user information
         $user = PPAEmployee::where('username', $credentials['username'])->first();
 
         // Check if the user account exists and the password is valid
         if(!$user || !Hash::check($credentials['password'], $user->password)){
-            return response()->json(['error' => 'Invalid Username / Password'], 422);
+            return response()->json(['error' => 'Invalid'], 422);
         }
+
+        // Check if the user token if exist
+        $token = PersonalAccessToken::where('tokenable_id', $user->id)->first();
+        if($token){ return response()->json(['error' => 'TokenExist'], 422); }
 
         // Check if the user is need to change pass
         if($user->status == 2){
-            return response()->json(['error' => 'Change Pass'], 422);
+            return response()->json(['error' => 'ChangePass'], 422);
         }
 
         // Check if the user is active
         if($user->status == 0){
-            return response()->json(['error' => 'This account is no longer active'], 404);
+            return response()->json(['error' => 'NotActive'], 404);
         }
 
         $userdata = [

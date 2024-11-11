@@ -299,6 +299,10 @@ class UserController extends Controller
     }
 
     /**
+     * Update User's Esignature
+     */
+
+    /**
      * Remove Account
      */
     public function removeEmployee(Request $request, $id){

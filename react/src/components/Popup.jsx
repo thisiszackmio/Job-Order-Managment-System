@@ -49,15 +49,15 @@ export default function Popup({
             </div>
           )}
           {/* Warning */}
-          {(popupContent == "warning" || 
+          {(popupContent == "warning" ||
             popupContent == "delete_user" ||
             popupContent == "dma" || popupContent == "dmd" || popupContent == "gsoi" || popupContent == "ama" || popupContent == "gsocr" || popupContent == "gsofc" ||
             popupContent == "adf" || popupContent == "amif" ||
             popupContent == "vdd" || popupContent == "amav" || popupContent == "amdv" || popupContent == "gsovcf")
             && (
-            <div class="f-modal-icon f-modal-warning scaleWarning">
-              <span class="f-modal-body pulseWarningIns"></span>
-              <span class="f-modal-dot pulseWarningIns"></span>
+            <div className="f-modal-icon f-modal-warning scaleWarning">
+              <span className="f-modal-body pulseWarningIns"></span>
+              <span className="f-modal-dot pulseWarningIns"></span>
             </div>
           )}
         </div>

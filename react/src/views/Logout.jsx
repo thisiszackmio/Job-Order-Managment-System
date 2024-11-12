@@ -7,13 +7,15 @@ const Logout = ({ setCurrentId, setUserToken }) => {
 
   useEffect(() => {
     // Perform the logout logic
-    axiosClient.post('/logout').then((response) => {
-      setCurrentId({});
+    axiosClient.post('/logout').then(() => {
+      localStorage.removeItem('USER_ID');
       localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USER_CODE');
+      localStorage.removeItem('loglevel');
       setUserToken(null);
 
       // Redirect to the login page
-      navigate('/');
+      navigate('/login');
     });
   }, [navigate, setCurrentId, setUserToken]);
 

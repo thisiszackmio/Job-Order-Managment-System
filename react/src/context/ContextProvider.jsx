@@ -7,6 +7,7 @@ const StateContext = createContext({
   setCurrentId: () => {},
   setUserToken: () => {},
   setUserCode: () => {},
+  clearUserData: () => {},
 });
 
 export const ContextProvider = ({ children }) => {
@@ -22,6 +23,13 @@ export const ContextProvider = ({ children }) => {
     }
   }, []);
 
+  // Create a function to update both the context and localStorage
+  const updateCurrentUserId = (id) => {
+    localStorage.setItem('USER_ID', JSON.stringify(id));
+    setCurrentId(id);
+  };
+
+  // Get Token
   const setUserTokenAndLocalStorage = (token) => {
     if (token) {
       localStorage.setItem('TOKEN', token);
@@ -31,19 +39,25 @@ export const ContextProvider = ({ children }) => {
     setUserToken(token);
   };
 
-  // Create a function to update both the context and localStorage
-  useEffect(() => {
-    localStorage.setItem('USER_CODE', userCode);
-  }, [userCode]);
-
+  // Get Code Clearance
   const updateUserCode = (code) => {
+    if(code) {
+      localStorage.setItem('USER_CODE', code);
+    } else {
+      localStorage.removeItem('USER_CODE');
+    }
     setUserCode(code);
   };
 
-  // Create a function to update both the context and localStorage
-  const updateCurrentUserId = (id) => {
-    localStorage.setItem('USER_ID', JSON.stringify(id));
-    setCurrentId(id);
+  // Clear all user data from context and localStorage (for logout)
+  const clearUserData = () => {
+    localStorage.removeItem('USER_ID');
+    localStorage.removeItem('TOKEN');
+    localStorage.removeItem('USER_CODE');
+    setCurrentId(null);
+    setUserToken('');
+    setUserCode('');
+    setTimeActivity(null);
   };
 
   return (
@@ -55,6 +69,7 @@ export const ContextProvider = ({ children }) => {
         setUserToken: setUserTokenAndLocalStorage,
         userCode,
         setUserCode: updateUserCode,
+        clearUserData,
       }}
     >
       {children}

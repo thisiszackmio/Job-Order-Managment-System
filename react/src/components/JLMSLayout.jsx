@@ -14,7 +14,7 @@ function classNames(...classes) {
 }
 
 export default function JLMSLayout() {
-  const { currentUserId, setCurrentId, setUserToken, userCode } = useUserStateContext();
+  const { currentUserId, setCurrentId, setUserToken, userCode, setUserCode } = useUserStateContext();
 
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
@@ -43,11 +43,14 @@ export default function JLMSLayout() {
   // Logout Area
   const logout = () => {
     // Perform the logout logic
-    axiosClient.post('/logout').then((response) => {
-      setCurrentId({});
+    axiosClient.post('/logout').then(() => {
+      localStorage.removeItem('USER_ID');
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USER_CODE');
+      localStorage.removeItem('loglevel');
       setUserToken(null);
 
-      // Redirect to the login page using the navigate function
+      // Redirect to the login page
       navigate('/login');
     });
   };

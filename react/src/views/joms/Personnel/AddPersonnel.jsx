@@ -324,7 +324,7 @@ export default function AddPersonnel(){
                   <>
                     <button 
                       type="submit"
-                      className={`ml-3 py-2 px-3 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                      className={`ml-3 py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                       disabled={submitLoading}
                     >
                     {submitLoading ? (
@@ -404,7 +404,7 @@ export default function AddPersonnel(){
                   <button 
                     type="submit"
                     onClick={RemovePersonnel}
-                    className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading w-full' : 'btn-default w-1/2' }`}
+                    className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (

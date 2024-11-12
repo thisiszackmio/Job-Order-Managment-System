@@ -17,6 +17,27 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+
+    /**
+     * User's Status Code
+     * 
+     * 0 - Not Active / Deactivate
+     * 1 - Active
+     * 2 - Change Password
+     */
+
+    /**
+     * Check the User's Code Clearance
+     */
+    public function checkCode($id){
+
+        $data = PPAEmployee::find($id);
+        $codeClearance = $data->code_clearance;
+
+        return response()->json($codeClearance);
+    }
+
+
     /**
      * Show all User Employee's Data
      */
@@ -157,25 +178,36 @@ class UserController extends Controller
      * Update User's Code Clearance
      */
     public function updateEmployeeCodeClearance(Request $request, $id){
-
         // Validate
         $validateCC = $request->validate([
             'code_clearance' => 'required|string',
         ]);
 
+        // Find the user
         $getUser = PPAEmployee::find($id);
 
         if (!$getUser) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
+        // Check if "AP" exists in the current code clearance
+        $currentCodeClearance = $getUser->code_clearance;
+        $newCodeClearance = $validateCC['code_clearance'];
+
+        // Remove "AP" if it appears anywhere in the new code clearance input
+        $newCodeClearance = str_replace('AP', '', $newCodeClearance);
+
+        // Add "AP" to the end if it was in the original data
+        if (str_contains($currentCodeClearance, 'AP')) {
+            $newCodeClearance .= ', AP';
+        }
+
         // Update Data
         $updateCC = $getUser->update([
-            'code_clearance' => $validateCC['code_clearance'],
+            'code_clearance' => $newCodeClearance,
         ]);
 
         if($updateCC){
-
             // Logs
             $logs = new LogsModel();
             $logs->category = 'User';
@@ -184,8 +216,9 @@ class UserController extends Controller
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
-            return response()->json(['message' => 'There area some missing.'], 204);
+            return response()->json(['message' => 'There are some missing details.'], 204);
         }
+
     }
 
     /**
@@ -301,6 +334,41 @@ class UserController extends Controller
     /**
      * Update User's Esignature
      */
+    public function updatePassword(Request $request, $id){
+        // Validate
+        $validatePWD = $request->validate([
+            'password' => [
+                'required',
+                Password::min(8)->mixedCase()->numbers()->symbols()
+            ],
+        ]);
+
+        // Find the user
+        $getUser = PPAEmployee::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Update Data
+        $updatePWD = $getUser->update([
+            'password' =>  $validatePWD['password'],
+            'status' =>  2,
+        ]);
+
+        if($updatePWD){
+
+            // Logs
+            $logs = new LogsModel();
+            $logs->category = 'User';
+            $logs->message = $request->input('logs');
+            $logs->save();
+
+            return response()->json(['message' => 'User details updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'There area some missing.'], 204);
+        }
+    }
 
     /**
      * Remove Account

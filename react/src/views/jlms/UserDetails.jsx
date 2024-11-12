@@ -75,6 +75,7 @@ export default function UserDetailsJLMS(){
         'PM': 'PortManager',
         'DM': 'DivisionManager',
         'PT': 'ProcurementTeam',
+        'AP': 'Assign Personnel',
       };
 
       const cc = userDet.code_clearance.split(',').map(code => clearanceLabels[code.trim()] || code).join(', ');
@@ -471,7 +472,79 @@ export default function UserDetailsJLMS(){
   function SubmitPwd(e){
     e.preventDefault();
 
-    alert("Hi")
+    setSubmitLoading(true);
+
+    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user password.`;
+
+    if(!getpassword){
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Field is required</p>
+          <p className="popup-message">You have left a field empty. A value must be entered.</p>
+        </div>
+      );
+      setSubmitLoading(false);
+    }else{
+      axiosClient
+      .put(`updatepassword/${id}`, {
+        password: getpassword,
+        logs: logs
+      })
+      .then(() => {
+        setShowPopup(true);
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p className="popup-message">The password has been updated</p>
+          </div>
+        );
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 404) {
+          // User not found
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">User not Found!</p>
+              <p className="popup-message">You cannot update the user detail, please inform the developer (Error 404)</p>
+            </div>
+          );
+        } else if (error.response && error.response.status === 204){
+          // Something wrong on submitting
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">There is something wrong</p>
+              <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
+            </div>
+          );
+        } else if (error.response && error.response.status === 422) {
+          // Empty Fields
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Field is required</p>
+              <p className="popup-message">You have left a field empty. A value must be entered.</p>
+            </div>
+          );
+        } else {
+          // System Error
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(DevErrorText);
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
+
   }
 
   // Delete the account
@@ -552,7 +625,7 @@ export default function UserDetailsJLMS(){
                 <Link to="/userlist">Back to User List</Link>
               </button>
 
-              {(userDet?.status == 1 && SuperAdmin) ? (
+              {(userDet?.status != 0 && SuperAdmin) ? (
               <>
                 {/* Update Details */}
                 <button 
@@ -642,7 +715,7 @@ export default function UserDetailsJLMS(){
                     </label> 
                   </div>
                   <div className="w-full pl-1 text-lg">
-                    {userDet?.status == 1 ? ("Active"):("Deleted")}
+                    {userDet?.status != 0 ? ("Active"):("Deleted")}
                   </div>
                 </div>
 
@@ -661,7 +734,7 @@ export default function UserDetailsJLMS(){
                 </div>
                 ):null}
 
-                {userDet?.status == 1 ? (
+                {userDet?.status != 0 ? (
                 <>
                   {/* User ID */}
                   <div className="flex items-center mt-5">
@@ -1071,7 +1144,7 @@ export default function UserDetailsJLMS(){
               </div>
 
               {/* User Avatar and E-sig */}
-              {userDet?.status == 1 ? (
+              {userDet?.status != 0 ? (
                 <div className="col-span-1 flex flex-col items-center">
                   {/* Avatar */}
                   <div>

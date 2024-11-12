@@ -162,31 +162,14 @@ export default function Login() {
           {/* Popup Message */}
           <p className="text-lg text-center"> 
             <p className="popup-title">Still Login</p>
-            <p className="popup-message">This user is still logged in. Do you want to log out to sign in on this device?</p>
+            <p className="popup-message">It seems this account is active on another device. Please log out there before signing in on this device.</p>
           </p>
           {/* Buttons */}
           <div className="flex justify-center mt-4">
-            {/* Confirm */}
-            <button 
-              type="submit"
-              onClick={() => SubmitSupReason(inspectionData)}
-              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
-              disabled={submitLoading}
-            >
-              {submitLoading ? (
-                <div className="flex justify-center">
-                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                  <span className="ml-1">Loading</span>
-                </div>
-              ):(
-                'Yes, Please'
-              )}
-            </button>
-
             {/* Cancel */}
             {!submitLoading && (
-              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
-                Close
+              <button onClick={justClose} className="w-full py-2 btn-default ml-2">
+                Noted
               </button>
             )}
           </div>

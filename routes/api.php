@@ -29,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
 
+  // --- Check Code Clearance --- //
+  Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
+
   // --- Team List --- //
   Route::get('/teams', [AnnounceController::class, 'teamList']);
 
@@ -48,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/updatecc/{id}', [UserController::class, 'updateEmployeeCodeClearance']); // Update Employee Code Clearance
   Route::put('/updateaavatar/{id}', [UserController::class, 'updateEmployeeAvatar']); // Update Employee Avatar
   Route::put('/updateesig/{id}', [UserController::class, 'updateEmployeeEsig']); // Update Employee Esig
+  Route::put('/updatepassword/{id}', [UserController::class, 'updatePassword']); // Get employee details
   Route::delete('/deleteuser/{id}', [UserController::class, 'removeEmployee']); // Delete User
   Route::get('/showusers', [UserController::class, 'showEmployee']); // Show employee list
   Route::get('/userdetail/{id}', [UserController::class, 'employeeDetails']); // Get employee details

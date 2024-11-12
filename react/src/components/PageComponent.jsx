@@ -8,8 +8,8 @@ const MAIN_LOGOUT_TIME = 500 * 1000;
 const POPUP_GRACE_PERIOD = 200 * 1000;
 
 export default function PageComponent({title, buttons = '', children}){
-  const { setCurrentId, setUserToken } = useUserStateContext();
-
+  const { currentUserId, userCode, setCurrentId, setUserToken } = useUserStateContext();
+  
   const [showPopup, setShowPopup] = useState(false);
 
   // Disable the Scroll on Popup
@@ -54,6 +54,30 @@ export default function PageComponent({title, buttons = '', children}){
       navigate("/");
     });
   }, [navigate, setCurrentId, setUserToken]);
+
+  // Check Code Clearance
+  useEffect(() => {
+    axiosClient
+      .get(`/checkcc/${currentUserId?.id}`)
+      .then((response) => {
+        const CodeClearanceData = response.data; // e.g., "MEM", "HACK"
+        const CurrentCodeClearance = userCode;   // e.g., "HACK", "MEM"
+
+        // Function to check if two strings contain the same characters in any order
+        function areStringsEqual(str1, str2) {
+          if (str1.length !== str2.length) return false;
+          return str1.split('').sort().join('') === str2.split('').sort().join('');
+        }
+
+        // If they don't match, log the user out
+        if (!areStringsEqual(CodeClearanceData, CurrentCodeClearance)) {
+          logout();
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [currentUserId?.id, logout]);
 
   // Main timer countdown function
   const startMainCountdown = () => {

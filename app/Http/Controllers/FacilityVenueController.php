@@ -97,18 +97,21 @@ class FacilityVenueController extends Controller
         foreach ($getDataFacs as $facility) {
             $facilityStartDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_start.' '.$facility->time_start);
             $facilityEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_end.' '.$facility->time_end);
-    
-            if ($facility->admin_approval === 3 && 
-            ($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
-            ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)) { 
-                return response()->json(['message' => 'Pending']);
+
+            if($facility->admin_approval === 3){
+                if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
+                ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
+                    return response()->json(['message' => 'Pending']);
+                }
+            }
+
+            if($facility->admin_approval === 1){
+                if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
+                ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
+                    return response()->json(['message' => 'Not Vacant']);
+                }
             }
     
-            if ($facility->admin_approval === 1 || $facility->admin_approval === 2 || 
-                ($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
-                ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)) {
-                return response()->json(['message' => 'Not Vacant']);
-            }
         }
     
         // If no conflicts, return 'Vacant'

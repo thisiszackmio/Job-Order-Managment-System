@@ -1640,7 +1640,7 @@ export default function InspectionForm(){
                             lastfilledDate && natureRepair ? (
                               // Filled all the forms
                               <button type="submit" form="partBForm"
-                                className={`py-2 px-3 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
+                                className={`py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
                                 disabled={submitLoading}
                               >
                               {submitLoading ? (

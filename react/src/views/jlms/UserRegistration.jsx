@@ -122,7 +122,7 @@ export default function UserRegistrationJLMS(){
     formData.append("username", getusername);
     formData.append("password", getpassword);
     formData.append("consfirmPassword", passwordCorfirmation);
-    formData.append("status", 1);
+    formData.append("status", 2);
 
     // Axios Client
     axiosClient.post("/register", formData, {

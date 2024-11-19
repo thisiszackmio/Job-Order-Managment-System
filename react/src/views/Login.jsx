@@ -11,9 +11,14 @@ export default function Login() {
   // Variable
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [inputErrors, setInputErrors] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [changePass, setChangePass] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   // Submit the login
   const onSubmit = async (ev) => {
@@ -43,11 +48,56 @@ export default function Login() {
       if(responseData == "TokenExist"){
         setShowPopup(true)
       }
+      else if(responseData == "Invalid"){
+        setInputErrors('Invalid Username / Password');
+      }
+      else if (responseData == "ChangePass"){
+        setChangePass(true);
+      }
 
     } finally {
         setSubmitLoading(false);
     }
   };
+
+  // Update Password
+  function onUpdateLogin(ev) {
+    ev.preventDefault();
+    setSubmitLoading(true);
+  
+    axiosClient
+      .put("/updateuser", {
+        username,
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      })
+      .then(() => {
+        setInputErrors('Password updated successfully'); // Clear errors on success
+        setChangePass(false);
+      })
+      .catch((error) => {
+        const message = error.response?.data?.error;
+  
+        if (error.response.status === 422) {
+          if (message === 'Incorrect password') {
+            setInputErrors('Incorrect current password');
+          } else if (message === 'User not found.') {
+            setInputErrors('User does not exist');
+          } else if (message === 'The confirmPassword and newPassword must match.') {
+            setInputErrors('Confirm Password does not match');
+          } else {
+            setInputErrors('Please check your input');
+          }
+        } else {
+          setInputErrors('An unexpected error occurred');
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+  }
+  
 
   //Close Popup on Error
   function justClose() {
@@ -69,7 +119,7 @@ export default function Login() {
               src="default/ppa_logo.png"
               alt="Your Company"
             />     
-            <div className="mb-10 login-title">
+            <div className="mb-5 login-title">
               <div>Joint Local</div>
               <div>Management System</div>
             </div>
@@ -82,47 +132,160 @@ export default function Login() {
 
           </div>
 
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
+          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+            
+            {changePass ? (
+            <>
+            <form onSubmit={onUpdateLogin} className="space-y-4" action="#" method="POST">
 
-              {/* Username */}
+              {/* Current Password*/}
+              <div className="relative">
+                
+                {/* Label with animated position */}
+                <label
+                  htmlFor="old_password"
+                  className={`ppa-label ${
+                    isFocused || currentPassword ? "ppa-label-focused" : ""
+                  }`}
+                >
+                  Current Password
+                </label>
+
+                {/* Input field */}
+                <input
+                  id="old_password"
+                  name="old_password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(ev) => setCurrentPassword(ev.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="block w-full ppa-form"
+                />
+
+              </div>
+
+              {/* New Password*/}
+              <div className="relative">
+                
+                {/* Label with animated position */}
+                <label
+                  htmlFor="new_password"
+                  className={`ppa-label ${
+                    isFocused || newPassword ? "ppa-label-focused" : ""
+                  }`}
+                >
+                  New Password
+                </label>
+
+                {/* Input field */}
+                <input
+                  id="new_password"
+                  name="new_password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(ev) => setNewPassword(ev.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="block w-full ppa-form"
+                />
+
+              </div>
+
+              {/* Confirm Password*/}
+              <div className="relative">
+                
+                {/* Label with animated position */}
+                <label
+                  htmlFor="new_password"
+                  className={`ppa-label ${
+                    isFocused || confirmPassword ? "ppa-label-focused" : ""
+                  }`}
+                >
+                  Confirm Password
+                </label>
+
+                {/* Input field */}
+                <input
+                  id="confirm_password"
+                  name="confirm_password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(ev) => setConfirmPassword(ev.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="block w-full ppa-form"
+                />
+
+              </div>
+
+              <p className="loginMessage">Password must contain at least one uppercase letter, one number, one symbol, and be at least 8 characters long. </p>
+
+              {/* Submit Button */}
               <div>
-                <div className="mt-2">
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="username"
-                    required
-                    placeholder="Username"
-                    value={username}
-                    onChange={(ev) => setUsername(ev.target.value)}
-                    className="block w-full ppa-form"
-                  />
-                </div>
+                <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn' : 'login-btn'}`} disabled={submitLoading}>
+                  {submitLoading ? (
+                    <div className="flex w-full items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Processing</span>
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
+                </button>
+              </div>
+            </form>
+            </>
+            ):(
+            <>
+            <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
+              {/* Username */}
+              <div className="relative">
+                <label
+                  htmlFor="username"
+                  className={`ppa-label ${
+                    isFocused || username ? "ppa-label-focused" : ""
+                  }`}
+                >
+                  Username
+                </label>
+
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  value={username}
+                  onChange={(ev) => setUsername(ev.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="block w-full ppa-form"
+                />
+
               </div>
 
               {/* Password */}
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      Forgot password?
-                    </a>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Password"
-                    value={password}
-                    onChange={(ev) => setPassword(ev.target.value)}
-                    className="block w-full ppa-form"
-                  />
-                </div>
+              <div className="relative">
+                <label
+                  htmlFor="password"
+                  className={`ppa-label ${
+                    isFocused || password ? "ppa-label-focused" : ""
+                  }`}
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(ev) => setPassword(ev.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className="block w-full ppa-form"
+                />
               </div>
 
               {/* Login Button */}
@@ -138,7 +301,10 @@ export default function Login() {
                   )}
                 </button>
               </div>
-            </form>
+              </form>
+            </>
+            )}
+            
           
           </div>
 

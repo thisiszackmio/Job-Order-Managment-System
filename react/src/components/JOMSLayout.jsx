@@ -31,11 +31,15 @@ export default function JOMSLayout() {
   // Logout Area
   const logout = () => {
     // Perform the logout logic
-    axiosClient.post('/logout').then((response) => {
-      setCurrentId({});
+    axiosClient.post('/logout').then(() => {
+      localStorage.removeItem('USER_ID');
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USER_CODE');
+      localStorage.removeItem('loglevel');
+      localStorage.removeItem('LAST_ACTIVITY');
       setUserToken(null);
 
-      // Redirect to the login page using the navigate function
+      // Redirect to the login page
       navigate('/login');
     });
   };

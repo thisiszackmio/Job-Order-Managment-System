@@ -20,6 +20,47 @@
 .btn-add:hover { background: #0fbe84; transition: 300ms; }
 .ppa-system-link:hover { background-color: rgb(0 0 0 / 32%); transition: 0.3s; }
 
+/* For The Animation on Label Fields */
+.loginMessage {
+  margin-top: 5px !important;
+  font-size: 11px;
+  line-height: 13px;
+}
+
+/* Initial label style */
+.ppa-label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #888;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+/* Label style when input is focused or contains text */
+.ppa-label-focused {
+  top: 0;
+  left: 10px;
+  font-size: 12px;
+  color: #333;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+/* Input styling */
+.ppa-form {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ppa-form:focus {
+  border-color: #007bff;
+}
 
 /* Pagination */
 .login-error {

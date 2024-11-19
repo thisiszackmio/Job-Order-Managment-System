@@ -12,6 +12,7 @@ const Logout = ({ setCurrentId, setUserToken }) => {
       localStorage.removeItem('TOKEN');
       localStorage.removeItem('USER_CODE');
       localStorage.removeItem('loglevel');
+      localStorage.removeItem('LAST_ACTIVITY');
       setUserToken(null);
 
       // Redirect to the login page

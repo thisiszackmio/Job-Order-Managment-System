@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
 
-const MAIN_LOGOUT_TIME = 300 * 1000; // 500 seconds
-const POPUP_GRACE_PERIOD = 120 * 1000; // 120 seconds
-const INACTIVITY_LIMIT = 120000; // Inactivity limit in milliseconds
+const MAIN_LOGOUT_TIME = 3 * 60 * 1000; // 300 seconds
+const POPUP_GRACE_PERIOD = 2 * 60 * 1000; // 120 seconds
+const INACTIVITY_LIMIT = 5 * 60 * 1000; // Inactivity limit in milliseconds
 
 export default function PageComponent({ title, buttons = '', children }) {
   const { currentUserId, userCode, setCurrentId, setUserToken } = useUserStateContext();
@@ -16,6 +16,7 @@ export default function PageComponent({ title, buttons = '', children }) {
   const [isTabActive, setIsTabActive] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(MAIN_LOGOUT_TIME);
   const [popupCountdown, setPopupCountdown] = useState(POPUP_GRACE_PERIOD);
+  const [isInactive, setIsInactive] = useState(false);
 
   const timeoutRef = useRef(null);
   const popupRef = useRef(null);
@@ -27,21 +28,18 @@ export default function PageComponent({ title, buttons = '', children }) {
       localStorage.removeItem('TOKEN');
       localStorage.removeItem('USER_CODE');
       localStorage.removeItem('loglevel');
+      localStorage.removeItem('LAST_ACTIVITY');
       setUserToken(null);
       navigate("/login");
     });
   }, [navigate, setCurrentId, setUserToken]);
 
-  // Save the last activity timestamp to localStorage
-  const saveLastActivity = () => {
-    const currentTime = Date.now();
-    localStorage.setItem("LAST_ACTIVITY", currentTime);
-  };
-
-  // Check if the user has exceeded inactivity limit
-  const isInactivityLimitExceeded = () => {
-    const lastActivity = parseInt(localStorage.getItem("LAST_ACTIVITY"), 10);
-    return lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT;
+  // Handle reset on user activity
+  const handleActivity = () => {
+    //saveLastActivity()
+    if (!showPopup) {
+      resetTimeout();
+    }
   };
 
   // Handle page visibility change for tab focus
@@ -58,18 +56,12 @@ export default function PageComponent({ title, buttons = '', children }) {
     };
   }, [showPopup]);
 
-  // Check inactivity on page load
-  useEffect(() => {
-    if (isInactivityLimitExceeded()) {
-      logout();
-    } else {
-      // Reset the last activity on page load if still within the limit
-      saveLastActivity();
-    }
-  }, [logout]);
-
   // Check Code Clearance
   useEffect(() => {
+    if (!currentUserId?.id) {
+      return;
+    }
+
     axiosClient
       .get(`/checkcc/${currentUserId?.id}`)
       .then((response) => {
@@ -133,18 +125,54 @@ export default function PageComponent({ title, buttons = '', children }) {
     startMainCountdown(); // Restart the main timer
   };
 
-  // Handle reset on user activity
-  const handleActivity = () => {
-    //saveLastActivity()
-    if (!showPopup) {
-      resetTimeout();
-    }
-  };
-
   // Handle button click to reset both timers
   const handleButtonClick = () => {
     resetTimeout();
   };
+
+  // Save the last activity timestamp to localStorage
+  const saveLastActivity = () => {
+    const givenTime = Date.now();
+    localStorage.setItem("LAST_ACTIVITY", givenTime);
+  };
+
+  // Check inactivity on page load
+  useEffect(() => {
+    const lastActivity = parseInt(localStorage.getItem("LAST_ACTIVITY"), 10);
+    const currentTime = Date.now();
+
+    // If `lastActivity` exists and inactivity limit is exceeded, log out
+    if (lastActivity && currentTime - lastActivity > INACTIVITY_LIMIT) {
+      //alert("Logout due to inactivity");
+      logout();
+    } else {
+      // Reset the last activity if within the inactivity limit
+      saveLastActivity();
+      //alert("Activity reset");
+    }
+  }, [logout]);
+
+  // Track tab or window closing, visibility change
+  useEffect(() => {
+    // Save last activity on page unload (tab/browser close)
+    const handleBeforeUnload = () => saveLastActivity();
+
+    // Save last activity when tab visibility changes (e.g., tab switching)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        saveLastActivity();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   useEffect(() => {
     // Add event listeners for user activity

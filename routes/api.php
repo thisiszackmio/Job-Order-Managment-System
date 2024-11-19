@@ -114,6 +114,9 @@ Route::middleware('auth:sanctum')->group(function(){
 // --- Login --- //
 Route::post('/login', [AuthController::class, 'login']);
 
+// --- Update User's Password --- //
+Route::put('/updateuser', [AuthController::class, 'updateUser']);
+
 // --- Logs --- //
 Route::get('/getlogs', [AnnounceController::class, 'dashboardLogs']);
 

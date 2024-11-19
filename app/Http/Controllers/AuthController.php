@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -113,14 +114,10 @@ class AuthController extends Controller
         if($token){ return response()->json(['error' => 'TokenExist'], 422); }
 
         // Check if the user is need to change pass
-        if($user->status == 2){
-            return response()->json(['error' => 'ChangePass'], 422);
-        }
+        if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
 
         // Check if the user is active
-        if($user->status == 0){
-            return response()->json(['error' => 'NotActive'], 404);
-        }
+        if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
 
         $userdata = [
             'id' => $user->id,
@@ -137,6 +134,43 @@ class AuthController extends Controller
         ]);
     
     }
+
+    /**
+     * Update on the system
+     */
+    public function updateUser(Request $request)
+    {
+        // Validate inputs
+        $systemValidations = $request->validate([
+            'username' => 'required|string',
+            'currentPassword' => 'required|string',
+            'newPassword' => [
+                'required_with:currentPassword',
+                Password::min(8)->mixedCase()->numbers()->symbols(),
+            ],
+            'confirmPassword' => 'required|same:newPassword', // Add confirmation check
+        ]);
+
+        // Retrieve user by username
+        $user = PPAEmployee::where('username', $systemValidations['username'])->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        // Check current password
+        if (!Hash::check($systemValidations['currentPassword'], $user->password)) {
+            return response()->json(['error' => 'Incorrect password'], 422);
+        }
+
+        // Update the user's password
+        $user->password = Hash::make($systemValidations['newPassword']);
+        $user->status = 1;
+        $user->save();
+
+        return response()->json(['message' => 'Password updated successfully'], 200);
+    }
+
 
     /**
      * Logout on the system

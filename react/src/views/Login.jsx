@@ -255,7 +255,6 @@ export default function Login() {
                   name="username"
                   type="text"
                   autoComplete="username"
-                  required
                   value={username}
                   onChange={(ev) => setUsername(ev.target.value)}
                   onFocus={() => setIsFocused(true)}
@@ -279,7 +278,6 @@ export default function Login() {
                   id="password"
                   name="password"
                   type="password"
-                  required
                   value={password}
                   onChange={(ev) => setPassword(ev.target.value)}
                   onFocus={() => setIsFocused(true)}
@@ -289,18 +287,20 @@ export default function Login() {
               </div>
 
               {/* Login Button */}
-              <div>
-                <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn' : 'login-btn'}`} disabled={submitLoading}>
-                  {submitLoading ? (
-                    <div className="flex w-full items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-1">Processing</span>
-                    </div>
-                  ) : (
-                    'Login'
-                  )}
-                </button>
-              </div>
+              {password && username ? (
+                <div>
+                  <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn' : 'login-btn'}`} disabled={submitLoading}>
+                    {submitLoading ? (
+                      <div className="flex w-full items-center justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-1">Processing</span>
+                      </div>
+                    ) : (
+                      'Login'
+                    )}
+                  </button>
+                </div>
+              ):null}
               </form>
             </>
             )}

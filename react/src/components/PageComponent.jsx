@@ -23,7 +23,10 @@ export default function PageComponent({ title, buttons = '', children }) {
 
   // Logout function
   const logout = useCallback(() => {
-    axiosClient.post("/logout").then(() => {
+    // Perform the logout logic
+    const logMessage = `${currentUserId.name} has been logged out of the system due to inactivity.`;
+
+    axiosClient.post("/logout", { logMessage }).then(() => {
       localStorage.removeItem('USER_ID');
       localStorage.removeItem('TOKEN');
       localStorage.removeItem('USER_CODE');

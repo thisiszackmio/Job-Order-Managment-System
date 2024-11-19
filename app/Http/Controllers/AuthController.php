@@ -127,6 +127,12 @@ class AuthController extends Controller
             'avatar' =>  $rootUrl . '/storage/displaypicture/' . $user->avatar
         ];
 
+        // LOGS
+        $logs = new LogsModel();
+        $logs->category = 'SYS';
+        $logs->message = $user->firstname.' '.$user->middlename.'. '.$user->lastname.' has logged into the system.';
+        $logs->save();
+
         return response([
             'userid' => $userdata,
             'code' => $user->code_clearance,
@@ -179,6 +185,12 @@ class AuthController extends Controller
         /** @var PPAUser $user */
         $user = Auth::user();
         $user->currentAccessToken()->delete();
+
+        // LOGS
+        $logs = new LogsModel();
+        $logs->category = 'SYS';
+        $logs->message = $request->input('logMessage');
+        $logs->save();
 
         return response([
             'success' => true

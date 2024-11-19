@@ -31,7 +31,9 @@ export default function JOMSLayout() {
   // Logout Area
   const logout = () => {
     // Perform the logout logic
-    axiosClient.post('/logout').then(() => {
+    const logMessage = `${currentUserId.name} has logged out of the system.`;
+
+    axiosClient.post('/logout', { logMessage }).then(() => {
       localStorage.removeItem('USER_ID');
       localStorage.removeItem('TOKEN');
       localStorage.removeItem('USER_CODE');
@@ -43,7 +45,6 @@ export default function JOMSLayout() {
       navigate('/login');
     });
   };
-
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");

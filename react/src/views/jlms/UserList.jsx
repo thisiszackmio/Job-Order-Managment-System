@@ -172,7 +172,7 @@ export default function UserListJLMS(){
                     <td className="px-3 py-2 text-center table-font">{getData.position}</td>
                     <td className="px-3 py-2 text-center table-font">{getData.username}</td>
                     <td className="px-3 py-2 text-center table-font">{getData.code_clearance}</td>
-                    <td className="px-3 py-2 text-center table-font">{getData.status == 1 ? ("Active") : ("Deleted")}</td>
+                    <td className="px-3 py-2 text-center table-font">{getData.status == 1 || getData.status == 2 ? ("Active") : ("Deleted")}</td>
                   </tr>
                 ))
               ):(

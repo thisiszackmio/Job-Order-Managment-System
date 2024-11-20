@@ -87,7 +87,7 @@ class AnnounceController extends Controller
         // Root URL
         $rootUrl = URL::to('/');
 
-        $data = PPAEmployee::where('status', 1)->orderBy('lastname')->get();
+        $data = PPAEmployee::whereIn('status', [1, 2])->orderBy('lastname')->get();
 
         $userData = [];
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\FacilityVenueController;
 use App\Http\Controllers\VehicleSlipController;
 use App\Http\Controllers\JOMSDashboardController;
+use App\Http\Controllers\LogsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- JOMS (My Request) --- //
   Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
+  Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
 
   // --- JOMS Inspection Request --- //
   Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']); // Submit the Request on Part A
@@ -118,7 +120,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::put('/updateuser', [AuthController::class, 'updateUser']);
 
 // --- Logs --- //
-Route::get('/getlogs', [AnnounceController::class, 'dashboardLogs']);
+Route::get('/getlogs', [LogsController::class, 'dashboardLogs']);
+Route::post('/showlogs', [LogsController::class, 'showLogs']);
 
 // --- Test --- //
 Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);

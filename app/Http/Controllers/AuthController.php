@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PPAEmployee;
 use App\Models\LogsModel;
+use App\Models\PPASecurity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -101,6 +102,8 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
+        $pcName = gethostname();
+
         // Get the user information
         $user = PPAEmployee::where('username', $credentials['username'])->first();
 
@@ -144,8 +147,7 @@ class AuthController extends Controller
     /**
      * Update on the system
      */
-    public function updateUser(Request $request)
-    {
+    public function updateUser(Request $request){
         // Validate inputs
         $systemValidations = $request->validate([
             'username' => 'required|string',
@@ -182,15 +184,21 @@ class AuthController extends Controller
      * Logout on the system
      */
     public function logout(Request $request){
+
         /** @var PPAUser $user */
         $user = Auth::user();
-        $user->currentAccessToken()->delete();
+
+        // Format the full name
+        $fullName = trim($user->firstname . ' ' . ($user->middlename ? $user->middlename[0] . '. ' : '') . $user->lastname);
 
         // LOGS
         $logs = new LogsModel();
         $logs->category = 'SYS';
-        $logs->message = $request->input('logMessage');
-        $logs->save();
+        $logs->message = $fullName .' '.$request->input('logMessage');
+
+        if($logs->save() === True){
+            $user->currentAccessToken()->delete();
+        }
 
         return response([
             'success' => true

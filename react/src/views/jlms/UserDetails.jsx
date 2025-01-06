@@ -3,7 +3,7 @@ import PageComponent from "../../components/PageComponent";
 import submitAnimation from '/default/ring-loading.gif';
 import { Link, useParams } from "react-router-dom";
 import axiosClient from "../../axios";
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
 import Popup from "../../components/Popup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,7 +20,7 @@ export default function UserDetailsJLMS(){
   const [popupMessage, setPopupMessage] = useState("");
 
   // Loading
-  const [loading, setLoading] = useState(true);
+  const [loadingArea, setLoadingArea] = useState(true);
 
   const [userDet, getUserDet] = useState([]);
 
@@ -29,34 +29,26 @@ export default function UserDetailsJLMS(){
     
     // Define the classes to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
     } 
-    else if(loading) {
-      addLoadingClass();
-    }
     else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
-      removeLoadingClass();
     };
-  }, [showPopup, loading]);
+  }, [showPopup]);
 
   const {id} = useParams();
 
@@ -83,7 +75,7 @@ export default function UserDetailsJLMS(){
       getUserDet({...userDet, cc});
     })
     .finally(() => {
-      setLoading(false);
+      setLoadingArea(false);
     });
   }, [id]);
 
@@ -599,32 +591,21 @@ export default function UserDetailsJLMS(){
   return(
     Authorize ? (
       <PageComponent title="Employee Details">
-        {loading ? (
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-            <img
-              className="mx-auto h-44 w-auto"
-              src={loadingAnimation}
-              alt="Your Company"
-            />
-            <span className="loading-text loading-animation">
-            {Array.from("Loading...").map((char, index) => (
-              <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-            ))}
-            </span>
-          </div>
-        ):(
-        <>
-          {/* Main Content */}
-          <div className="font-roboto">
-
+        {/* Main Content */}
+        <div className="font-roboto">
+          {loadingArea ? (
+            <div className="flex justify-center items-center">
+              <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+              <span className="loading-table">Loading Employee Details</span>
+            </div>
+          ):(
+          <>
             {/* Button */}
             <div className="flex">
-
               {/* Back to User */}
               <button className="py-2 px-4 btn-default">
                 <Link to="/userlist">Back to User List</Link>
               </button>
-
               {(userDet?.status != 0 && SuperAdmin) ? (
               <>
                 {/* Update Details */}
@@ -698,632 +679,630 @@ export default function UserDetailsJLMS(){
                 )}
               </>
               ):null}
-
             </div>
 
             {/* Employee List */}
             <div className="grid grid-cols-2 gap-4 mt-10">
 
-              {/* User Details */}
-              <div className="col-span-1">
+            {/* User Details */}
+            <div className="col-span-1">
 
-                {/* Account Status*/}
-                <div className="flex items-center">
-                  <div className="w-56">
-                    <label className="block text-lg font-bold leading-6 text-gray-900">
-                      User Status:
-                    </label> 
-                  </div>
-                  <div className="w-full pl-1 text-lg">
-                    {userDet?.status != 0 ? ("Active"):("Deleted")}
-                  </div>
+              {/* Account Status*/}
+              <div className="flex items-center">
+                <div className="w-56">
+                  <label className="block text-lg font-bold leading-6 text-gray-900">
+                    User Status:
+                  </label> 
                 </div>
+                <div className="w-full pl-1 text-lg">
+                  {userDet?.status != 0 ? ("Active"):("Deleted")}
+                </div>
+              </div>
 
-                {/* Name (If deleted) */}
-                {userDet?.status == 0 ? (
+              {/* Name (If deleted) */}
+              {userDet?.status == 0 ? (
+              <div className="flex items-center mt-5">
+                <div className="w-56">
+                  <label className="block text-lg font-bold leading-6 text-gray-900">
+                    Name:
+                  </label> 
+                </div>
+                <div className="w-full pl-1 text-lg">
+                  {userDet.name}
+                </div>
+                    
+              </div>
+              ):null}
+
+              {userDet?.status != 0 ? (
+              <>
+                {/* User ID */}
                 <div className="flex items-center mt-5">
                   <div className="w-56">
                     <label className="block text-lg font-bold leading-6 text-gray-900">
-                      Name:
+                      User ID:
                     </label> 
                   </div>
                   <div className="w-full pl-1 text-lg">
-                    {userDet.name}
+                    {userDet?.id}
                   </div>
-                      
                 </div>
-                ):null}
 
-                {userDet?.status != 0 ? (
-                <>
-                  {/* User ID */}
+                {/* User Details Form */}
+                <form id="user_details" onSubmit={SubmitUserDetails}>
+
+                  {/* Name */}
                   <div className="flex items-center mt-5">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
-                        User ID:
+                        Name:
                       </label> 
                     </div>
-                    <div className="w-full pl-1 text-lg">
-                      {userDet?.id}
-                    </div>
-                  </div>
+                    {enableEditUser ? (
+                      <div className="w-full">
+                        <div className="flex flex-col space-y-2">
 
-                  {/* User Details Form */}
-                  <form id="user_details" onSubmit={SubmitUserDetails}>
-
-                    {/* Name */}
-                    <div className="flex items-center mt-5">
-                      <div className="w-56">
-                        <label className="block text-lg font-bold leading-6 text-gray-900">
-                          Name:
-                        </label> 
-                      </div>
-                      {enableEditUser ? (
-                        <div className="w-full">
-                          <div className="flex flex-col space-y-2">
-
-                            {/* First Name */}
-                            <input
-                              type="text"
-                              name="ppa-fname"
-                              id="ppa-fname"
-                              value={fname}
-                              onChange={ev => setFname(ev.target.value)}
-                              placeholder={userDet.firstname}
-                              className="w-full ppa-form"
-                            />
-
-                            {/* Middle Initial */}
-                            <input
-                              type="text"
-                              name="ppa-mname"
-                              id="ppa-mname"
-                              value={mname}
-                              onChange={ev => setMname(ev.target.value)}
-                              placeholder={userDet.middlename}
-                              className="w-full ppa-form"
-                            />
-
-                            {/* Last Name */}
-                            <input
-                              type="text"
-                              name="ppa-lname"
-                              id="ppa-lname"
-                              value={lname}
-                              onChange={ev => setLname(ev.target.value)}
-                              placeholder={userDet.lastname}
-                              className="w-full ppa-form"
-                            />
-                          </div>
-                        </div>
-                      ):(
-                        <div className="w-full pl-1 text-lg">
-                          {userDet.name}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Position */}
-                    <div className="flex items-center mt-5">
-                      <div className="w-56">
-                        <label className="block text-lg font-bold leading-6 text-gray-900">
-                        Position:
-                        </label> 
-                      </div>
-                      {enableEditUser ? (
-                        <div className="w-full">
+                          {/* First Name */}
                           <input
                             type="text"
-                            name="ppa-position"
-                            id="ppa-position"
-                            value={position}
-                            onChange={ev => setPosition(ev.target.value)}
-                            placeholder={userDet.position}
+                            name="ppa-fname"
+                            id="ppa-fname"
+                            value={fname}
+                            onChange={ev => setFname(ev.target.value)}
+                            placeholder={userDet.firstname}
+                            className="w-full ppa-form"
+                          />
+
+                          {/* Middle Initial */}
+                          <input
+                            type="text"
+                            name="ppa-mname"
+                            id="ppa-mname"
+                            value={mname}
+                            onChange={ev => setMname(ev.target.value)}
+                            placeholder={userDet.middlename}
+                            className="w-full ppa-form"
+                          />
+
+                          {/* Last Name */}
+                          <input
+                            type="text"
+                            name="ppa-lname"
+                            id="ppa-lname"
+                            value={lname}
+                            onChange={ev => setLname(ev.target.value)}
+                            placeholder={userDet.lastname}
                             className="w-full ppa-form"
                           />
                         </div>
-                      ):(
-                        <div className="w-full pl-1 text-lg">
-                          {userDet.position}
-                        </div>
-                      )}       
-                    </div>
-
-                    {/* Division */}
-                    <div className="flex items-center mt-5">
-                      <div className="w-56">
-                        <label className="block text-lg font-bold leading-6 text-gray-900">
-                        Division:
-                        </label> 
                       </div>
-                      {enableEditUser ? (
-                        <div className="w-full">
-                          <select 
-                            name="ppa-division" 
-                            id="ppa-division"
-                            value={division}
-                            onChange={ev => setDivision(ev.target.value)}
-                            className="block w-full ppa-form"
-                          >
-                            <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
-                            {divisions
-                              .filter(div => div !== userDet.division)
-                              .map(div => (
-                                <option key={div} value={div}>{div}</option>
-                              ))
-                            }
-                          </select>
-                        </div>
-                      ):(
-                        <div className="w-full pl-1 text-lg">
-                          {userDet.division}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Username */}
-                    <div className="flex items-center mt-5">
-                      <div className="w-56">
-                        <label className="block text-lg font-bold leading-6 text-gray-900">
-                        Username:
-                        </label> 
+                    ):(
+                      <div className="w-full pl-1 text-lg">
+                        {userDet.name}
                       </div>
-                      {enableEditUser ? (
-                        <div className="w-full">
-                          <input
-                            type="text"
-                            name="ppa-username"
-                            id="ppa-username"
-                            value={username}
-                            onChange={ev => setUsername(ev.target.value)}
-                            placeholder={userDet.username}
-                            className="w-full ppa-form"
-                          />
-                        </div>
-                      ):(
-                        <div className="w-full">
-                          <div className="w-full pl-1 text-lg">
-                          {userDet.username}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                  </form>
-                
-                  {/* Code Clearance */}
-                  <form id="user_code" onSubmit={SubmitCodeClearance}>
-                    <div className="flex items-center mt-5">
-                      <div className="w-56">
-                        <label className="block text-lg font-bold leading-6 text-gray-900">
-                          Code Clearance:
-                        </label> 
-                      </div>
-                      {enableCC ? (
-                        <div className="w-full">
-
-                          {/* For PM - Port Manager */}
-                          <div className="relative flex items-center font-roboto">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="pm-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('PM')}
-                                onChange={(e) => handleCheckboxChange(e, 'PM')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                Port Manager (PM)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For AM - Admin Manager */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="am-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('AM')}
-                                onChange={(e) => handleCheckboxChange(e, 'AM')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="am-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                Admin Manager (AM)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For DM - Division Manager */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="dm-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('DM')}
-                                onChange={(e) => handleCheckboxChange(e, 'DM')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="dm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                Division Manager (DM)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For PT - Procurement Team */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="pt-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('PT')}
-                                onChange={(e) => handleCheckboxChange(e, 'PT')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="pt-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                Procurement Team (PT)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For GSO - General Service Officer */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="gso-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('GSO')}
-                                onChange={(e) => handleCheckboxChange(e, 'GSO')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                General Service Officer (GSO)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For HACK - IT Superadmin */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="hack-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('HACK')}
-                                onChange={(e) => handleCheckboxChange(e, 'HACK')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="hack-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                IT People (HACK)
-                              </label> 
-                            </div>
-                          </div>
-
-                          {/* For MEM - Members (COS and Regular) */}
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="mem-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('MEM')}
-                                onChange={(e) => handleCheckboxChange(e, 'MEM')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                Members (MEM)
-                              </label> 
-                            </div>
-                          </div>
-
-                        </div>
-                      ):(
-                        <div className="w-full pl-1 text-lg">
-                          {userDet.cc}
-                        </div> 
-                      )}     
-                    </div>
-                  </form>
-                </>
-                ):null}
-
-                {/* Avatar */}
-                {enableAvatar && (
-                  <form id="user_avatar" onSubmit={SubmitAvatar} method="POST" action="#" encType="multipart/form-data">
-                    <div className="flex items-center mt-5">
-                      <div className="w-36">
-                      <label htmlFor="ppa-avatar" className="block text-base font-medium leading-6 text-black">
-                          Upload Avatar:
-                        </label> 
-                      </div>
-
-                      <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                        <div className="text-center">
-                          <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                          </svg>
-                          <div className="mt-3 text-sm leading-6 text-gray-600">
-                            <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                              <span>Upload your new avatar here</span>
-                              <input 
-                                id="ppa-avatar" 
-                                name="ppa-avatar" 
-                                type="file" 
-                                accept=".png, .jpg, .jpeg"
-                                className="sr-only" 
-                                onChange={handleAvatarChange} 
-                              />
-                            </label>
-                          </div>
-                          <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
-                          {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                )}
-
-                {/* Esignature */}
-                {enableEsig && (
-                  <form id="user_esig" onSubmit={SubmitEsig} action="#" method="POST" encType="multipart/form-data">
-                    <div className="flex items-center mt-5">
-                      <div className="w-36">
-                      <label htmlFor="ppa-esignature" className="block text-base font-medium leading-6 text-black">
-                          Upload Esig:
-                        </label> 
-                      </div>
-
-                      <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                        <div className="text-center">
-                          <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                          </svg>
-                          <div className="mt-3 text-sm leading-6 text-gray-600">
-                            <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                              <span>Upload your new esig here</span>
-                              <input 
-                                id="ppa-esignature" 
-                                name="ppa-esignature" 
-                                type="file" 
-                                accept=".png"
-                                className="sr-only" 
-                                onChange={handleEsigChange}  
-                              />
-                            </label>
-                          </div>
-                          <p className="pl-1 text-sm">PNG only up to 2MB</p>
-                          {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                )}
-
-                {/* Password */}
-                {enablePassword && (
-                  <form id="user_pwd" onSubmit={SubmitPwd} action="#" method="POST">
-                    <div className="flex items-center mt-10">
-                      <div className="w-36">
-                        <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
-                          Password:
-                        </label> 
-                      </div>
-                      <div className="w-full relative">
-                      <input
-                        id="password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={getpassword}
-                        onChange={ev => setPassword(ev.target.value)}
-                        className="block w-full ppa-form input-placeholder"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                      </button>
-                      </div>
-                    </div>
-                  </form>
-                )}
-
-              </div>
-
-              {/* User Avatar and E-sig */}
-              {userDet?.status != 0 ? (
-                <div className="col-span-1 flex flex-col items-center">
-                  {/* Avatar */}
-                  <div>
-                    <img src={userDet.avatar} onContextMenu={(e) => e.preventDefault()} draggable="false" className="user-image" alt="" />
+                    )}
                   </div>
-                  {/* Esig */}
-                  <div className="esig-area flex flex-col items-center border-b border-black relative">
-                    <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" onContextMenu={(e) => e.preventDefault()} draggable="false" />
-                    <span className="text-base font-bold ppa-user-name">{userDet.name}</span>
+
+                  {/* Position */}
+                  <div className="flex items-center mt-5">
+                    <div className="w-56">
+                      <label className="block text-lg font-bold leading-6 text-gray-900">
+                      Position:
+                      </label> 
+                    </div>
+                    {enableEditUser ? (
+                      <div className="w-full">
+                        <input
+                          type="text"
+                          name="ppa-position"
+                          id="ppa-position"
+                          value={position}
+                          onChange={ev => setPosition(ev.target.value)}
+                          placeholder={userDet.position}
+                          className="w-full ppa-form"
+                        />
+                      </div>
+                    ):(
+                      <div className="w-full pl-1 text-lg">
+                        {userDet.position}
+                      </div>
+                    )}       
                   </div>
-                </div>
+
+                  {/* Division */}
+                  <div className="flex items-center mt-5">
+                    <div className="w-56">
+                      <label className="block text-lg font-bold leading-6 text-gray-900">
+                      Division:
+                      </label> 
+                    </div>
+                    {enableEditUser ? (
+                      <div className="w-full">
+                        <select 
+                          name="ppa-division" 
+                          id="ppa-division"
+                          value={division}
+                          onChange={ev => setDivision(ev.target.value)}
+                          className="block w-full ppa-form"
+                        >
+                          <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
+                          {divisions
+                            .filter(div => div !== userDet.division)
+                            .map(div => (
+                              <option key={div} value={div}>{div}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+                    ):(
+                      <div className="w-full pl-1 text-lg">
+                        {userDet.division}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Username */}
+                  <div className="flex items-center mt-5">
+                    <div className="w-56">
+                      <label className="block text-lg font-bold leading-6 text-gray-900">
+                      Username:
+                      </label> 
+                    </div>
+                    {enableEditUser ? (
+                      <div className="w-full">
+                        <input
+                          type="text"
+                          name="ppa-username"
+                          id="ppa-username"
+                          value={username}
+                          onChange={ev => setUsername(ev.target.value)}
+                          placeholder={userDet.username}
+                          className="w-full ppa-form"
+                        />
+                      </div>
+                    ):(
+                      <div className="w-full">
+                        <div className="w-full pl-1 text-lg">
+                        {userDet.username}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                </form>
+              
+                {/* Code Clearance */}
+                <form id="user_code" onSubmit={SubmitCodeClearance}>
+                  <div className="flex items-center mt-5">
+                    <div className="w-56">
+                      <label className="block text-lg font-bold leading-6 text-gray-900">
+                        Code Clearance:
+                      </label> 
+                    </div>
+                    {enableCC ? (
+                      <div className="w-full">
+
+                        {/* For PM - Port Manager */}
+                        <div className="relative flex items-center font-roboto">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="pm-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('PM')}
+                              onChange={(e) => handleCheckboxChange(e, 'PM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Port Manager (PM)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For AM - Admin Manager */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="am-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('AM')}
+                              onChange={(e) => handleCheckboxChange(e, 'AM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="am-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Admin Manager (AM)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For DM - Division Manager */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="dm-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('DM')}
+                              onChange={(e) => handleCheckboxChange(e, 'DM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="dm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Division Manager (DM)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For PT - Procurement Team */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="pt-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('PT')}
+                              onChange={(e) => handleCheckboxChange(e, 'PT')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="pt-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Procurement Team (PT)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For GSO - General Service Officer */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="gso-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('GSO')}
+                              onChange={(e) => handleCheckboxChange(e, 'GSO')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              General Service Officer (GSO)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For HACK - IT Superadmin */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="hack-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('HACK')}
+                              onChange={(e) => handleCheckboxChange(e, 'HACK')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="hack-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              IT People (HACK)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For MEM - Members (COS and Regular) */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="mem-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('MEM')}
+                              onChange={(e) => handleCheckboxChange(e, 'MEM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Members (MEM)
+                            </label> 
+                          </div>
+                        </div>
+
+                      </div>
+                    ):(
+                      <div className="w-full pl-1 text-lg">
+                        {userDet.cc}
+                      </div> 
+                    )}     
+                  </div>
+                </form>
+              </>
               ):null}
+
+              {/* Avatar */}
+              {enableAvatar && (
+                <form id="user_avatar" onSubmit={SubmitAvatar} method="POST" action="#" encType="multipart/form-data">
+                  <div className="flex items-center mt-5">
+                    <div className="w-36">
+                    <label htmlFor="ppa-avatar" className="block text-base font-medium leading-6 text-black">
+                        Upload Avatar:
+                      </label> 
+                    </div>
+
+                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                      <div className="text-center">
+                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                        </svg>
+                        <div className="mt-3 text-sm leading-6 text-gray-600">
+                          <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                            <span>Upload your new avatar here</span>
+                            <input 
+                              id="ppa-avatar" 
+                              name="ppa-avatar" 
+                              type="file" 
+                              accept=".png, .jpg, .jpeg"
+                              className="sr-only" 
+                              onChange={handleAvatarChange} 
+                            />
+                          </label>
+                        </div>
+                        <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
+                        {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {/* Esignature */}
+              {enableEsig && (
+                <form id="user_esig" onSubmit={SubmitEsig} action="#" method="POST" encType="multipart/form-data">
+                  <div className="flex items-center mt-5">
+                    <div className="w-36">
+                    <label htmlFor="ppa-esignature" className="block text-base font-medium leading-6 text-black">
+                        Upload Esig:
+                      </label> 
+                    </div>
+
+                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                      <div className="text-center">
+                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                        </svg>
+                        <div className="mt-3 text-sm leading-6 text-gray-600">
+                          <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                            <span>Upload your new esig here</span>
+                            <input 
+                              id="ppa-esignature" 
+                              name="ppa-esignature" 
+                              type="file" 
+                              accept=".png"
+                              className="sr-only" 
+                              onChange={handleEsigChange}  
+                            />
+                          </label>
+                        </div>
+                        <p className="pl-1 text-sm">PNG only up to 2MB</p>
+                        {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {/* Password */}
+              {enablePassword && (
+                <form id="user_pwd" onSubmit={SubmitPwd} action="#" method="POST">
+                  <div className="flex items-center mt-10">
+                    <div className="w-36">
+                      <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
+                        Password:
+                      </label> 
+                    </div>
+                    <div className="w-full relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={getpassword}
+                      onChange={ev => setPassword(ev.target.value)}
+                      className="block w-full ppa-form input-placeholder"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    </button>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+            </div>
+
+            {/* User Avatar and E-sig */}
+            {userDet?.status != 0 ? (
+              <div className="col-span-1 flex flex-col items-center">
+                {/* Avatar */}
+                <div>
+                  <img src={userDet.avatar} onContextMenu={(e) => e.preventDefault()} draggable="false" className="user-image" alt="" />
+                </div>
+                {/* Esig */}
+                <div className="esig-area flex flex-col items-center border-b border-black relative">
+                  <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" onContextMenu={(e) => e.preventDefault()} draggable="false" />
+                  <span className="text-base font-bold ppa-user-name">{userDet.name}</span>
+                </div>
+              </div>
+            ):null}
 
             </div>
 
             {/* Submit Button */}
             <div className="flex mt-10">
 
-              {/* Submit button on Register User's */}
-              <div>
-                {enableEditUser && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_details"
-                    type="submit"
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-                  
-                  {/* Delete Account User */}
-                  {!submitLoading && (
-                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
-                      Cancel
-                    </button>
+            {/* Submit button on Register User's */}
+            <div>
+              {enableEditUser && (
+              <>
+                {/* Submit */}
+                <button 
+                  form="user_details"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
                   )}
-                  
-                </>
-                )}
-              </div>
-
-              {/* Submit button on  Code Clearance */}
-              <div>
-                {enableCC && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_code"
-                    type="submit"
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
+                </button>
+                
+                {/* Delete Account User */}
+                {!submitLoading && (
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                    Cancel
                   </button>
-                  
-                  {/* Delete Account User */}
-                  {!submitLoading && (
-                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
                 )}
-              </div>
-
-              {/* Submit button on Avatar */}
-              <div>
-                {enableAvatar && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_avatar"
-                    type="submit"
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-                  
-                  {/* Delete Account User */}
-                  {!submitLoading && (
-                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-              </div>
-
-              {/* Submit button on Esig */}
-              <div>
-                {enableEsig && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_esig"
-                    type="submit"
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-                  
-                  {/* Delete Account User */}
-                  {!submitLoading && (
-                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-              </div>
-
-              {/* Submit button on Password */}
-              <div>
-                {enablePassword && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_pwd"
-                    type="submit"
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-                  
-                  {/* Delete Account User */}
-                  {!submitLoading && (
-                    <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-              </div>
-
+                
+              </>
+              )}
             </div>
 
-          </div>
-        </>
-        )}
+            {/* Submit button on  Code Clearance */}
+            <div>
+              {enableCC && (
+              <>
+                {/* Submit */}
+                <button 
+                  form="user_code"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
+                </button>
+                
+                {/* Delete Account User */}
+                {!submitLoading && (
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                    Cancel
+                  </button>
+                )}
+              </>
+              )}
+            </div>
+
+            {/* Submit button on Avatar */}
+            <div>
+              {enableAvatar && (
+              <>
+                {/* Submit */}
+                <button 
+                  form="user_avatar"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
+                </button>
+                
+                {/* Delete Account User */}
+                {!submitLoading && (
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                    Cancel
+                  </button>
+                )}
+              </>
+              )}
+            </div>
+
+            {/* Submit button on Esig */}
+            <div>
+              {enableEsig && (
+              <>
+                {/* Submit */}
+                <button 
+                  form="user_esig"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
+                </button>
+                
+                {/* Delete Account User */}
+                {!submitLoading && (
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                    Cancel
+                  </button>
+                )}
+              </>
+              )}
+            </div>
+
+            {/* Submit button on Password */}
+            <div>
+              {enablePassword && (
+              <>
+                {/* Submit */}
+                <button 
+                  form="user_pwd"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
+                </button>
+                
+                {/* Delete Account User */}
+                {!submitLoading && (
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                    Cancel
+                  </button>
+                )}
+              </>
+              )}
+            </div>
+
+            </div>
+          </>
+          )}
+        </div>
 
         {/* Popup */}
         {showPopup && (

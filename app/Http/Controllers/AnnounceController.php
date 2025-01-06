@@ -105,15 +105,5 @@ class AnnounceController extends Controller
 
     }
 
-    // -------- For LOGS ------- // // -------- For LOGS ------- // // -------- For LOGS ------- // // -------- For LOGS ------- //
-
-    public function dashboardLogs(){
-        $startDate = Carbon::now()->startOfMonth();
-        $endDate = Carbon::now()->endOfMonth();
-
-         // Retrieve logs within the current month
-        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
-
-        return response()->json($logs);
-    }
+    
 }

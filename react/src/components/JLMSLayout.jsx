@@ -3,9 +3,8 @@ import axiosClient from '../axios';
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faBars, faSignOutAlt, faFlag, faUserPlus, faChevronRight, faScroll } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faBars, faSignOutAlt, faFileLines, faUserPlus, faChevronRight, faScroll } from '@fortawesome/free-solid-svg-icons';
 import Footer from "./Footer";
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../context/ContextProvider";
 import { useNavigate } from 'react-router-dom';
 
@@ -18,15 +17,6 @@ export default function JLMSLayout() {
 
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Set Delay for Loading
-  useEffect(() => {
-    // Simulate an authentication check
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
 
   const navigate = useNavigate();
 
@@ -64,24 +54,12 @@ export default function JLMSLayout() {
   const SuperAdmin = codes.includes("HACK");
   const GSOOnly = codes.includes("GSO");
   const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
+  const ITOnly = codes.includes("HACK");
 
   return (
+  <>
+    {/* Main Screen */}
     <div className="w-full h-full font-roboto">
-      {loading ? (
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-          <img
-            className="mx-auto h-44 w-auto"
-            src={loadingAnimation}
-            alt="Your Company"
-          />
-          <span className="loading-text loading-animation">
-          {Array.from("Loading...").map((char, index) => (
-            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-          ))}
-          </span>
-        </div>
-      ):(
-      <>
       {/* Side Bar */}
       <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
         <div className={`transition-width duration-300 ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
@@ -190,6 +168,18 @@ export default function JLMSLayout() {
               </li>
             )}
 
+            {/* Logs */}
+            {ITOnly && (
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
+                  <Link to="/logs" className="flex items-center">
+                    <FontAwesomeIcon icon={faFileLines} />
+                    {!isSidebarMinimized && <p className="ml-4 text-lg">Logs</p>}
+                  </Link>
+                </div>
+              </li>
+            )}
+
           </ul>
 
           {/* Logout Area */}
@@ -231,8 +221,7 @@ export default function JLMSLayout() {
 
       {/* Footer */}
       <Footer />
-      </>
-      )}
     </div>
+  </>
   );
 }

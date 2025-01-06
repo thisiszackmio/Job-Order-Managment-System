@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,35 +13,9 @@ export default function UserListJLMS(){
   const { userCode } = useUserStateContext();
 
   // Loading
-  const [loading, setLoading] = useState(true);
+  const [loadingArea, setLoadingArea] = useState(true);
 
   const [userList, setUserList] = useState([]);
-
-  // Disable the Scroll on Popup
-  useEffect(() => {
-    
-    // Define the classes to be added/removed
-    const loadingClass = 'loading-show';
-
-    // Function to add the class to the body
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
-
-    // Function to remove the class from the body
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
-
-    // Add or remove the class based on showPopup state
-   if(loading) {
-      addLoadingClass();
-    }
-    else {
-      removeLoadingClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removeLoadingClass();
-    };
-  }, [loading]);
 
   // Get User Employee's Data
   useEffect(() => {  
@@ -66,7 +40,7 @@ export default function UserListJLMS(){
       setUserList(mappedData)
     })
     .finally(() => {
-      setLoading(false);
+      setLoadingArea(false);
     });
 
   }, []);
@@ -106,62 +80,57 @@ export default function UserListJLMS(){
   return(
     Authorize ? (
       <PageComponent title="Employee List">
-        {loading ? (
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-            <img
-              className="mx-auto h-44 w-auto"
-              src={loadingAnimation}
-              alt="Your Company"
-            />
-            <span className="loading-text loading-animation">
-            {Array.from("Loading...").map((char, index) => (
-              <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-            ))}
-            </span>
-          </div>
-        ):(
-        <>
-          {/* Main Content */}
-          <div className="font-roboto">
+        {/* Main Content */}
+        <div className="font-roboto">
+          {/* Search Filter */}
+          <div className="mt-5 mb-4 flex">
 
-            {/* Search Filter */}
-            <div className="mt-5 mb-4 flex">
-
-              {/* Search */}
-              <div className="flex-grow">
-                <input
-                  type="text"
-                  placeholder="Search Here"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-96 p-2 border border-gray-300 rounded text-sm"
-                />
-              </div>
-
-              {/* Count */}
-              <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
-                <div className="text-right text-sm/[17px]">
-                  Total of {userList.length} user's list
-                </div>
-              </div>
-
+            {/* Search */}
+            <div className="flex-grow">
+              <input
+                type="text"
+                placeholder="Search Here"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-96 p-2 border border-gray-300 rounded text-sm"
+              />
             </div>
 
-            {/* Table */}
-            <table className="ppa-table w-full mb-10 mt-2">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">User ID</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Avatar</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Division</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Position</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Username</th>  
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Code CLR</th>
-                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
+            {/* Count */}
+            <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
+              <div className="text-right text-sm/[17px]">
+                Total of {userList.length} user's list
+              </div>
+            </div>
+
+          </div>
+
+          {/* Table */}
+          <table className="ppa-table w-full mb-10 mt-2">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">ID</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Avatar</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Division</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Position</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Username</th>  
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Clearance</th>
+                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
+              </tr>
+            </thead>
+            <tbody style={{ backgroundColor: '#fff' }}>
+            {loadingArea ? (
+              <tr>
+                <td colSpan={8} className="px-2 py-4 text-center text-sm text-gray-600">
+                  <div className="flex justify-center items-center">
+                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                    <span className="loading-table">Loading Employees</span>
+                  </div>
+                </td>
+              </tr>
+            ):(
+            <>
               {currentUser.length > 0 ? (
                 currentUser.map((getData)=>(
                   <tr key={getData.id}>
@@ -182,34 +151,34 @@ export default function UserListJLMS(){
                   </td>
                 </tr>
               )}
-              </tbody>
-            </table>
-            {/* Pagination */}
-            {displayPaginationUser && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={pageCountUser}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={handlePageChange}
-                containerClassName="pagination"
-                subContainerClassName="pages pagination"
-                activeClassName="active"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-              />
+            </>
             )}
-          </div>
-        </>
-        )}
+            </tbody>
+          </table>
+          {/* Pagination */}
+          {displayPaginationUser && (
+            <ReactPaginate
+              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+              breakLabel="..."
+              pageCount={pageCountUser}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageChange}
+              containerClassName="pagination"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+            />
+          )}
+        </div>
       </PageComponent>
     ):(
       (() => { window.location = '/unauthorize'; return null; })()

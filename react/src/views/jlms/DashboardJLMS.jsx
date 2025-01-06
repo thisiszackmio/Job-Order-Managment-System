@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
+import loading_table from "/default/ring-loading.gif";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import { Link } from "react-router-dom";
@@ -8,6 +9,14 @@ import { Link } from "react-router-dom";
 export default function DashboardJLMS(){
 
   const { currentUserId, userCode } = useUserStateContext();
+
+  //Date Format 
+  function formatDate(dateString) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
+  const currentDate = formatDate(new Date());
 
   // Greetings
   const getTimeOfDay = () => {
@@ -21,16 +30,11 @@ export default function DashboardJLMS(){
     }
   };
 
-  // Loading
   const [loading, setLoading] = useState(true);
-
-  const [announceList, setAnnounceList] = useState([]);
-  const [isLogs, setLogs] = useState([]);
-  const [teams, setTeams] = useState([]);
 
   // Disable the Scroll on Popup
   useEffect(() => {
-    
+  
     // Define the classes to be added/removed
     const loadingClass = 'loading-show';
 
@@ -41,7 +45,7 @@ export default function DashboardJLMS(){
     const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
-   if(loading) {
+    if(loading) {
       addLoadingClass();
     }
     else {
@@ -53,6 +57,21 @@ export default function DashboardJLMS(){
       removeLoadingClass();
     };
   }, [loading]);
+
+  // Set Delay for Loading
+  useEffect(() => {
+    // Simulate an authentication check
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+  }, []);
+
+  // Loading
+  const [loadingArea, setLoadingArea] = useState(true);
+
+  const [announceList, setAnnounceList] = useState([]);
+  const [isLogs, setLogs] = useState([]);
+  const [teams, setTeams] = useState([]);
 
   // Get All the Data on Announcements
   const fetchAnnounce = async () => {
@@ -80,6 +99,9 @@ export default function DashboardJLMS(){
       });
 
       setAnnounceList({mappedData});
+    })
+    .finally(() => {
+      setLoadingArea(false);
     });
   };
 
@@ -94,12 +116,13 @@ export default function DashboardJLMS(){
         const date = new Date(dataItem.created_at);
 
         // Format date
-        const optionsDate = { month: 'short', day: 'numeric', timeZone: 'Asia/Manila' };
-        const formattedDate = new Intl.DateTimeFormat('en-PH', optionsDate).format(date);
+        const optionsDate = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Manila' };
+        const formattedDate = new Intl.DateTimeFormat('en-CA', optionsDate).format(date);
 
         // Format time
-        const optionsTime = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, timeZone: 'Asia/Manila' };
-        const formattedTime = new Intl.DateTimeFormat('en-PH', optionsTime).format(date);
+        const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'Asia/Manila' };
+        let formattedTime = new Intl.DateTimeFormat('en-US', optionsTime).format(date);
+        formattedTime = formattedTime.replace(/\s/g, '');
 
         return{
           id: dataItem.id,
@@ -110,6 +133,9 @@ export default function DashboardJLMS(){
       });
 
       setLogs({LogsData});
+    })
+    .finally(() => {
+      setLoadingArea(false);
     });
   };
 
@@ -133,7 +159,7 @@ export default function DashboardJLMS(){
       setTeams({TeamData});
     })
     .finally(() => {
-      setLoading(false);
+      setLoadingArea(false);
     });
   };
 
@@ -149,26 +175,32 @@ export default function DashboardJLMS(){
   const ProcurementTeam = codes.includes("PT") || codes.includes("HACK");
 
   return (
-    <PageComponent title={`${getTimeOfDay()}! ${currentUserId?.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUserId?.firstname}`}>
-      {loading ? (
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-          <img
-            className="mx-auto h-44 w-auto"
-            src={loadingAnimation}
-            alt="Your Company"
-          />
+  <PageComponent title={`${getTimeOfDay()}! ${currentUserId?.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUserId?.firstname}`}>
+
+    {/* Preload Screen */}
+    {loading && (
+      <div className="pre-loading-screen z-50">
+          <img className="mx-auto h-44 w-auto" src={loadingAnimation} alt="Your Company" />
           <span className="loading-text loading-animation">
           {Array.from("Loading...").map((char, index) => (
             <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
           ))}
           </span>
-        </div>
-      ):(
-      <div className="font-roboto">
-        
-        {/* Announcement */}
-        <div className="ppa-widget">
-          <div className="ppa-widget-title">Announcement Board</div>
+      </div>
+    )}
+
+    {/* Main */}
+    <div className="font-roboto">
+
+      {/* Announcement */}
+      <div className="ppa-widget">
+        <div className="ppa-widget-title">Announcement Board</div>
+        {loadingArea ? (
+          <div className="flex justify-center items-center py-4">
+            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+            <span className="loading-table">Loading Announcements</span>
+          </div>
+        ):(
           <div style={{ minHeight: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
             <table className="ppa-table w-full">
               <tbody>
@@ -187,116 +219,119 @@ export default function DashboardJLMS(){
               </tbody>
             </table>
           </div>
+        )}
+      </div>
+
+      {/* System Link */}
+      <div className="grid grid-cols-5 gap-4 mt-10">
+
+        {/* For AMS */}
+        <div className="col-span-1 ppa-widget">
+
+          <div className="ppa-system-abbr">
+            <img className="mx-auto jlms-icons" src="default/asset.gif" alt="Your Company"/>  
+            AMS
+          </div>
+
+          <div className="ppa-system-text">
+            Asset Management System
+          </div>
+
+          <div className="ppa-system-link">
+            {ProcurementTeam ? ("(Coming Soon)"):("Unauthorize")}
+          </div>
+
         </div>
+        {/* For JOMS */}
+        <div className="col-span-1 ppa-widget relative">
 
-        {/* System Link */}
-        <div className="grid grid-cols-5 gap-4 mt-10">
-
-          {/* For AMS */}
-          <div className="col-span-1 ppa-widget">
-
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons" src="default/asset.gif" alt="Your Company"/>  
-              AMS
-            </div>
-
-            <div className="ppa-system-text">
-              Asset Management System
-            </div>
-
-            <div className="ppa-system-link">
-              {ProcurementTeam ? ("(Coming Soon)"):("Unauthorize")}
-            </div>
-
+          <div className="ppa-system-abbr joms">
+            <img className="mx-auto jlms-icons" src="default/task-unscreen.gif" alt="Your Company"/>  
+            JOMS
           </div>
 
-          {/* For JOMS */}
-          <div className="col-span-1 ppa-widget relative">
-
-            <div className="ppa-system-abbr joms">
-              <img className="mx-auto jlms-icons" src="default/task-unscreen.gif" alt="Your Company"/>  
-              JOMS
-            </div>
-
-            <div className="ppa-system-text">
-              Job Order Management System
-            </div>
-
-            <div className="ppa-system-link">
-              <Link to={`/joms`}> Go to the System </Link>
-            </div>
-
+          <div className="ppa-system-text">
+            Job Order Management System
           </div>
 
-          {/* For PPS */}
-          <div className="col-span-1 ppa-widget">
-
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons" src="default/personnel-unscreen.gif" alt="Your Company"/>  
-              PPS
-            </div>
-
-            <div className="ppa-system-text px-4">
-              Personnel Profiling System
-            </div>
-
-            <div className="ppa-system-link">
-              (Coming Soon)
-            </div>
-
+          <div className="ppa-system-link">
+            <Link to={`/joms`}> Go to the System </Link>
           </div>
 
-          {/* For DTS */}
-          <div className="col-span-1 ppa-widget">
+        </div>
+        {/* For PPS */}
+        <div className="col-span-1 ppa-widget">
 
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons" src="default/folder-unscreen.gif" alt="Your Company"/>  
-              DTS
-            </div>
-
-            <div className="ppa-system-text">
-              Document Tracking System
-            </div>
-
-            <div className="ppa-system-link">
-              (Coming Soon)
-            </div>
-
+          <div className="ppa-system-abbr">
+            <img className="mx-auto jlms-icons" src="default/personnel-unscreen.gif" alt="Your Company"/>  
+            PPS
           </div>
 
-          {/* For DIS */}
-          <div className="col-span-1 ppa-widget">
+          <div className="ppa-system-text px-4">
+            Personnel Profiling System
+          </div>
 
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons" src="default/file-info-unscreen.gif" alt="Your Company"/>  
-              DIS
-            </div>
+          <div className="ppa-system-link">
+            (Coming Soon)
+          </div>
 
-            <div className="ppa-system-text">
-              Database of Issuance System
-            </div>
+        </div>
+        {/* For DTS */}
+        <div className="col-span-1 ppa-widget">
 
-            <div className="ppa-system-link">
-              (Coming Soon)
-            </div>
+          <div className="ppa-system-abbr">
+            <img className="mx-auto jlms-icons" src="default/folder-unscreen.gif" alt="Your Company"/>  
+            DTS
+          </div>
 
+          <div className="ppa-system-text">
+            Document Tracking System
+          </div>
+
+          <div className="ppa-system-link">
+            (Coming Soon)
+          </div>
+
+        </div>
+        {/* For DIS */}
+        <div className="col-span-1 ppa-widget">
+
+          <div className="ppa-system-abbr">
+            <img className="mx-auto jlms-icons" src="default/file-info-unscreen.gif" alt="Your Company"/>  
+            DIS
+          </div>
+
+          <div className="ppa-system-text">
+            Database of Issuance System
+          </div>
+
+          <div className="ppa-system-link">
+            (Coming Soon)
           </div>
 
         </div>
 
-        {/* Logs and Members */}
-        <div className="grid grid-cols-2 gap-4 mt-10">
+      </div>
 
-          {/* For Logs */}
-          <div className="col-span-1 ppa-widget">
-            <div className="ppa-widget-title">Logs</div>
-            <div className="ppa-div-table" style={{ minHeight: '200px', maxHeight: '400px', overflowY: 'auto' }}>
+      {/* Logs and Members */}
+      <div className="grid grid-cols-2 gap-4 mt-10">
+
+        {/* For Logs */}
+        <div className="col-span-1 ppa-widget">
+          <div className="ppa-widget-title">Logs for {currentDate}</div>
+          {loadingArea ? (
+            <div className="flex justify-center items-center py-4">
+              <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+              <span className="loading-table">Loading Logs</span>
+            </div>
+          ):(
+            <div className="ppa-div-table" style={{ minHeight: '400px', maxHeight: '400px', overflowY: 'auto' }}>
               <table className="ppa-table w-full mb-4">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="px-1 py-1 w-28 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
-                    <th className="px-1 py-1 w-22 text-left text-xs font-medium text-gray-600 uppercase">Category</th>
-                    <th className="px-1 py-1 text-left text-xs font-medium text-gray-600 uppercase">Message</th>
+                    <th className="px-1 py-1 w-32 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+                    <th className="px-1 py-1 w-18 text-center text-xs font-medium text-gray-600 uppercase">Category</th>
+                    <th className="px-1 py-1 text-center text-xs font-medium text-gray-600 uppercase">Description</th>
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#fff' }}>
@@ -304,8 +339,8 @@ export default function DashboardJLMS(){
                     isLogs?.LogsData?.map((Logs) => (
                       <tr key={Logs.id}>
                         <td className="px-1 py-1 text-left table-font text-xs">{Logs?.date}</td>
-                        <td className="px-1 py-1 text-left table-font text-xs">{Logs?.category}</td>
-                        <td className="px-1 py-1 text-left table-font text-xs">{Logs?.message}</td>
+                        <td className="px-1 py-1 text-center table-font text-xs">{Logs?.category}</td>
+                        <td className="px-1 py-1 text-center table-font text-xs">{Logs?.message}</td>
                       </tr>
                     ))
                   ):(
@@ -316,11 +351,18 @@ export default function DashboardJLMS(){
                 </tbody>
               </table>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* For Members */}
-          <div className="col-span-1 ppa-widget">
-            <div className="ppa-widget-title">PMO Members</div>
+        {/* For Members */}
+        <div className="col-span-1 ppa-widget">
+          <div className="ppa-widget-title">PMO Members</div>
+          {loadingArea ? (
+            <div className="flex justify-center items-center py-4">
+              <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+              <span className="loading-table">Loading Teams</span>
+            </div>
+          ):(
             <div className="members-container p-4 ppa-div-table" style={{ minHeight: 'auto', maxHeight: '400px', overflowY: 'auto' }}>
               {teams?.TeamData?.map((TeamData)=>(
               <div key={TeamData.id} className="member-info">
@@ -330,12 +372,13 @@ export default function DashboardJLMS(){
               </div>
               ))}
             </div>
-          </div>
-
+          )}
         </div>
 
       </div>
-      )}
-    </PageComponent>
+
+    </div>
+
+  </PageComponent>
   );
 }

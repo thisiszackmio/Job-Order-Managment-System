@@ -3,45 +3,62 @@ import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import loading_table from "/default/ring-loading.gif";
 import { Link } from "react-router-dom";
 
 export default function DashboardJOMS(){
 
   const { currentUserId } = useUserStateContext();
 
+  //Date Format 
+  function formatDate(dateString) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
   // Loading
   const [loading, setLoading] = useState(true);
+  const [loadingArea, setLoadingArea] = useState(true);
 
   // Variable
   const [inspectionForm, getInspectionForm] = useState([]);
   const [facilityForm, getFacilityForm] = useState([]);
   const [vehicleForm, getVehicleForm] = useState([]);
+  const [pending, getPending] = useState([]);
 
-    // Disable the Scroll on Popup
-    useEffect(() => {
-    
-      // Define the classes to be added/removed
-      const loadingClass = 'loading-show';
+  // Disable the Scroll on Popup
+  useEffect(() => {
   
-      // Function to add the class to the body
-      const addLoadingClass = () => document.body.classList.add(loadingClass);
-  
-      // Function to remove the class from the body
-      const removeLoadingClass = () => document.body.classList.remove(loadingClass);
-  
-      // Add or remove the class based on showPopup state
-      if(loading) {
-        addLoadingClass();
-      }
-      else {
-        removeLoadingClass();
-      }
-  
-      // Cleanup function to remove the class when the component is unmounted or showPopup changes
-      return () => {
-        removeLoadingClass();
-      };
-    }, [loading]);
+    // Define the classes to be added/removed
+    const loadingClass = 'loading-show';
+
+    // Function to add the class to the body
+    const addLoadingClass = () => document.body.classList.add(loadingClass);
+
+    // Function to remove the class from the body
+    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
+
+    // Add or remove the class based on showPopup state
+    if(loading) {
+      addLoadingClass();
+    }
+    else {
+      removeLoadingClass();
+    }
+
+    // Cleanup function to remove the class when the component is unmounted or showPopup changes
+    return () => {
+      removeLoadingClass();
+    };
+  }, [loading]);
+
+  // Set Delay for Loading
+  useEffect(() => {
+    // Simulate an authentication check
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+  }, []);
 
   //Get the data
   const fetchRequest = () => {
@@ -58,7 +75,23 @@ export default function DashboardJOMS(){
       getVehicleForm(VehicleForm);
     })
     .finally(() => {
-      setLoading(false);
+      setLoadingArea(false);
+    });
+  }
+
+  // Get Pending Request
+  const fetchPending = () => {
+    axiosClient
+    .get(`/pendingrequest/${currentUserId.id}`)
+    .then((response) => {
+      const responseData = response.data;
+      const PendingRemarks = responseData.pending_requests;
+
+      //console.log(PendingRemarks);
+      getPending({PendingRemarks});
+    })
+    .finally(() => {
+      setLoadingArea(false);
     });
   }
 
@@ -66,24 +99,26 @@ export default function DashboardJOMS(){
   useEffect(() => {
     if(currentUserId && currentUserId.id){
       fetchRequest();
+      fetchPending();
     }
   }, [currentUserId]);
 
-  return loading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="loading-text loading-animation">
-      {Array.from("Loading...").map((char, index) => (
-        <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-      ))}
-      </span>
-    </div>
-  ):(
+  return (
     <PageComponent title="Dashboard">
+
+      {/* Preload Screen */}
+      {loading && (
+        <div className="pre-loading-screen z-50">
+          <img className="mx-auto h-44 w-auto" src={loadingAnimation} alt="Your Company" />
+          <span className="loading-text loading-animation">
+          {Array.from("Loading...").map((char, index) => (
+            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
+          ))}
+          </span>
+        </div>
+      )}
+
+      {/* Main */}
       <div className="font-roboto">
   
         {/* Request Form */}
@@ -92,33 +127,106 @@ export default function DashboardJOMS(){
           {/* For Repair */}
           <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Pre/Post Repair Inspection Form </div>
-            <img className="mx-auto joms-icons" src="/default/technician-unscreen.gif" alt="Your Company"/>
-            <div className="joms-count">{inspectionForm}</div>
-            <div className="joms-word-count">Total Count</div>
+            {loadingArea ? (
+              <div className="flex justify-center items-center py-4">
+                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                <span className="loading-table">Loading</span>
+              </div>
+            ):(
+            <>
+              <img className="mx-auto joms-icons" src="/default/technician-unscreen.gif" alt="Your Company"/>
+              <div className="joms-count">{inspectionForm}</div>
+              <div className="joms-word-count">Total Count</div>
+            </>
+            )}
             <div className="ppa-system-link"> <Link to={`/joms/inspection/form`}> Go to Request Form </Link> </div>
           </div>
 
           {/* For Facility */}
           <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Facility / Venue Form </div>
-            <img className="mx-auto joms-icons" src="/default/form-unscreen.gif" alt="Your Company"/>
-            <div className="joms-count">{facilityForm}</div>
-            <div className="joms-word-count">Total Count</div>
+            {loadingArea ? (
+              <div className="flex justify-center items-center py-4">
+                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                <span className="loading-table">Loading</span>
+              </div>
+            ):(
+            <>
+              <img className="mx-auto joms-icons" src="/default/form-unscreen.gif" alt="Your Company"/>
+              <div className="joms-count">{facilityForm}</div>
+              <div className="joms-word-count">Total Count</div>
+            </>
+            )}
             <div className="ppa-system-link"> <Link to={`/joms/facilityvenue/form`}> Go to Request Form </Link> </div>
           </div>
 
           {/* For Vehicle Slip */}
           <div className="col-span-1 ppa-widget relative">
             <div className="joms-dashboard-title"> Vehicle Slip </div>
-            <img className="mx-auto joms-icons" src="/default/formother-unscreen.gif" alt="Your Company"/>
-            <div className="joms-count">{vehicleForm}</div>
-            <div className="joms-word-count">Total Count</div>
+            {loadingArea ? (
+              <div className="flex justify-center items-center py-4">
+                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                <span className="loading-table">Loading</span>
+              </div>
+            ):(
+            <>
+              <img className="mx-auto joms-icons" src="/default/formother-unscreen.gif" alt="Your Company"/>
+              <div className="joms-count">{vehicleForm}</div>
+              <div className="joms-word-count">Total Count</div>
+            </>
+            )}
             <div className="ppa-system-link"> <Link to={`/joms/vehicle/form`}> Go to Request Form </Link> </div>
           </div>
 
         </div>
 
+        {/* Pending Request */}
+        <div className="ppa-widget mt-10">
+          <div className="ppa-widget-title">Pending Request</div>
+          <div className="ppa-div-table" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+            <table className="ppa-table w-full mb-4">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-1 py-1 w-5 text-center text-xs font-medium text-gray-600 uppercase">Ctrl No</th>
+                  <th className="px-1 py-1 w-18 text-center text-xs font-medium text-gray-600 uppercase">Type of Request</th>
+                  <th className="px-1 py-1 w-18 text-center text-xs font-medium text-gray-600 uppercase">Date Request</th>
+                  <th className="px-1 py-1 w-2/4 text-center text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                </tr>
+              </thead>
+              <tbody style={{ backgroundColor: '#fff' }}>
+                {loadingArea ? (
+                  <tr>
+                    <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
+                      <div className="flex justify-center items-center py-4">
+                        <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                        <span className="loading-table">Loading Request</span>
+                      </div>
+                    </td>
+                  </tr>
+                ):(
+                <>
+                  {pending?.PendingRemarks?.length > 0 ? (
+                    pending?.PendingRemarks?.map((list) => (
+                      <tr key={list.id}>
+                        <td className="px-1 py-3 text-center table-font text-base">{list?.id}</td>
+                        <td className="px-1 py-3 text-center table-font text-base">{list?.type}</td>
+                        <td className="px-1 py-3 text-center table-font text-base">{formatDate(list?.date_request)}</td>
+                        <td className="px-1 py-3 text-center table-font text-base">{list?.remarks}</td>
+                      </tr>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom"> No Pending Request </td>
+                    </tr>
+                  )}
+                </>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </PageComponent>
-  );
+  )
 }

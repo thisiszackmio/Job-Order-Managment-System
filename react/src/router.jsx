@@ -17,6 +17,7 @@ import AddAnnouncements from './views/jlms/AddAnnounce';
 import UserRegistrationJLMS from './views/jlms/UserRegistration';
 import UserListJLMS from './views/jlms/UserList';
 import UserDetailsJLMS from './views/jlms/UserDetails';
+import Logs from './views/jlms/Logs';
 
 // -- AMS -- //
 import AMSLayout from './components/AMSLayout';
@@ -87,7 +88,8 @@ const routes = [
       { path: '/addemployee', element: <UserRegistrationJLMS /> },
       { path: '/userlist', element: <UserListJLMS /> },
       { path: '/userdetails/:id', element: <UserDetailsJLMS /> },
-      { path: '/user', element: <ViewUser /> }
+      { path: '/user', element: <ViewUser /> },
+      { path: '/logs', element: <Logs /> }
     ]
   },
 

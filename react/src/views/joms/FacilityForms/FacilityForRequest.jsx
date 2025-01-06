@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import submitAnimation from '/default/ring-loading.gif';
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
@@ -479,20 +478,7 @@ export default function FacilityVenueForm(){
     window.location.href = '/joms/myrequest';
   }
 
-  return loading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="loading-text loading-animation">
-      {Array.from("Loading...").map((char, index) => (
-        <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-      ))}
-      </span>
-    </div>
-  ):(
+  return (
     <PageComponent title="Request Form">
 
       {/* Form Content */}

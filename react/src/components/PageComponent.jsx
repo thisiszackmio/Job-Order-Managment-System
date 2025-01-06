@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
 
-const MAIN_LOGOUT_TIME = 3 * 60 * 1000; // 300 seconds
+const MAIN_LOGOUT_TIME = 3 * 60 * 1000; // 180 seconds
 const POPUP_GRACE_PERIOD = 2 * 60 * 1000; // 120 seconds
-const INACTIVITY_LIMIT = 5 * 60 * 1000; // Inactivity limit in milliseconds
+const LOGOUT_DELAY = 5 * 60 * 1000; // Inactivity limit in milliseconds
+const LOGOUT_KEY = "logout-timestamp";
+const RELOAD_KEY = "pending-logout";
 
 export default function PageComponent({ title, buttons = '', children }) {
+
   const { currentUserId, userCode, setCurrentId, setUserToken } = useUserStateContext();
   const navigate = useNavigate();
 
@@ -16,15 +19,46 @@ export default function PageComponent({ title, buttons = '', children }) {
   const [isTabActive, setIsTabActive] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(MAIN_LOGOUT_TIME);
   const [popupCountdown, setPopupCountdown] = useState(POPUP_GRACE_PERIOD);
-  const [isInactive, setIsInactive] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   const timeoutRef = useRef(null);
   const popupRef = useRef(null);
 
-  // Logout function
+  // Set Delay for Loading
+  useEffect(() => {
+    // Simulate an authentication check
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+  }, []);
+
+  // Logout function for Close the TAB
+  const logoutCloseTab = useCallback(() => {
+    // Perform the logout logic
+    const logMessage = `has been logged out of the system due to closing the browser.`;
+
+    // Set a logout reason in localStorage
+    localStorage.setItem("logoutReason", "You have been logged out of the system due to inactivity.");
+
+    axiosClient.post("/logout", { logMessage }).then(() => {
+      localStorage.removeItem('USER_ID');
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USER_CODE');
+      localStorage.removeItem(LOGOUT_KEY);
+      localStorage.removeItem(RELOAD_KEY);
+      setUserToken(null);
+      navigate("/login");
+    });
+  }, [navigate, setCurrentId, setUserToken]);
+
+  // Logout function for Idle
   const logout = useCallback(() => {
     // Perform the logout logic
-    const logMessage = `${currentUserId.name} has been logged out of the system due to inactivity.`;
+    const logMessage = `has been logged out of the system due to inactivity.`;
+
+    // Set a logout reason in localStorage
+    localStorage.setItem("logoutReason", "You have been logged out of the system due to inactivity.");
 
     axiosClient.post("/logout", { logMessage }).then(() => {
       localStorage.removeItem('USER_ID');
@@ -37,6 +71,52 @@ export default function PageComponent({ title, buttons = '', children }) {
     });
   }, [navigate, setCurrentId, setUserToken]);
 
+  const checkLogoutTimer = () => {
+    const logoutTimestamp = localStorage.getItem(LOGOUT_KEY);
+    const isPendingLogout = localStorage.getItem(RELOAD_KEY);
+  
+    // Case 1: Logout timer has expired
+    if (logoutTimestamp && Date.now() - logoutTimestamp > LOGOUT_DELAY) {
+      if (!isPendingLogout) {
+        // Set flag to indicate the page is reloading for logout
+        localStorage.setItem(RELOAD_KEY, "true");
+        window.location.reload(); // Reload the page
+      } else {
+        // After reload, execute logout
+        logoutCloseTab();
+      }
+    }
+  };
+
+  // Logout if the Browser is Closed
+  useEffect(() => {
+    const handleUnload = () => {
+      console.log("Tab is being closed. Setting logout timer...");
+      localStorage.setItem(LOGOUT_KEY, Date.now());
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // When the tab is reopened, check if the logout timer has passed
+        console.log("Tab is active again. Checking logout timer...");
+        checkLogoutTimer();
+      }
+    };
+
+    // Check immediately if the app is opened after being closed
+    checkLogoutTimer();
+
+    // Event listeners for tab close and visibility change
+    window.addEventListener("unload", handleUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("unload", handleUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+
+  }, []);
+
   // Handle reset on user activity
   const handleActivity = () => {
     //saveLastActivity()
@@ -45,47 +125,15 @@ export default function PageComponent({ title, buttons = '', children }) {
     }
   };
 
-  // Handle page visibility change for tab focus
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        handleActivity(); // Reset the timer when returning to the tab
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [showPopup]);
-
-  // Check Code Clearance
-  useEffect(() => {
-    if (!currentUserId?.id) {
-      return;
-    }
-
-    axiosClient
-      .get(`/checkcc/${currentUserId?.id}`)
-      .then((response) => {
-        const CodeClearanceData = response.data; // e.g., "MEM", "HACK"
-        const CurrentCodeClearance = userCode;   // e.g., "HACK", "MEM"
-
-        // Function to check if two strings contain the same characters in any order
-        const areStringsEqual = (str1, str2) => {
-          if (str1.length !== str2.length) return false;
-          return str1.split('').sort().join('') === str2.split('').sort().join('');
-        };
-
-        // If they don't match, log the user out
-        if (!areStringsEqual(CodeClearanceData, CurrentCodeClearance)) {
-          logout();
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [currentUserId?.id, logout, userCode]);
+  // Reset both main and popup timers
+  const resetTimeout = () => {
+    setShowPopup(false); // Hide popup if visible
+    clearInterval(timeoutRef.current);
+    clearInterval(popupRef.current);
+    setTimeRemaining(MAIN_LOGOUT_TIME);
+    setPopupCountdown(POPUP_GRACE_PERIOD);
+    startMainCountdown(); // Restart the main timer
+  };
 
   // Main countdown function
   const startMainCountdown = () => {
@@ -118,64 +166,10 @@ export default function PageComponent({ title, buttons = '', children }) {
     }, 1000);
   };
 
-  // Reset both main and popup timers
-  const resetTimeout = () => {
-    setShowPopup(false); // Hide popup if visible
-    clearInterval(timeoutRef.current);
-    clearInterval(popupRef.current);
-    setTimeRemaining(MAIN_LOGOUT_TIME);
-    setPopupCountdown(POPUP_GRACE_PERIOD);
-    startMainCountdown(); // Restart the main timer
-  };
-
   // Handle button click to reset both timers
   const handleButtonClick = () => {
     resetTimeout();
   };
-
-  // Save the last activity timestamp to localStorage
-  const saveLastActivity = () => {
-    const givenTime = Date.now();
-    localStorage.setItem("LAST_ACTIVITY", givenTime);
-  };
-
-  // Check inactivity on page load
-  useEffect(() => {
-    const lastActivity = parseInt(localStorage.getItem("LAST_ACTIVITY"), 10);
-    const currentTime = Date.now();
-
-    // If `lastActivity` exists and inactivity limit is exceeded, log out
-    if (lastActivity && currentTime - lastActivity > INACTIVITY_LIMIT) {
-      //alert("Logout due to inactivity");
-      logout();
-    } else {
-      // Reset the last activity if within the inactivity limit
-      saveLastActivity();
-      //alert("Activity reset");
-    }
-  }, [logout]);
-
-  // Track tab or window closing, visibility change
-  useEffect(() => {
-    // Save last activity on page unload (tab/browser close)
-    const handleBeforeUnload = () => saveLastActivity();
-
-    // Save last activity when tab visibility changes (e.g., tab switching)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        saveLastActivity();
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Cleanup event listeners on component unmount
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
 
   useEffect(() => {
     // Add event listeners for user activity
@@ -202,7 +196,7 @@ export default function PageComponent({ title, buttons = '', children }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isTabActive, showPopup]);
-
+  
   return (
   <>
     <header className="bg-white shadow flex justify-between items-center">

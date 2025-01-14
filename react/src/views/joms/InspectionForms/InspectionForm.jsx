@@ -2438,7 +2438,7 @@ export default function InspectionForm(){
                                 />
                                 <span className="text-base font-bold">{inspectionData?.admin_name}</span>
                               </div>
-                              <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Admin Division Manager </label>
+                              <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Acting Admin Division Manager </label>
                             </div>
                           </div>
 

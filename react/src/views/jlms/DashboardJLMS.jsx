@@ -172,7 +172,7 @@ export default function DashboardJLMS(){
   // Restrictions Condition
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const ProcurementTeam = codes.includes("PT") || codes.includes("HACK");
+  const ProcurementTeam = codes.includes("PT") || codes.includes("HACK") || codes.includes("DM") || codes.includes("AM");
 
   return (
   <PageComponent title={`${getTimeOfDay()}! ${currentUserId?.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUserId?.firstname}`}>
@@ -238,10 +238,16 @@ export default function DashboardJLMS(){
           </div>
 
           <div className="ppa-system-link">
-            {ProcurementTeam ? ("(Coming Soon)"):("Unauthorize")}
+            (Coming Soon)
+            {/* {ProcurementTeam ? (
+              <Link to={`/ams`}> Go to the System </Link>
+            ):(
+              "Unauthorize"
+            )} */}
           </div>
 
         </div>
+
         {/* For JOMS */}
         <div className="col-span-1 ppa-widget relative">
 
@@ -259,6 +265,7 @@ export default function DashboardJLMS(){
           </div>
 
         </div>
+
         {/* For PPS */}
         <div className="col-span-1 ppa-widget">
 
@@ -276,6 +283,7 @@ export default function DashboardJLMS(){
           </div>
 
         </div>
+
         {/* For DTS */}
         <div className="col-span-1 ppa-widget">
 
@@ -293,6 +301,7 @@ export default function DashboardJLMS(){
           </div>
 
         </div>
+
         {/* For DIS */}
         <div className="col-span-1 ppa-widget">
 

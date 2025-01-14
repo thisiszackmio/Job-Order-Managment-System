@@ -59,6 +59,9 @@ export default function Login() {
       else if(responseData == "ChangePass"){
         setChangePass(true);
       }
+      else{
+        setInputErrors('Please input the username and password');
+      }
 
     } finally {
       setSubmitLoading(false);
@@ -175,14 +178,12 @@ export default function Login() {
             <div className="login-word mb-6"> {changePass ? "Change Credentials" : "Login"} </div>
 
             {/* Error Code */}
-            {logoutMessage ? (
-              (logoutMessage) && (
-                <div className="login-error mb-8 mt-2"> {logoutMessage} </div>
-              )
-            ):(
-              inputErrors && ( 
-                <div className="login-error mb-8 mt-2"> {inputErrors} </div> 
-              )
+            {logoutMessage && (
+              <div className="login-error mb-8 mt-2"> {logoutMessage} </div>
+            )}
+
+            {inputErrors && (
+              <div className="login-error mb-8 mt-2"> {inputErrors} </div>
             )}
 
             {changePass ? (

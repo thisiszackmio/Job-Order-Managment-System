@@ -1513,7 +1513,7 @@ export default function FacilityForm(){
                 </tr>
                 <tr>
                   <td className="border border-black w-1/2 text-center text-sm">{facData?.ReqPosition}</td>
-                  <td className="border border-black w-1/2 text-center text-sm">Admin. Division Manager</td>
+                  <td className="border border-black w-1/2 text-center text-sm">Acting Admin Division Manager</td>
                 </tr>
                 <tr>
                   <td className="border text-base border-black w-1/2 text-center text-sm"><b>DATE: </b> {formatDate(facData?.form?.created_at)}</td>

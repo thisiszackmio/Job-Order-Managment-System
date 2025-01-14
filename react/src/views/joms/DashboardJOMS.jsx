@@ -104,7 +104,7 @@ export default function DashboardJOMS(){
   }, [currentUserId]);
 
   return (
-    <PageComponent title="Dashboard">
+    <PageComponent title="JOMS Dashboard">
 
       {/* Preload Screen */}
       {loading && (

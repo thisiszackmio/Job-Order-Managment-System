@@ -3,12 +3,15 @@ import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faPlus, faChevronRight, faHouse, faTachometerAlt, faLayerGroup, faUserPlus, faTrash, faWarehouse, faBoxesStacked, faLandmark, faList, faTruck, faMapLocation, faFilePen, faFile, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { useUserStateContext } from "../context/ContextProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function AMSLayout() {
+
+  const { currentUserId, setCurrentId, setUserToken, userCode } = useUserStateContext();
 
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
@@ -22,6 +25,24 @@ export default function AMSLayout() {
       setActiveAccordion(null);
     }
   }, [isSidebarMinimized, setActiveAccordion]);
+
+  // Logout Area
+  const logout = () => {
+    // Perform the logout logic
+    const logMessage = `${currentUserId.name} has logged out of the system.`;
+
+    axiosClient.post('/logout', { logMessage }).then(() => {
+      localStorage.removeItem('USER_ID');
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USER_CODE');
+      localStorage.removeItem('loglevel');
+      localStorage.removeItem('LAST_ACTIVITY');
+      setUserToken(null);
+
+      // Redirect to the login page
+      navigate('/login');
+    });
+  };
 
   return (
     <div className="w-full h-full font-roboto">
@@ -51,182 +72,53 @@ export default function AMSLayout() {
           <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
 
             {/* Back to JLMS */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center ${isSidebarMinimized ? 'mb-6':'mb-3'}`}>
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <Link to="/" className="flex items-center">
                   <FontAwesomeIcon icon={faHouse} />
-                  {!isSidebarMinimized && <p className="ml-4 text-lg">Go to JLMS</p>}
+                  {!isSidebarMinimized && <p className="ml-4 text-lg">Back to JLMS</p>}
                 </Link>
               </div>
             </li>
 
             {/* Dashboard */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center ${isSidebarMinimized ? 'mb-6':'mb-3'}`}>
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to="/ams/dashboard" className="flex items-center">
+                <Link to="/ams" className="flex items-center">
                   <FontAwesomeIcon icon={faTachometerAlt} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">Dashboard</p>}
                 </Link>
               </div>
             </li>
 
-            {/* Manage */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center ${isSidebarMinimized ? 'mb-6':'mb-3'}`}> 
-                    
-              <FontAwesomeIcon icon={faLayerGroup} />
+            {/* Asset Management */}
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+
+              <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
               {!isSidebarMinimized && 
               <>
                 <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
                 <label htmlFor="toggle1" className="w-full justify-between text-white cursor-pointer items-center text-lg">
-                  <span className="ml-4">Manage</span>
-                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                </label>
-              </>
-              }
-              
-              {(activeAccordion === 1 || !isSidebarMinimized) && (
-                <section>
-                  <ul id="menu1" className="pl-3 mt-4">
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/ams/accountable-officer">
-                      <FontAwesomeIcon icon={faUserPlus} className="mr-2" /> Accountable Officer
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">
-                        <FontAwesomeIcon icon={faTrash} className="mr-2" /> Recent Deleted Asset
-                      </Link>
-                    </li>
-                  </ul>
-                </section>
-              )}
-              
-            </li>
-
-            {/* Assest Management */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center ${isSidebarMinimized ? 'mb-6':'mb-3'}`}> 
-                    
-              <FontAwesomeIcon icon={faWarehouse} />
-              {!isSidebarMinimized && 
-              <>
-                <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)} />
-                <label htmlFor="toggle2" className="w-full justify-between text-white cursor-pointer items-center text-lg">
                   <span className="ml-4">Assest Management</span>
                   <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
                 </label>
               </>
               }
-              
-              {(activeAccordion === 2 || !isSidebarMinimized) && (
-                <section>
-                  <ul id="menu1" className="pl-3 mt-4">
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/ams/asset-classification">
-                        <FontAwesomeIcon icon={faList} className="mr-2" /> Classification of Asset
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faPlus} className="mr-2" /> Add Assets
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faBoxesStacked} className="mr-2" /> All Assets
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">
-                        <FontAwesomeIcon icon={faLandmark} className="mr-2" /> Land Assets
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">
-                        <FontAwesomeIcon icon={faBoxesStacked} className="mr-2" /> Add Semi-Expendable Asset
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">
-                        <FontAwesomeIcon icon={faTruck} className="mr-2" /> Supplier
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/facilityrequestform">
-                        <FontAwesomeIcon icon={faMapLocation} className="mr-2" /> Location
-                      </Link>
-                    </li>
-                  </ul>
-                </section>
-              )}
-              
-            </li>
 
-            {/* Report */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center ${isSidebarMinimized ? 'mb-6':'mb-3'}`}> 
-                    
-              <FontAwesomeIcon icon={faFilePen} />
-              {!isSidebarMinimized && 
-              <>
-                <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
-                <label htmlFor="toggle3" className="w-full justify-between text-white cursor-pointer items-center text-lg">
-                  <span className="ml-4">Report</span>
-                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                </label>
-              </>
-              }
-              
-              {(activeAccordion === 3 || !isSidebarMinimized) && (
+              {(activeAccordion === 1 || !isSidebarMinimized) && (
                 <section>
                   <ul id="menu1" className="pl-3 mt-4">
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faFile} className="mr-2" /> Inventory Count of Assets
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faFile} className="mr-2" /> Property Acknowledgment Receipt
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faFile} className="mr-2" /> Transfer (Comming Soon)
-                      </Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/requestinspectionform">
-                      <FontAwesomeIcon icon={faFile} className="mr-2" /> Return (Comming Soon)
-                      </Link>
+                      <Link to="/joms/inspection/form">Pre/Post Repair Inspection Form</Link>
                     </li>
                   </ul>
                 </section>
-              )}
-              
+              )} 
+
             </li>
 
           </ul>
 
-          {/* Logout */}
-          <ul>
-            {/* Logout */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-3 mt-3">
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <FontAwesomeIcon icon={faSignOutAlt} />
-                {!isSidebarMinimized && <a className="text-base  ml-4 leading-4 text-lg">Logout</a>}
-              </div>
-            </li>
-            {/* Account */}
-            <li className="flex w-full justify-between text-white cursor-pointer items-center pb-3">
-              <div className="flex items-center">
-              <img src={defaultImage} className="ppa-display-picture" alt="" />
-              {!isSidebarMinimized ? 
-                <p className="text-base leading-4 text-sm">
-                  <Link to={`/`}> Zack-Mio A. Sermon </Link>
-                </p> 
-              : null }  
-              </div>
-            </li>
-          </ul>
         </div>
       </div>
 

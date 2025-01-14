@@ -1066,7 +1066,7 @@ export default function VehicleSlip(){
                           {admin?.adminName}
                         </div> 
                         <div className="w-3/4 text-center text-sm relative">
-                          Adminstrative Division Manager
+                          Acting Adminstrative Division Manager
                         </div> 
 
                       </td>
@@ -1253,7 +1253,7 @@ export default function VehicleSlip(){
                           {admin?.adminName}
                         </div> 
                         <div className="w-3/4 text-center text-sm relative">
-                          Adminstrative Division Manager
+                          Acting Adminstrative Division Manager
                         </div> 
 
                       </td>

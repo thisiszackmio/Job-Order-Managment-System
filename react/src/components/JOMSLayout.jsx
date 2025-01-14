@@ -45,6 +45,7 @@ export default function JOMSLayout() {
       navigate('/login');
     });
   };
+  
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");

@@ -231,7 +231,7 @@ class InspectionController extends Controller
             $notiGSO->sender_avatar = $request->input('sender_avatar');
             $notiGSO->sender_id = $request->input('sender_id');
             $notiGSO->sender_name = $request->input('sender_name');
-            $notiGSO->message = 'The request for ' .$ApproveRequest->user_name. ' was approved by ' .$ApproveRequest->supervisor_name. '. Please check it here.' ;
+            $notiGSO->message = 'The request for ' .$ApproveRequest->user_name. ' was approved by ' .$ApproveRequest->supervisor_name. '.' ;
             $notiGSO->receiver_id = $data->id;
             $notiGSO->receiver_name = $data->firstname. ' ' .$data->middlename. '. ' .$data->lastname;
             $notiGSO->joms_type = 'JOMS_Inspection';
@@ -324,42 +324,62 @@ class InspectionController extends Controller
         // Save Update
         if ($ApproveRequest->save()) {
 
-            // Send to the Requestor
-            $noti = new NotificationModel();
-            $noti->type_of_jlms = "JOMS";
-            $noti->sender_avatar = $request->input('sender_avatar');
-            $noti->sender_id = $request->input('sender_id');
-            $noti->sender_name = $request->input('sender_name');
-            $noti->message = $request->input('sender_name') . " has approved your request.";
-            $noti->receiver_id = $request->input('receiver_id');
-            $noti->receiver_name = $request->input('receiver_name');
-            $noti->joms_type = 'JOMS_Inspection';
-            $noti->status = 2;
-            $noti->joms_id = $ApproveRequest->id; 
-            $noti->save();
-            
-            // Send to the Assign Personnel
-            $notiPer = new NotificationModel();
-            $notiPer->type_of_jlms = "JOMS";
-            $notiPer->sender_avatar = $request->input('sender_avatar');
-            $notiPer->sender_id = $request->input('sender_id');
-            $notiPer->sender_name = $request->input('sender_name');
-            $notiPer->message = "You have been assigned to this task.";
-            $notiPer->receiver_id = $ApproveRequest->personnel_id;
-            $notiPer->receiver_name = $ApproveRequest->	personnel_name;
-            $notiPer->joms_type = 'JOMS_Inspection';
-            $notiPer->status = 2;
-            $notiPer->joms_id = $ApproveRequest->id; 
-            $notiPer->save();
+            if($ApproveRequest->user_id === $ApproveRequest->personnel_id){
 
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+                $notiPer = new NotificationModel();
+                $notiPer->type_of_jlms = "JOMS";
+                $notiPer->sender_avatar = $request->input('sender_avatar');
+                $notiPer->sender_id = $request->input('sender_id');
+                $notiPer->sender_name = $request->input('sender_name');
+                $notiPer->message = "Your request has been approved, and you are to assign for this.";
+                $notiPer->receiver_id = $ApproveRequest->personnel_id;
+                $notiPer->receiver_name = $ApproveRequest->	personnel_name;
+                $notiPer->joms_type = 'JOMS_Inspection';
+                $notiPer->status = 2;
+                $notiPer->joms_id = $ApproveRequest->id; 
+                $notiPer->save();
+
+            } else {
+
+                // Send to the Requestor
+                $noti = new NotificationModel();
+                $noti->type_of_jlms = "JOMS";
+                $noti->sender_avatar = $request->input('sender_avatar');
+                $noti->sender_id = $request->input('sender_id');
+                $noti->sender_name = $request->input('sender_name');
+                $noti->message = 'Your request has been approved by the Admin Manager';
+                $noti->receiver_id = $request->input('receiver_id');
+                $noti->receiver_name = $request->input('receiver_name');
+                $noti->joms_type = 'JOMS_Inspection';
+                $noti->status = 2;
+                $noti->joms_id = $ApproveRequest->id; 
+                $noti->save();
+
+                // Send to the Assign Personnel
+                $notiPer = new NotificationModel();
+                $notiPer->type_of_jlms = "JOMS";
+                $notiPer->sender_avatar = $request->input('sender_avatar');
+                $notiPer->sender_id = $request->input('sender_id');
+                $notiPer->sender_name = $request->input('sender_name');
+                $notiPer->message = "You have been assigned to this task.";
+                $notiPer->receiver_id = $ApproveRequest->personnel_id;
+                $notiPer->receiver_name = $ApproveRequest->	personnel_name;
+                $notiPer->joms_type = 'JOMS_Inspection';
+                $notiPer->status = 2;
+                $notiPer->joms_id = $ApproveRequest->id; 
+                $notiPer->save();
+
+            }
 
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
+
+        // Logs
+        $logs = new LogsModel();
+        $logs->category = 'JOMS';
+        $logs->message = $request->input('logs');
+        $logs->save();
     }
 
     /**
@@ -546,9 +566,9 @@ class InspectionController extends Controller
 
         if($sPartB){
 
-            if($dataGSO->id === $request->input('receiver_id')) { 
+            if($dataGSO->id === $InspectionRequest->user_id) { 
 
-                // Send to the Admin
+                // If the GSO Submits the Request
                 $notiAdmin = new NotificationModel();
                 $notiAdmin->type_of_jlms = "JOMS";
                 $notiAdmin->sender_avatar = $request->input('sender_avatar');
@@ -562,9 +582,11 @@ class InspectionController extends Controller
                 $notiAdmin->joms_id = $InspectionRequest->id; 
                 $notiAdmin->save();
 
-            } else if($data->id === $request->input('receiver_id')){
+            } else if($data->id === $InspectionRequest->user_id){
 
-                // Send to the Admin
+                $PersonnelDet = PPAEmployee::find($InspectionRequest->personnel_id);
+
+                // If the Admin Submits the Request
                 $notiAdmin = new NotificationModel();
                 $notiAdmin->type_of_jlms = "JOMS";
                 $notiAdmin->sender_avatar = $request->input('sender_avatar');
@@ -578,29 +600,29 @@ class InspectionController extends Controller
                 $notiAdmin->joms_id = $InspectionRequest->id; 
                 $notiAdmin->save();
 
-                // Send to the Personnel
-                $notiPer = new NotificationModel();
-                $notiPer->type_of_jlms = "JOMS";
-                $notiPer->sender_avatar = $request->input('sender_avatar');
-                $notiPer->sender_id = $request->input('sender_id');
-                $notiPer->sender_name = $request->input('sender_name');
-                $notiPer->message = "You have been assigned to this task.";
-                $notiPer->receiver_id = $InspectionRequest->personnel_id;
-                $notiPer->receiver_name = $InspectionRequest->personnel_name;
-                $notiPer->joms_type = 'JOMS_Inspection';
-                $notiPer->status = 2;
-                $notiPer->joms_id = $InspectionRequest->id; 
-                $notiPer->save();
+                // It sends to the Personnel
+                $notiPerso = new NotificationModel();
+                $notiPerso->type_of_jlms = "JOMS";
+                $notiPerso->sender_avatar = $dataGSO->avatar;
+                $notiPerso->sender_id = $dataGSO->id;
+                $notiPerso->sender_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+                $notiPerso->message = 'You have been assigned to this task.' ;
+                $notiPerso->receiver_id = $PersonnelDet->id;
+                $notiPerso->receiver_name = $PersonnelDet->firstname. ' ' .$PersonnelDet->middlename. '. ' .$PersonnelDet->lastname;
+                $notiPerso->joms_type = 'JOMS_Inspection';
+                $notiPerso->status = 2;
+                $notiPerso->joms_id = $InspectionRequest->id; 
+                $notiPerso->save();
             
             }else{
 
-                // Send to the Admin Manager
+                // Other sends the request
                 $notiAdmin = new NotificationModel();
                 $notiAdmin->type_of_jlms = "JOMS";
                 $notiAdmin->sender_avatar = $request->input('sender_avatar');
                 $notiAdmin->sender_id = $request->input('sender_id');
                 $notiAdmin->sender_name = $request->input('sender_name');
-                $notiAdmin->message = $request->input('sender_name').' has filled out the Part B Form for '.$InspectionRequest->user_name."'s request and is waiting for your approval";
+                $notiAdmin->message = 'The request for '.$InspectionRequest->user_name.' has filled out the form (Part B) by the GSO, and it needs your approval.';
                 $notiAdmin->receiver_id = $data->id;
                 $notiAdmin->receiver_name = $data->firstname. ' ' .$data->middlename. '. ' .$data->lastname;
                 $notiAdmin->joms_type = 'JOMS_Inspection';
@@ -658,7 +680,7 @@ class InspectionController extends Controller
             $notiPer->sender_avatar = $request->input('sender_avatar');
             $notiPer->sender_id = $request->input('sender_id');
             $notiPer->sender_name = $request->input('sender_name');
-            $notiPer->message = "You still need to fill out Part D.";
+            $notiPer->message = "You still need to fill out the Part D.";
             $notiPer->receiver_id = $request->input('sender_id');
             $notiPer->receiver_name = $request->input('sender_name');
             $notiPer->joms_type = 'JOMS_Inspection';
@@ -728,33 +750,52 @@ class InspectionController extends Controller
 
             }else{
 
-                // Send for the Requestor
-                $noti = new NotificationModel();
-                $noti->type_of_jlms = "JOMS";
-                $noti->sender_avatar = $request->input('sender_avatar');
-                $noti->sender_id = $request->input('sender_id');
-                $noti->sender_name = $request->input('sender_name');
-                $noti->message = "Your request has been completed. Please check it here.";
-                $noti->receiver_id = $request->input('receiver_id');
-                $noti->receiver_name = $request->input('receiver_name');
-                $noti->joms_type = 'JOMS_Inspection';
-                $noti->status = 2;
-                $noti->joms_id = $InspectionRequest->id; 
-                $noti->save();
+                if($InspectionRequest->user_id != $InspectionRequest->personnel_id){
+                    // Send for the Requestor
+                    $noti = new NotificationModel();
+                    $noti->type_of_jlms = "JOMS";
+                    $noti->sender_avatar = $request->input('sender_avatar');
+                    $noti->sender_id = $request->input('sender_id');
+                    $noti->sender_name = $request->input('sender_name');
+                    $noti->message = "Your request has been completed. Please check it here.";
+                    $noti->receiver_id = $request->input('receiver_id');
+                    $noti->receiver_name = $request->input('receiver_name');
+                    $noti->joms_type = 'JOMS_Inspection';
+                    $noti->status = 2;
+                    $noti->joms_id = $InspectionRequest->id; 
+                    $noti->save();
 
-                // Send for the GSO
-                $notiGSO = new NotificationModel();
-                $notiGSO->type_of_jlms = "JOMS";
-                $notiGSO->sender_avatar = $request->input('sender_avatar');
-                $notiGSO->sender_id = $request->input('sender_id');
-                $notiGSO->sender_name = $request->input('sender_name');
-                $notiGSO->message = "The request for ".$InspectionRequest->user_name." is complete.";
-                $notiGSO->receiver_id = $dataGSO->id;
-                $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiGSO->joms_type = 'JOMS_Inspection';
-                $notiGSO->status = 2;
-                $notiGSO->joms_id = $InspectionRequest->id; 
-                $notiGSO->save();
+                    // Send for the GSO
+                    $notiGSO = new NotificationModel();
+                    $notiGSO->type_of_jlms = "JOMS";
+                    $notiGSO->sender_avatar = $request->input('sender_avatar');
+                    $notiGSO->sender_id = $request->input('sender_id');
+                    $notiGSO->sender_name = $request->input('sender_name');
+                    $notiGSO->message = "The request for ".$InspectionRequest->user_name." is complete.";
+                    $notiGSO->receiver_id = $dataGSO->id;
+                    $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+                    $notiGSO->joms_type = 'JOMS_Inspection';
+                    $notiGSO->status = 2;
+                    $notiGSO->joms_id = $InspectionRequest->id; 
+                    $notiGSO->save();
+                } else {
+
+                    // Send for the GSO
+                    $notiGSO = new NotificationModel();
+                    $notiGSO->type_of_jlms = "JOMS";
+                    $notiGSO->sender_avatar = $request->input('sender_avatar');
+                    $notiGSO->sender_id = $request->input('sender_id');
+                    $notiGSO->sender_name = $request->input('sender_name');
+                    $notiGSO->message = "The request for ".$InspectionRequest->user_name." is complete.";
+                    $notiGSO->receiver_id = $dataGSO->id;
+                    $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
+                    $notiGSO->joms_type = 'JOMS_Inspection';
+                    $notiGSO->status = 2;
+                    $notiGSO->joms_id = $InspectionRequest->id; 
+                    $notiGSO->save();
+
+                }
+
 
             }
 

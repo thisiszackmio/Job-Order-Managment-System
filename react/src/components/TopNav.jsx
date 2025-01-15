@@ -91,6 +91,11 @@ const TopNav = () =>{
       });
   };
 
+  const handleIconClick = () => {
+    // Reset the notification count
+    setCount(null);
+  };
+
 
   return (
   <div className="px-4 sm:px-6 lg:px-8">
@@ -103,15 +108,15 @@ const TopNav = () =>{
 
             {/* Display number of Notification */}
             <div>
-              <Menu.Button className="notification-icon">
+              <Menu.Button className="notification-icon" onClick={handleIconClick}>
                 <span className="absolute -inset-1.5" />
                 <span className="sr-only">View notifications</span>
                 <BellIcon className="h-7 w-7" aria-hidden="true" />
               </Menu.Button>
 
-              {count.count ? (
+              {count?.count ? (
                 <span className="notifications">
-                    {count.count > 9 ? '9+' : count.count}
+                    {count?.count > 9 ? '9+' : count?.count}
                 </span>
               ) : null}
 
@@ -128,103 +133,57 @@ const TopNav = () =>{
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute font-arial right-0 z-10 mt-2 w-[500px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <p className="text-xs font-bold text-center leading-7 text-red-500 ml-2">Notifications</p>
 
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <p className="notification-text font-roboto pl-3">Notifications</p>
                   {loadingNotifications ? (
                     <div className="flex p-8 justify-center items-center">
                       <img className="h-7 w-auto mr-1" src={loading_table} alt="Loading" />
                       <span className="loading-table">Loading Notification</span>
                     </div>
                   ):(
-                    <div className="font-roboto">
-                    {notifications.length > 0 ? (
-                    <>
-                      {/* Display "New" title only once */}
-                      {notifications.some((NofiData) => NofiData.status === 2) && (
-                        <p className="text-base font-bold text-left px-4">Unread</p>
-                      )}
-
-                      {notifications.map((NofiData) => (
-                        <div key={NofiData.id} className="notification-item">
-                          {NofiData.status === 2 && (
-                            <a onClick={() => OpenLink(NofiData.id, NofiData.joms_id, NofiData.joms_type)} className="noti-link">
-                              <div className="flex notification-container p-3">
-                                {/* Icon */}
+                  <>
+                    {notifications?.length > 0 ? (
+                      <div>
+                        {notifications?.map((NofiData) => (
+                          <div key={NofiData?.id} className="notification-item">
+                            <a onClick={() => OpenLink(NofiData?.id, NofiData?.joms_id, NofiData?.joms_type)} className="noti-link">
+                              <div className="flex notification-container p-3 font-roboto">
+                                {/* Image and Icon */}
                                 <div className="w-32 items-center relative">
-                                 <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
-                                 <img src={
-                                  NofiData.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
-                                  NofiData.joms_type == "JOMS_Inspection" ? repair : 
-                                  NofiData.joms_type == "JOMS_Facility" ? facilityicon : 
+                                  <img src={NofiData?.sender_avatar} className="notification_avatar" alt={`${NofiData?.sender_name}'s avatar`} />
+                                  <img src={
+                                  NofiData?.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                  NofiData?.joms_type == "JOMS_Inspection" ? repair : 
+                                  NofiData?.joms_type == "JOMS_Facility" ? facilityicon : 
                                   null
-                                  } className="notification_icon" alt={`${NofiData.sender_name}'s avatar`} /> 
+                                  } className="notification_icon" alt={`${NofiData?.sender_name}'s avatar`} /> 
                                 </div>
                                 {/* Message */}
-                                <div className="w-full">
-                                  <h4 className="noti-type">
-                                    {NofiData.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData.joms_id})`}
-                                    {NofiData.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData.joms_id})`}
-                                    {NofiData.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData.joms_id})`}
-                                  </h4>
-                                  <h3 className="noti-message">{NofiData.message}</h3>
-                                  <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData.date_request)}</h4>
-                                </div>
+                              <div className="w-full">
+                                <h4 className={`noti-type ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>
+                                  {NofiData?.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData?.joms_id})`}
+                                  {NofiData?.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData?.joms_id})`}
+                                  {NofiData?.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData?.joms_id})`}
+                                </h4>
+                                <h3 className={`noti-message ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>{NofiData?.message}</h3>
+                                <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData?.date_request)}</h4>
+                              </div>
                               </div>
                             </a>
-                          )}
-                        </div>
-                      ))}
-
-                      {/* Display "Recent" title only once */}
-                      {notifications.some((NofiData) => NofiData.status === 1) && (
-                        <p className="text-base font-bold text-left px-4">Recent</p>
-                      )}
-
-                      {notifications.map((NofiData) => (
-                        <div key={NofiData.id} className="notification-item">
-                          {NofiData.status === 1 && (
-                            <a onClick={() => OpenLink(NofiData.id, NofiData.joms_id, NofiData.joms_type)} className="noti-link">
-                              <div className="flex notification-container p-3">
-                                {/* Icon */}
-                                <div className="w-32 items-center relative">
-                                <img src={NofiData.sender_avatar} className="notification_avatar" alt={`${NofiData.sender_name}'s avatar`} />
-                                <img src={
-                                  NofiData.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
-                                  NofiData.joms_type == "JOMS_Inspection" ? repair : 
-                                  NofiData.joms_type == "JOMS_Facility" ? facilityicon : 
-                                  null
-                                  } className="notification_icon" alt={`${NofiData.sender_name}'s avatar`} /> 
-                                </div>
-                                {/* Message */}
-                                <div className="w-full">
-                                  <h4 className="noti-type">
-                                    {NofiData.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request: (Vehicle Slip No ${NofiData.joms_id})`}
-                                    {NofiData.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData.joms_id})`}
-                                    {NofiData.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData.joms_id})`}
-                                  </h4>
-                                  <h3 className="noti-message">{NofiData.message}</h3>
-                                  <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData.date_request)}</h4>
-                                </div>
-                              </div>
-                            </a>
-                          )}
-                        </div>
-                      ))}
-
-                    </>
+                          </div>
+                        ))}
+                      </div>
                     ):(
-                    <>
                       <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
-                    </>
                     )}
-                    </div>
+                  </>
                   )}
-
                 </Menu.Items>
+
               </Transition>
             </div>
-            
+
           </Menu>
         </div>
       </div>

@@ -238,12 +238,11 @@ export default function DashboardJLMS(){
           </div>
 
           <div className="ppa-system-link">
-            (Coming Soon)
-            {/* {ProcurementTeam ? (
+            {ProcurementTeam ? (
               <Link to={`/ams`}> Go to the System </Link>
             ):(
               "Unauthorize"
-            )} */}
+            )}
           </div>
 
         </div>

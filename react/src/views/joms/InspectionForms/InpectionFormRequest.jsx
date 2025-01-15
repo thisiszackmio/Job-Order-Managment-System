@@ -135,7 +135,7 @@ export default function RepairRequestForm(){
     setSubmitLoading(true);
 
     let remarks = Admin || DivisionManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
-    const notification = Admin || DivisionManager ? `${currentUserId.name} has submitted a request. Please check it here.` : `${currentUserId.name} has submitted a request and is waiting for your approval.`;
+    const notification = Admin || DivisionManager ? `${currentUserId.name} has submitted a request.` : `${currentUserId.name} has a request and needs your approval.`;
     
     const formData = {
       user_id: currentUserId.id,

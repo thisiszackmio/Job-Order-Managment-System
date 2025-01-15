@@ -91,11 +91,6 @@ img.login-logo { width: 50%; margin-left: auto; margin-right: auto; }
 .btn-pdf { background-color: #50C878; border-radius: 5px; color: #fff; }
 .btn-pdf:hover { background-color: #32B45E; }
 
-
-
-
-
-
 .btn-default { background-color: #4169E1; color: #fff; border-radius: 5px; }
 .btn-default:hover { background-color: #1D4CD8; }
 .btn-cancel { background-color: #D22B2B; color: #fff; border-radius: 5px; }
@@ -124,12 +119,6 @@ img.login-logo { width: 50%; margin-left: auto; margin-right: auto; }
   margin-top: 15px;
   font-size: 20px;
 }
-
-
-
-
-
-
 
 /* For 403 Page */
 .error {
@@ -350,6 +339,11 @@ img.ppa-display-picture { object-fit: cover; object-position: top; width: 35px; 
 .joms-icons { position: absolute; width: 30%; right: 10px; }
 
 /* Notifaction*/
+p.notification-text {
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .notifications {
   color: #ffff;
   background-color: #ff0000;
@@ -363,11 +357,12 @@ img.ppa-display-picture { object-fit: cover; object-position: top; width: 35px; 
   width: 25px;
   text-align: center;
 }
+.noti-read {
+  color: #808080;
+}
 .noti-type {
-  color: #202020;
-  font-style: italic;
   padding-bottom: 5px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
 }
 .noti-message {

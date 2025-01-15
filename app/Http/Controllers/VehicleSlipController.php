@@ -16,7 +16,7 @@ class VehicleSlipController extends Controller
 {
     /**
      *  Legend
-     * 
+     *  
      *  1 - Admin Approval
      *  2 - Disapprove
      *  3 - Pending Approval

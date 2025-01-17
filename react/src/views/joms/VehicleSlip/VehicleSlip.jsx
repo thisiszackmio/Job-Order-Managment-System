@@ -521,7 +521,7 @@ export default function VehicleSlip(){
               {/* Main Form */}
               <div className="pl-2 pt-6 pb-6">
 
-                { Access  ? (
+                {Access ? (
                   <div className="grid grid-cols-2">
 
                   {/* 1st Column */}

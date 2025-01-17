@@ -514,8 +514,7 @@ export default function VehicleSlip(){
             </div>
           ):(
           <>
-
-            {id == vehicleData?.id ? (
+            {vehicleData?.id == id ? (
             <>
               
               {/* Main Form */}

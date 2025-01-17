@@ -157,11 +157,23 @@ export default function VehicleSlip(){
   // Get Vehicle Details
   const fetchVehicle = () => {
     axiosClient
-    .get(`/getvehdet`)
+    .get('/getvehdet')
     .then((response) => {
       const responseData = response.data;
 
-      setVehicleDet(responseData)
+      setVehicleDet(responseData);
+
+      const ucode = userCode;
+      const codes = ucode.split(',').map(code => code.trim());
+      const Admin = codes.includes("AM");
+      const GSO = codes.includes("GSO");
+      const SuperAdmin = codes.includes("HACK");
+      const DivisionManager = codes.includes("DM");
+      const Personnel = codes.includes("AP");
+      const myAccess = form?.user_id == currentUserId?.id;
+
+       // Create A condition for access
+       setAccess(myAccess || DivisionManager || GSO || Admin || SuperAdmin || Personnel);
       
     })
     .finally(() => {
@@ -515,151 +527,153 @@ export default function VehicleSlip(){
           ):(
           <>
             {vehicleData?.id == id ? (
-            <>
-              
-              {/* Main Form */}
-              <div className="pl-2 pt-6 pb-6">
+              Access ? (
+                <>
+                  
+                  {/* Main Form */}
+                  <div className="pl-2 pt-6 pb-6">
 
-                {Access ? (
-                  <div className="grid grid-cols-2">
+                    <div className="grid grid-cols-2">
 
-                  {/* 1st Column */}
-                  <div className="col-span-1">
+                      {/* 1st Column */}
+                      <div className="col-span-1">
 
-                    {/* Date Request */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                          Date of Request:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {formatDate(vehicleData?.created_at)}
-                      </div>
-                    </div>
-
-                    {/* Purpose */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                          Purpose:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.purpose}
-                      </div>
-                    </div>
-
-                    {/* Place/s to be Visited */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                          Place/s to be Visited:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.place_visited}
-                      </div>
-                    </div>
-
-                    {/* Date/Time of Arrival */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                          Date/Time of Arrival:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)}
-                      </div>
-                    </div>
-
-                    {/* Type of Vehicle */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                          Type of Vehicle:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null}
-                      </div>
-                    </div>
-
-                    {/* Plate Number */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                        Plate Number:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
-                      </div>
-                    </div>
-
-                    {/* Driver */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                        Driver:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.driver}
-                      </div>
-                    </div>
-
-                    {/* Requested By */}
-                    <div className="flex items-center mt-2">
-                      <div className="w-44">
-                        <label className="block text-base font-bold leading-6 text-gray-900">
-                        Requested By:
-                        </label> 
-                      </div>
-                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                        {vehicleData?.user_name}
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* 2nd Column */}
-                  <div className="col-span-1">
-                    {/* Passengers */}
-                    <div className="mt-2">
-                      <label className="block text-base font-bold leading-6 text-gray-900">
-                        {passenger == "None" ? null : 'Passengers:'}
-                      </label> 
-                      {passenger == "None" ? null:(
-                        <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
-                          {passenger?.map((data, index) => (
-                            <div key={index} className="flex mt-1.5">
-                              <div className="w-6">
-                                <label className="block text-base font-bold leading-6 text-gray-900">
-                                {index + 1}.
-                                </label> 
-                              </div>
-                              <div className="w-64 ppa-form-view text-left h-6 mr-2">
-                                {data}
-                              </div>
-                            </div>
-                          ))}
+                        {/* Date Request */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                              Date of Request:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {formatDate(vehicleData?.created_at)}
+                          </div>
                         </div>
-                      )}
+
+                        {/* Purpose */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                              Purpose:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.purpose}
+                          </div>
+                        </div>
+
+                        {/* Place/s to be Visited */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                              Place/s to be Visited:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.place_visited}
+                          </div>
+                        </div>
+
+                        {/* Date/Time of Arrival */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                              Date/Time of Arrival:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)}
+                          </div>
+                        </div>
+
+                        {/* Type of Vehicle */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                              Type of Vehicle:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null}
+                          </div>
+                        </div>
+
+                        {/* Plate Number */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                            Plate Number:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
+                          </div>
+                        </div>
+
+                        {/* Driver */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                            Driver:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.driver}
+                          </div>
+                        </div>
+
+                        {/* Requested By */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-44">
+                            <label className="block text-base font-bold leading-6 text-gray-900">
+                            Requested By:
+                            </label> 
+                          </div>
+                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                            {vehicleData?.user_name}
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* 2nd Column */}
+                      <div className="col-span-1">
+                        {/* Passengers */}
+                        <div className="mt-2">
+                          <label className="block text-base font-bold leading-6 text-gray-900">
+                            {passenger == "None" ? null : 'Passengers:'}
+                          </label> 
+                          {passenger == "None" ? null:(
+                            <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
+                              {passenger?.map((data, index) => (
+                                <div key={index} className="flex mt-1.5">
+                                  <div className="w-6">
+                                    <label className="block text-base font-bold leading-6 text-gray-900">
+                                    {index + 1}.
+                                    </label> 
+                                  </div>
+                                  <div className="w-64 ppa-form-view text-left h-6 mr-2">
+                                    {data}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
                     </div>
+
                   </div>
 
-                </div>
-                ):(
-                  (() => { window.location = '/unauthorize'; return null; })()
-                )}
-
-              </div>
-
-            </>
+                </>
+              ):(
+                ""
+                //(() => { window.location = '/unauthorize'; return null; })()
+              )
             ):(
-              (() => { window.location = '/404'; return null; })()
+              ""
+              //(() => { window.location = '/404'; return null; })()
             )}
 
           </>

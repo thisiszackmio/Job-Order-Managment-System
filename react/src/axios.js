@@ -30,6 +30,9 @@ axiosClient.interceptors.response.use(
         // Redirect to the login page
         router.navigate('/login');
       }
+      if(error.response && error.response.status === 503){
+        window.location.href = "/maintanance";
+      }
       return Promise.reject(error);
     }
   );

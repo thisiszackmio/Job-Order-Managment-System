@@ -8,6 +8,7 @@ import FileNotFound from './components/404';
 import ViewUser from './views/jlms/ViewUser';
 import Login from './views/Login';
 import Logout from './views/Logout';
+import Maintenance from './components/maint';
 
 //  -- JLMS -- //
 import AllAnnouncements from './views/jlms/AllAnnounce';
@@ -125,6 +126,7 @@ const routes = [
   { path: '/unauthorize', element: <Unauthorize /> },
   { path: '*', element: <FileNotFound /> },
   { path: '/404', element: <FileNotFound /> },
+  { path: '/maintanance', element:<Maintenance /> },
 ];
 
 const router = createBrowserRouter(routes);

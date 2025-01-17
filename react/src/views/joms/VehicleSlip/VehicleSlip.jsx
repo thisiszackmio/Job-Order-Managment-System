@@ -515,13 +515,13 @@ export default function VehicleSlip(){
           ):(
           <>
 
-            {Access ? (
+            {id == vehicleData?.id ? (
             <>
               
               {/* Main Form */}
               <div className="pl-2 pt-6 pb-6">
 
-                {id == vehicleData?.id ? (
+                { Access  ? (
                   <div className="grid grid-cols-2">
 
                   {/* 1st Column */}
@@ -653,14 +653,14 @@ export default function VehicleSlip(){
 
                 </div>
                 ):(
-                  (() => { window.location = '/404'; return null; })()
+                  (() => { window.location = '/unauthorize'; return null; })()
                 )}
 
               </div>
 
             </>
             ):(
-              (() => { window.location = '/unauthorize'; return null; })()
+              (() => { window.location = '/404'; return null; })()
             )}
 
           </>

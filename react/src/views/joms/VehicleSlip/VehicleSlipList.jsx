@@ -79,7 +79,7 @@ export default function VehicleSlipList(){
     setCurrentPage(selected);
   };
 
-  return Access ? (
+  return (
     <PageComponent title="Request List">
 
       {/* Table */}
@@ -125,45 +125,49 @@ export default function VehicleSlipList(){
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
-            {loading ? (
-              <tr>
-                <td colSpan={12} className="px-2 py-2 text-center table-font">
-                  <div className="flex justify-center items-center">
-                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                    <span className="loading-table">Loading</span>
-                  </div>
-                </td>
-              </tr>
-            ):(
-              currentList.length > 0 ? (
-                currentList.map((list)=>(
-                  <tr key={list.id}>
-                    <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/vehicle/form/${list.id}`}>{list.id}</Link></td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.date_request}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.purpose}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.place_visited}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.date_arrival}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.time_arrival}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.driver ? list.driver : "None"}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.vehicle_type ? list.vehicle_type : "None"}</td>
-                    <td className="px-2 py-2 text-sm w-1 text-center table-font">{list.passengers}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                    <td className="px-2 py-2 text-sm text-center table-font">
-                      {list.admin_approval == 1 && ("Approved")}
-                      {list.admin_approval == 2 && ("Disapproved")}
-                      {(list.admin_approval == 3 || list.admin_approval == 4 || list.admin_approval == 6) && ("Pending")}
-                      {list.admin_approval == 5 && ("Closed by GSO")}
-                    </td>
-                  </tr>
-                ))
-              ):(
+              {loading ? (
                 <tr>
-                  <td colSpan={13} className="px-2 py-2 text-center text-sm text-gray-600">
-                    No records found.
+                  <td colSpan={12} className="px-2 py-2 text-center table-font">
+                    <div className="flex justify-center items-center">
+                      <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                      <span className="loading-table">Loading</span>
+                    </div>
                   </td>
                 </tr>
-              )
-            )}
+              ):(
+                Access ? (
+                  currentList.length > 0 ? (
+                    currentList.map((list)=>(
+                      <tr key={list.id}>
+                        <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/vehicle/form/${list.id}`}>{list.id}</Link></td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.date_request}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.purpose}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.place_visited}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.date_arrival}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.time_arrival}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.driver ? list.driver : "None"}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.vehicle_type ? list.vehicle_type : "None"}</td>
+                        <td className="px-2 py-2 text-sm w-1 text-center table-font">{list.passengers}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
+                        <td className="px-2 py-2 text-sm text-center table-font">
+                          {list.admin_approval == 1 && ("Approved")}
+                          {list.admin_approval == 2 && ("Disapproved")}
+                          {(list.admin_approval == 3 || list.admin_approval == 4 || list.admin_approval == 6) && ("Pending")}
+                          {list.admin_approval == 5 && ("Closed by GSO")}
+                        </td>
+                      </tr>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={13} className="px-2 py-2 text-center text-sm text-gray-600">
+                        No records found.
+                      </td>
+                    </tr>
+                  )
+                ):(
+                  (() => { window.location = '/unauthorize'; return null; })()
+                )
+              )}
             </tbody>
           </table>
           {displayPaginationUser && (
@@ -188,12 +192,11 @@ export default function VehicleSlipList(){
               nextLinkClassName="page-link"
             />
           )}
+
         </div>
       </div>
 
     </PageComponent>
-  ):(
-    (() => { window.location = '/unauthorize'; return null; })()
   );
 
 }

@@ -119,6 +119,13 @@ img.login-logo { width: 50%; margin-left: auto; margin-right: auto; }
   margin-top: 15px;
   font-size: 20px;
 }
+span.system-generated {
+  font-size: 12px;
+  position: absolute;
+  bottom: 0px;
+  color: #272727;
+  font-style: italic;
+}
 
 /* For 403 Page */
 .error {

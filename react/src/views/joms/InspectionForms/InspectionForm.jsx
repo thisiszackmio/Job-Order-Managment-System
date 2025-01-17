@@ -2079,7 +2079,7 @@ export default function InspectionForm(){
             )}
 
             {/* Generate PDF by GSO */}
-            {inspectionData?.form?.status === '1111' && GSO && (
+            {(inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1200') && GSO && (
               <div className="mt-5">
                 <button type="button" onClick={handleButtonClick}
                   className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
@@ -2125,10 +2125,10 @@ export default function InspectionForm(){
       <div>
         <div className="hidden md:none">
           <div ref={componentRef}>
-            <div style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
+            <div className="relative" style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
 
               {/* Control Number */}
-              <div className="title-area font-arial pr-6 text-right pb-4 pt-2">
+              <div className="title-area font-arial pr-6 text-right pb-2 pt-2">
                 <span>Control No:</span>{" "}
                 <span style={{ textDecoration: "underline", fontWeight: "900" }}>    
                 ___{inspectionData?.form?.id}___
@@ -2431,11 +2431,13 @@ export default function InspectionForm(){
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
                             <div className="mt-5">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                <img 
-                                  src={inspectionData?.admin_esig} 
-                                  alt="User Signature" 
-                                  className="ppa-esignature-form" 
-                                />
+                                {inspectionData?.form?.status === '1111' && (
+                                  <img 
+                                    src={inspectionData?.admin_esig} 
+                                    alt="User Signature" 
+                                    className="ppa-esignature-form" 
+                                  />
+                                )}
                                 <span className="text-base font-bold">{inspectionData?.admin_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Acting Admin Division Manager </label>
@@ -2488,12 +2490,12 @@ export default function InspectionForm(){
                       <div className="mt-4">
                         <div className="grid grid-cols-2 gap-4">
 
-                          {/* For Requestor Signature */}
+                          {/* Date */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> DATE INSPECTED:</label>
                             <div className="mt-5">
-                              <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                <span className="text-base">{formatDate(inspectionData?.form?.before_repair_date)}</span>
+                              <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
+                                <span className="text-base">{inspectionData?.form?.status === '1111' && formatDate(inspectionData?.form?.before_repair_date)}</span>
                               </div>
                             </div>
                           </div>
@@ -2502,13 +2504,15 @@ export default function InspectionForm(){
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
                             <div className="mt-5">
-                              <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                <img 
-                                  src={inspectionData?.assign_esig} 
-                                  alt="User Signature" 
-                                  className="ppa-esignature-form" 
-                                />
-                                <span className="text-base font-bold">{inspectionData?.form?.personnel_name}</span>
+                              <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
+                                {inspectionData?.form?.status === '1111' && (
+                                  <img 
+                                    src={inspectionData?.assign_esig} 
+                                    alt="User Signature" 
+                                    className="ppa-esignature-form" 
+                                  />
+                                )}
+                                <span className="text-base font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Property Inspector </label>
                             </div>
@@ -2552,8 +2556,8 @@ export default function InspectionForm(){
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> DATE INSPECTED:</label>
                             <div className="mt-5">
-                              <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                <span className="text-base">{formatDate(inspectionData?.form?.after_reapir_date)}</span>
+                              <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
+                                <span className="text-base">{inspectionData?.form?.status === '1111' && formatDate(inspectionData?.form?.after_reapir_date)}</span>
                               </div>
                             </div>
                           </div>
@@ -2562,13 +2566,15 @@ export default function InspectionForm(){
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
                             <div className="mt-5">
-                              <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
-                                <img 
-                                  src={inspectionData?.assign_esig} 
-                                  alt="User Signature" 
-                                  className="ppa-esignature-form" 
-                                />
-                                <span className="text-base font-bold">{inspectionData?.form?.personnel_name}</span>
+                              <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
+                                {inspectionData?.form?.status === '1111' && (
+                                  <img 
+                                    src={inspectionData?.assign_esig} 
+                                    alt="User Signature" 
+                                    className="ppa-esignature-form" 
+                                  />
+                                )}
+                                <span className="text-base font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Property Inspector </label>
                             </div>
@@ -2583,6 +2589,8 @@ export default function InspectionForm(){
 
                 </tbody>
               </table>
+
+              <span className="system-generated">Joint Local Management System - This is system-generated.</span>
 
             </div>
           </div>

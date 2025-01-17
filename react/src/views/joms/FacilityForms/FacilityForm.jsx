@@ -966,7 +966,7 @@ export default function FacilityForm(){
                   )}
 
                   {/* Generate PDF */}
-                  {GSO && facData?.form?.admin_approval === 1 && facData?.form?.obr_comment && (
+                  {GSO && (facData?.form?.admin_approval === 1 || facData?.form?.admin_approval === 3) && (
                     <div className="mt-4">
                       <button type="button" onClick={handleButtonClick}
                         className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
@@ -1018,7 +1018,7 @@ export default function FacilityForm(){
       <div>
         <div className="hidden md:none">
           <div ref={componentRef}>
-            <div style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
+            <div className="relative" style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
 
               {/* Control Number */}
               <div className="title-area font-arial pr-6 text-right">
@@ -1499,11 +1499,13 @@ export default function FacilityForm(){
                       : 'Approved / Disapproved by:' }
                     </div>
                     <div className="relative">
-                      <img
-                        src={facData?.AdminEsig}
-                        className="ppa-esignature-form-fac"
-                        alt="Signature"
-                      />
+                      {facData?.form?.admin_approval === 1 && (
+                        <img
+                          src={facData?.AdminEsig}
+                          className="ppa-esignature-form-fac"
+                          alt="Signature"
+                        />
+                      )}
                     </div>
                     <div className="text-center font-bold text-base relative mt-5">
                       {facData?.AdminName}
@@ -1551,6 +1553,8 @@ export default function FacilityForm(){
 
                 </tr>
               </table>
+
+              <span className="system-generated">Joint Local Management System - This is system-generated.</span>
 
             </div>
           </div>

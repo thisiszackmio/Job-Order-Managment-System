@@ -514,161 +514,155 @@ export default function VehicleSlip(){
             </div>
           ):(
           <>
-            {vehicleData && (
-            <> 
 
-              {vehicleData?.id == id ? (
-              <>
-                {Access ? (
-                <>
-                  
-                  {/* Main Form */}
-                  <div className="pl-2 pt-6 pb-6">
+            {Access ? (
+            <>
+              
+              {/* Main Form */}
+              <div className="pl-2 pt-6 pb-6">
 
-                    <div className="grid grid-cols-2">
+                {id == vehicleData?.id ? (
+                  <div className="grid grid-cols-2">
 
-                      {/* 1st Column */}
-                      <div className="col-span-1">
+                  {/* 1st Column */}
+                  <div className="col-span-1">
 
-                        {/* Date Request */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                              Date of Request:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {formatDate(vehicleData?.created_at)}
-                          </div>
-                        </div>
-
-                        {/* Purpose */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                              Purpose:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.purpose}
-                          </div>
-                        </div>
-
-                        {/* Place/s to be Visited */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                              Place/s to be Visited:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.place_visited}
-                          </div>
-                        </div>
-
-                        {/* Date/Time of Arrival */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                              Date/Time of Arrival:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)}
-                          </div>
-                        </div>
-
-                        {/* Type of Vehicle */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                              Type of Vehicle:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null}
-                          </div>
-                        </div>
-
-                        {/* Plate Number */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Plate Number:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
-                          </div>
-                        </div>
-
-                        {/* Driver */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Driver:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.driver}
-                          </div>
-                        </div>
-
-                        {/* Requested By */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Requested By:
-                            </label> 
-                          </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.user_name}
-                          </div>
-                        </div>
-
+                    {/* Date Request */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                          Date of Request:
+                        </label> 
                       </div>
-
-                      {/* 2nd Column */}
-                      <div className="col-span-1">
-                        {/* Passengers */}
-                        <div className="mt-2">
-                          <label className="block text-base font-bold leading-6 text-gray-900">
-                            {passenger == "None" ? null : 'Passengers:'}
-                          </label> 
-                          {passenger == "None" ? null:(
-                            <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
-                              {passenger?.map((data, index) => (
-                                <div key={index} className="flex mt-1.5">
-                                  <div className="w-6">
-                                    <label className="block text-base font-bold leading-6 text-gray-900">
-                                    {index + 1}.
-                                    </label> 
-                                  </div>
-                                  <div className="w-64 ppa-form-view text-left h-6 mr-2">
-                                    {data}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {formatDate(vehicleData?.created_at)}
                       </div>
+                    </div>
 
+                    {/* Purpose */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                          Purpose:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.purpose}
+                      </div>
+                    </div>
+
+                    {/* Place/s to be Visited */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                          Place/s to be Visited:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.place_visited}
+                      </div>
+                    </div>
+
+                    {/* Date/Time of Arrival */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                          Date/Time of Arrival:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)}
+                      </div>
+                    </div>
+
+                    {/* Type of Vehicle */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                          Type of Vehicle:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null}
+                      </div>
+                    </div>
+
+                    {/* Plate Number */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                        Plate Number:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
+                      </div>
+                    </div>
+
+                    {/* Driver */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                        Driver:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.driver}
+                      </div>
+                    </div>
+
+                    {/* Requested By */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                        Requested By:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {vehicleData?.user_name}
+                      </div>
                     </div>
 
                   </div>
 
-                </>
+                  {/* 2nd Column */}
+                  <div className="col-span-1">
+                    {/* Passengers */}
+                    <div className="mt-2">
+                      <label className="block text-base font-bold leading-6 text-gray-900">
+                        {passenger == "None" ? null : 'Passengers:'}
+                      </label> 
+                      {passenger == "None" ? null:(
+                        <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
+                          {passenger?.map((data, index) => (
+                            <div key={index} className="flex mt-1.5">
+                              <div className="w-6">
+                                <label className="block text-base font-bold leading-6 text-gray-900">
+                                {index + 1}.
+                                </label> 
+                              </div>
+                              <div className="w-64 ppa-form-view text-left h-6 mr-2">
+                                {data}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
                 ):(
-                  (() => { window.location = '/unauthorize'; return null; })()
+                  (() => { window.location = '/404'; return null; })()
                 )}
-              </>
-              ):(
-                (() => { window.location = '/404'; return null; })()
-              )}
+
+              </div>
 
             </>
+            ):(
+              (() => { window.location = '/unauthorize'; return null; })()
             )}
+
           </>
           )}
 
@@ -839,7 +833,7 @@ export default function VehicleSlip(){
               </div>
 
               {/* Button on Generate PDF */}
-              {(vehicleData?.admin_approval === 1 || vehicleData?.admin_approval === 2) && GSO && (
+              {(vehicleData?.admin_approval === 1 || vehicleData?.admin_approval === 2 || vehicleData?.admin_approval === 3) && GSO && (
                 <div className="mt-4">
                   <button type="button" onClick={handleButtonClick}
                     className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
@@ -885,7 +879,7 @@ export default function VehicleSlip(){
           <div className="hidden md:none">
             <div ref={componentRef}>
 
-            <div style={{ width: '297mm', height: '210mm', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '0px solid' }}>
+            <div className="relative" style={{ width: '297mm', height: '210mm', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '0px solid' }}>
 
               <div className="grid grid-cols-2 gap-4">
 
@@ -1074,6 +1068,8 @@ export default function VehicleSlip(){
 
                   </table>
 
+                  <span className="system-generated">Joint Local Management System - This is system-generated.</span>
+
                 </div>
 
                 {/* Copy for GSO */}
@@ -1260,6 +1256,8 @@ export default function VehicleSlip(){
                     </tr>
 
                   </table>
+
+                  <span className="system-generated">Joint Local Management System - This is system-generated.</span>
 
                 </div>
 

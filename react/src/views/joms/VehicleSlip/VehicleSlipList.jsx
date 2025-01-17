@@ -30,7 +30,7 @@ export default function VehicleSlipList(){
   // Get Data
   useEffect(() => {
     axiosClient
-    .get('/allvehicleslip/')
+    .get('/allvehicleslip')
     .then((response) => {
       const VehicleSlipData = response.data;
 

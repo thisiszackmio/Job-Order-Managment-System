@@ -71,7 +71,7 @@ class VehicleSlipController extends Controller
         $DataRequest = VehicleSlipModel::find($id);
 
         if (!$DataRequest) {
-            return response()->json(['error' => 'Data Error'], 500);
+            return response()->json(['error' => 'No-Form'], 500);
         }
 
         // Get the Admin Manager Detail
@@ -269,15 +269,15 @@ class VehicleSlipController extends Controller
         // for the Remarks 
         if($TypeofTravel === 'within'){
             if(in_array($Approval, [5, 6])) {
-                $remark = $GSOName." has assigned a vehicle and a driver for you.";
+                $remark = "The GSO has assigned a vehicle and a driver for you.";
             }else {
-                $remark = $GSOName." has finished assigning the driver and vehicle and is now waiting for the Admin Manager's approval.";
+                $remark = "The GSO has finished assigning the driver and vehicle and is now waiting for the Admin Manager's approval.";
             }
         } else {
             if($Approval == 5 || $Approval == 6) {
-                $remark = $GSOName." has assigned the driver and the vehicle.";
+                $remark = "The GSO has assigned a vehicle and a driver for you.";
             }else {
-                $remark = $GSOName." has finished assigning the driver and vehicle and is now waiting for the Port Manager's approval.";
+                $remark = "The GSO has finished assigning the driver and vehicle and is now waiting for the Port Manager's approval.";
             }
         }
 

@@ -564,7 +564,7 @@ export default function VehicleSlip(){
     }
   }, [seconds]);
 
-  return (
+  return vehicleData?.id ? (
     <PageComponent title="Vehicle Slip">
 
       {/* Form Content */}
@@ -600,8 +600,7 @@ export default function VehicleSlip(){
             </div>
           ):(
           <>
-          {vehicleData?.id ? (
-            Access || accessOnly ? (
+          {Access || accessOnly ? (
             <>
               {/* Main Form */}
               <div className="pl-2 pt-6 pb-2">
@@ -905,10 +904,7 @@ export default function VehicleSlip(){
             </>
             ):(
               (() => { window.location = '/unauthorize'; return null; })()
-            )
-          ):(
-            (() => { window.location = '/404'; return null; })()
-          )}
+            )}
           </>
           )}
 
@@ -1640,5 +1636,7 @@ export default function VehicleSlip(){
       )}
 
     </PageComponent>
+  ):(
+    "No Display"
   );
 }

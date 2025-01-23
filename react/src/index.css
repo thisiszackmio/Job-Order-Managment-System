@@ -126,6 +126,12 @@ span.system-generated {
   color: #272727;
   font-style: italic;
 }
+.ppa-esig-driver-vs {
+  position: absolute;
+  width: 200px;
+  top: 0px;
+  left: 0px;
+}
 
 /* For 403 Page */
 .error {
@@ -465,7 +471,7 @@ input:focus, textarea:focus {
   padding: 5px;
 }
 .ppa-form-edit {
-  padding: 3px 5px;
+  padding: 5px 5px;
   border-radius: 5px;
   background-color: #F9F6EE;
 }

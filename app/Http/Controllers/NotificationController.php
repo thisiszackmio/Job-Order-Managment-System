@@ -9,6 +9,14 @@ use Carbon\Carbon;
 
 class NotificationController extends Controller
 {
+     /**
+     *  Legend
+     *  
+     *  0 - Deleted Notification
+     *  1 - Read Notifications
+     *  2 - Unread Notifications
+     * 
+     */
 
     public function getNotifications($id){
 
@@ -16,7 +24,7 @@ class NotificationController extends Controller
         $rootUrl = URL::to('/');
     
         // Retrieve all notifications
-        $NotificationRequest = NotificationModel::where('receiver_id', $id)->orderBy('created_at', 'desc')->get();
+        $NotificationRequest = NotificationModel::where('receiver_id', $id)->whereIn('status', [1, 2])->orderBy('created_at', 'desc')->get();
         $NotificationUnread = NotificationModel::where('receiver_id', $id)->where('status', 2)->get();
     
         // Initialize an empty array to store notification data

@@ -23,6 +23,7 @@ export default function VehicleSlip(){
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
+  const PortManager = codes.includes("PM");
   const GSO = codes.includes("GSO");
 
   //Date Format 
@@ -62,8 +63,8 @@ export default function VehicleSlip(){
 
   // Variable
   const [vehicalName, setVehicleName] = useState('');
-  const [driver, setDriver] = useState('');
   const [adminReason, setAdminReason] = useState('');
+  const [pointDriver, setPointDriver] = useState({ did: '', dname: '' });
 
   // Set Access
   const [Access, setAccess] = useState(false);
@@ -76,7 +77,16 @@ export default function VehicleSlip(){
   const [requestor, setRequestor] = useState([]);
   const [admin, setAdmin] = useState([]);
 
+  const [editDetail, setEditDetail] = useState(true);
   const [adminApproval, setAdminApproval] = useState(false);
+
+  // Update
+  const [updatePurpose, setUpdatePurpose] = useState('');
+  const [updateVisited, setUpdateVisited] = useState('');
+  const [updateArrivalDate, setUpdateArrivalDate] = useState('');
+  const [updateArrivalTime, setUpdateArrivalTime] = useState('');
+  const [updateVehicle, setUpdateVehicle] = useState('');
+  const [updatePassengers, setUpdatePassengers] = useState('');
 
   // Dev Error Text
   const DevErrorText = (
@@ -132,11 +142,14 @@ export default function VehicleSlip(){
       const requestorEsig = responseData.requestorEsig;
       const adminName = responseData.adminName;
       const adminEsig = responseData.adminEsig;
+      const pmName = responseData.pmName;
+      const pmEsig = responseData.pmEsig;
+      const driverEsig = responseData.driverEsig;
 
       setVehicleData(FormData);
       setPassenger(passengerData);
-      setRequestor({requestorPosData, requestorEsig});
-      setAdmin({adminName, adminEsig});
+      setRequestor({requestorPosData, requestorEsig, driverEsig});
+      setAdmin({adminName, adminEsig, pmName, pmEsig});
 
       // Restrictions Condition
       const ucode = userCode;
@@ -145,9 +158,10 @@ export default function VehicleSlip(){
       const GSO = codes.includes("GSO");
       const SuperAdmin = codes.includes("HACK");
       const DivisionManager = codes.includes("DM");
+      const PortManager = codes.includes("PM");
       const myAccess = FormData?.user_id == currentUserId?.id;
 
-      setAccess(myAccess || GSO || Admin || DivisionManager || SuperAdmin);
+      setAccess(myAccess || GSO || Admin || DivisionManager || SuperAdmin || PortManager);
     })
     .finally(() => {
       setLoading(false);
@@ -162,18 +176,6 @@ export default function VehicleSlip(){
       const responseData = response.data;
 
       setVehicleDet(responseData);
-
-      const ucode = userCode;
-      const codes = ucode.split(',').map(code => code.trim());
-      const Admin = codes.includes("AM");
-      const GSO = codes.includes("GSO");
-      const SuperAdmin = codes.includes("HACK");
-      const DivisionManager = codes.includes("DM");
-      const Personnel = codes.includes("AP");
-      const myAccess = form?.user_id == currentUserId?.id;
-
-       // Create A condition for access
-       setAccess(myAccess || DivisionManager || GSO || Admin || SuperAdmin || Personnel);
       
     })
     .finally(() => {
@@ -211,7 +213,7 @@ export default function VehicleSlip(){
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">Do you want close it? It cannot be undone.</p>
+        <p className="popup-message">Do you want delete this form? It cannot be restore.</p>
       </div>
     );
   }
@@ -221,7 +223,7 @@ export default function VehicleSlip(){
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has force-closed the request (Vehicle Slip No. ${vehicleData.id}).`;
-    const remarks = `This has been closed by the GSO.`
+    const remarks = `This has been deleted by the GSO.`
 
     axiosClient
     .put(`/forceclose/${id}`,{
@@ -234,7 +236,7 @@ export default function VehicleSlip(){
       setPopupMessage(
         <div>
           <p className="popup-title">Success!</p>
-          <p className="popup-message">The request has been closed.</p>
+          <p className="popup-message">The request has been deleted.</p>
         </div>
       );
     })
@@ -266,11 +268,12 @@ export default function VehicleSlip(){
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has assigned the driver and vehicle (Vehicle Slip No. ${vehicleData?.id}).`
-    const notif_message = `${currentUserId.name} has assigned the driver and vehicle and is awaiting your approval.`;
+    const notif_message = `${currentUserId.name} has assigned the driver and vehicle as per ${vehicleData?.user_name}'s request and is now awaiting your approval.`;
 
     const data = {
       vehicle_type : vehicalName,
-      driver : driver,
+      driver_id : pointDriver.did, 
+      driver : pointDriver.dname,
       // Logs
       logs: logs,
       // Notification
@@ -280,7 +283,7 @@ export default function VehicleSlip(){
       notif_message : notif_message,
     }
 
-    if(!vehicalName && !driver){
+    if(!vehicalName && !pointDriver.did){
       setPopupContent("error");
       setPopupMessage(
         <div>
@@ -334,9 +337,10 @@ export default function VehicleSlip(){
 
     const logs = `${currentUserId.name} has dispprove the request (Vehicle Slip No. ${vehicleData?.id}).`;
     const message = `Your request has been disapproved by ${currentUserId.name}. Please see the reason.`;
+    const remarks = vehicleData?.type_of_slip == 'within' ? `Disapproved by the Admin Manager. (Reason: ${adminReason})` : `Disapproved by the Port Manager. (Reason: ${adminReason})`;
     
     const data = {
-      remarks: `Disapprove (Reason: ${adminReason})`,
+      remarks: remarks,
       // Logs
       logs: logs,
       // Notifications
@@ -390,7 +394,7 @@ export default function VehicleSlip(){
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">Do you want to approve this request? It cannot be undone.</p>
+        <p className="popup-message">Do you want to approve this request?</p>
       </div>
     );
   }
@@ -403,9 +407,10 @@ export default function VehicleSlip(){
 
     const logs = `${currentUserId.name} has approve the request (Vehicle Slip No. ${vehicleData?.id}).`
     const notif_message = `${currentUserId.name} has approved your request.`;
+    const remarks = vehicleData?.type_of_slip == 'within' ? "Approved by the Admin Manager." : "Approved by the Port Manager.";
 
     const data = {
-      remarks: "Approved by the Admin Manager",
+      remarks: remarks,
       // Logs
       logs: logs,
       // Notification
@@ -436,6 +441,73 @@ export default function VehicleSlip(){
       setSubmitLoading(false);
     });
 
+  }
+
+  // Submit Updated Form
+  function UpdateVehicleForm(event, id){
+    event.preventDefault();
+
+    const hasFilledFields = [updatePurpose, updateVisited, updateArrivalDate, updateArrivalTime, updateVehicle, updateVehicle, pointDriver.did, pointDriver.dname, updatePassengers].some(Boolean);
+    const logs = `${currentUserId.name} has updated the Vehicle Slip No. ${id}`;
+    
+    const data = {
+      purpose : updatePurpose ? updatePurpose : vehicleData?.purpose ,
+      place_visited : updateVisited ? updateVisited : vehicleData?.place_visited,
+      date_arrival : updateArrivalDate ? updateArrivalDate : vehicleData?.date_arrival,
+      time_arrival : updateArrivalTime ? updateArrivalTime : vehicleData?.time_arrival,
+      vehicle_type : updateVehicle ? updateVehicle : vehicleData?.vehicle_type,
+      driver_id : pointDriver.did ? pointDriver.did : vehicleData?.driver_id, 
+      driver : pointDriver.dname ? pointDriver.dname : vehicleData?.driver,
+      passengers : updatePassengers ? updatePassengers : vehicleData?.passengers,
+      // Logs
+      logs : logs
+    }
+
+    if(!hasFilledFields){
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Field is required</p>
+          <p className="popup-message">You have left a field empty. A value must be entered.</p>
+        </div>
+      );
+    } else {
+      setSubmitLoading(true);
+
+      axiosClient
+      .put(`/updatevehicleslip/${id}`, data)
+      .then(() => {
+        setPopupContent("success");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success!</p>
+            <p className="popup-message">The form has been updated.</p>
+          </div>
+        );
+        setShowPopup(true);
+        setEditDetail(true);
+      })
+      .catch((error) => {
+        if (error.response.status === 409) {
+          setPopupContent("error");
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Oops!</p>
+              <p className="popup-message">This form is already closed!</p>
+            </div>
+          );
+          setShowPopup(true);
+        } else {
+          setPopupContent("error");
+          setPopupMessage(DevErrorText);
+          setShowPopup(true); 
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+    }
   }
 
   // Popup Button Function
@@ -507,9 +579,14 @@ export default function VehicleSlip(){
         
         {!loading && (
         <>
-          {(vehicleData?.admin_approval === 1 || vehicleData?.admin_approval === 5 || vehicleData?.admin_approval === 2) ? null:(
-            GSO && (
-              <button onClick={() => handleRemovalConfirmation()} className="py-1.5 px-3 text-base btn-cancel"> Close Form </button>
+          {[1, 2, 3, 4, 9].includes(vehicleData?.admin_approval) ? null : (
+            GSO && editDetail && (
+              <button 
+                onClick={() => handleRemovalConfirmation()} 
+                className="py-1.5 px-3 text-base btn-cancel"
+              >
+                Delete Form
+              </button>
             )
           )}
         </>
@@ -526,12 +603,14 @@ export default function VehicleSlip(){
             </div>
           ):(
           <>
-            {vehicleData?.id == id ? (
-              Access ? (
-                <>
-                  
-                  {/* Main Form */}
-                  <div className="pl-2 pt-6 pb-6">
+          {vehicleData?.id == id ? (
+            Access ? (
+              <>
+                
+                {/* Main Form */}
+                <div className="pl-2 pt-6 pb-2">
+
+                  <form id="editVehicleSlip" onSubmit={event => UpdateVehicleForm(event, vehicleData?.id)} >
 
                     <div className="grid grid-cols-2">
 
@@ -545,7 +624,7 @@ export default function VehicleSlip(){
                               Date of Request:
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                          <div className="w-7/12 ppa-form-view text-left pl-2 h-6">
                             {formatDate(vehicleData?.created_at)}
                           </div>
                         </div>
@@ -557,8 +636,20 @@ export default function VehicleSlip(){
                               Purpose:
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.purpose}
+                          <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                            {editDetail ? (
+                              vehicleData?.purpose
+                            ):(
+                              <input
+                                type="text"
+                                name="update_purpose"
+                                id="update_purpose"    
+                                value={updatePurpose}
+                                onChange={ev => setUpdatePurpose(ev.target.value)}
+                                placeholder={vehicleData?.purpose}
+                                className="block w-full ppa-form-edit"
+                              />
+                            )}
                           </div>
                         </div>
 
@@ -569,8 +660,20 @@ export default function VehicleSlip(){
                               Place/s to be Visited:
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.place_visited}
+                          <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                            {editDetail ? (
+                              vehicleData?.place_visited
+                            ):(
+                              <input
+                                type="text"
+                                name="update_visited"
+                                id="update_visited"    
+                                value={updateVisited}
+                                onChange={ev => setUpdateVisited(ev.target.value)}
+                                placeholder={vehicleData?.place_visited}
+                                className="block w-full ppa-form-edit"
+                              />
+                            )}
                           </div>
                         </div>
 
@@ -581,8 +684,36 @@ export default function VehicleSlip(){
                               Date/Time of Arrival:
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)}
+                          <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                            {editDetail ? (
+                            <> {formatDate(vehicleData?.date_arrival)} @ {formatTime(vehicleData?.time_arrival)} </>
+                            ):(
+                            <>
+                              {/* Date */}
+                              <div>
+                                <input
+                                  type="date"
+                                  name="update_date"
+                                  id="update_date"    
+                                  value={updateArrivalDate ? updateArrivalDate : vehicleData?.date_arrival}
+                                  onChange={ev => setUpdateArrivalDate(ev.target.value)}
+                                  className="block w-full ppa-form-edit"
+                                />
+                              </div>
+                              
+                              {/* Time */}
+                              <div className="pt-4">
+                                <input
+                                  type="time"
+                                  name="update_time"
+                                  id="update_time"    
+                                  value={updateArrivalTime ? updateArrivalTime : vehicleData?.time_arrival}
+                                  onChange={ev => setUpdateArrivalTime(ev.target.value)}
+                                  className="block w-full ppa-form-edit"
+                                />
+                              </div>
+                            </>
+                            )}
                           </div>
                         </div>
 
@@ -590,92 +721,199 @@ export default function VehicleSlip(){
                         <div className="flex items-center mt-2">
                           <div className="w-44">
                             <label className="block text-base font-bold leading-6 text-gray-900">
-                              Type of Vehicle:
+                              {editDetail ? "Type of Vehicle:" : vehicleData?.vehicle_type ? "Type of Vehicle:" : null}
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null}
+                          <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                            {editDetail ? (
+                             vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null
+                            ):(
+                              vehicleData?.vehicle_type ? (
+                                <select 
+                                  name="update_vehicle" 
+                                  id="update_vehicle" 
+                                  value={updateVehicle}
+                                  onChange={ev => { setUpdateVehicle(ev.target.value); }}
+                                  className="block w-full ppa-form"
+                                >
+                                  <option value="" disabled>{vehicleData?.vehicle_type}</option>
+                                  {vehicleDet?.map((vehDet) => (
+                                    <option key={vehDet.vehicle_id} value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`}>
+                                      {vehDet.vehicle_name} ({vehDet.vehicle_plate})
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : null
+                            )}
                           </div>
                         </div>
 
                         {/* Plate Number */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Plate Number:
-                            </label> 
+                        {editDetail && (
+                          <div className="flex items-center mt-2">
+                            <div className="w-44">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Plate Number:
+                              </label> 
+                            </div>
+                            <div className="w-7/12 ppa-form-view text-left pl-2 h-6">
+                              {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
+                            </div>
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
-                          </div>
-                        </div>
+                        )}
 
                         {/* Driver */}
                         <div className="flex items-center mt-2">
                           <div className="w-44">
                             <label className="block text-base font-bold leading-6 text-gray-900">
-                            Driver:
+                            {editDetail ? "Driver:" : vehicleData?.driver ? "Driver:" : null}
                             </label> 
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.driver}
+                          <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                            {editDetail ? (
+                              vehicleData?.driver
+                            ):(
+                              vehicleData?.driver ? (
+                                <select 
+                                  name="update_driver" 
+                                  id="update_driver" 
+                                  value={pointDriver.did}
+                                  onChange={ev => {
+                                    const personnelId = parseInt(ev.target.value);
+                                    const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
+
+                                    setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                                  }}
+                                  className="block w-full ppa-form"
+                                >
+                                  <option value="" disabled>{vehicleData?.driver}</option>
+                                  {driverName?.map((driverDet) => (
+                                    <option key={driverDet.driver_id} value={driverDet.driver_id}>
+                                      {driverDet.driver_name}
+                                    </option>
+                                  ))}
+                                </select>
+                              ):null
+                            )}
                           </div>
                         </div>
 
                         {/* Requested By */}
-                        <div className="flex items-center mt-2">
-                          <div className="w-44">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Requested By:
-                            </label> 
+                        {editDetail && (
+                          <div className="flex items-center mt-2">
+                            <div className="w-44">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Requested By:
+                              </label> 
+                            </div>
+                            <div className="w-7/12 ppa-form-view text-left pl-2 h-6">
+                              {vehicleData?.user_name}
+                            </div>
                           </div>
-                          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                            {vehicleData?.user_name}
-                          </div>
-                        </div>
+                        )}
 
                       </div>
 
                       {/* 2nd Column */}
                       <div className="col-span-1">
                         {/* Passengers */}
-                        <div className="mt-2">
+                        <div className={`mt-2 ${editDetail ? '' : 'w-11/12'}`}>
                           <label className="block text-base font-bold leading-6 text-gray-900">
-                            {passenger == "None" ? null : 'Passengers:'}
+                            {editDetail ? (passenger == "None" ? null : 'Passengers:'):('Passengers:')}
                           </label> 
-                          {passenger == "None" ? null:(
-                            <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
-                              {passenger?.map((data, index) => (
-                                <div key={index} className="flex mt-1.5">
-                                  <div className="w-6">
-                                    <label className="block text-base font-bold leading-6 text-gray-900">
-                                    {index + 1}.
-                                    </label> 
+                          {editDetail ? (
+                            passenger == "None" ? null:(
+                              <div style={{ columnCount: passenger.length > 10 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
+                                {passenger?.map((data, index) => (
+                                  <div key={index} className="flex mt-1.5">
+                                    <div className="w-6">
+                                      <label className="block text-base font-bold leading-6 text-gray-900">
+                                      {index + 1}.
+                                      </label> 
+                                    </div>
+                                    <div className="w-7/12 ppa-form-view text-left h-6 mr-2">
+                                      {data}
+                                    </div>
                                   </div>
-                                  <div className="w-64 ppa-form-view text-left h-6 mr-2">
-                                    {data}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                                ))}
+                              </div>
+                            )
+                          ):(
+                          <>
+                            <textarea
+                              id="vr_passengers"
+                              name="vr_passengers"
+                              rows={7}
+                              value={updatePassengers ? updatePassengers : vehicleData?.passengers}
+                              onChange={ev => setUpdatePassengers(ev.target.value)}
+                              style={{ resize: 'none' }}
+                              maxLength={1000}
+                              className="block w-full ppa-form"
+                            />
+                            <p className="text-gray-500 text-xs mt-2">Separate name on next line (If no passengers just leave it blank)</p>
+                          </>
                           )}
                         </div>
                       </div>
 
                     </div>
 
+                  </form>
+
+                  <div className="pt-10">
+                    {GSO && [10, 8, 7, 6, 5].includes(vehicleData?.admin_approval) && (
+                      editDetail ? (
+                        <button 
+                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault(); // Prevent any default behavior
+                            setEditDetail(false); // Toggle the state
+                          }}
+                          className="py-1.5 px-3 text-base btn-edit"
+                        >
+                          Edit Form
+                        </button>
+                      ) : (
+                        <>
+                          {/* Approve */}
+                          <button 
+                            type="submit" 
+                            form="editVehicleSlip"
+                            className={`py-2 px-3 ${submitLoading ? 'process-btn' : 'btn-default'}`}
+                            disabled={submitLoading}
+                          >
+                            {submitLoading ? (
+                              <div className="flex">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-2">Loading</span>
+                              </div>
+                            ) : (
+                              'Submit'
+                            )}
+                          </button>
+  
+                          {/* Decline */}
+                          <button 
+                            type="button" 
+                            onClick={() => setEditDetail(true)} 
+                            className="ml-2 py-2 px-4 btn-cancel"
+                          >
+                            Close
+                          </button>
+                        </>
+                      )
+                    )}
                   </div>
 
-                </>
-              ):(
-                ""
-                //(() => { window.location = '/unauthorize'; return null; })()
-              )
-            ):(
-              ""
-              //(() => { window.location = '/404'; return null; })()
-            )}
+                </div>
 
+              </>
+            ):(
+              (() => { window.location = '/unauthorize'; return null; })()
+            )
+          ):(
+            (() => { window.location = '/404'; return null; })()
+          )}
           </>
           )}
 
@@ -690,8 +928,8 @@ export default function VehicleSlip(){
           {/* Header */}
           <div className="ppa-form-header text-base">
             {(!vehicleData?.vehicle_type && !vehicleData?.driver) && 
-            (vehicleData?.admin_approval == 4 || vehicleData?.admin_approval == 6) && 
-            GSO ? (
+            [8, 6, 5].includes(vehicleData?.admin_approval) && 
+            GSO && editDetail ? (
               "Vehicle Info"
             ):(
               "Remarks"
@@ -699,123 +937,44 @@ export default function VehicleSlip(){
           </div>
 
           <div className="pl-2 pt-6 pb-6 pr-2">
-            {(vehicleData?.admin_approval === 4 || vehicleData?.admin_approval === 6) && GSO ? (
-            <>
-              <form id="vehicleInfo" onSubmit={SubmitVehicleInfo}>
 
-                {/* Vehicle Type */}
-                <div className="flex items-center">
-                  <div className="w-40">
-                    <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                      Vehicle Type:
-                    </label> 
+            {Admin && ((vehicleData?.admin_approval === 10 || vehicleData?.admin_approval === 7) && vehicleData?.type_of_slip == 'within') ? ( // For the Admin
+              adminApproval ? (
+              <>
+                {/* Form */}
+                <form id="vr_reason" onSubmit={SubmitAdminReason}>
+                  <label htmlFor="rep_location" className="block text-base font-bold leading-6 text-black">
+                    Reasons:
+                  </label>
+                  <div className="w-full mt-2">
+                    <input
+                      type="text"
+                      name="rep_location"
+                      id="rep_location"
+                      value={adminReason}
+                      onChange={ev => setAdminReason(ev.target.value)}
+                      className="block w-full ppa-form"
+                    />
                   </div>
-                  <div className="w-3/5">
-                    <select 
-                    name="rep_type_of_property" 
-                    id="rep_type_of_property" 
-                    autoComplete="rep_type_of_property"
-                    value={vehicalName}
-                    onChange={ev => { setVehicleName(ev.target.value); }}
-                    className="block w-full ppa-form"
-                    >
-                      <option value="" disabled>Vehicle Select</option>
-                      {vehicleDet?.map((vehDet) => (
-                        <option key={vehDet.vehicle_id} value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`}>
-                          {vehDet.vehicle_name} ({vehDet.vehicle_plate})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                </form>
 
-                {/* Driver Details */}
-                <div className="flex items-center mt-2">
-                  <div className="w-40">
-                    <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
-                      Driver:
-                    </label> 
-                  </div>
-                  <div className="w-3/5">
-                    <select 
-                    name="rep_type_of_property" 
-                    id="rep_type_of_property" 
-                    autoComplete="rep_type_of_property"
-                    value={driver}
-                    onChange={ev => { setDriver(ev.target.value); }}
-                    className="block w-full ppa-form"
-                    >
-                      <option value="" disabled>Driver Select</option>
-                      {driverName?.map((driverDet) => (
-                        <option key={driverDet.driver_id} value={driverDet.driver_name}>
-                          {driverDet.driver_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                {/* Button */}
+                <div className="mt-4">
 
-              </form>
+                  {/* Submit */}
+                  <button onClick={handleAdminDecline} className="py-2 px-4 btn-default">
+                    Submit
+                  </button>
 
-              {/* Button */}
-              <div className="mt-4">
-                <button 
-                  type="submit"
-                  form="vehicleInfo"
-                  className={`py-2 px-4 ${ submitLoading ? 'btn-submitLoading' : 'btn-default' }`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-2">Loading</span>
-                    </div>
-                  ):(
-                    'Submit'
-                  )}
-                </button>
-              </div>
-            </>
-            )
-            : vehicleData?.admin_approval === 3 && Admin ? (
-            <>
-              {adminApproval ? (
-                <div>
-                  {/* Form */}
-                  <form id="vr_reason" onSubmit={SubmitAdminReason}>
-                    <label htmlFor="rep_location" className="block text-base font-bold leading-6 text-black">
-                      Reasons:
-                    </label>
-                    <div className="w-full mt-2">
-                      <input
-                        type="text"
-                        name="rep_location"
-                        id="rep_location"
-                        value={adminReason}
-                        onChange={ev => setAdminReason(ev.target.value)}
-                        className="block w-full ppa-form"
-                      />
-                    </div>
-                  </form>
-
-                  {/* Button */}
-                  <div className="mt-4">
-
-                    {/* Submit */}
-                    <button onClick={handleAdminDecline} className="py-2 px-4 btn-default">
-                      Submit
+                  {/* Cancel */}
+                  {!submitLoading && (
+                    <button onClick={() => { setAdminApproval(false); setAdminReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
+                      Cancel
                     </button>
+                  )}
 
-                    {/* Cancel */}
-                    {!submitLoading && (
-                      <button onClick={() => { setAdminApproval(false); setAdminReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
-                        Cancel
-                      </button>
-                    )}
-    
                   </div>
-
-                </div>
+              </>
               ):(
               <>
                 <div className="w-full ppa-form-remarks">
@@ -837,18 +996,162 @@ export default function VehicleSlip(){
 
                 </div>
               </>
-              )}
-            </>
+              )
+            ): PortManager && ((vehicleData?.admin_approval === 10 || vehicleData?.admin_approval === 7) && vehicleData?.type_of_slip == 'outside') ? ( // For the Port Manager
+              adminApproval ? (
+                <>
+                  {/* Form */}
+                  <form id="vr_reason" onSubmit={SubmitAdminReason}>
+                    <label htmlFor="rep_location" className="block text-base font-bold leading-6 text-black">
+                      Reasons:
+                    </label>
+                    <div className="w-full mt-2">
+                      <input
+                        type="text"
+                        name="rep_location"
+                        id="rep_location"
+                        value={adminReason}
+                        onChange={ev => setAdminReason(ev.target.value)}
+                        className="block w-full ppa-form"
+                      />
+                    </div>
+                  </form>
+  
+                  {/* Button */}
+                  <div className="mt-4">
+  
+                    {/* Submit */}
+                    <button onClick={handleAdminDecline} className="py-2 px-4 btn-default">
+                      Submit
+                    </button>
+  
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { setAdminApproval(false); setAdminReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+  
+                    </div>
+                </>
+              ):(
+              <>
+                <div className="w-full ppa-form-remarks">
+                  Waiting for your approval
+                </div>
+
+                {/* Button */}
+                <div className="mt-4">
+
+                  {/* Approve */}
+                  <button onClick={handleAdminConfirmation} className="py-2 px-4 btn-default">
+                    Approve
+                  </button>
+
+                  {/* Decline */}
+                  <button onClick={() => setAdminApproval(true)} className="ml-2 py-2 px-4 btn-cancel">
+                    Decline
+                  </button>
+
+                </div>
+              </>
+              )
             ):(
             <>
-              <div className="w-full ppa-form-remarks">
-                {vehicleData?.remarks}
-              </div>
+              {/* For the GSO */}
+              {GSO && [8, 6, 5].includes(vehicleData?.admin_approval) && editDetail ? (
+              <>
+                <form id="vehicleInfo" onSubmit={SubmitVehicleInfo}>
 
-              {/* Button on Generate PDF */}
-              {(vehicleData?.admin_approval === 1 || vehicleData?.admin_approval === 2 || vehicleData?.admin_approval === 3) && GSO && (
+                  {/* Vehicle Type */}
+                  <div className="flex items-center">
+                    <div className="w-40">
+                      <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                        Vehicle Type:
+                      </label> 
+                    </div>
+                    <div className="w-3/5">
+                      <select 
+                      name="rep_type_of_property" 
+                      id="rep_type_of_property" 
+                      autoComplete="rep_type_of_property"
+                      value={vehicalName}
+                      onChange={ev => { setVehicleName(ev.target.value); }}
+                      className="block w-full ppa-form"
+                      >
+                        <option value="" disabled>Vehicle Select</option>
+                        {vehicleDet?.map((vehDet) => (
+                          <option key={vehDet.vehicle_id} value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`}>
+                            {vehDet.vehicle_name} ({vehDet.vehicle_plate})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Driver Details */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
+                        Driver:
+                      </label> 
+                    </div>
+                    <div className="w-3/5">
+                      <select 
+                      name="rep_type_of_property" 
+                      id="rep_type_of_property" 
+                      autoComplete="rep_type_of_property"
+                      value={pointDriver.did}
+                      onChange={ev => {
+                        const personnelId = parseInt(ev.target.value);
+                        const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
+
+                        setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                      }}
+                      className="block w-full ppa-form"
+                      >
+                        <option value="" disabled>Driver Select</option>
+                        {driverName?.map((driverDet) => (
+                          <option key={driverDet.driver_id} value={driverDet.driver_id}>
+                            {driverDet.driver_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                </form>
+
+                {/* Button */}
                 <div className="mt-4">
-                  <button type="button" onClick={handleButtonClick}
+                <button 
+                  type="submit"
+                  form="vehicleInfo"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Loading</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
+                </button>
+                </div>
+              </>
+              ):(
+              <>
+              
+                <div className="w-full ppa-form-remarks">
+                  {vehicleData?.remarks}
+                </div>
+
+                {/* Button on Generate PDF */}
+                {GSO && vehicleData?.admin_approval != 9 && (
+                  <div className="mt-4">
+                    <button type="button" onClick={handleButtonClick}
                     className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
                     disabled={submitLoading}
                   >
@@ -862,9 +1165,13 @@ export default function VehicleSlip(){
                     )}
                   </button>
                 </div>
+                )}
+
+              </>
               )}
             </>
             )}
+
           </div>
 
         </div>
@@ -1007,19 +1314,24 @@ export default function VehicleSlip(){
                     <tr>
 
                       {/* Vehicle Type */}
-                      <td className="w-1/3 pt-4">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0]}</p>
+                      <td className="w-1/3 pt-10">
+                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
                         <p className="text-sm text-center font-arial">Type of Vehicle</p>
                       </td>
 
                       {/* Plate No */}
-                      <td className="w-1/3 pt-4 px-8">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1]}</p>
+                      <td className="w-1/3 pt-10 px-8">
+                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
                         <p className="text-sm text-center font-arial">Plate No.</p>
                       </td>
 
                       {/* Driver */}
-                      <td className="w-1/3 pt-4">
+                      <td className="w-1/3 pt-10 relative">
+                        <img
+                          src={requestor?.driverEsig}
+                          className="ppa-esig-driver-vs"
+                          alt="Signature"
+                        />
                         <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
                         <p className="text-sm text-center font-arial">Driver</p>
                       </td>
@@ -1051,7 +1363,7 @@ export default function VehicleSlip(){
                       </td>
                     </tr>
 
-                    {/* Admin Manager */}
+                    {/* Admin Manager or Port Manager */}
                     <tr>
                       <td colSpan={2} className="pt-4">
 
@@ -1059,22 +1371,44 @@ export default function VehicleSlip(){
                           {vehicleData?.admin_approval == 1 ? ("APPROVED:"):
                           vehicleData?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
                         </div>
-
-                        <div className="relative pt-2">
-                          {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
-                            <img
-                              src={admin?.adminEsig}
-                              className="ppa-esig-user-vs"
-                              alt="Signature"
-                            />
-                          )}
-                        </div>
-                        <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                          {admin?.adminName}
-                        </div> 
-                        <div className="w-3/4 text-center text-sm relative">
-                          Acting Adminstrative Division Manager
-                        </div> 
+                        
+                        {vehicleData?.type_of_slip == 'within' ? (
+                        <>
+                          <div className="relative pt-2">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                              <img
+                                src={admin?.adminEsig}
+                                className="ppa-esig-user-vs"
+                                alt="Signature"
+                              />
+                            )}
+                          </div>
+                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
+                            {admin?.adminName}
+                          </div> 
+                          <div className="w-3/4 text-center text-sm relative">
+                            Acting Adminstrative Division Manager
+                          </div> 
+                        </>
+                        ):(
+                        <>
+                          <div className="relative pt-2">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                              <img
+                                src={admin?.pmEsig}
+                                className="ppa-esig-user-vs"
+                                alt="Signature"
+                              />
+                            )}
+                          </div>
+                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
+                            {admin?.pmName}
+                          </div> 
+                          <div className="w-3/4 text-center text-sm relative">
+                            Acting Port Manager
+                          </div> 
+                        </>
+                        )}
 
                       </td>
                     </tr>
@@ -1196,19 +1530,24 @@ export default function VehicleSlip(){
                     <tr>
 
                       {/* Vehicle Type */}
-                      <td className="w-1/3 pt-4">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0]}</p>
+                      <td className="w-1/3 pt-10">
+                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
                         <p className="text-sm text-center font-arial">Type of Vehicle</p>
                       </td>
 
                       {/* Plate No */}
-                      <td className="w-1/3 pt-4 px-8">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1]}</p>
+                      <td className="w-1/3 pt-10 px-8">
+                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
                         <p className="text-sm text-center font-arial">Plate No.</p>
                       </td>
 
                       {/* Driver */}
-                      <td className="w-1/3 pt-4">
+                      <td className="w-1/3 pt-10 relative">
+                        <img
+                          src={requestor?.driverEsig}
+                          className="ppa-esig-driver-vs"
+                          alt="Signature"
+                        />
                         <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
                         <p className="text-sm text-center font-arial">Driver</p>
                       </td>
@@ -1240,7 +1579,7 @@ export default function VehicleSlip(){
                       </td>
                     </tr>
 
-                    {/* Admin Manager */}
+                    {/* Admin Manager or Port Manager */}
                     <tr>
                       <td colSpan={2} className="pt-4">
 
@@ -1248,22 +1587,44 @@ export default function VehicleSlip(){
                           {vehicleData?.admin_approval == 1 ? ("APPROVED:"):
                           vehicleData?.admin_approval == 2 ? ("DISAPPROVED:"):"APPROVED:"}
                         </div>
-
-                        <div className="relative pt-2">
-                          {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
-                            <img
-                              src={admin?.adminEsig}
-                              className="ppa-esig-user-vs"
-                              alt="Signature"
-                            />
-                          )}
-                        </div>
-                        <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                          {admin?.adminName}
-                        </div> 
-                        <div className="w-3/4 text-center text-sm relative">
-                          Acting Adminstrative Division Manager
-                        </div> 
+                        
+                        {vehicleData?.type_of_slip == 'within' ? (
+                        <>
+                          <div className="relative pt-2">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                              <img
+                                src={admin?.adminEsig}
+                                className="ppa-esig-user-vs"
+                                alt="Signature"
+                              />
+                            )}
+                          </div>
+                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
+                            {admin?.adminName}
+                          </div> 
+                          <div className="w-3/4 text-center text-sm relative">
+                            Acting Adminstrative Division Manager
+                          </div> 
+                        </>
+                        ):(
+                        <>
+                          <div className="relative pt-2">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                              <img
+                                src={admin?.pmEsig}
+                                className="ppa-esig-user-vs"
+                                alt="Signature"
+                              />
+                            )}
+                          </div>
+                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
+                            {admin?.pmName}
+                          </div> 
+                          <div className="w-3/4 text-center text-sm relative">
+                            Acting Port Manager
+                          </div> 
+                        </>
+                        )}
 
                       </td>
                     </tr>

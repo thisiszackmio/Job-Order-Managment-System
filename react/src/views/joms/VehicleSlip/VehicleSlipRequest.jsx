@@ -9,7 +9,7 @@ import Popup from "../../../components/Popup";
 export default function FacilityVenueForm(){
   const { currentUserId, userCode } = useUserStateContext();
 
-  // Get the avatar
+  // Get the avatar from the sender on notification
   const dp = currentUserId?.avatar;
   const dpname = dp ? dp.substring(dp.lastIndexOf('/') + 1) : null;
 
@@ -18,6 +18,15 @@ export default function FacilityVenueForm(){
   const codes = ucode.split(',').map(code => code.trim());
   const GSO = codes.includes("GSO");
   const Admin = codes.includes("AM");
+  const PortManager = codes.includes("PM");
+
+  // Dev Error Text
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
+    </div>
+  );
 
   //Date Format 
   function formatDate(dateString) {
@@ -49,32 +58,24 @@ export default function FacilityVenueForm(){
   const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
   const time = moment().tz('Asia/Manila').format('HH:mm');
 
-  // Set Delay for Loading
-  useEffect(() => {
-    // Simulate an authentication check
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
-
-  const [loading, setLoading] = useState(true);
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
-
   //Vehicle Request
+  const [selectedTravelType, setSelectedTravelType] = useState('');
   const [VRPurpose, setVRPurpose] = useState('');
   const [VRPlace, setVRPlace] = useState('');
   const [VRDateArrival, setVRDateArrival] = useState('');
   const [VRTimeArrival, setVRTimeArrival] = useState('');
   const [VRPassenger, setVRPassenger] = useState('');
   const [vehicalName, setVehicleName] = useState('');
-  const [driver, setDriver] = useState('');
+  const [pointDriver, setPointDriver] = useState({ did: '', dname: '' });
+
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
   const [inputErrors, setInputErrors] = useState({});
   const [vehicleDet, setVehicleDet] = useState([]);
-  const [driverName, setDriverName] = useState([]);
+  const [driver, setDriver] = useState([]);
 
   // Get Vehicle Details
   const fetchVehicle = () => {
@@ -83,20 +84,18 @@ export default function FacilityVenueForm(){
     .then((response) => {
       const responseData = response.data;
 
-      setVehicleDet(responseData)
-      
+      setVehicleDet(responseData)    
     });
   }
 
-  // Get Driver Details
-  const fetchDriver = () => {
+   // Get Driver Details
+   const fetchDriver = () => {
     axiosClient
     .get(`/getdriverdet`)
     .then((response) => {
       const responseData = response.data;
 
-      setDriverName(responseData)
-      
+      setDriver(responseData)
     });
   }
 
@@ -107,45 +106,29 @@ export default function FacilityVenueForm(){
 
   // Disable the Scroll on Popup
   useEffect(() => {
-    
+  
     // Define the classes to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
     } 
-    else if(loading) {
-      addLoadingClass();
-    }
     else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
-      removeLoadingClass();
     };
-  }, [showPopup, loading]);
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
+  }, [showPopup]);
 
   // Submit the Form
   function SubmitVehicleForm(event){
@@ -153,10 +136,18 @@ export default function FacilityVenueForm(){
 
     setSubmitLoading(true);
 
-    const remarks = GSO ? "Waiting for the Admin Manager's Approval." : Admin ? "Waiting for the assign vehicle and driver." : 'Awaiting the GSO to assign a vehicle and driver.';
-    const message = GSO ? `The request for ${currentUserId.name} needs your approval.` : `There is a request for ${currentUserId.name}`;
+    // For the remarks
+    const remarks = GSO ? 
+    selectedTravelType == 'within' ? "Waiting for the Admin's Approval" : "Waiting for the Port Manager's Approval" :
+    Admin ? 'Waiting for the assign vehicle and driver.' :
+    PortManager ? 'Waiting for the assign vehicle and driver' :
+    "Awaiting the GSO to assign a vehicle and driver."
 
+    // For the Notifications
+    const message = GSO ? `There is a request for ${currentUserId.name} and needs your approval.` : `There is a request for ${currentUserId.name}`
+    
     const data = {
+      type_of_slip : selectedTravelType,
       user_id : currentUserId.id,
       user_name : currentUserId.name,
       purpose : VRPurpose,
@@ -165,9 +156,11 @@ export default function FacilityVenueForm(){
       date_arrival : VRDateArrival,
       time_arrival : VRTimeArrival,
       vehicle_type : vehicalName,
-      driver : driver,
-      admin_approval: GSO ? 3 : Admin ? 6 : 4,
+      driver_id : pointDriver.did,
+      driver : pointDriver.dname,
+      admin_approval : GSO ? 7 : Admin ? 5 : PortManager ? 6 : 8,
       remarks : remarks,
+
       // Notifications
       code_clearance : ucode,
       avatar : dpname,
@@ -176,7 +169,7 @@ export default function FacilityVenueForm(){
       notif_message : message,
     }
 
-    if(GSO && (!vehicalName && !driver)){
+    if(GSO && (!vehicalName || !pointDriver.did)){
       setShowPopup(true);
       setPopupContent('error');
       setPopupMessage(
@@ -223,7 +216,7 @@ export default function FacilityVenueForm(){
         setSubmitLoading(false);
       });
     }
-    
+ 
   }
 
   // Popup Button Function
@@ -241,19 +234,64 @@ export default function FacilityVenueForm(){
 
   return (
     <PageComponent title="Request Form">
-
+      
       {/* Form Content */}
       <div className="font-roboto ppa-form-box bg-white">
         <div className="ppa-form-header"> Vehicle Slip Request </div>
 
         <div className="p-4">
-
           <form id="vehicleslip" onSubmit={SubmitVehicleForm}>
 
             {/* Title */}
             <div>
               <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
               <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+            </div>
+
+            {/* Type of Travel */}
+            <div className="flex items-center mt-10 font-roboto">
+              <div className="font-roboto w-60">
+                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                  Type of Travel:
+                </label>
+              </div>
+              <div className="w-1/2 flex items-center space-x-6">
+
+                {/* Within City */}
+                <div className="flex items-center">
+                  <input
+                    id="within-city-checkbox"
+                    type="checkbox"
+                    checked={selectedTravelType === "within"}
+                    onChange={() => setSelectedTravelType("within")}
+                    className="h-6 w-6 text-indigo-600 border-black-500 rounded focus:ring-gray-400"
+                  />
+                  <label
+                    htmlFor="within-city-checkbox"
+                    className="ml-2 text-base leading-6 text-black"
+                  >
+                    Within the City
+                  </label>
+                </div>
+
+                {/* Outside City */}
+                <div className="flex items-center">
+                  <input
+                    id="outside-city-checkbox"
+                    type="checkbox"
+                    checked={selectedTravelType === "outside"}
+                    onChange={() => setSelectedTravelType("outside")}
+                    className="h-6 w-6 text-indigo-600 border-black-500 rounded focus:ring-gray-400"
+                  />
+                  <label
+                    htmlFor="outside-city-checkbox"
+                    className="ml-2 text-base leading-6 text-black"
+                  >
+                    Outside the City
+                  </label>
+                </div>
+
+              </div>
             </div>
 
             {/* Date */}
@@ -367,9 +405,10 @@ export default function FacilityVenueForm(){
                 )}
               </div>
             </div>
-            
+
             {GSO && (
             <>
+
               {/* Vehicle Type */}
               <div className="flex items-center mt-4">
                 <div className="w-60">
@@ -408,20 +447,26 @@ export default function FacilityVenueForm(){
                   name="rep_type_of_property" 
                   id="rep_type_of_property" 
                   autoComplete="rep_type_of_property"
-                  value={driver}
-                  onChange={ev => { setDriver(ev.target.value); }}
+                  value={pointDriver.did}
+                  onChange={ev => {
+                    const personnelId = parseInt(ev.target.value);
+                    const selectedPersonnel = driver.find(staff => staff.driver_id === personnelId);
+
+                    setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                  }}
                   className="block w-full ppa-form"
                   >
                     <option value="" disabled>Driver Select</option>
-                    {driverName?.map((driverDet) => (
-                      <option key={driverDet.driver_id} value={driverDet.driver_name}>
+                    {driver?.map((driverDet) => (
+                      <option key={driverDet.driver_id} value={driverDet.driver_id}>
                         {driverDet.driver_name}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
-            </>
+
+            </>  
             )}
 
             {/* Passengers */}
@@ -450,9 +495,7 @@ export default function FacilityVenueForm(){
 
           {/* Submit Button */}
           <div className="mt-10 font-roboto">
-            <button
-              type="submit"
-              form="vehicleslip"
+            <button type="submit" form="vehicleslip"
               className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
               disabled={submitLoading}
             >
@@ -468,7 +511,6 @@ export default function FacilityVenueForm(){
           </div>
 
         </div>
-
       </div>
 
       {/* Popup */}

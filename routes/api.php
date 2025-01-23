@@ -107,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/storevehinfo/{id}', [VehicleSlipController::class, 'storeVehicleInformation']);
   Route::put('/vehreqapprove/{id}', [VehicleSlipController::class, 'approveRequest']);
   Route::put('/forceclose/{id}', [VehicleSlipController::class, 'forceCloseRequest']);
+  Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
   Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
   Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
   Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);

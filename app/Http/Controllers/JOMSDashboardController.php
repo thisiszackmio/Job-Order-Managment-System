@@ -67,7 +67,7 @@ class JOMSDashboardController extends Controller
 
         // Vehicle Slip Data
         $vehicleData = VehicleSlipModel::where('user_id', $id)
-            ->whereNotIn('admin_approval', [2, 5, 1])
+            ->whereNotIn('admin_approval', [9, 4, 3, 2, 1])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($vehicleForm) {

@@ -632,7 +632,7 @@ export default function VehicleSlip(){
                             Purpose:
                           </label> 
                         </div>
-                        <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                        <div className={`w-7/12 ${vehicleData?.purpose ? '' : 'h-6'} ${editDetail ? 'ppa-form-view text-left pl-2' : 'pt-2' }`}>
                           {editDetail ? (
                             vehicleData?.purpose
                           ):(
@@ -900,7 +900,7 @@ export default function VehicleSlip(){
                     )
                   )}
                 </div>
-
+ 
               </div>
             </>
             ):(

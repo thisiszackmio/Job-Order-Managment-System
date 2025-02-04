@@ -121,7 +121,8 @@ export default function FacilityVenueFormList(){
   const GSO = codes.includes("GSO");
   const DivisionManager = codes.includes("DM");
   const SuperAdmin = codes.includes("HACK");
-  const Access = Admin || GSO || DivisionManager || SuperAdmin;
+  const PortManager = codes.includes("PM");
+  const Access = Admin || GSO || DivisionManager || PortManager || SuperAdmin;
 
   return Access ? (
     <PageComponent title="Request List">

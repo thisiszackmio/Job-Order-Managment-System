@@ -80,7 +80,9 @@ export default function InspectionFormList(){
   const GSO = codes.includes("GSO");
   const SuperAdmin = codes.includes("HACK");
   const DivisionManager = codes.includes("DM");
-  const Access = Admin || GSO || DivisionManager || SuperAdmin;
+  const AssignPersonnel = codes.includes("AP");
+  const PortManager = codes.includes("PM");
+  const Access = Admin || GSO || DivisionManager || SuperAdmin || PortManager || AssignPersonnel;
 
   return Access ? (
     <PageComponent title="Request List">

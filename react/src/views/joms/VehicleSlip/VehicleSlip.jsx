@@ -24,10 +24,11 @@ export default function VehicleSlip(){
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
+  const PersonAuthority = codes.includes("AU");
   // const SuperAdmin = codes.includes("HACK");
   // const DivisionManager = codes.includes("DM");
   const PortManager = codes.includes("PM");
-  const roles = ["AM", "GSO", "HACK", "DM", "PM"];
+  const roles = ["AM", "GSO", "HACK", "DM", "PM", "AU"];
   const accessOnly = roles.some(role => codes.includes(role));
 
   //Date Format 
@@ -105,34 +106,26 @@ export default function VehicleSlip(){
     
     // Define the classes to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
     } 
-    else if(loading) {
-      addLoadingClass();
-    }
     else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
-      removeLoadingClass();
     };
-  }, [showPopup, loading]);
+  }, [showPopup]);
 
   // Get the Data
   const fetchData = () => {
@@ -274,12 +267,13 @@ export default function VehicleSlip(){
     setSubmitLoading(true);
 
     const logs = `${currentUserId.name} has assigned the driver and vehicle (Vehicle Slip No. ${vehicleData?.id}).`
-    const notif_message = `${currentUserId.name} has assigned the driver and vehicle as per ${vehicleData?.user_name}'s request and is now awaiting your approval.`;
+    const notif_message = `${currentUserId.name} has assigned the driver and vehicle for (Vehicle Slip No. ${vehicleData?.id}), and is now awaiting your approval.`;
 
     const data = {
       vehicle_type : vehicalName,
       driver_id : pointDriver.did, 
       driver : pointDriver.dname,
+      assign: currentUserId.name,
       // Logs
       logs: logs,
       // Notification
@@ -312,10 +306,21 @@ export default function VehicleSlip(){
           </div>
         );
       })
-      .catch(()=>{
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
+      .catch((error)=>{
+        if (error.response.status === 409) {
+          setPopupContent("error");
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Oops!</p>
+              <p className="popup-message">This slip has already assign the vehicle and driver. Please reload the page.</p>
+            </div>
+          );
+          setShowPopup(true);
+        } else {
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(DevErrorText);
+        }
       })
       .finally(() => {
         setSubmitLoading(false);
@@ -660,7 +665,7 @@ export default function VehicleSlip(){
                           Place/s to be Visited:
                         </label> 
                       </div>
-                      <div className={`w-7/12 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
+                      <div className={`w-7/12 ${vehicleData?.place_visited ? '' : 'h-6'} ${editDetail ? 'ppa-form-view text-left pl-2' : 'pt-2' }`}>
                         {editDetail ? (
                           vehicleData?.place_visited
                         ):(
@@ -863,7 +868,7 @@ export default function VehicleSlip(){
               </form>
 
               <div className={` ${editDetail ? 'pt-4' : 'pt-10'}`}>
-                {GSO && [10, 8, 7, 6, 5].includes(vehicleData?.admin_approval) && (
+                {(GSO || PersonAuthority) && [10, 8, 7, 6, 5].includes(vehicleData?.admin_approval) && (
                   editDetail ? (
                     <button 
                       type="button"
@@ -986,7 +991,7 @@ export default function VehicleSlip(){
                   </div>
                 </>
                 )
-              ): PortManager && ((vehicleData?.admin_approval === 10 || vehicleData?.admin_approval === 7) && vehicleData?.type_of_slip == 'outside') ? ( // For the Port Manager
+              ): PortManager && ((vehicleData?.admin_approval === 11 || vehicleData?.admin_approval === 10 || vehicleData?.admin_approval === 7) && vehicleData?.type_of_slip == 'outside') ? ( // For the Port Manager
                 adminApproval ? (
                   <>
                     {/* Form */}
@@ -1048,7 +1053,7 @@ export default function VehicleSlip(){
               ):(
                 <>
                   {/* For the GSO */}
-                  {GSO && [8, 6, 5].includes(vehicleData?.admin_approval) && editDetail ? (
+                  {(GSO || PersonAuthority) && [8, 6, 5].includes(vehicleData?.admin_approval) && editDetail ? (
                   <>
                     <form id="vehicleInfo" onSubmit={SubmitVehicleInfo}>
 
@@ -1159,6 +1164,25 @@ export default function VehicleSlip(){
                   </>
                   )}
                 </>
+              )}
+
+              {/* For Request Prints the form */}
+              {Access && (vehicleData?.admin_approval ==1 || vehicleData?.admin_approval == 2) && (
+                <div className="mt-4">
+                  <button type="button" onClick={handleButtonClick}
+                  className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-2">Generating</span>
+                    </div>
+                  ) : (
+                    'Get PDF'
+                  )}
+                </button>
+              </div>
               )}
 
             </div>

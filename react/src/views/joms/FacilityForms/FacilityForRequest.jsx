@@ -244,8 +244,8 @@ export default function FacilityVenueForm(){
         setPopupContent('error');
         setPopupMessage(
           <div>
-            <p className="popup-title">Sorry</p>
-            <p className="popup-message">This schedule request is awaiting approval.</p>
+            <p className="popup-title">Not Available</p>
+            <p className="popup-message">Sorry, that schedule is pending approval from another requestor.</p>
           </div>
         );
       }
@@ -254,8 +254,8 @@ export default function FacilityVenueForm(){
         setPopupContent('error');
         setPopupMessage(
           <div>
-            <p className="popup-title">Sorry</p>
-            <p className="popup-message">The venue is not available at the moment.</p>
+            <p className="popup-title">Not Available</p>
+            <p className="popup-message">Sorry, this schedule is not available. Please try another day.</p>
           </div>
         );
       }
@@ -378,7 +378,7 @@ export default function FacilityVenueForm(){
       name_male: getMaleList ? getMaleList : null,
       name_female: getFemaleList ? getFemaleList : null,
       other_details: otherDetails ? otherDetails: null,
-      admin_approval: Admin ? 1 : 3,
+      admin_approval: Admin ? 2 : 4,
       obr_instruct: Admin ? oprInstruct : null,
       date_approve: Admin ? today : null,
       remarks: remark,
@@ -388,73 +388,85 @@ export default function FacilityVenueForm(){
       sender_name: currentUserId.name,
     };
 
-    if(enableFacility){
-      if(checkedCount <= 0){
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Wait Wait Wait!</p>
-            <p className="popup-message">You haven’t selected any checkboxes.</p>
-          </div>
-        );
-        setSubmitLoading(false);
-      }else{
-        axiosClient
-        .post('/submitfacrequest', data)
-        .then(() => {
-          setShowPopup(true);
-          setPopupContent('success');
-          setPopupMessage(
-            <div>
-              <p className="popup-title">Submission Complete!</p>
-              <p className="popup-message">Form submitted successfully. Please wait for approval from the admin manager.</p>
-            </div>
-          );
-        })
-        .catch(()=>{
+    if(!oprInstruct && Admin){
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Error</p>
+          <p className="popup-message">Please fill up the OPR Intruction.</p>
+        </div>
+      );
+      setSubmitLoading(false);
+    } else {
+      if(enableFacility){
+        if(checkedCount <= 0){
           setShowPopup(true);
           setPopupContent('error');
-          setPopupMessage(DevErrorText);
-        })
-        .finally(() => {
-          setSubmitLoading(false);
-        });
-      }
-    }else{
-      if(maleList || femaleList ){
-        axiosClient
-        .post('/submitfacrequest', data)
-        .then(() => {
-          setShowPopup(true);
-          setPopupContent('success');
           setPopupMessage(
             <div>
-              <p className="popup-title">Submission Complete!</p>
-              <p className="popup-message">Form submitted successfully. Please wait for the admin manager's approval.</p>
+              <p className="popup-title">Wait Wait Wait!</p>
+              <p className="popup-message">You haven’t selected any checkboxes.</p>
             </div>
           );
-        })
-        .catch(()=>{
+          setSubmitLoading(false);
+        }else{
+          axiosClient
+          .post('/submitfacrequest', data)
+          .then(() => {
+            setShowPopup(true);
+            setPopupContent('success');
+            setPopupMessage(
+              <div>
+                <p className="popup-title">Submission Complete!</p>
+                <p className="popup-message">Form submitted successfully. Please wait for approval from the admin manager.</p>
+              </div>
+            );
+          })
+          .catch(()=>{
+            setShowPopup(true);
+            setPopupContent('error');
+            setPopupMessage(DevErrorText);
+          })
+          .finally(() => {
+            setSubmitLoading(false);
+          });
+        }
+      }else{
+        if(maleList || femaleList ){
+          axiosClient
+          .post('/submitfacrequest', data)
+          .then(() => {
+            setShowPopup(true);
+            setPopupContent('success');
+            setPopupMessage(
+              <div>
+                <p className="popup-title">Submission Complete!</p>
+                <p className="popup-message">Form submitted successfully. Please wait for the admin manager's approval.</p>
+              </div>
+            );
+          })
+          .catch(()=>{
+            setShowPopup(true);
+            setPopupContent('error');
+            setPopupMessage(DevErrorText);
+          })
+          .finally(() => {
+            setSubmitLoading(false);
+          });
+        }else{
           setShowPopup(true);
           setPopupContent('error');
-          setPopupMessage(DevErrorText);
-        })
-        .finally(() => {
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Wait Wait Wait!</p>
+              <p className="popup-message">Please enter the details of the guest.</p>
+            </div>
+          );
           setSubmitLoading(false);
-        });
-      }else{
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Wait Wait Wait!</p>
-            <p className="popup-message">Please enter the details of the guest.</p>
-          </div>
-        );
-        setSubmitLoading(false);
-      }
-    }    
+        }
+      }  
+    };
 
   }
 

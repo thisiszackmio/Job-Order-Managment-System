@@ -28,39 +28,25 @@ export default function RepairRequestForm(){
   useEffect(() => {
     // Define the class to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
-    } else if (loading) {
-      addLoadingClass();
     } else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
     };
-  }, [showPopup, loading]);
-
-  // Set Delay for Loading
-  useEffect(() => {
-    // Simulate an authentication check
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+  }, [showPopup]);
 
   // Date
   const today = new Date().toISOString().split('T')[0];

@@ -16,9 +16,11 @@ class FacilityVenueController extends Controller
     /**
      *  Legend
      * 
-     *  1 - Admin Approval
-     *  2 - Disapprove
-     *  3 - Pending Approval
+     *  1 - GSO
+     *  2 - Admin Approval
+     *  3 - Admin Disapprovel
+     *  4 - Pending Approval
+     *  5 - Deleted
      * 
      */
 
@@ -176,6 +178,7 @@ class FacilityVenueController extends Controller
             $logs->category = 'JOMS';
             $logs->message = $data['user_name']. ' has submitted the request for Facility/Venue Request Form (Control No. '.$deploymentData->id.')';
             $logs->save();
+
         } else {
             return response()->json(['error' => 'Failed to save notification'], 500);
         }
@@ -195,7 +198,7 @@ class FacilityVenueController extends Controller
 
         // Check if the facility request exists
         if (!$FacilityRequest) {
-            return response()->json(['message' => 'Facility request not found.'], 404);
+            return response()->json(['error' => 'No-Form'], 404);
         }
 
         // Get Requestor Detail
@@ -223,9 +226,12 @@ class FacilityVenueController extends Controller
     }
 
     /**
-     *  Input OPR Instruction
+     *  Input OPR Instruction and Approve the Form
      */
     public function submitOPRInstruction(Request $request, $id) {
+        $CheckOPR = $request->validate([
+            'oprInstruct' => 'required|string'
+        ]);
 
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
@@ -236,79 +242,24 @@ class FacilityVenueController extends Controller
         }
     
         // Update the OPR instruction
-        $facilityRequest->obr_instruct = $request->input('oprInstruct');
-    
-        // Save the updated facility request
-        if ($facilityRequest->save()) {
-
-            $getAdmin = 'AM';
-            $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAdmin}%")->first();
-
-            // Create logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname . ' has entered the OPR instruction on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').  ';
-            $logs->save();
-
-            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
-        } else {
-            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
-        }
-    }
-
-    /**
-     *  Input OPR Action
-     */
-    public function submitOPRAction(Request $request, $id) {
-
-        // Find the facility request by ID
-        $facilityRequest = FacilityVenueModel::find($id);
-    
-        // Check if the facility request exists
-        if (!$facilityRequest) {
-            return response()->json(['message' => 'Facility request not found.'], 404);
-        }
-    
-        // Update the OPR instruction
-        $facilityRequest->obr_comment = $request->input('oprAction');
-    
-        // Save the updated facility request
-        if ($facilityRequest->save()) {
-
-            $getGSO = 'GSO';
-            $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
-
-            // Create logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.')';
-            $logs->save();
-
-            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
-        } else {
-            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
-        }
-    }
-
-    /**
-     *  Admin Approval
-     */
-    public function adminApproval(Request $request, $id){
-        $facilityRequest = FacilityVenueModel::find($id);
-
-        $facilityRequest->admin_approval = 1;
+        $facilityRequest->obr_instruct = $CheckOPR['oprInstruct'];
+        $facilityRequest->admin_approval = 2;
         $facilityRequest->date_approve = today();
         $facilityRequest->remarks = "The Admin Manager has approved this request.";
-        
-        if($facilityRequest->save()){
+    
+        // Save the updated facility request
+        if ($facilityRequest->save()) {
 
-            // Get Admin Manager
+            // Get GSO
             $getGSO = 'GSO';
             $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
+
+            // Get Admin Manager
+            $getAM = 'AM';
+            $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first();
 
             // Check if the Requestor is a GSO to avoid double notifications
             if($facilityRequest->user_id === $dataGSO->id){
-                
                 // Send to the GSO
                 $noti1 = new NotificationModel();
                 $noti1->type_of_jlms = "JOMS";
@@ -322,9 +273,7 @@ class FacilityVenueController extends Controller
                 $noti1->status = 2;
                 $noti1->joms_id = $facilityRequest->id;
                 $noti1->save();
-
             } else {
-
                 // Send to the Requestor
                 $noti = new NotificationModel();
                 $noti->type_of_jlms = "JOMS";
@@ -352,18 +301,61 @@ class FacilityVenueController extends Controller
                 $noti2->status = 2;
                 $noti2->joms_id = $facilityRequest->id;
                 $noti2->save();  
-
             }
 
+            // Create logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $request->input('sender_name') . ' has approved the request on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').';
+            $logs->message = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname . ' has approved the request on Facility/Venue Form (Control No. '.$facilityRequest->id.')';;
             $logs->save();
-        
-            return response()->json(['message' => 'Approve'], 200);
-            
-        }else{
-            return response()->json(['message' => 'There is something wrong.'], 500);
+
+            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
+        }
+    }
+
+    /**
+     *  Input OPR Action
+     */
+    public function submitOPRAction(Request $request, $id) {
+
+        // Find the facility request by ID
+        $facilityRequest = FacilityVenueModel::find($id);
+    
+        // Check if the facility request exists
+        if (!$facilityRequest) {
+            return response()->json(['message' => 'Facility request not found.'], 404);
+        }
+    
+        // Update the OPR instruction
+        $facilityRequest->obr_comment = $request->input('oprAction');
+        $facilityRequest->admin_approval = 1;
+    
+        // Save the updated facility request
+        if ($facilityRequest->save()) {
+
+            $getGSO = 'GSO';
+            $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
+
+            $Noti = NotificationModel::where('joms_id', $facilityRequest->id)->where('joms_type', 'JOMS_Facility')->get();
+
+            // Loop through each notification and update status
+            foreach ($Noti as $notification) {
+                $notification->status = 3;
+
+                if ($notification->save()) {
+                    // Create logs
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.')';
+                    $logs->save();
+                }
+            }
+
+            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
         }
     }
 
@@ -373,7 +365,7 @@ class FacilityVenueController extends Controller
     public function adminDisapproval(Request $request, $id){
         $facilityRequest = FacilityVenueModel::find($id);
 
-        $facilityRequest->admin_approval = 2;
+        $facilityRequest->admin_approval = 3;
         $facilityRequest->date_approve = today();
         $facilityRequest->remarks = "Disapproved (Reason: ".$request->input('remarks'). ")";
         
@@ -441,6 +433,40 @@ class FacilityVenueController extends Controller
             
         }else{
             return response()->json(['message' => 'There is something wrong.'], 500);
+        }
+    }
+
+    /**
+     * Close Force Request 
+     */
+    public function closeRequestForce(Request $request, $id){
+
+        $facilityRequest = FacilityVenueModel::find($id);
+
+        // Update Approve
+        $facilityRequest->admin_approval = 5;
+        $facilityRequest->remarks = "Deleted";
+
+        // Save Update
+        if ($facilityRequest->save()) {
+
+            $Noti = NotificationModel::where('joms_id', $facilityRequest->id)->where('joms_type', 'JOMS_Facility')->get();
+
+            // Loop through each notification and update status
+            foreach ($Noti as $notification) {
+                $notification->status = 0;
+
+                if ($notification->save()) {
+                    // Log only if saving the notification is successful
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+            }
+
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
         }
     }
 

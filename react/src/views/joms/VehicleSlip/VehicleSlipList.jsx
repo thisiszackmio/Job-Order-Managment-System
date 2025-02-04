@@ -19,7 +19,8 @@ export default function VehicleSlipList(){
   const GSO = codes.includes("GSO");
   const SuperAdmin = codes.includes("HACK");
   const DivisionManager = codes.includes("DM");
-  const Access = Admin || GSO || DivisionManager || SuperAdmin ;
+  const PortManager = codes.includes("PM");
+  const Access = Admin || GSO || DivisionManager || PortManager || SuperAdmin ;
 
   // Loading
   const [loading, setLoading] = useState(true);

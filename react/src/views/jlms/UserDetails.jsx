@@ -68,6 +68,7 @@ export default function UserDetailsJLMS(){
         'DM': 'DivisionManager',
         'PT': 'ProcurementTeam',
         'AP': 'Assign Personnel',
+        'AU': 'Authority Person',
       };
 
       const cc = userDet.code_clearance.split(',').map(code => clearanceLabels[code.trim()] || code).join(', ');
@@ -972,6 +973,24 @@ export default function UserDetailsJLMS(){
                           </div>
                         </div>
 
+                        {/* For GSO - General Service Officer */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="gso-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('AU')}
+                              onChange={(e) => handleCheckboxChange(e, 'AU')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Vehicle Slip Authority Person (AU)
+                            </label> 
+                          </div>
+                        </div>
+
                         {/* For HACK - IT Superadmin */}
                         <div className="relative flex items-center font-roboto mt-2">
                           <div className="flex items-center h-5">
@@ -1004,6 +1023,24 @@ export default function UserDetailsJLMS(){
                           <div className="ml-3">
                             <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
                               Members (MEM)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For Assign Personnel (Neccessary) */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="mem-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('AP')}
+                              onChange={(e) => handleCheckboxChange(e, 'AP')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Assign Personnel (AP)
                             </label> 
                           </div>
                         </div>

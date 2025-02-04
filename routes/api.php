@@ -29,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
+  Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
+  Route::get('/jomspendingapproval/{id}', [JOMSDashboardController::class, 'PendingApproval']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -38,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- Notification --- //
   Route::put('/read/{id}', [NotificationController::class, 'readNotifications']);
-  // Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
+  Route::put('/unread/{id}', [NotificationController::class, 'updateOldNotifications']);
 
   // --- Announcement --- //
   Route::post('/addannouncements', [AnnounceController::class, 'storeAnnouncements']);
@@ -68,7 +70,6 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- JOMS (My Request) --- //
   Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
-  Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
 
   // --- JOMS Inspection Request --- //
   Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']); // Submit the Request on Part A
@@ -94,6 +95,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/opraction/{id}', [FacilityVenueController::class, 'submitOPRAction']); // Input OPR Action
   Route::put('/adminfacapproval/{id}', [FacilityVenueController::class, 'adminApproval']); // Admin Approve
   Route::put('/adminfacdisapproval/{id}', [FacilityVenueController::class, 'adminDisapproval']); 
+  Route::put('/closefacilityforce/{id}', [FacilityVenueController::class, 'closeRequestForce']); // Force close the Form
   Route::get('/showfacvenrequest/{id}', [FacilityVenueController::class, 'showFacilityVenueForm']); // Show Facility / Venue Form Details
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 

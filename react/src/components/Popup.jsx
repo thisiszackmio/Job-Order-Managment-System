@@ -53,7 +53,7 @@ export default function Popup({
             popupContent == "delete_user" ||
             popupContent == "dma" || popupContent == "dmd" || popupContent == "gsoi" || popupContent == "ama" || popupContent == "gsocr" || popupContent == "gsofc" ||
             popupContent == "adf" || popupContent == "amif" ||
-            popupContent == "vdd" || popupContent == "amav" || popupContent == "amdv" || popupContent == "gsovcf")
+            popupContent == "vdd" || popupContent == "amav" || popupContent == "amdv" || popupContent == "gsovcf" || popupContent == "gsofv")
             && (
             <div className="f-modal-icon f-modal-warning scaleWarning">
               <span className="f-modal-body pulseWarningIns"></span>
@@ -449,6 +449,35 @@ export default function Popup({
             <button 
               type="submit"
               onClick={() => handleCloseForm(vehicle)}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
+
+          {/* Close Force Request on Facility */}
+          {popupContent == "gsofv" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              onClick={() => CloseForceRequest(facility)}
               className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
               disabled={submitLoading}
             >

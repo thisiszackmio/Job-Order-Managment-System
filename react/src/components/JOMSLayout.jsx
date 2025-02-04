@@ -52,7 +52,7 @@ export default function JOMSLayout() {
   const GSOOnly = codes.includes("GSO");
   const AssignPersonnel = codes.includes("AP");
   const DivisionManager = codes.includes("DM");
-  const Authorize = codes.includes("AM") || codes.includes("HACK");
+  const Authorize = codes.includes("AM") || codes.includes("HACK") || codes.includes("PM");
 
   return (
     <div className="w-full h-full font-roboto">

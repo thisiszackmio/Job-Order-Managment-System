@@ -103,6 +103,10 @@ class InspectionController extends Controller
 
         $InspectionRequest = InspectionModel::find($id);
 
+        if (!$InspectionRequest) {
+            return response()->json(['error' => 'No-Form'], 404);
+        }
+
         // Requestor Esig
         $RequestorEsigRequest = $SupervisorEsigRequest = PPAEmployee::where('id', $InspectionRequest->user_id)->first();
         $RequestorEsig = $rootUrl . '/storage/displayesig/' . $RequestorEsigRequest->esign;
@@ -241,10 +245,22 @@ class InspectionController extends Controller
 
         }
 
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('sender_name') . ' has approved the request for Pre/Post Repair Inspection (Control No. ' . $ApproveRequest->id . ').';
-            $logs->save();
+        // Set the notification to be unread
+        $unreadNoti = NotificationModel::where('receiver_id', $ApproveRequest->supervisor_id)
+                                        ->where('joms_id', $ApproveRequest->id)
+                                        ->where('joms_type', 'JOMS_Inspection')
+                                        ->get();
+        foreach ($unreadNoti as $unread) {
+            $unread->status = 1;
+
+            if($unread->save()){
+                // Logs
+                $logs = new LogsModel();
+                $logs->category = 'JOMS';
+                $logs->message = $request->input('sender_name') . ' has approved the request for Pre/Post Repair Inspection (Control No. ' . $ApproveRequest->id . ').';
+                $logs->save();
+            }
+        }
 
         return response()->json(['message' => 'Supervisor approval and notification saved successfully'], 200);
     }
@@ -316,6 +332,9 @@ class InspectionController extends Controller
 
         $ApproveRequest = InspectionModel::find($id);
 
+        $getAM = 'AM';
+        $data = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first(); 
+
         // Update Approve
         $ApproveRequest->admin_status = 1;
         $ApproveRequest->inspector_status = 3; 
@@ -371,15 +390,27 @@ class InspectionController extends Controller
 
             }
 
+            // Set the notification to be unread
+            $unreadNoti = NotificationModel::where('receiver_id', $data->id)
+                                    ->where('joms_id', $ApproveRequest->id)
+                                    ->where('joms_type', 'JOMS_Inspection')
+                                    ->get();
+            foreach ($unreadNoti as $unread) {
+                $unread->status = 1;
+    
+                if($unread->save()){
+                    // Logs
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+            }
+
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
 
-        // Logs
-        $logs = new LogsModel();
-        $logs->category = 'JOMS';
-        $logs->message = $request->input('logs');
-        $logs->save();
     }
 
     /**
@@ -632,11 +663,22 @@ class InspectionController extends Controller
 
             }
 
-            // Logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+            // Set the notification to be unread
+            $unreadNoti = NotificationModel::where('receiver_id', $dataGSO->id)
+                                            ->where('joms_id', $InspectionRequest->id)
+                                            ->get();
+            foreach ($unreadNoti as $unread) {
+                $unread->status = 1;
+
+                if($unread->save()){
+                    // Logs
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+            }
+
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
@@ -658,6 +700,9 @@ class InspectionController extends Controller
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
+
+        $getAM = 'AM';
+        $data = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first(); 
 
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
@@ -688,11 +733,23 @@ class InspectionController extends Controller
             $notiPer->joms_id = $InspectionRequest->id; 
             $notiPer->save();
 
-            // Logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+            // Set the notification to be unread
+            $unreadNoti = NotificationModel::where('receiver_id', $InspectionRequest->personnel_id)
+                ->where('sender_id', $data->id)
+                ->where('joms_id', $InspectionRequest->id)
+                ->where('joms_type', 'JOMS_Inspection')
+                ->get();
+            foreach ($unreadNoti as $unread) {
+                $unread->status = 1;
+    
+                if($unread->save()){
+                    // Logs
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+            }
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
@@ -799,11 +856,24 @@ class InspectionController extends Controller
 
             }
 
-            // Logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+            // Set the notification to be unread
+            $unreadNoti = NotificationModel::where('receiver_id', $InspectionRequest->personnel_id)
+                ->where('sender_id', $InspectionRequest->personnel_id)
+                ->where('joms_id', $InspectionRequest->id)
+                ->where('joms_type', 'JOMS_Inspection')
+                ->get();
+            foreach ($unreadNoti as $unread) {
+                $unread->status = 1;
+    
+                if($unread->save()){
+                    // Logs
+                    $logs = new LogsModel();
+                    $logs->category = 'JOMS';
+                    $logs->message = $request->input('logs');
+                    $logs->save();
+                }
+            }
+
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
@@ -825,11 +895,13 @@ class InspectionController extends Controller
         // Save Update
         if ($ApproveRequest->save()) {
 
-            $Noti = NotificationModel::where('joms_id', $ApproveRequest->id)->where('joms_type', 'JOMS_Inspection')->get();
+            $Noti = NotificationModel::where('joms_id', $ApproveRequest->id)
+                        ->where('joms_type', 'JOMS_Inspection')
+                        ->get();
 
             // Loop through each notification and update status
             foreach ($Noti as $notification) {
-                $notification->status = 1;
+                $notification->status = 3;
 
                 if ($notification->save()) {
                     // Log only if saving the notification is successful
@@ -846,7 +918,7 @@ class InspectionController extends Controller
     }
 
     /**
-     * Close Force Request 
+     * Delete Form 
      */
     public function closeRequestForce(Request $request, $id){
 
@@ -857,7 +929,7 @@ class InspectionController extends Controller
         $ApproveRequest->admin_status = 0;
         $ApproveRequest->inspector_status = 2;
         $ApproveRequest->form_status = 3;
-        $ApproveRequest->form_remarks = "This form has been closed by the GSO.";
+        $ApproveRequest->form_remarks = "This form has been delete by the GSO.";
 
         // Save Update
         if ($ApproveRequest->save()) {
@@ -866,7 +938,7 @@ class InspectionController extends Controller
 
             // Loop through each notification and update status
             foreach ($Noti as $notification) {
-                $notification->status = 3;
+                $notification->status = 0;
 
                 if ($notification->save()) {
                     // Log only if saving the notification is successful

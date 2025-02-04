@@ -464,6 +464,11 @@ input:focus, textarea:focus {
 .form-label { font-size: 20px; }
 .ppa-form { border: 1px solid #808080; border-radius: 5px; padding: 7px; }
 .form-validation { color: #ff0000; font-weight: 900; font-size: 12px; }
+.dashboard-small {
+  font-size: 12px;
+  color: #808080;
+  font-weight: 900;
+}
 .ppa-form-remarks {
   border: 1px solid #808080;
   border-radius: 5px;

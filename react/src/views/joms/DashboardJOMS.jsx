@@ -8,7 +8,12 @@ import { Link } from "react-router-dom";
 
 export default function DashboardJOMS(){
 
-  const { currentUserId } = useUserStateContext();
+  const { currentUserId, userCode } = useUserStateContext();
+
+  const ucode = userCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const roles = ["AM", "GSO", "DM", "PM", "AP", "AU"];
+  const accessOnly = roles.some(role => codes.includes(role));
 
   //Date Format 
   function formatDate(dateString) {
@@ -25,6 +30,7 @@ export default function DashboardJOMS(){
   const [facilityForm, getFacilityForm] = useState([]);
   const [vehicleForm, getVehicleForm] = useState([]);
   const [pending, getPending] = useState([]);
+  const [pendingApproval, getPendingApproval] = useState([]);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -95,11 +101,28 @@ export default function DashboardJOMS(){
     });
   }
 
+  // Get Pending Approval
+  const fetchApprove = () => {
+    axiosClient
+    .get(`/jomspendingapproval/${currentUserId.id}`)
+    .then((response) => {
+      const responseData = response.data;
+      const PendingApproval = responseData.pending_approved;
+
+      // console.log(TypePending);
+      getPendingApproval({PendingApproval});
+    })
+    .finally(() => {
+      setLoadingArea(false);
+    });
+  }
+
   // Get the useEffect
   useEffect(() => {
     if(currentUserId && currentUserId.id){
       fetchRequest();
       fetchPending();
+      fetchApprove();
     }
   }, [currentUserId]);
 
@@ -179,6 +202,59 @@ export default function DashboardJOMS(){
           </div>
 
         </div>
+
+        {/* Pending Forms */}
+        {accessOnly && (
+          <div className="ppa-widget mt-10">
+            <div className="ppa-widget-title">Pending Form</div>
+            <div className="ppa-div-table" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <table className="ppa-table w-full mb-4">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-1 py-1 w-5 text-center text-xs font-medium text-gray-600 uppercase">Ctrl No</th>
+                    <th className="px-1 py-1 w-auto text-center text-xs font-medium text-gray-600 uppercase">Type of Request</th>
+                    <th className="px-1 py-1 w-auto text-center text-xs font-medium text-gray-600 uppercase">Date Request</th>
+                    <th className="px-1 py-1 w-auto text-center text-xs font-medium text-gray-600 uppercase">Requestor</th>
+                    <th className="px-1 py-1 w-auto text-center text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody style={{ backgroundColor: '#fff' }}>
+                  {loadingArea ? (
+                    <tr>
+                      <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
+                        <div className="flex justify-center items-center py-4">
+                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                          <span className="loading-table">Loading Request</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ):(
+                    pendingApproval?.PendingApproval?.length > 0 ? (
+                      pendingApproval?.PendingApproval?.map((list) => (
+                        <tr key={list.id}>
+                          <td className="px-1 py-3 text-center table-font text-base">
+                            {list.type == "Pre/Post Repair Inspection Form" && <Link to={`/joms/inspection/form/${list.id}`}>{list.id}</Link>}
+                            {list.type == "Facility / Venue Form" && <Link to={`/joms/facilityvenue/form/${list.id}`}>{list.id}</Link>}
+                            {list.type == "Vehicle Slip Form" && <Link to={`/joms/vehicle/form/${list.id}`}>{list.id}</Link>}
+                          </td>
+                          <td className="px-1 py-3 text-center table-font text-base">{list.type}</td>
+                          <td className="px-1 py-3 text-center table-font text-base">{formatDate(list?.date_request)}</td>
+                          <td className="px-1 py-3 text-center table-font text-base">{list?.requestor}</td>
+                          <td className="px-1 py-3 text-center table-font text-base">{list?.remarks}</td>
+                        </tr>
+                      ))
+                    ):(
+                      <tr>
+                        <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom"> No Pending Form </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <p className="dashboard-small pl-2">Please click the Ctrl No. to redirect to the form page</p>
+          </div>
+        )}
 
         {/* Pending Request */}
         <div className="ppa-widget mt-10">

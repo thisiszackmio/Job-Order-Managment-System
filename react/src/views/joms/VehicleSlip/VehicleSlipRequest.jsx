@@ -17,6 +17,7 @@ export default function FacilityVenueForm(){
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const GSO = codes.includes("GSO");
+  const PersonAuthority = codes.includes("AU");
   const Admin = codes.includes("AM");
   const PortManager = codes.includes("PM");
 
@@ -88,8 +89,8 @@ export default function FacilityVenueForm(){
     });
   }
 
-   // Get Driver Details
-   const fetchDriver = () => {
+  // Get Driver Details
+  const fetchDriver = () => {
     axiosClient
     .get(`/getdriverdet`)
     .then((response) => {
@@ -137,14 +138,14 @@ export default function FacilityVenueForm(){
     setSubmitLoading(true);
 
     // For the remarks
-    const remarks = GSO ? 
+    const remarks = GSO || PersonAuthority ? 
     selectedTravelType == 'within' ? "Waiting for the Admin's Approval" : "Waiting for the Port Manager's Approval" :
     Admin ? 'Waiting for the assign vehicle and driver.' :
     PortManager ? 'Waiting for the assign vehicle and driver' :
-    "Awaiting the GSO to assign a vehicle and driver."
+    "Awaiting the to assign a vehicle and driver."
 
     // For the Notifications
-    const message = GSO ? `There is a request for ${currentUserId.name} and needs your approval.` : `There is a request for ${currentUserId.name}`
+    const message = GSO || PersonAuthority ? `There is a request for ${currentUserId.name} and needs your approval.` : `There is a request for ${currentUserId.name}`
     
     const data = {
       type_of_slip : selectedTravelType,
@@ -158,7 +159,7 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO ? 7 : Admin ? 5 : PortManager ? 6 : 8,
+      admin_approval : GSO || PersonAuthority ? 7 : Admin ? 5 : PortManager ? 6 : 8,
       remarks : remarks,
 
       // Notifications
@@ -168,6 +169,8 @@ export default function FacilityVenueForm(){
       sender_name : currentUserId.name,
       notif_message : message,
     }
+
+    console.log(data);
 
     if(GSO && (!vehicalName || !pointDriver.did)){
       setShowPopup(true);
@@ -406,7 +409,7 @@ export default function FacilityVenueForm(){
               </div>
             </div>
 
-            {GSO && (
+            {(GSO || PersonAuthority) && (
             <>
 
               {/* Vehicle Type */}

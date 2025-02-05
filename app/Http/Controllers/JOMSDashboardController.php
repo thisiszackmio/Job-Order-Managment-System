@@ -220,6 +220,22 @@ class JOMSDashboardController extends Controller
                 });
 
             $pendingApproval = $pendingApproval->merge($facilityDataAdmin);
+
+            // Vehicle
+            $vehicleDataAdmin = VehicleSlipModel::whereIn('admin_approval', [10])
+                ->get()
+                ->map(function ($vehicleDataAdmin) {
+                    return [
+                        'id' => $vehicleDataAdmin->id,
+                        'type' => 'Vehicle Slip Form',
+                        'date_request' => $vehicleDataAdmin->created_at,
+                        'requestor' => $vehicleDataAdmin->user_name,
+                        'remarks' => 'Waiting for your approval',
+                    ];
+                });
+
+            $pendingApproval = $pendingApproval->merge($vehicleDataAdmin);
+
         }
 
         // Notify the Assign Personne
@@ -237,6 +253,29 @@ class JOMSDashboardController extends Controller
                 ];
             });
         $pendingApproval = $pendingApproval->merge($assignPersonnel);
+
+        // Notify the Port Manager
+        $PortManagerRequest = PPAEmployee::where('id', $id)
+        ->where('code_clearance', 'LIKE', "%PM%")
+        ->first();
+
+        if($PortManagerRequest) {
+            // Vehicle
+            $vehicleDataPM = VehicleSlipModel::whereIn('admin_approval', [11])
+                ->get()
+                ->map(function ($vehicleDataPM) {
+                    return [
+                        'id' => $vehicleDataPM->id,
+                        'type' => 'Vehicle Slip Form',
+                        'date_request' => $vehicleDataPM->created_at,
+                        'requestor' => $vehicleDataPM->user_name,
+                        'remarks' => 'Waiting for your approval',
+                    ];
+                });
+
+            $pendingApproval = $pendingApproval->merge($vehicleDataPM);
+        }
+        
 
         $responseData = $pendingApproval->isEmpty() ? null : $pendingApproval->sortBy('date_request')->values();
 

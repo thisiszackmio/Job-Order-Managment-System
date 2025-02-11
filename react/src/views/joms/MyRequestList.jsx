@@ -163,7 +163,7 @@ export default function MyRequest(){
                     <tr key={getInspData.id}>
                       <td className="px-2 py-2 text-lg font-bold text-center table-font">
                         <Link 
-                          to={`/joms/vehicle/form/${getInspData.id}`} 
+                          to={`/joms/inspection/form/${getInspData.id}`} 
                           className="group flex justify-center items-center"
                         >
                           {/* Initially show the ID */}
@@ -228,7 +228,7 @@ export default function MyRequest(){
                     <tr key={getFacData.id}>
                       <td className="px-2 py-2 text-lg font-bold text-center table-font">
                         <Link 
-                          to={`/joms/vehicle/form/${getFacData.id}`} 
+                          to={`/joms/facility/form/${getFacData.id}`} 
                           className="group flex justify-center items-center"
                         >
                           {/* Initially show the ID */}

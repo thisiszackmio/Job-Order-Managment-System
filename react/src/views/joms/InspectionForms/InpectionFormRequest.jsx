@@ -15,6 +15,7 @@ export default function RepairRequestForm(){
   const ucode = userCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
+  const PortManager = codes.includes("PM");
   const DivisionManager = codes.includes("DM");
 
   const [loading, setLoading] = useState(true);
@@ -120,7 +121,7 @@ export default function RepairRequestForm(){
 
     setSubmitLoading(true);
 
-    let remarks = Admin || DivisionManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
+    let remarks = Admin || DivisionManager || PortManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
     const notification = Admin || DivisionManager ? `${currentUserId.name} has submitted a request.` : `${currentUserId.name} has a request and needs your approval.`;
     
     const formData = {
@@ -135,12 +136,12 @@ export default function RepairRequestForm(){
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-      supervisor_id: Admin || DivisionManager ? currentUserId.id : selectedSupervisor.id,
-      supervisor_name: Admin || DivisionManager ? currentUserId.name : selectedSupervisor.name,
-      supervisor_status: Admin || DivisionManager ? 1 : 0,
+      supervisor_id: Admin || DivisionManager || PortManager ? currentUserId.id : selectedSupervisor.id,
+      supervisor_name: Admin || DivisionManager || PortManager ? currentUserId.name : selectedSupervisor.name,
+      supervisor_status: Admin || DivisionManager || PortManager ? 1 : 0,
       admin_status: 0,
       inspector_status: 0,
-      form_status: DivisionManager ? 4 : Admin ? 5 : 0,
+      form_status: DivisionManager || PortManager ? 4 : Admin ? 5 : 0,
       form_remarks: remarks,
       
       //Notifications
@@ -148,8 +149,8 @@ export default function RepairRequestForm(){
       sender_id: currentUserId.id,
       sender_name: currentUserId.name,
       notif_message: notification,
-      receiver_id: Admin || DivisionManager ? gso.gsoID: selectedSupervisor.id,
-      receiver_name: Admin || DivisionManager ? gso.gsoName : selectedSupervisor.name,
+      receiver_id: Admin || DivisionManager || PortManager ? gso.gsoID: selectedSupervisor.id,
+      receiver_name: Admin || DivisionManager || PortManager ? gso.gsoName : selectedSupervisor.name,
     };
 
     axiosClient
@@ -160,7 +161,7 @@ export default function RepairRequestForm(){
       setPopupMessage(
         <div>
           <p className="popup-title">Submission Complete!</p>
-          {Admin || DivisionManager ? 
+          {Admin || DivisionManager || PortManager ? 
           <p className="popup-message">Waiting for the GSO to fill up the Part B form.</p> : 
           <p className="popup-message">Please wait for the supervisor's approval.</p>
           }
@@ -463,7 +464,7 @@ export default function RepairRequestForm(){
                 </div>
                 
                 {/* Supervisor */}
-                {Admin || DivisionManager ? null : (
+                {(Admin || DivisionManager|| PortManager) ? null : (
                   <div className="flex items-center mt-4">
                     <div className="w-40">
                       <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">

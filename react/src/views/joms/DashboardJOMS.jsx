@@ -5,6 +5,8 @@ import axiosClient from "../../axios";
 import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
 import loading_table from "/default/ring-loading.gif";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function DashboardJOMS(){
 
@@ -63,7 +65,7 @@ export default function DashboardJOMS(){
     // Simulate an authentication check
     setTimeout(() => {
       setLoading(false);
-    }, 5000);
+    }, 3000);
   }, []);
 
   //Get the data
@@ -109,7 +111,7 @@ export default function DashboardJOMS(){
       const responseData = response.data;
       const PendingApproval = responseData.pending_approved;
 
-      // console.log(TypePending);
+      //console.log(PendingApproval);
       getPendingApproval({PendingApproval});
     })
     .finally(() => {
@@ -198,7 +200,7 @@ export default function DashboardJOMS(){
               <div className="joms-word-count">Total Count</div>
             </>
             )}
-            <div className="ppa-system-link"> <Link to={`/joms/vehicle/form`}> Go to Request Form </Link> </div>
+            <Link to={`/joms/vehicle/form`}> <div className="ppa-system-link"> Go to Request Form </div></Link> 
           </div>
 
         </div>
@@ -222,20 +224,41 @@ export default function DashboardJOMS(){
                   {loadingArea ? (
                     <tr>
                       <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
-                        <div className="flex justify-center items-center py-4">
+                        <div className="flex justify-center items-center">
                           <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
                           <span className="loading-table">Loading Request</span>
                         </div>
                       </td>
                     </tr>
+                  ):pendingApproval?.PendingApproval === undefined ? (
+                  <tr>
+                    <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
+                      <span className="loading-table">Fetching Data...</span>
+                    </td>
+                  </tr>
                   ):(
                     pendingApproval?.PendingApproval?.length > 0 ? (
                       pendingApproval?.PendingApproval?.map((list) => (
                         <tr key={list.id}>
-                          <td className="px-1 py-3 text-center table-font text-base">
-                            {list.type == "Pre/Post Repair Inspection Form" && <Link to={`/joms/inspection/form/${list.id}`}>{list.id}</Link>}
-                            {list.type == "Facility / Venue Form" && <Link to={`/joms/facilityvenue/form/${list.id}`}>{list.id}</Link>}
-                            {list.type == "Vehicle Slip Form" && <Link to={`/joms/vehicle/form/${list.id}`}>{list.id}</Link>}
+                          <td className="px-1 py-3 text-center font-bold table-font text-base">
+                            <Link 
+                              to={
+                                list.type === "Pre/Post Repair Inspection Form"
+                                  ? `/joms/inspection/form/${list.id}`
+                                  : list.type === "Facility / Venue Form"
+                                  ? `/joms/facilityvenue/form/${list.id}`
+                                  : `/joms/vehicle/form/${list.id}`
+                              }
+                              className="group flex justify-center items-center"
+                            >
+                              {/* Initially show the ID */}
+                              <span className="group-hover:hidden">{list.id}</span>
+                              
+                              {/* Show the View Icon on hover */}
+                              <span className="hidden group-hover:inline-flex items-center">
+                                <FontAwesomeIcon icon={faEye} />
+                              </span>
+                            </Link>
                           </td>
                           <td className="px-1 py-3 text-center table-font text-base">{list.type}</td>
                           <td className="px-1 py-3 text-center table-font text-base">{formatDate(list?.date_request)}</td>
@@ -252,7 +275,6 @@ export default function DashboardJOMS(){
                 </tbody>
               </table>
             </div>
-            <p className="dashboard-small pl-2">Please click the Ctrl No. to redirect to the form page</p>
           </div>
         )}
 
@@ -273,29 +295,44 @@ export default function DashboardJOMS(){
                 {loadingArea ? (
                   <tr>
                     <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
-                      <div className="flex justify-center items-center py-4">
+                      <div className="flex justify-center items-center">
                         <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
                         <span className="loading-table">Loading Request</span>
                       </div>
                     </td>
                   </tr>
-                ):(
-                <>
-                  {pending?.PendingRemarks?.length > 0 ? (
-                    pending?.PendingRemarks?.map((list) => (
-                      <tr key={list.id}>
-                        <td className="px-1 py-3 text-center table-font text-base">{list?.id}</td>
-                        <td className="px-1 py-3 text-center table-font text-base">{list?.type}</td>
-                        <td className="px-1 py-3 text-center table-font text-base">{formatDate(list?.date_request)}</td>
-                        <td className="px-1 py-3 text-center table-font text-base">{list?.remarks}</td>
-                      </tr>
-                    ))
-                  ):(
-                    <tr>
-                      <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom"> No Pending Request </td>
+                ): pending?.PendingRemarks === undefined ? (
+                  <tr>
+                    <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
+                      <span className="loading-table">Fetching Data...</span>
+                    </td>
+                  </tr>
+                ):pending?.PendingRemarks?.length > 0 ? (
+                  pending?.PendingRemarks?.map((list) => (
+                    <tr key={list.id}>
+                      <td className="px-1 py-3 text-center font-bold table-font text-base">
+                        <Link 
+                          to={`/joms/vehicle/form/${list.id}`} 
+                          className="group flex justify-center items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{list.id}</span>
+                          
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="px-1 py-3 text-center table-font text-base">{list?.type}</td>
+                      <td className="px-1 py-3 text-center table-font text-base">{formatDate(list?.date_request)}</td>
+                      <td className="px-1 py-3 text-center table-font text-base">{list?.remarks}</td>
                     </tr>
-                  )}
-                </>
+                  ))
+                ):(
+                  <tr>
+                    <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom"> No Pending Request </td>
+                  </tr>
                 )}
               </tbody>
             </table>

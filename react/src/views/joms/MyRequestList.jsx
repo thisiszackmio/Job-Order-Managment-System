@@ -4,6 +4,8 @@ import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
 import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function MyRequest(){
 
@@ -137,7 +139,7 @@ export default function MyRequest(){
 
         {loading ? (
           <div className="flex justify-center items-center pt-2 pb-2">
-            <img className="h-10 w-auto mr-2" src={loading_table} alt="Loading" />
+            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
         ):(
@@ -159,7 +161,20 @@ export default function MyRequest(){
                 {inspectionForm && inspectionForm?.length > 0 ? (
                   inspectionForm.map((getInspData)=>(
                     <tr key={getInspData.id}>
-                      <td className="px-2 py-2 text-sm text-left table-font"><Link to={`/joms/inspection/form/${getInspData.id}`}>{getInspData.id}</Link></td>
+                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                        <Link 
+                          to={`/joms/vehicle/form/${getInspData.id}`} 
+                          className="group flex justify-center items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{getInspData.id}</span>
+                          
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
+                      </td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getInspData.date_request}</td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getInspData.property_number ? getInspData.property_number : 'N/A'}</td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getInspData.type}</td>
@@ -190,7 +205,7 @@ export default function MyRequest(){
 
         {loading ? (
           <div className="flex justify-center items-center pt-2 pb-2">
-            <img className="h-10 w-auto mr-2" src={loading_table} alt="Loading" />
+            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
         ) : (
@@ -211,8 +226,19 @@ export default function MyRequest(){
                 {facilityForm && facilityForm.length > 0 ? (
                   facilityForm.map((getFacData) => (
                     <tr key={getFacData.id}>
-                      <td className="px-2 py-2 text-sm text-left table-font">
-                        <Link to={`/joms/facilityvenue/form/${getFacData.id}`}>{getFacData.id}</Link>
+                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                        <Link 
+                          to={`/joms/vehicle/form/${getFacData.id}`} 
+                          className="group flex justify-center items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{getFacData.id}</span>
+                          
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
                       </td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getFacData.date_requested}</td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getFacData.request_office}</td>
@@ -247,7 +273,7 @@ export default function MyRequest(){
         
         {loading ? (
           <div className="flex justify-center items-center pt-2 pb-2">
-            <img className="h-10 w-auto mr-2" src={loading_table} alt="Loading" />
+            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
         ):(
@@ -270,7 +296,20 @@ export default function MyRequest(){
                 {vehicleForm && vehicleForm?.length > 0 ? (
                   vehicleForm.map((getVehData) => (
                     <tr key={getVehData.id}>
-                      <td className="px-2 py-2 text-sm text-left w-1 table-font"><Link to={`/joms/vehicle/form/${getVehData.id}`}>{getVehData.id}</Link></td>
+                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                        <Link 
+                          to={`/joms/vehicle/form/${getVehData.id}`} 
+                          className="group flex justify-center items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{getVehData.id}</span>
+                          
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
+                      </td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getVehData.date_request}</td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getVehData.purpose}</td>
                       <td className="px-2 py-2 text-sm text-left table-font">{getVehData.place}</td>

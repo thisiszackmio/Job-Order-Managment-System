@@ -30,9 +30,9 @@ class VehicleSlipRequest extends FormRequest
             'place_visited' => 'required|string',
             'date_arrival' => 'required|date',
             'time_arrival' => 'required|date_format:H:i',
-            'vehicle_type' => 'nullable|string',
-            'driver_id' => 'nullable|numeric',
-            'driver' => 'nullable|string',
+            'vehicle_type' => 'required|string',
+            'driver_id' => 'required|numeric',
+            'driver' => 'required|string',
             'admin_approval' => 'required|numeric',
             'remarks' => 'required|string',
         ];

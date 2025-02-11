@@ -654,6 +654,7 @@ export default function InspectionForm(){
     const dataC = {
       findings : updatefindings ? updatefindings : inspectionData?.form?.findings,
       recommendations: updaterecommendations ? updaterecommendations : inspectionData?.form?.recommendations,
+      today: inspectionData?.form?.before_repair_date ? inspectionData?.form?.before_repair_date : today,
       logs: logs
     }
     
@@ -1568,12 +1569,17 @@ export default function InspectionForm(){
                 {(inspectionData?.form?.status === "1130" ||
                   inspectionData?.form?.status === "1120" ||
                   inspectionData?.form?.status === "1112" || 
-                  inspectionData?.form?.status === "1111") && (
+                  inspectionData?.form?.status === "1111" || GSO) && (
                     <div className={`pb-6 mt-4 ${(inspectionData?.form?.status === "1130") ? "" : "border-b border-gray-300"}`}>
 
                       {/* Caption */}
                       <div className="flex">
                         <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
+                        {/* For the GSO */}
+                        {inspectionData?.form?.admin_status == 1 && (
+                          <button onClick={() => { setEnablePartC(true); }}  className="ml-3 px-6 btn-edit"> Edit Part C </button>
+                        )}
+                        {/* For the Assign Personnel */}
                         {inspectionData?.form?.form_status != 1 && inspectionData?.form?.form_status != 3 ? (
                           !enablePartA && !enablePartB && !enablePartC && !enablePartD && inspectionData?.form?.personnel_id == currentUserId?.id && inspectionData?.form?.before_repair_date &&
                           <button onClick={() => { setEnablePartC(true); }}  className="ml-3 px-6 btn-edit"> Edit Part C </button> 
@@ -1674,33 +1680,42 @@ export default function InspectionForm(){
                       </>
                       ):(
                       <>
-                        {/* Date */}
-                        <div className="flex items-center mt-6">
-                          <div className="w-40">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Date:
-                            </label> 
-                          </div>
-                          <div className={`w-1/4 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                            {inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) 
-                            : null}
-                          </div>
-                        </div>
-
-                        {/* Assigned Personnel*/}
-                        <div className="flex items-center mt-2">
-                          <div className="w-40">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Assigned Personnel:
-                            </label> 
-                          </div>
-                          <div className={`w-1/4 ppa-form-view font-bold italic ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                            {inspectionData?.form?.before_repair_date ? inspectionData?.form?.personnel_name :
-                            null }
-                          </div>
-                        </div>
 
                         <form id="editPartC" onSubmit={event => UpdatePartC(event, inspectionData?.form?.id)}>
+                          {/* Date */}
+                          <div className="flex items-center mt-6">
+                            <div className="w-40">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Date:
+                              </label> 
+                            </div>
+                            <div className={`w-1/4 ${enablePartC ? '' : 'ppa-form-view'} ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
+                            {!enablePartC ? (
+                              inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) : null
+                            ):(
+                              <input 
+                                type="date" 
+                                name="rep_date" 
+                                id="rep_date" 
+                                defaultValue={today} 
+                                className="block w-full ppa-form-edit"
+                                readOnly
+                              />
+                            )}
+                            </div>
+                          </div>
+
+                          {/* Assigned Personnel*/}
+                          <div className="flex items-center mt-2">
+                            <div className="w-40">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Assigned Personnel:
+                              </label> 
+                            </div>
+                            <div className={`w-1/4 ppa-form-view font-bold italic ${enablePartC ? 'mt-2' : 'h-6' }`}>
+                              {inspectionData?.form?.personnel_name}
+                            </div>
+                          </div>
 
                           {/* Findings */}
                           <div className="flex items-center mt-2">
@@ -1726,7 +1741,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Recommendations */}
-                          <div className="flex items-center mt-2">
+                          <div className={`flex items-center ${enablePartC ? 'mt-4' : 'mt-2'}`}>
                             <div className="w-40">
                               <label className="block text-base font-bold leading-6 text-gray-900">
                               Recommendations:
@@ -1747,7 +1762,6 @@ export default function InspectionForm(){
                               )}
                             </div>
                           </div>
-
                         </form>
 
                         {/* Submit Button */}
@@ -1788,12 +1802,17 @@ export default function InspectionForm(){
                 {/* Part D */}
                 {(inspectionData?.form?.status === "1120" ||
                   inspectionData?.form?.status === "1112" ||
-                  inspectionData?.form?.status === "1111") && (
+                  inspectionData?.form?.status === "1111" || GSO) && (
                     <div className="mt-4 pb-6">
 
                       {/* Caption */}
                       <div className="flex">
                         <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
+                        {/* For GSO */}
+                        {!enablePartA && !enablePartB && !enablePartC && !enablePartD &&  inspectionData?.form?.admin_status == 1 && (
+                          <button onClick={() => { setEnablePartD(true); }}  className="ml-3 px-6 btn-edit"> Edit Part D </button>
+                        )}
+                        {/* For Assing Personnel */}
                         {inspectionData?.form?.form_status != 1 && inspectionData?.form?.form_status != 3 ? (
                           !enablePartA && !enablePartB && !enablePartC && !enablePartD && inspectionData?.form?.personnel_id == currentUserId?.id && inspectionData?.form?.after_reapir_date && 
                           <button onClick={() => { setEnablePartD(true); }}  className="ml-3 px-6 btn-edit"> Edit Part D </button> 
@@ -1870,33 +1889,41 @@ export default function InspectionForm(){
                       </>
                       ):(
                       <>
-                        {/* Date */}
-                        <div className="flex items-center mt-6">
-                          <div className="w-40">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Date:
-                            </label> 
-                          </div>
-                          <div className={`w-1/4 ppa-form-view ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
-                            {inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) 
-                            : null}
-                          </div>
-                        </div>
-
-                        {/* Assigned Personnel*/}
-                        <div className="flex items-center mt-2">
-                          <div className="w-40">
-                            <label className="block text-base font-bold leading-6 text-gray-900">
-                            Assigned Personnel:
-                            </label> 
-                          </div>
-                          <div className={`w-1/4 ppa-form-view font-bold italic ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
-                            {inspectionData?.form?.after_reapir_date ? inspectionData?.form?.personnel_name :
-                            null }
-                          </div>
-                        </div>
-
                         <form id="updateDForm" onSubmit={event => UpdatePartD(event, inspectionData?.form?.id)}>
+                          {/* Date */}
+                          <div className="flex items-center mt-6">
+                            <div className="w-40">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Date:
+                              </label> 
+                            </div>
+                            <div className={`w-1/4 ${enablePartD ? '' : 'ppa-form-view'} ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
+                            {!enablePartD ? (
+                              inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) : null
+                            ):(
+                              <input 
+                                type="date" 
+                                name="rep_date" 
+                                id="rep_date" 
+                                defaultValue={today} 
+                                className="block w-full ppa-form-edit"
+                                readOnly
+                              />
+                            )}
+                            </div>
+                          </div>
+
+                          {/* Assigned Personnel*/}
+                          <div className="flex items-center mt-2">
+                            <div className="w-40">
+                              <label className="block text-base font-bold leading-6 text-gray-900">
+                              Assigned Personnel:
+                              </label> 
+                            </div>
+                            <div className={`w-1/4 ppa-form-view font-bold italic ${enablePartD ? 'mt-2' : 'h-6' }`}>
+                              {inspectionData?.form?.personnel_name}
+                            </div>
+                          </div>
 
                           {/* Remarks */}
                           <div className="flex items-center mt-2">

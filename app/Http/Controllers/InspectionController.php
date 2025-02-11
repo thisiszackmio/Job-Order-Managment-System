@@ -160,6 +160,7 @@ class InspectionController extends Controller
             'supervisor_name' => $InspectionRequest->supervisor_name,
             'form_remarks' => $InspectionRequest->form_remarks,
             'form_status' => $InspectionRequest->form_status,
+            'admin_status' => $InspectionRequest->admin_status,
             'status' => $InspectionRequest->supervisor_status.''.$InspectionRequest->admin_status.''.$InspectionRequest->inspector_status.''.$InspectionRequest->form_status,
         ];
 
@@ -503,7 +504,8 @@ class InspectionController extends Controller
 
             $uPartC = $InspectionRequest->update([
                 'findings' => $request->input('findings'),
-                'recommendations' => $request->input('recommendations')
+                'recommendations' => $request->input('recommendations'),
+                'before_repair_date' => $request->input('today')
             ]);
     
             if($uPartC){

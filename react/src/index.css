@@ -3,6 +3,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Restrict */
+.res-container {
+  width: 100%;
+  text-align: center;
+  background-color: #800000;
+  padding: 10px;
+}
+.res-title {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+}
+.res-des {
+  color: #fff;
+  font-size: 19px;
+  margin-top: 7px;
+}
+.res-btnarea {
+  margin-top: 15px;
+}
+.res-btn {
+  padding: 5px 13px;
+}
+
 /* Pre-loading */
 .pre-loading-screen {
   position: fixed;

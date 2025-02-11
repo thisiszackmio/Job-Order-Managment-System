@@ -215,7 +215,7 @@ class JOMSDashboardController extends Controller
                         'type' => 'Facility / Venue Form',
                         'date_request' => $facilityDataAdmin->created_at,
                         'requestor' => $facilityDataAdmin->user_name,
-                        'remarks' => 'Waiting for your approval',
+                        'remarks' => "Waiting for Admin Manager's approval",
                     ];
                 });
 

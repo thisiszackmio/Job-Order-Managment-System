@@ -75,6 +75,7 @@ export default function FacilityVenueForm(){
   const [popupMessage, setPopupMessage] = useState("");
 
   const [inputErrors, setInputErrors] = useState({});
+  const [travelType, setTravelType] = useState(false);
   const [vehicleDet, setVehicleDet] = useState([]);
   const [driver, setDriver] = useState([]);
 
@@ -134,20 +135,21 @@ export default function FacilityVenueForm(){
   // Submit the Form
   function SubmitVehicleForm(event){
     event.preventDefault();
-
     setSubmitLoading(true);
 
-    // For the remarks
+    // For the Remarks
     const remarks = GSO || PersonAuthority ? 
     selectedTravelType == 'within' ? "Waiting for the Admin's Approval" : "Waiting for the Port Manager's Approval" :
-    Admin ? 'Waiting for the assign vehicle and driver.' :
-    PortManager ? 'Waiting for the assign vehicle and driver' :
-    "Awaiting the to assign a vehicle and driver."
+    Admin || PortManager ? 'Waiting for the assign vehicle and driver.' :
+    "Awaiting the assignment of a vehicle and driver.";
 
-    // For the Notifications
-    const message = GSO || PersonAuthority ? `There is a request for ${currentUserId.name} and needs your approval.` : `There is a request for ${currentUserId.name}`
-    
+    // For the notification message
+    const message = GSO || PersonAuthority ?
+    selectedTravelType == 'within' ? `There is a request for ${currentUserId.name} and needs your approval` : `There is a request for ${currentUserId.name} and needs your approval` :
+    `There is a request for ${currentUserId.name}`;
+
     const data = {
+      user_type : GSO || PersonAuthority ? 'authorize' : 'member',
       type_of_slip : selectedTravelType,
       user_id : currentUserId.id,
       user_name : currentUserId.name,
@@ -170,19 +172,12 @@ export default function FacilityVenueForm(){
       notif_message : message,
     }
 
-    console.log(data);
-
-    if(GSO && (!vehicalName || !pointDriver.did)){
-      setShowPopup(true);
-      setPopupContent('error');
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Field is required</p>
-          <p className="popup-message">You have left a field empty. A value must be entered. (Vehicle Type and Driver)</p>
-        </div>
-      );
+    if(!selectedTravelType){
+      setTravelType(true);
       setSubmitLoading(false);
     } else {
+      setTravelType(false);
+
       axiosClient
       .post('/submitvehrequest', data)
       .then(() => {
@@ -196,7 +191,7 @@ export default function FacilityVenueForm(){
         );
       })
       .catch((error)=>{
-        if (error.response.status === 422 && error.response.data.error === 'invalidDate') {
+        if(error.response.data.error === 'invalidDate'){
           setShowPopup(true);
           setPopupContent('error');
           setPopupMessage(
@@ -206,18 +201,19 @@ export default function FacilityVenueForm(){
             </div>
           );
         }
-        else if (error.response.status === 500) {
+        else if(error.response.status === 422){
+          const responseErrors = error.response.data.errors;
+          setInputErrors(responseErrors);
+        } else {
           setShowPopup(true);
           setPopupContent('error');
           setPopupMessage(DevErrorText);
-        }else{
-          const responseErrors = error.response.data.errors;
-          setInputErrors(responseErrors);
         }
       })
       .finally(() => {
         setSubmitLoading(false);
       });
+
     }
  
   }
@@ -293,7 +289,9 @@ export default function FacilityVenueForm(){
                     Outside the City
                   </label>
                 </div>
-
+                {travelType && (
+                  <p className="form-validation">Don't forget on this one</p>
+                )}
               </div>
             </div>
 
@@ -435,6 +433,9 @@ export default function FacilityVenueForm(){
                       </option>
                     ))}
                   </select>
+                  {!vehicalName && inputErrors.vehicle_type && (
+                    <p className="form-validation">This form is required</p>
+                  )}
                 </div>
               </div>
 
@@ -466,6 +467,9 @@ export default function FacilityVenueForm(){
                       </option>
                     ))}
                   </select>
+                  {!pointDriver.did && inputErrors.driver && (
+                    <p className="form-validation">This form is required</p>
+                  )}
                 </div>
               </div>
 
@@ -490,7 +494,7 @@ export default function FacilityVenueForm(){
                   maxLength={1000}
                   className="block w-full ppa-form"
                 />
-                <p className="text-gray-500 text-xs mt-2">Separate name on next line (If no passengers just leave it blank)</p>
+                <p className="text-gray-500 text-xs mt-2">List each name on a separate line without numbering. If there are no passengers, leave it blank.</p>
               </div>
             </div>
 

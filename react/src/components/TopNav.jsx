@@ -78,7 +78,7 @@ const TopNav = () =>{
   // Delete Notification Request
   const fetchDeleteNotification = () => {
     axiosClient
-    .put(`/delete/${currentUserId.id}`)
+    .delete(`/delete/${currentUserId.id}`)
     .then(response => {
       console.log(response.data.message); // Show success message
     })

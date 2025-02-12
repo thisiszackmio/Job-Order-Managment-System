@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- Notification --- //
   Route::put('/read/{id}', [NotificationController::class, 'readNotifications']);
   Route::put('/unread/{id}', [NotificationController::class, 'updateOldNotifications']);
+  Route::put('/delete/{id}', [NotificationController::class, 'deleteOldNotifications']);
 
   // --- Announcement --- //
   Route::post('/addannouncements', [AnnounceController::class, 'storeAnnouncements']);

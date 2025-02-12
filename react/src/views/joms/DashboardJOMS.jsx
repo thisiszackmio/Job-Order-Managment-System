@@ -164,7 +164,7 @@ export default function DashboardJOMS(){
               <div className="joms-word-count">Total Count</div>
             </>
             )}
-            <div className="ppa-system-link"> <Link to={`/joms/inspection/form`}> Go to Request Form </Link> </div>
+            <Link to={`/joms/inspection/form`}> <div className="ppa-system-link"> Go to Request Form  </div> </Link>
           </div>
 
           {/* For Facility */}
@@ -182,7 +182,7 @@ export default function DashboardJOMS(){
               <div className="joms-word-count">Total Count</div>
             </>
             )}
-            <div className="ppa-system-link"> <Link to={`/joms/facilityvenue/form`}> Go to Request Form </Link> </div>
+            <Link to={`/joms/facilityvenue/form`}> <div className="ppa-system-link"> Go to Request Form </div> </Link>
           </div>
 
           {/* For Vehicle Slip */}
@@ -221,7 +221,7 @@ export default function DashboardJOMS(){
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#fff' }}>
-                  {loadingArea ? (
+                  {(loadingArea || pendingApproval?.PendingApproval === undefined) ? (
                     <tr>
                       <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
                         <div className="flex justify-center items-center">
@@ -230,12 +230,6 @@ export default function DashboardJOMS(){
                         </div>
                       </td>
                     </tr>
-                  ):pendingApproval?.PendingApproval === undefined ? (
-                  <tr>
-                    <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
-                      <span className="loading-table">Fetching Data...</span>
-                    </td>
-                  </tr>
                   ):(
                     pendingApproval?.PendingApproval?.length > 0 ? (
                       pendingApproval?.PendingApproval?.map((list) => (
@@ -292,7 +286,7 @@ export default function DashboardJOMS(){
                 </tr>
               </thead>
               <tbody style={{ backgroundColor: '#fff' }}>
-                {loadingArea ? (
+                {(loadingArea || pending?.PendingRemarks === undefined) ? (
                   <tr>
                     <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
                       <div className="flex justify-center items-center">
@@ -301,18 +295,18 @@ export default function DashboardJOMS(){
                       </div>
                     </td>
                   </tr>
-                ): pending?.PendingRemarks === undefined ? (
-                  <tr>
-                    <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
-                      <span className="loading-table">Fetching Data...</span>
-                    </td>
-                  </tr>
                 ):pending?.PendingRemarks?.length > 0 ? (
                   pending?.PendingRemarks?.map((list) => (
                     <tr key={list.id}>
                       <td className="px-1 py-3 text-center font-bold table-font text-base">
                         <Link 
-                          to={`/joms/vehicle/form/${list.id}`} 
+                          to={
+                            list.type === "Pre/Post Repair Inspection Form"
+                              ? `/joms/inspection/form/${list.id}`
+                              : list.type === "Facility / Venue Form"
+                              ? `/joms/facilityvenue/form/${list.id}`
+                              : `/joms/vehicle/form/${list.id}`
+                          }
                           className="group flex justify-center items-center"
                         >
                           {/* Initially show the ID */}

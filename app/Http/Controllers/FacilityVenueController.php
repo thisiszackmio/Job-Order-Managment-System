@@ -141,7 +141,7 @@ class FacilityVenueController extends Controller
         $getGSO = 'GSO';
         $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
 
-        if($dataAM->id === $deploymentData->user_id){
+        if($deploymentData->user_id === $dataAM->id){
             // Send to the Admin
             $noti = new NotificationModel();
             $noti->type_of_jlms = "JOMS";
@@ -155,7 +155,7 @@ class FacilityVenueController extends Controller
             $noti->status = 2;
             $noti->joms_id = $deploymentData->id; 
             $noti->save();
-        }else{
+        } else {
             // Send to the Admin
             $noti = new NotificationModel();
             $noti->type_of_jlms = "JOMS";
@@ -170,18 +170,13 @@ class FacilityVenueController extends Controller
             $noti->joms_id = $deploymentData->id; 
             $noti->save();
         }
+        
+        // Create logs
+        $logs = new LogsModel();
+        $logs->category = 'JOMS';
+        $logs->message = $data['user_name']. ' has submitted the request for Facility/Venue Request Form (Control No. '.$deploymentData->id.')';
+        $logs->save();
 
-        // Save the notification and create logs if successful
-        if ($noti->save()) {
-            // Create logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $data['user_name']. ' has submitted the request for Facility/Venue Request Form (Control No. '.$deploymentData->id.')';
-            $logs->save();
-
-        } else {
-            return response()->json(['error' => 'Failed to save notification'], 500);
-        }
     
         return response()->json(['message' => 'Deployment data created successfully'], 200);
     }
@@ -258,7 +253,6 @@ class FacilityVenueController extends Controller
             $getAM = 'AM';
             $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first();
 
-            // Check if the Requestor is a GSO to avoid double notifications
             if($facilityRequest->user_id === $dataGSO->id){
                 // Send to the GSO
                 $noti1 = new NotificationModel();
@@ -287,7 +281,7 @@ class FacilityVenueController extends Controller
                 $noti->status = 2;
                 $noti->joms_id = $facilityRequest->id;
                 $noti->save();
-                
+
                 // Send to the GSO
                 $noti2 = new NotificationModel();
                 $noti2->type_of_jlms = "JOMS";
@@ -338,20 +332,11 @@ class FacilityVenueController extends Controller
             $getGSO = 'GSO';
             $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
 
-            $Noti = NotificationModel::where('joms_id', $facilityRequest->id)->where('joms_type', 'JOMS_Facility')->get();
-
-            // Loop through each notification and update status
-            foreach ($Noti as $notification) {
-                $notification->status = 3;
-
-                if ($notification->save()) {
-                    // Create logs
-                    $logs = new LogsModel();
-                    $logs->category = 'JOMS';
-                    $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.')';
-                    $logs->save();
-                }
-            }
+            // Create logs
+            $logs = new LogsModel();
+            $logs->category = 'JOMS';
+            $logs->message = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname . ' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.')';
+            $logs->save();
 
             return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
         } else {

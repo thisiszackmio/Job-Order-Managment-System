@@ -52,7 +52,8 @@ export default function JOMSLayout() {
   const GSOOnly = codes.includes("GSO");
   const AssignPersonnel = codes.includes("AP");
   const DivisionManager = codes.includes("DM");
-  const Authorize = codes.includes("AM") || codes.includes("HACK") || codes.includes("PM");
+  const PortManager = codes.includes("PM");
+  const AuthorizePerson = codes.includes("AU");
 
   return (
     <div className="w-full h-full font-roboto">
@@ -144,7 +145,7 @@ export default function JOMSLayout() {
             </li>
             
             {/* Request List */}
-            {(Authorize || GSOOnly || SuperAdmin || AssignPersonnel || DivisionManager) && (
+            {(SuperAdmin || GSOOnly || AssignPersonnel || DivisionManager || PortManager) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
@@ -177,7 +178,7 @@ export default function JOMSLayout() {
             )}
             
             {/* Personnel */}
-            {(Authorize || GSOOnly || SuperAdmin) && (
+            {(SuperAdmin || GSOOnly || AuthorizePerson) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/personnel" className="flex items-center">
@@ -189,7 +190,7 @@ export default function JOMSLayout() {
             )}
 
             {/* Vehicle */}
-            {(Authorize || GSOOnly || SuperAdmin) && (
+            {(SuperAdmin || GSOOnly || AuthorizePerson) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/vehicletype" className="flex items-center">

@@ -6,7 +6,7 @@ import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function FacilityVenueFormList(){
 
@@ -183,7 +183,21 @@ export default function FacilityVenueFormList(){
               currentList.length > 0 ? (
                 currentList.map((list)=>(
                   <tr key={list.id}>
-                    <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/facilityvenue/form/${list.id}`}>{list.id}</Link></td>
+                    <td className="px-2 py-2 text-lg text-center font-bold table-font">
+                      <Link
+                        to={`/joms/facilityvenue/form/${list.id}`}
+                        className="relative group inline-flex items-center"
+                      >
+                        {/* Initially show the ID */}
+                        <span className="group-hover:hidden">{list.id}</span>
+
+                        {/* Show the View Icon on hover */}
+                        <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                          <FontAwesomeIcon icon={faEye} />
+                        </span>
+                      </Link>
+                    </td>
+                    {/* <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/facilityvenue/form/${list.id}`}>{list.id}</Link></td> */}
                     <td className="px-2 py-2 text-sm text-left table-font">{formatDate(list.date_request)}</td>
                     <td className="px-2 py-2 text-sm text-left table-font">{list.request_office}</td>
                     <td className="px-2 py-2 text-sm text-left table-font">{list.title_activity}</td>

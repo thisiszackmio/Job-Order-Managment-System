@@ -162,7 +162,6 @@ export default function InspectionFormList(){
                         </span>
                       </Link>
                     </td>
-                    {/* <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/inspection/form/${list.id}`}>{list.id}</Link></td> */}
                     <td className="px-2 py-2 text-sm text-left table-font">{formatDate(list.date_request)}</td>
                     <td className="px-2 py-2 text-sm text-left table-font">{list.property_number ? list.property_number : 'N/A'}</td>
                     <td className="px-2 py-2 text-sm text-left table-font">{list.acquisition_date ? formatDate(list.acquisition_date) : 'N/A'}</td>

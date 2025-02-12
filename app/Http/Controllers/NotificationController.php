@@ -81,7 +81,7 @@ class NotificationController extends Controller
         // Update notifications for the specific user if older than 15 days
         $updatedCount = NotificationModel::where('receiver_id', $id)
                                          ->where('created_at', '<', $fifteenDaysAgo)
-                                         ->whereIn('status', 2)
+                                         ->where('status', 2)
                                          ->update(['status' => 1]);
     
         return response()->json(['message' => "$updatedCount old notifications updated successfully."], 200);

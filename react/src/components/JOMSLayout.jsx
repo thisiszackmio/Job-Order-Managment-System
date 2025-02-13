@@ -52,6 +52,7 @@ export default function JOMSLayout() {
   const GSOOnly = codes.includes("GSO");
   const AssignPersonnel = codes.includes("AP");
   const DivisionManager = codes.includes("DM");
+  const AdminManager = codes.includes("AM");
   const PortManager = codes.includes("PM");
   const AuthorizePerson = codes.includes("AU");
 
@@ -145,7 +146,7 @@ export default function JOMSLayout() {
             </li>
             
             {/* Request List */}
-            {(SuperAdmin || GSOOnly || AssignPersonnel || DivisionManager || PortManager) && (
+            {(SuperAdmin || GSOOnly || AssignPersonnel || DivisionManager || PortManager || AdminManager) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />

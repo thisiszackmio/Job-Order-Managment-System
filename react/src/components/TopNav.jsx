@@ -63,7 +63,7 @@ const TopNav = () =>{
     });
   }
 
-  // Get Notification Request
+  // Unread Notification Request
   const fetchUnreadNotification = () => {
     axiosClient
     .put(`/unread/${currentUserId.id}`)
@@ -74,11 +74,24 @@ const TopNav = () =>{
       console.error("Error updating notifications:", error);
     });
   }
-  
+
+  // Delete Notification Request
+  const fetchDeleteNotification = () => {
+    axiosClient
+    .delete(`/delete/${currentUserId.id}`)
+    .then(response => {
+      console.log(response.data.message); // Show success message
+    })
+    .catch(error => {
+      console.error("Error updating notifications:", error);
+    });
+  }
+
   useEffect(()=>{
     if(currentUserId && currentUserId.id){
       fetchNotification();
       fetchUnreadNotification();
+      fetchDeleteNotification();
     }
   },[currentUserId]);
 

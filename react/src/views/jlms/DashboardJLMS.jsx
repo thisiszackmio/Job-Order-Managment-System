@@ -175,7 +175,7 @@ export default function DashboardJLMS(){
   const ProcurementTeam = codes.includes("PT") || codes.includes("HACK") || codes.includes("DM") || codes.includes("AM");
 
   return (
-  <PageComponent title={`${getTimeOfDay()}! ${currentUserId?.gender === 'Male' ? 'Sir' : 'Maam'} ${currentUserId?.firstname}`}>
+  <PageComponent title={currentUserId ? `${getTimeOfDay()}! ${currentUserId?.firstname}` : `${getTimeOfDay()}!`}>
 
     {/* Preload Screen */}
     {loading && (
@@ -195,7 +195,7 @@ export default function DashboardJLMS(){
       {/* Announcement */}
       <div className="ppa-widget">
         <div className="ppa-widget-title">Announcement Board</div>
-        {loadingArea ? (
+        {(loadingArea || announceList?.mappedData === undefined) ? (
           <div className="flex justify-center items-center py-4">
             <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading Announcements</span>
@@ -259,9 +259,11 @@ export default function DashboardJLMS(){
             Job Order Management System
           </div>
 
-          <div className="ppa-system-link">
-            <Link to={`/joms`}> Go to the System </Link>
-          </div>
+          <Link to={`/joms`}> 
+            <div className="ppa-system-link">
+              Go to the System
+            </div>
+          </Link>
 
         </div>
 
@@ -327,7 +329,7 @@ export default function DashboardJLMS(){
         {/* For Logs */}
         <div className="col-span-1 ppa-widget">
           <div className="ppa-widget-title">Logs for {currentDate}</div>
-          {loadingArea ? (
+          {(loadingArea || isLogs?.LogsData === undefined) ? (
             <div className="flex justify-center items-center py-4">
               <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
               <span className="loading-table">Loading Logs</span>
@@ -365,7 +367,7 @@ export default function DashboardJLMS(){
         {/* For Members */}
         <div className="col-span-1 ppa-widget">
           <div className="ppa-widget-title">PMO Members</div>
-          {loadingArea ? (
+          {(loadingArea || teams?.TeamData === undefined) ? (
             <div className="flex justify-center items-center py-4">
               <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
               <span className="loading-table">Loading Teams</span>

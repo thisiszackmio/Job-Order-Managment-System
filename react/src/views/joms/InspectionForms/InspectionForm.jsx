@@ -8,6 +8,7 @@ import ppa_logo from '/default/ppa_logo.png'
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
+import Restrict from "../../../components/Restrict";
 
 export default function InspectionForm(){
   // Get the ID
@@ -21,6 +22,14 @@ export default function InspectionForm(){
   // Get the avatar
   const dp = currentUserId?.avatar;
   const dpname = dp ? dp.substring(dp.lastIndexOf('/') + 1) : null;
+
+  // Restrictions Condition
+  const ucode = userCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const Admin = codes.includes("AM");
+  const GSO = codes.includes("GSO");
+  const roles = ["AM", "GSO", "HACK", "DM", "PM", "AU"];
+  const accessOnly = roles.some(role => codes.includes(role)); 
 
   //Date Format 
   function formatDate(dateString) {
@@ -84,7 +93,8 @@ export default function InspectionForm(){
   const [otherReason, setOtherReason] = useState('');
 
   // Set Access
-  const [Access, setAccess] = useState(false);
+  const [Access, setAccess] = useState('');
+  const [dataAccess, setDataAccess] = useState(null);
 
   // Dev Error Text
   const DevErrorText = (
@@ -146,12 +156,14 @@ export default function InspectionForm(){
         admin_esig
       })
 
-      const myAccess = form?.user_id == currentUserId?.id;
+      const myAccess = form?.user_id == currentUserId?.id || accessOnly ? "Access" : "Denied";
       setAccess(myAccess);
+      setDataAccess(null);
 
     })
     .catch((error) => {
       if(error.response.data.error == "No-Form"){ // The Form doesn't exist
+        setDataAccess('Not-Found');
         window.location = '/404';
       }
     })
@@ -317,12 +329,6 @@ export default function InspectionForm(){
 
     const data = {
       logs:logs,
-      // Notification
-      sender_avatar: dpname,
-      sender_id: currentUserId.id,
-      sender_name: currentUserId.name,
-      receiver_id: inspectionData?.form?.user_id,
-      receiver_name: inspectionData?.form?.user_name,
     }
 
     axiosClient
@@ -384,12 +390,6 @@ export default function InspectionForm(){
       form_remarks: formRemarks,
       // LOGS
       logs: logs,
-      // NOTIFICATIONS
-      sender_avatar: dpname,
-      sender_id: currentUserId.id,
-      sender_name: currentUserId.name,
-      receiver_id: inspectionData?.form?.user_id,
-      receiver_name: inspectionData?.form?.user_name,
     }
 
     axiosClient
@@ -434,12 +434,6 @@ export default function InspectionForm(){
       recommendations: recommendations,
       form_remarks: formRemarks,
       logs: logs,
-      // Notification
-      sender_avatar: dpname,
-      sender_id: currentUserId.id,
-      sender_name: currentUserId.name,
-      receiver_id: inspectionData?.form?.user_id,
-      receiver_name: inspectionData?.form?.user_name,
     }
 
     axiosClient
@@ -483,12 +477,10 @@ export default function InspectionForm(){
       remarks: remarks,
       form_remarks: formRemarks,
       logs: logs,
-      // Notifications
+      // NOTIFICATIONS
       sender_avatar: dpname,
       sender_id: currentUserId.id,
       sender_name: currentUserId.name,
-      receiver_id: inspectionData?.form?.user_id,
-      receiver_name: inspectionData?.form?.user_name,
     }
 
     axiosClient
@@ -901,43 +893,30 @@ export default function InspectionForm(){
     window.location.reload();
   }
 
-  // Restrictions Condition
-  const ucode = userCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const SuperAdmin = codes.includes("HACK");
-  const DivisionManager = codes.includes("DM");
-  const PortManager = codes.includes("PM");
-  const Personnel = codes.includes("AP");
-  const Restrictions = Admin || GSO || DivisionManager || SuperAdmin || PortManager || Personnel ; 
-
   return (
     <PageComponent title="Pre/Post Repair Inspection Form">
 
-      {/* Form Content */}
-      <div className="font-roboto ppa-form-box bg-white">
-
-        {/* Header */}
-        <div className="ppa-form-header text-base flex justify-between items-center">
-          {!loadingArea ? <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span> : <span className="h-6">Control No:</span> }
-          {!loadingArea ? (
-            inspectionData?.form?.status === '0000' || inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1112' || inspectionData?.form?.status === '2023' || inspectionData?.form?.status === '2001') ? null : (
-            GSO && (<button onClick={() => handleCloseForm()} className="py-1.5 px-3 text-base btn-cancel"> Delete Form </button>)
-          ):null}
+      {/* Form */}
+      {(loadingArea || inspectionData?.form === undefined) ? (
+        <div className="flex justify-center items-center py-4">
+          <img className="h-8 w-auto mr-1" src={loading_table} alt="Loading" />
+          <span className="loading-table">Loading Pre/Post Repair Inspection Form</span>
         </div>
+      ):(
+        dataAccess != 'Not-Found' ? (
+          Access === "Access" ? (
+            <div className="font-roboto">
+              {/* Header */}
+              <div className="ppa-form-header text-base flex justify-between items-center">
+                {!loadingArea ? <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span> : <span className="h-6">Control No:</span> }
+                {!loadingArea ? (
+                  inspectionData?.form?.status === '0000' || inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1112' || inspectionData?.form?.status === '2023' || inspectionData?.form?.status === '2001') ? null : (
+                  GSO && (<button onClick={() => handleCloseForm()} className="py-1.5 px-3 text-base btn-cancel"> Delete Form </button>)
+                ):null}
+              </div>
 
-        {/* For the Forms */}
-        <div className="p-2 mt-2">
-          {loadingArea ? (
-            <div className="flex justify-center items-center py-4">
-              <img className="h-8 w-auto mr-1" src={loading_table} alt="Loading" />
-              <span className="loading-table">Loading Pre/Post Repair Inspection Form</span>
-            </div>
-          ):(
-            Restrictions || Access ? (
-              inspectionData?.form?.id == id ? (
-              <>
+              {/* Form */}
+              <div className="pl-2 pt-6 pb-6 ppa-form-box bg-white mb-6">
                 {/* Part A */}
                 <div className={`pb-6 ${inspectionData?.form?.status === '0000' ? "" : "border-b border-gray-300"}`}>
 
@@ -1211,9 +1190,10 @@ export default function InspectionForm(){
                   )}
 
                 </div>
-                
+
                 {/* Part B */}
                 {(inspectionData?.form?.status === "1004" || 
+                  inspectionData?.form?.status === "1005" ||
                   inspectionData?.form?.status === "1200" ||
                   inspectionData?.form?.status === "1130" ||
                   inspectionData?.form?.status === "1120" ||
@@ -1567,8 +1547,8 @@ export default function InspectionForm(){
 
                 {/* Part C */}
                 {(inspectionData?.form?.status === "1130" ||
-                  inspectionData?.form?.status === "1120" ||
-                  inspectionData?.form?.status === "1112" || 
+                    inspectionData?.form?.status === "1120" ||
+                    inspectionData?.form?.status === "1112" || 
                   inspectionData?.form?.status === "1111" || GSO) && (
                     <div className={`pb-6 mt-4 ${(inspectionData?.form?.status === "1130") ? "" : "border-b border-gray-300"}`}>
 
@@ -1576,7 +1556,11 @@ export default function InspectionForm(){
                       <div className="flex">
                         <h2 className="text-base font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
                         {/* For the GSO */}
-                        {inspectionData?.form?.admin_status == 1 && (
+                        {(inspectionData?.form?.status !== "1004" && 
+                          inspectionData?.form?.status !== "1005" &&
+                          inspectionData?.form?.status !== "1200" &&
+                          inspectionData?.form?.form_status != 1 && 
+                          inspectionData?.form?.form_status != 3 && GSO) && (
                           <button onClick={() => { setEnablePartC(true); }}  className="ml-3 px-6 btn-edit"> Edit Part C </button>
                         )}
                         {/* For the Assign Personnel */}
@@ -1809,7 +1793,12 @@ export default function InspectionForm(){
                       <div className="flex">
                         <h2 className="text-base font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
                         {/* For GSO */}
-                        {!enablePartA && !enablePartB && !enablePartC && !enablePartD &&  inspectionData?.form?.admin_status == 1 && (
+                        {!enablePartA && !enablePartB && !enablePartC && !enablePartD && 
+                        (inspectionData?.form?.status !== "1004" && 
+                          inspectionData?.form?.status !== "1005" &&
+                          inspectionData?.form?.status !== "1200" &&
+                          inspectionData?.form?.form_status != 1 && 
+                          inspectionData?.form?.form_status != 3 && GSO) && (
                           <button onClick={() => { setEnablePartD(true); }}  className="ml-3 px-6 btn-edit"> Edit Part D </button>
                         )}
                         {/* For Assing Personnel */}
@@ -1984,183 +1973,174 @@ export default function InspectionForm(){
 
                     </div>
                 )}
+              </div>
 
-              </>
-              ):(
-                <div className="flex justify-center items-center py-4">
-                  <span className="loading-table">Form Not Found</span>
-                </div>
-              )
-            ):(
-              (() => { window.location = '/unauthorize'; return null; })()
-            )
-          )}
-        </div>
+              {/* Form Remarks and Buttons */}
+              {(!loadingArea && inspectionData?.form?.id == id) && (
+                <div className="font-roboto ppa-form-box mt-4 bg-white">
 
-      </div>
-
-      {/* Form Remarks and Buttons */}
-      {(!loadingArea && inspectionData?.form?.id == id) && (
-        <div className="font-roboto ppa-form-box mt-4 bg-white">
-
-          {/* Caption */}
-          <div>
-            <h2 className="ppa-form-header text-base flex justify-between items-center"> 
-              {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) ? ("Pending Approval") :
-              inspectionData?.form?.status === '1200' && Admin ? ("Pending Approval") :
-              ("Remarks")} 
-            </h2>
-          </div>
-
-          <div className="mt-2 pb-6 p-2">
-            {/* Remarks */}
-            {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) ? (
-            <>
-              {/* For the Supervisor */}
-              {enableSupDecline ? (
-                <form id="submitSupReason" onSubmit={SubmitSupReason}>
-                  <div className="w-full mt-2">
-                    <select 
-                      name="supervisor_reason" 
-                      id="supervisor_reason" 
-                      autoComplete="supervisor_reason"
-                      value={reason}
-                      onChange={ev => {
-                        setReason(ev.target.value);
-                      }}
-                      className="block w-full ppa-form"
-                    >
-                      <option value="" disabled>Select a reason</option>
-                      <option value="Wrong Supervisor">Wrong Supervisor</option>
-                      <option value="Lack of Information">Lack of Information</option>
-                      <option value="Others">Others</option>
-                    </select>
+                  {/* Caption */}
+                  <div>
+                    <h2 className="ppa-form-header text-base flex justify-between items-center"> 
+                      {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) ? ("Pending Approval") :
+                      inspectionData?.form?.status === '1200' && Admin ? ("Pending Approval") :
+                      ("Remarks")} 
+                    </h2>
                   </div>
-                  {reason === 'Others' && (
-                    <div className="mt-3">
-                      <div className="w-full">
-                        <input
-                          type="text"
-                          name="reason"
-                          id="reason"
-                          value={otherReason}
-                          onChange={ev => setOtherReason(ev.target.value)}
-                          placeholder="Input your reasons"
-                          className="block w-full ppa-form"
-                        />
+
+                  <div className="mt-2 pb-6 p-2">
+                    {/* Remarks */}
+                    {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) ? (
+                    <>
+                      {/* For the Supervisor */}
+                      {enableSupDecline ? (
+                        <form id="submitSupReason" onSubmit={SubmitSupReason}>
+                          <div className="w-full mt-2">
+                            <select 
+                              name="supervisor_reason" 
+                              id="supervisor_reason" 
+                              autoComplete="supervisor_reason"
+                              value={reason}
+                              onChange={ev => {
+                                setReason(ev.target.value);
+                              }}
+                              className="block w-full ppa-form"
+                            >
+                              <option value="" disabled>Select a reason</option>
+                              <option value="Wrong Supervisor">Wrong Supervisor</option>
+                              <option value="Lack of Information">Lack of Information</option>
+                              <option value="Others">Others</option>
+                            </select>
+                          </div>
+                          {reason === 'Others' && (
+                            <div className="mt-3">
+                              <div className="w-full">
+                                <input
+                                  type="text"
+                                  name="reason"
+                                  id="reason"
+                                  value={otherReason}
+                                  onChange={ev => setOtherReason(ev.target.value)}
+                                  placeholder="Input your reasons"
+                                  className="block w-full ppa-form"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </form>
+                      ):(
+                        <div className="w-full ppa-form-remarks mt-2">Waiting for your approval</div>
+                      )}
+                    </>
+                    ):inspectionData?.form?.status === '1200' && Admin ? (
+                      <div className="w-full ppa-form-remarks mt-2">Waiting for your approval</div>
+                    ):(
+                      <div className="w-full ppa-form-remarks mt-2">
+                        {inspectionData?.form?.form_remarks}
                       </div>
-                    </div>
-                  )}
-                </form>
-              ):(
-                <div className="w-full ppa-form-remarks mt-2">Waiting for your approval</div>
+                    )}
+
+                    {/* Button */}
+                    {/* For the Supervisor */}
+                    {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) && (
+                      <div className="mt-5">
+                        {/* Enable Reason */}
+                        {enableSupDecline ? (
+                        <>
+                          {/* Confirmation */}
+                          <button onClick={() => handleSupDeclineConfirmation()} className="py-2 px-4 btn-default">
+                            Submit
+                          </button>
+                          {/* Cancel */}
+                          <button onClick={() => { setEnableSupDecline(false); setReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
+                            Cancel
+                          </button>
+                        </>
+                        ):(
+                        <>
+                          {/* Approve */}
+                          <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 btn-default">
+                            Approve
+                          </button>
+                          {/* Decline */}
+                          <button onClick={() => setEnableSupDecline(true)} className="ml-2 py-2 px-4 btn-cancel">
+                            Decline
+                          </button>
+                        </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* For the Admin */}
+                    {inspectionData?.form?.status === '1200' && Admin && (
+                      <div className="mt-5">
+                        {/* Approve */}
+                        <button
+                          onClick={() => handleAdminApprovalConfirmation()} 
+                          className="py-2 px-4 btn-default"
+                        >
+                          Approve
+                        </button>
+                      </div>
+                    )}
+
+                    {/* For the GSO */}
+                    {inspectionData?.form?.status === '1112' && GSO && (
+                      <div className="mt-5">
+                        {/* Close */}
+                        <button
+                          onClick={() => handleCloseRequest()} 
+                          className="py-2 px-4 btn-default"
+                        >
+                          Close Request
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Generate PDF by GSO */}
+                    {(inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1200' || inspectionData?.form?.status === '1130' || inspectionData?.form?.status === '1120') && GSO && (
+                      <div className="mt-5">
+                        <button type="button" onClick={handleButtonClick}
+                          className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+                          disabled={submitLoading}
+                        >
+                          {submitLoading ? (
+                            <div className="flex items-center justify-center">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-1">Generating</span>
+                            </div>
+                          ) : (
+                            'Get PDF'
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Generate PDF by Requestor */}
+                    {(inspectionData?.form?.status === '1111' && currentUserId.id == inspectionData?.form?.user_id) && (
+                      <div className="mt-5">
+                        <button type="button" onClick={handleButtonClick}
+                          className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+                          disabled={submitLoading}
+                        >
+                          {submitLoading ? (
+                            <div className="flex items-center justify-center">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-1">Generating</span>
+                            </div>
+                          ) : (
+                            'Get PDF'
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
               )}
-            </>
-            ):inspectionData?.form?.status === '1200' && Admin ? (
-              <div className="w-full ppa-form-remarks mt-2">Waiting for your approval</div>
-            ):(
-              <div className="w-full ppa-form-remarks mt-2">
-                {inspectionData?.form?.form_remarks}
-              </div>
-            )}
-
-            {/* Button */}
-            {/* For the Supervisor */}
-            {inspectionData?.form?.status === '0000' && (currentUserId.id == inspectionData?.form?.supervisor_id) && (
-              <div className="mt-5">
-                {/* Enable Reason */}
-                {enableSupDecline ? (
-                <>
-                  {/* Confirmation */}
-                  <button onClick={() => handleSupDeclineConfirmation()} className="py-2 px-4 btn-default">
-                    Submit
-                  </button>
-                  {/* Cancel */}
-                  <button onClick={() => { setEnableSupDecline(false); setReason(''); }} className="ml-2 py-2 px-4 btn-cancel">
-                    Cancel
-                  </button>
-                </>
-                ):(
-                <>
-                  {/* Approve */}
-                  <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 btn-default">
-                    Approve
-                  </button>
-                  {/* Decline */}
-                  <button onClick={() => setEnableSupDecline(true)} className="ml-2 py-2 px-4 btn-cancel">
-                    Decline
-                  </button>
-                </>
-                )}
-              </div>
-            )}
-
-            {/* For the Admin */}
-            {inspectionData?.form?.status === '1200' && Admin && (
-              <div className="mt-5">
-                {/* Approve */}
-                <button
-                  onClick={() => handleAdminApprovalConfirmation()} 
-                  className="py-2 px-4 btn-default"
-                >
-                  Approve
-                </button>
-              </div>
-            )}
-
-            {/* For the GSO */}
-            {inspectionData?.form?.status === '1112' && GSO && (
-              <div className="mt-5">
-                {/* Close */}
-                <button
-                  onClick={() => handleCloseRequest()} 
-                  className="py-2 px-4 btn-default"
-                >
-                  Close Request
-                </button>
-              </div>
-            )}
-
-            {/* Generate PDF by GSO */}
-            {(inspectionData?.form?.status === '1111' || inspectionData?.form?.status === '1200' || inspectionData?.form?.status === '1130' || inspectionData?.form?.status === '1120') && GSO && (
-              <div className="mt-5">
-                <button type="button" onClick={handleButtonClick}
-                  className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-1">Generating</span>
-                    </div>
-                  ) : (
-                    'Get PDF'
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Generate PDF by Requestor */}
-            {(inspectionData?.form?.status === '1111' && Access) && (
-              <div className="mt-5">
-                <button type="button" onClick={handleButtonClick}
-                  className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex items-center justify-center">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-1">Generating</span>
-                    </div>
-                  ) : (
-                    'Get PDF'
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-
-        </div>
+            </div>
+          ):<Restrict />
+        ):null
       )}
 
       {/* Popup */}

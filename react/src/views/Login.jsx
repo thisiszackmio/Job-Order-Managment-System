@@ -5,7 +5,7 @@ import submitAnimation from '/default/ring-loading.gif';
 
 export default function Login() {
 
-  const { setCurrentId, setUserToken, setUserCode } = useUserStateContext();
+  const { setCurrentUserId, setCurrentUserName, setCurrentUserAvatar, setCurrentUserToken, setCurrentUserCode } = useUserStateContext();
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // Variable
@@ -36,32 +36,34 @@ export default function Login() {
         });
 
         // Assuming the response contains these fields
-        const { userid, token, code } = response.data;
+        const { userId, userDet, userAvatar, token, code } = response.data;
 
         // Set the user state or context
-        setCurrentId(userid);
-        setUserToken(token);
-        setUserCode(code);
+        setCurrentUserId(userId);
+        setCurrentUserToken(token);
+        setCurrentUserCode(code);
+        setCurrentUserName(userDet);
+        setCurrentUserAvatar(userAvatar);
 
         localStorage.removeItem("logoutReason");
 
         // Redirect to home page or dashboard
         window.location.href = '/';
     } catch (error) {
-      const responseData = error.response?.data?.error;
+      // const responseData = error.response?.data?.error;
 
-      if(responseData == "TokenExist"){
-        setShowPopup(true)
-      }
-      else if(responseData == "Invalid"){
-        setInputErrors('Invalid Username / Password');
-      }
-      else if(responseData == "ChangePass"){
-        setChangePass(true);
-      }
-      else{
-        setInputErrors('Please input the username and password');
-      }
+      // if(responseData == "TokenExist"){
+      //   setShowPopup(true)
+      // }
+      // else if(responseData == "Invalid"){
+      //   setInputErrors('Invalid Username / Password');
+      // }
+      // else if(responseData == "ChangePass"){
+      //   setChangePass(true);
+      // }
+      // else{
+      //   setInputErrors('Please input the username and password');
+      // }
 
     } finally {
       setSubmitLoading(false);

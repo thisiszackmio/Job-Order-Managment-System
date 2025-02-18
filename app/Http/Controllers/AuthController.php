@@ -123,11 +123,9 @@ class AuthController extends Controller
         if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
 
         $userdata = [
-            'id' => $user->id,
             'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
             'firstname' => $user->firstname,
             'gender' => $user->gender,
-            'avatar' =>  $rootUrl . '/storage/displaypicture/' . $user->avatar
         ];
 
         // LOGS
@@ -137,7 +135,9 @@ class AuthController extends Controller
         $logs->save();
 
         return response([
-            'userid' => $userdata,
+            'userId' => $user->id,
+            'userDet' => $userdata,
+            'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
             'code' => $user->code_clearance,
             'token' => $user->createToken('main')->plainTextToken
         ]);

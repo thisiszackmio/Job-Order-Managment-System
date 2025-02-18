@@ -2,79 +2,115 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StateContext = createContext({
   currentUserId: null,
-  userToken: null,
-  userCode: null,
-  setCurrentId: () => {},
-  setUserToken: () => {},
-  setUserCode: () => {},
+  currentUserName: null,
+  currentUserAvatar: null,
+  currentUserToken: null,
+  currentUserCode: null,
+  setCurrentUserId: () => {},
+  setCurrentUserName: () => {},
+  setCurrentUserAvatar: () => {},
+  setCurrentUserToken: () => {},
+  setCurrentUserCode: () => {},
   clearUserData: () => {},
 });
 
 export const ContextProvider = ({ children }) => {
-  const [currentUserId, setCurrentId] = useState(null);
-  const [userToken, setUserToken] = useState(localStorage.getItem('TOKEN') || '');
-  const [userCode, setUserCode] = useState(localStorage.getItem('USER_CODE') || '');
+  const [currentUserId, setCurrentUserId] = useState(localStorage.getItem('USER_ID') || null);
+  const [currentUserToken, setCurrentUserToken] = useState(localStorage.getItem('TOKEN') || '');
+  const [currentUserAvatar, setCurrentUserAvatar] = useState(localStorage.getItem('USER_AVATAR') || '');
+  const [currentUserCode, setCurrentUserCode] = useState(localStorage.getItem('USER_CODE') || '');
 
-  // Use useEffect to set the initial user data from localStorage
-  useEffect(() => {
-    const storedUserId = JSON.parse(localStorage.getItem('USER_ID'));
-    if (storedUserId) {
-      setCurrentId(storedUserId);
+  // Get the initial User Details from localStorage
+  const [currentUserName, setCurrentUserName] = useState(() => {
+    const storedUserDet = localStorage.getItem('USER_DET');
+    return storedUserDet ? JSON.parse(storedUserDet) : null;
+  });
+
+  // Function to update both context and localStorage for userId
+  const updateCurrentUserId = (userId) => {
+    if (userId) {
+      localStorage.setItem('USER_ID', userId);
+    } else {
+      localStorage.removeItem('USER_ID');
     }
-  }, []);
-
-  // Create a function to update both the context and localStorage
-  const updateCurrentUserId = (id) => {
-    localStorage.setItem('USER_ID', JSON.stringify(id));
-    setCurrentId(id);
+    setCurrentUserId(userId);
   };
 
-  // Get Token
-  const setUserTokenAndLocalStorage = (token) => {
+  // Function to update Token in both context and localStorage
+  const setUserToken = (token) => {
     if (token) {
       localStorage.setItem('TOKEN', token);
     } else {
       localStorage.removeItem('TOKEN');
     }
-    setUserToken(token);
+    setCurrentUserToken(token);
   };
 
-  // Get Code Clearance
+  // Function to update User Code Clearance
   const updateUserCode = (code) => {
-    if(code) {
+    if (code) {
       localStorage.setItem('USER_CODE', code);
     } else {
       localStorage.removeItem('USER_CODE');
     }
-    setUserCode(code);
+    setCurrentUserCode(code);
   };
 
-  // Clear all user data from context and localStorage (for logout)
+  // Function to update User Details (Handles full object)
+  const setUserDetail = (userDet) => {
+    if (userDet) {
+      localStorage.setItem('USER_DET', JSON.stringify(userDet)); // Store object as JSON
+    } else {
+      localStorage.removeItem('USER_DET');
+    }
+    setCurrentUserName(userDet); // Update state with object
+  };
+
+  // Function to update User Avatar
+  const setUserAvatar = (userAvatar) => {
+    if (userAvatar) {
+      localStorage.setItem('USER_AVATAR', userAvatar);
+    } else {
+      localStorage.removeItem('USER_AVATAR');
+    }
+    setCurrentUserAvatar(userAvatar);
+  };
+
+  // Function to clear all user data from context and localStorage (for logout)
   const clearUserData = () => {
     localStorage.removeItem('USER_ID');
     localStorage.removeItem('TOKEN');
     localStorage.removeItem('USER_CODE');
-    setCurrentId(null);
-    setUserToken('');
-    setUserCode('');
-    setTimeActivity(null);
+    localStorage.removeItem('USER_DET');
+    localStorage.removeItem('USER_AVATAR');
+
+    setCurrentUserId(null);
+    setCurrentUserToken('');
+    setCurrentUserCode('');
+    setCurrentUserName(null);
+    setCurrentUserAvatar(null);
   };
 
   return (
     <StateContext.Provider
       value={{
         currentUserId,
-        setCurrentId: updateCurrentUserId,
-        userToken,
-        setUserToken: setUserTokenAndLocalStorage,
-        userCode,
-        setUserCode: updateUserCode,
+        setCurrentUserId: updateCurrentUserId,
+        currentUserName,
+        setCurrentUserName: setUserDetail,
+        currentUserAvatar,
+        setCurrentUserAvatar: setUserAvatar,
+        currentUserToken,
+        setCurrentUserToken: setUserToken,
+        currentUserCode,
+        setCurrentUserCode: updateUserCode,
         clearUserData,
       }}
     >
       {children}
     </StateContext.Provider>
   );
+  
 };
 
 export const useUserStateContext = () => useContext(StateContext);

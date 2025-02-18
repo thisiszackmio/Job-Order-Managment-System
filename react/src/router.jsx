@@ -52,66 +52,66 @@ const routes = [
     children: [
       { path: '/dashboard', element: <Navigate to="/" /> },
       { path: '/', element:  <DashboardJLMS /> },
-      { path: '/addannouncement', element: <AddAnnouncements /> },
-      { path: '/allannouncement', element: <AllAnnouncements /> },
-      { path: '/addemployee', element: <UserRegistrationJLMS /> },
-      { path: '/userlist', element: <UserListJLMS /> },
-      { path: '/userdetails/:id', element: <UserDetailsJLMS /> },
-      { path: '/user', element: <ViewUser /> },
-      { path: '/logs', element: <Logs /> }
+  //     { path: '/addannouncement', element: <AddAnnouncements /> },
+  //     { path: '/allannouncement', element: <AllAnnouncements /> },
+  //     { path: '/addemployee', element: <UserRegistrationJLMS /> },
+  //     { path: '/userlist', element: <UserListJLMS /> },
+  //     { path: '/userdetails/:id', element: <UserDetailsJLMS /> },
+  //     { path: '/user', element: <ViewUser /> },
+  //     { path: '/logs', element: <Logs /> }
     ]
   },
 
   // ---- Job Order Management System ---- //
-  {
-    path: '/joms',
-    element: <ProtectedRoute><JOMSLayout /></ProtectedRoute>,
-    children: [
-      { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
-      { path: '/joms/dashboard', element: <DashboardJOMS /> },
-      { path: '/joms/myrequest', element: <MyRequest /> },
-      { path: '/joms/personnel', element: <AddPersonnel /> },
-      { path: '/joms/vehicletype', element: <AddVehicleType /> },
-      // Inspection
-      { path: '/joms/inspection', element: <InspectionFormList /> },
-      { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
-      { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
-      // Facility
-      { path: '/joms/facilityvenue/form', element: <FacilityVenueFormRequest /> },
-      { path: '/joms/facilityvenue/form/:id', element: <FacilityVenueForm /> },
-      { path: '/joms/facilityvenue', element: <FacilityVenueList /> },
-      // Vehicle
-      { path: '/joms/vehicle/form', element: <VehicleSlipFormRequest /> },
-      { path: '/joms/vehicle/form/:id', element: <VehicleSlipForm /> },
-      { path: '/joms/vehicle', element: <VehicleSlipList /> },
-    ]
-  },
+  // {
+  //   path: '/joms',
+  //   element: <ProtectedRoute><JOMSLayout /></ProtectedRoute>,
+  //   children: [
+  //     { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
+  //     { path: '/joms/dashboard', element: <DashboardJOMS /> },
+  //     { path: '/joms/myrequest', element: <MyRequest /> },
+  //     { path: '/joms/personnel', element: <AddPersonnel /> },
+  //     { path: '/joms/vehicletype', element: <AddVehicleType /> },
+  //     // Inspection
+  //     { path: '/joms/inspection', element: <InspectionFormList /> },
+  //     { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
+  //     { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
+  //     // Facility
+  //     { path: '/joms/facilityvenue/form', element: <FacilityVenueFormRequest /> },
+  //     { path: '/joms/facilityvenue/form/:id', element: <FacilityVenueForm /> },
+  //     { path: '/joms/facilityvenue', element: <FacilityVenueList /> },
+  //     // Vehicle
+  //     { path: '/joms/vehicle/form', element: <VehicleSlipFormRequest /> },
+  //     { path: '/joms/vehicle/form/:id', element: <VehicleSlipForm /> },
+  //     { path: '/joms/vehicle', element: <VehicleSlipList /> },
+  //   ]
+  // },
 
   // ---- Asset Management System ---- //
-  {
-    path: '/ams',
-    element: <ProtectedRoute><AMSLayout /></ProtectedRoute>,
-    children: [
-      { path: '/ams', element: <Navigate to="/ams/dashboard" /> },
-      { path: '/ams/dashboard', element: <DashboardAMS /> },
-  //     {
-  //       path: '/ams/accountable-officer',
-  //       element: <AccountableOfficerAMS />
-  //     },
-  //     {
-  //       path: '/ams/add-accountable-officer',
-  //       element: <AddAccountableOfficerAMS />
-  //     },
-  //     {
-  //       path: '/ams/asset-classification',
-  //       element: <AssestClassificationAMS />
-  //     },
-  //     {
-  //       path: '/ams/add-asset-classification',
-  //       element: <AddAssestClassificationAMS />
-  //     }
-    ]
-  },
+  // {
+  //   path: '/ams',
+  //   element: <ProtectedRoute><AMSLayout /></ProtectedRoute>,
+  //   children: [
+  //     { path: '/ams', element: <Navigate to="/ams/dashboard" /> },
+  //     { path: '/ams/dashboard', element: <DashboardAMS /> },
+  // //     {
+  // //       path: '/ams/accountable-officer',
+  // //       element: <AccountableOfficerAMS />
+  // //     },
+  // //     {
+  // //       path: '/ams/add-accountable-officer',
+  // //       element: <AddAccountableOfficerAMS />
+  // //     },
+  // //     {
+  // //       path: '/ams/asset-classification',
+  // //       element: <AssestClassificationAMS />
+  // //     },
+  // //     {
+  // //       path: '/ams/add-asset-classification',
+  // //       element: <AddAssestClassificationAMS />
+  // //     }
+  //   ]
+  // },
 
   // ---- Login ---- //
   {
@@ -123,10 +123,10 @@ const routes = [
     ]
   },
   // --- Other Pages --- //
-  { path: '/unauthorize', element: <Unauthorize /> },
-  { path: '*', element: <FileNotFound /> },
-  { path: '/404', element: <FileNotFound /> },
-  { path: '/maintanance', element:<Maintenance /> },
+  // { path: '/unauthorize', element: <Unauthorize /> },
+  // { path: '*', element: <FileNotFound /> },
+  // { path: '/404', element: <FileNotFound /> },
+  // { path: '/maintanance', element:<Maintenance /> },
 ];
 
 const router = createBrowserRouter(routes);

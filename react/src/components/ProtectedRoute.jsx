@@ -3,9 +3,9 @@ import { Navigate } from 'react-router-dom';
 import { useUserStateContext } from '../context/ContextProvider';
 
 const ProtectedRoute = ({ children }) => {
-  const { userToken } = useUserStateContext();
+  const { currentUserToken } = useUserStateContext();
 
-  if (!userToken) {
+  if (!currentUserToken) {
     return <Navigate to="/login" />;
   }
 

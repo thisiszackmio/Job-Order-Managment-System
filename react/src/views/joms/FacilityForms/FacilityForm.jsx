@@ -1023,7 +1023,7 @@ export default function FacilityForm(){
                   </td>
                   <td className="border border-black p-0 font-arial">
                     <div className="border-b text-xs border-black px-3 py-3" style={{ fontWeight: 'bold' }}>RF 03-2018 ver 1</div>
-                    <div className="border-black text-xs px-3 py-3" style={{ fontWeight: 'bold' }}>DATE: May 31, 2023</div>
+                    <div className="border-black text-xs px-3 py-3" style={{ fontWeight: 'bold' }}>DATE: {formatDate(facData?.form?.created_at)}</div>
                   </td>
                 </tr>
 

@@ -10,7 +10,7 @@ import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-sv
 
 export default function FacilityVenueFormList(){
 
-  const { userCode } = useUserStateContext();
+  const { currentUserCode } = useUserStateContext();
 
   //Date Format 
   function formatDate(dateString) {
@@ -115,7 +115,7 @@ export default function FacilityVenueFormList(){
   };
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
@@ -183,7 +183,7 @@ export default function FacilityVenueFormList(){
               currentList.length > 0 ? (
                 currentList.map((list)=>(
                   <tr key={list.id}>
-                    <td className="px-2 py-2 text-lg text-center font-bold table-font">
+                    <td className="px-2 py-2 text-center font-bold table-font">
                       <Link
                         to={`/joms/facilityvenue/form/${list.id}`}
                         className="relative group inline-flex items-center"

@@ -6,10 +6,11 @@ import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../axios";
 import { useUserStateContext } from "../../context/ContextProvider";
 import Popup from "../../components/Popup";
+import Restrict from "../../components/Restrict";
 
 export default function UserRegistrationJLMS(){
 
-  const { userCode } = useUserStateContext();
+  const { currentUserCode } = useUserStateContext();
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -173,15 +174,15 @@ export default function UserRegistrationJLMS(){
   }
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Authorize = codes.includes("HACK");
 
   return(
-    Authorize ? (
-      <PageComponent title="Add Employee">
+    <PageComponent title="Add Employee">
 
-        {/* Main Content */}
+      {/* Main Content */}
+      {Authorize ? (
         <div className="font-roboto ppa-form-box">
 
           <div className="ppa-form-header"> Input Employee Details </div>
@@ -676,21 +677,20 @@ export default function UserRegistrationJLMS(){
           </div>
 
         </div>
+      ):(
+      <Restrict />
+      )}
 
-        {/* Popup */}
-        {showPopup && (
-          <Popup
-            popupContent={popupContent}
-            popupMessage={popupMessage}
-            justClose={justClose}
-            closePopup={closePopup}
-          />
+      {/* Popup */}
+      {showPopup && (
+        <Popup
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          justClose={justClose}
+          closePopup={closePopup}
+        />
 
-        )}
-
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
+      )}
+    </PageComponent>
   );
 }

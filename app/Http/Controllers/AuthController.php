@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Validation\Rules\Password;
+use Jenssegers\Agent\Agent;
 
 class AuthController extends Controller
 {
@@ -97,6 +98,8 @@ class AuthController extends Controller
         // Root URL
         $rootUrl = URL::to('/');
 
+        $agent = new Agent();
+
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string'
@@ -128,11 +131,19 @@ class AuthController extends Controller
             'gender' => $user->gender,
         ];
 
-        // LOGS
-        $logs = new LogsModel();
-        $logs->category = 'SYS';
-        $logs->message = $user->firstname.' '.$user->middlename.'. '.$user->lastname.' has logged into the system.';
-        $logs->save();
+        // Store on the security database to get the PC Name for tracking
+        $security = new PPASecurity();
+        $security->user_id = $user->id;
+        $security->hostingname = $pcName;
+        $security->browser = $agent->browser();
+        
+        if($security->save()){
+            // LOGS
+            $logs = new LogsModel();
+            $logs->category = 'SYS';
+            $logs->message = $user->firstname.' '.$user->middlename.'. '.$user->lastname.' has logged into the system using '.$pcName.'.';
+            $logs->save();
+        }
 
         return response([
             'userId' => $user->id,
@@ -179,7 +190,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Password updated successfully'], 200);
     }
 
-
     /**
      * Logout on the system
      */
@@ -190,14 +200,16 @@ class AuthController extends Controller
 
         // Format the full name
         $fullName = trim($user->firstname . ' ' . ($user->middlename ? $user->middlename[0] . '. ' : '') . $user->lastname);
+        $pcName = gethostname();
 
         // LOGS
         $logs = new LogsModel();
         $logs->category = 'SYS';
-        $logs->message = $fullName .' '.$request->input('logMessage');
+        $logs->message = $fullName .' has logged out on the system using '.$pcName.'.';
 
         if($logs->save() === True){
             $user->currentAccessToken()->delete();
+            PPASecurity::where('user_id', $user->id)->delete();
         }
 
         return response([

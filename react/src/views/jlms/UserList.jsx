@@ -3,19 +3,48 @@ import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
 import loading_table from "/default/ring-loading.gif";
+import loadingAnimation from '/default/loading-new.gif';
+import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faCircle } from '@fortawesome/free-solid-svg-icons';
+import Restrict from "../../components/Restrict";
 
 export default function UserListJLMS(){
+  const { currentUserCode } = useUserStateContext();
 
-  const { userCode } = useUserStateContext();
-
-  // Loading
+  // loading Function
+  const [loading, setLoading] = useState(true);
   const [loadingArea, setLoadingArea] = useState(true);
 
   const [userList, setUserList] = useState([]);
+
+  // Disable the Scroll on Popup
+  useEffect(() => {
+  
+    // Define the classes to be added/removed
+    const loadingClass = 'loading-show';
+
+    // Function to add the class to the body
+    const addLoadingClass = () => document.body.classList.add(loadingClass);
+
+    // Function to remove the class from the body
+    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
+
+    // Add or remove the class based on showPopup state
+    if(loading) {
+      addLoadingClass();
+    }
+    else {
+      removeLoadingClass();
+    }
+
+    // Cleanup function to remove the class when the component is unmounted or showPopup changes
+    return () => {
+      removeLoadingClass();
+    };
+  }, [loading]);
 
   // Get User Employee's Data
   useEffect(() => {  
@@ -40,6 +69,7 @@ export default function UserListJLMS(){
       setUserList(mappedData)
     })
     .finally(() => {
+      setLoading(false);
       setLoadingArea(false);
     });
 
@@ -73,15 +103,24 @@ export default function UserListJLMS(){
   };
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("HACK") || codes.includes("GSO") || codes.includes("DM") || codes.includes("AM") || codes.includes("PM");
+  const Authorize = codes.includes("GSO") || codes.includes("DM") || codes.includes("AM") || codes.includes("PM") || codes.includes("HACK");
 
   return(
-    Authorize ? (
-      <PageComponent title="Employee List">
-        {/* Main Content */}
+    <PageComponent title="Employee List">
+
+      {/* Preload Screen */}
+      {loading && (
+        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
+          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
+          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
+        </div>
+      )}
+
+      {Authorize ? (
         <div className="font-roboto">
+
           {/* Search Filter */}
           <div className="mt-5 mb-4 flex">
 
@@ -120,39 +159,41 @@ export default function UserListJLMS(){
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
-            {loadingArea ? (
-              <tr>
-                <td colSpan={8} className="px-2 py-4 text-center text-sm text-gray-600">
-                  <div className="flex justify-center items-center">
-                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                    <span className="loading-table">Loading Employees</span>
-                  </div>
-                </td>
-              </tr>
-            ):(
-            <>
-              {currentUser.length > 0 ? (
-                currentUser.map((getData)=>(
-                  <tr key={getData.id}>
-                    <td className="px-3 py-2 text-center table-font">{getData.id}</td>
-                    <td className="px-3 py-2 text-center table-font w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
-                    <td className="px-3 py-2 text-left table-font"><Link to={`/userdetails/${getData.id}`}>{getData.name}</Link></td>
-                    <td className="px-3 py-2 text-center table-font">{getData.division}</td>
-                    <td className="px-3 py-2 text-center table-font">{getData.position}</td>
-                    <td className="px-3 py-2 text-center table-font">{getData.username}</td>
-                    <td className="px-3 py-2 text-center table-font">{getData.code_clearance}</td>
-                    <td className="px-3 py-2 text-center table-font">{getData.status == 1 || getData.status == 2 ? ("Active") : ("Deleted")}</td>
-                  </tr>
-                ))
-              ):(
+              {loadingArea ? (
                 <tr>
                   <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                    No records found.
+                    <div className="flex justify-center items-center py-4">
+                      <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                      <span className="loading-table">Loading Employee List</span>
+                    </div>
                   </td>
                 </tr>
+              ):(
+                currentUser.length > 0 ? (
+                  currentUser.map((getData)=>(
+                    <tr key={getData.id}>
+                      <td className="px-3 py-2 text-center">{getData.id}</td>
+                      <td className="px-3 py-2 text-center table-font w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
+                      <td className="px-3 py-2 text-left table-font"><Link to={`/userdetails/${getData.id}`}>{getData.name}</Link></td>
+                      <td className="px-3 py-2 text-center table-font">{getData.division}</td>
+                      <td className="px-3 py-2 text-center table-font">{getData.position}</td>
+                      <td className="px-3 py-2 text-center table-font">{getData.username}</td>
+                      <td className="px-3 py-2 text-center table-font">{getData.code_clearance}</td>
+                      <td className="px-3 py-2 text-center table-font">
+                        {getData.status == 0 && (<FontAwesomeIcon className="user-deleted" title="Deleted" icon={faCircle} />)}
+                        {getData.status == 1 && (<FontAwesomeIcon className="user-active" title="Active" icon={faCircle} />)}
+                        {getData.status == 2 && (<FontAwesomeIcon className="user-need" title="Not Activate" icon={faCircle} />)}
+                      </td>
+                    </tr>
+                  ))
+                ):(
+                  <tr>
+                    <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
+                      No records found.
+                    </td>
+                  </tr>
+                )
               )}
-            </>
-            )}
             </tbody>
           </table>
           {/* Pagination */}
@@ -178,10 +219,12 @@ export default function UserListJLMS(){
               nextLinkClassName="page-link"
             />
           )}
+
         </div>
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
-  )
+      ):(
+        <Restrict />
+      )}
+      
+    </PageComponent>
+  );
 }

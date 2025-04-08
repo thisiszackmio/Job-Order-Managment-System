@@ -28,7 +28,7 @@ class LogsController extends Controller
         $endDate = Carbon::createFromFormat('Y-m-d', $getEndDate);
 
         // Retrieve logs within the selected date range
-        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'asc')->get();
+        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
 
         return response()->json($logs);
     }

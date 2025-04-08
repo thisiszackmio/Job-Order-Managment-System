@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\NotificationModel;
 use Illuminate\Support\Facades\URL;
+use App\Models\InspectionModel;
+use App\Models\FacilityVenueModel;
+use App\Models\VehicleSlipModel;
 use Carbon\Carbon;
 
 class NotificationController extends Controller
@@ -22,10 +25,14 @@ class NotificationController extends Controller
 
         // Root URL
         $rootUrl = URL::to('/');
+
+        // Calculate the date 1 week
+        $oneDayInterval = Carbon::now()->subDays(7);
+        NotificationModel::where('receiver_id', $id)->where('created_at', '<', $oneDayInterval)->update(['status' => 0]);
     
         // Retrieve all notifications
-        $NotificationRequest = NotificationModel::where('receiver_id', $id)->whereIn('status', [1, 2])->orderBy('created_at', 'desc')->get();
-        $NotificationUnread = NotificationModel::where('receiver_id', $id)->where('status', 2)->get();
+        $NotificationRequest = NotificationModel::where('receiver_id', $id)->whereIn('status', [1, 2, 4])->orderBy('created_at', 'desc')->get();
+        $NotificationUnread = NotificationModel::where('receiver_id', $id)->whereIn('status', [2, 4])->get();
     
         // Initialize an empty array to store notification data
         $notiData = [];
@@ -74,30 +81,30 @@ class NotificationController extends Controller
 
     }
 
-    public function updateOldNotifications($id) {
-        // Get the current time minus 15 days
-        $fifteenDaysAgo = Carbon::now()->subDays(15);
+    // public function updateOldNotifications($id) {
+    //     // Get the current time minus 15 days
+    //     $fifteenDaysAgo = Carbon::now()->subDays(15);
     
-        // Update notifications for the specific user if older than 15 days
-        $updatedCount = NotificationModel::where('receiver_id', $id)
-                                         ->where('created_at', '<', $fifteenDaysAgo)
-                                         ->where('status', 2)
-                                         ->update(['status' => 1]);
+    //     // Update notifications for the specific user if older than 15 days
+    //     $updatedCount = NotificationModel::where('receiver_id', $id)
+    //                                      ->where('created_at', '<', $fifteenDaysAgo)
+    //                                      ->where('status', 2)
+    //                                      ->update(['status' => 1]);
     
-        return response()->json(['message' => "$updatedCount old notifications updated successfully."], 200);
-    }
+    //     return response()->json(['message' => "$updatedCount old notifications updated successfully."], 200);
+    // }
 
-    public function deleteOldNotifications($id) {
-        // Calculate the date 6 months ago
-        $sixMonthsAgo = Carbon::now()->subMonths(6);
+    // public function deleteOldNotifications($id) {
+    //     // Calculate the date 6 months ago
+    //     $sixMonthsAgo = Carbon::now()->subMonths(6);
     
-        // Find and delete notifications that are older than 6 months
-        $deletedCount = NotificationModel::where('created_at', '<', $sixMonthsAgo)
-                                        ->where('receiver_id', $id)
-                                        ->where('status', 1)
-                                        ->delete();
+    //     // Find and delete notifications that are older than 6 months
+    //     $deletedCount = NotificationModel::where('created_at', '<', $sixMonthsAgo)
+    //                                     ->where('receiver_id', $id)
+    //                                     ->where('status', 1)
+    //                                     ->delete();
     
-        // Return a response indicating how many records were deleted
-        return response()->json(['message' => "$deletedCount old notifications removed successfully."], 200);
-    }
+    //     // Return a response indicating how many records were deleted
+    //     return response()->json(['message' => "$deletedCount old notifications removed successfully."], 200);
+    // }
 }

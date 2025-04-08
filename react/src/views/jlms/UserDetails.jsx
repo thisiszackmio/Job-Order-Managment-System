@@ -4,81 +4,30 @@ import submitAnimation from '/default/ring-loading.gif';
 import { Link, useParams } from "react-router-dom";
 import axiosClient from "../../axios";
 import loading_table from "/default/ring-loading.gif";
+import loadingAnimation from '/default/loading-new.gif';
+import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../context/ContextProvider";
 import Popup from "../../components/Popup";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import Restrict from "../../components/Restrict";
 
 
 export default function UserDetailsJLMS(){
+  const { currentUserCode, currentUserName } = useUserStateContext();
 
-  const { currentUserId, userCode } = useUserStateContext();
+  const {id} = useParams();
+
+  // loading Function
+  const [loading, setLoading] = useState(true);
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
-  // Loading
-  const [loadingArea, setLoadingArea] = useState(true);
-
   const [userDet, getUserDet] = useState([]);
-
-  // Disable the Scroll on Popup
-  useEffect(() => {
-    
-    // Define the classes to be added/removed
-    const popupClass = 'popup-show';
-
-    // Function to add the class to the body
-    const addPopupClass = () => document.body.classList.add(popupClass);
-
-    // Function to remove the class from the body
-    const removePopupClass = () => document.body.classList.remove(popupClass);
-
-    // Add or remove the class based on showPopup state
-    if (showPopup) {
-      addPopupClass();
-    } 
-    else {
-      removePopupClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removePopupClass();
-    };
-  }, [showPopup]);
-
-  const {id} = useParams();
-
-  // Get User Detail
-  useEffect(() => {
-    axiosClient
-    .get(`/userdetail/${id}`)
-    .then((response) => {
-      const userDet = response.data;
-
-      // Clerance Label
-      const clearanceLabels = {
-        'MEM': 'Member',
-        'HACK': 'SuperAdmin',
-        'AM': 'AdminManager',
-        'PM': 'PortManager',
-        'DM': 'DivisionManager',
-        'PT': 'ProcurementTeam',
-        'AP': 'Assign Personnel',
-        'AU': 'Authority Person',
-      };
-
-      const cc = userDet.code_clearance.split(',').map(code => clearanceLabels[code.trim()] || code).join(', ');
-
-      getUserDet({...userDet, cc});
-    })
-    .finally(() => {
-      setLoadingArea(false);
-    });
-  }, [id]);
+  const [getSec, setGetSec] = useState([]);
 
   // Variable
   const [fname, setFname] = useState('');
@@ -103,16 +52,6 @@ export default function UserDetailsJLMS(){
   const [enableEsig, setChangeEsig] = useState(false);
   const [enablePassword, setChangePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // Cancel Form
-  const handleCancel = () => {
-    setEditUser(false);
-    setChangeCC(false);
-    setChangeEsig(false);
-    setChangeAvatar(false);
-    setChangePassword(false);
-    setActionInProgress(false);
-  };
 
   // Code Clearance
   const handleCheckboxChange = (e, role) => {
@@ -142,17 +81,81 @@ export default function UserDetailsJLMS(){
     setUploadEsig(selectedEsigFile);
   }
 
-  // Delete Account
-  const handleDeleteConfirmation = () => {
-    setShowPopup(true);
-    setPopupContent('delete_user');
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">If you delete this, Bye-Bye.</p>
-      </div>
-    );
-  } 
+  // Disable the Scroll on Popup
+  useEffect(() => {
+    
+    // Define the classes to be added/removed
+    const popupClass = 'popup-show';
+    const loadingClass = 'loading-show';
+
+    // Function to add the class to the body
+    const addPopupClass = () => document.body.classList.add(popupClass);
+    const addLoadingClass = () => document.body.classList.add(loadingClass);
+
+    // Function to remove the class from the body
+    const removePopupClass = () => document.body.classList.remove(popupClass);
+    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
+
+    // Add or remove the class based on showPopup state
+    if (showPopup) {
+      addPopupClass();
+    }
+    else if(loading) {
+      addLoadingClass();
+    } 
+    else {
+      removePopupClass();
+      removeLoadingClass();
+    }
+
+    // Cleanup function to remove the class when the component is unmounted or showPopup changes
+    return () => {
+      removePopupClass();
+      removeLoadingClass();
+    };
+  }, [showPopup, loading]);
+
+  // Get User Detail
+  useEffect(() => {
+    axiosClient
+    .get(`/userdetail/${id}`)
+    .then((response) => {
+      const userDet = response.data;
+
+      // Clerance Label
+      const clearanceLabels = {
+        'MEM': 'Member',
+        'HACK': 'SuperAdmin',
+        'AM': 'AdminManager',
+        'PM': 'PortManager',
+        'DM': 'DivisionManager',
+        'PT': 'ProcurementTeam',
+        'AP': 'Assign Personnel',
+        'AU': 'Authority Person',
+      };
+
+      const cc = userDet.code_clearance.split(',').map(code => clearanceLabels[code.trim()] || code).join(', ');
+
+      getUserDet({...userDet, cc});
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [id]);
+
+  // Get User Active Login
+  useEffect(() => {
+    axiosClient
+    .get(`/getsecurity/${id}`)
+    .then((response) => {
+      const security = response.data;
+
+      setGetSec(security);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [id]);
 
   // Dev Error Text
   const DevErrorText = (
@@ -173,11 +176,21 @@ export default function UserDetailsJLMS(){
     "Terminal Management Office - Tubod"
   ];
 
+  // Cancel Form
+  const handleCancel = () => {
+    setEditUser(false);
+    setChangeCC(false);
+    setChangeEsig(false);
+    setChangeAvatar(false);
+    setChangePassword(false);
+    setActionInProgress(false);
+  };
+
   //Submit Button on Update User Details
   function SubmitUserDetails(e){
     e.preventDefault();
 
-    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user detail information.`;
+    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user detail information.`;
 
     setSubmitLoading(true);
 
@@ -257,7 +270,7 @@ export default function UserDetailsJLMS(){
 
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user code clearance.`;
+    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user code clearance.`;
 
     axiosClient
     .put(`updatecc/${id}`, {
@@ -323,7 +336,7 @@ export default function UserDetailsJLMS(){
 
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user avatar.`;
+    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user avatar.`;
 
     const formData = new FormData();
     formData.append('_method', 'PUT');
@@ -395,7 +408,7 @@ export default function UserDetailsJLMS(){
 
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user e-signature.`;
+    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user e-signature.`;
 
     const formData = new FormData();
     formData.append('_method', 'PUT');
@@ -414,7 +427,7 @@ export default function UserDetailsJLMS(){
       setPopupMessage(
         <div>
           <p className="popup-title">Success</p>
-          <p className="popup-message">The user avatar has been updated</p>
+          <p className="popup-message">The user esign has been updated</p>
         </div>
       );
     })
@@ -467,7 +480,7 @@ export default function UserDetailsJLMS(){
 
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user password.`;
+    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user password.`;
 
     if(!getpassword){
       setShowPopup(true);
@@ -540,11 +553,23 @@ export default function UserDetailsJLMS(){
 
   }
 
+  // Delete Account
+  const handleDeleteConfirmation = () => {
+    setShowPopup(true);
+    setPopupContent('delete_user');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">If you delete this, Bye-Bye.</p>
+      </div>
+    );
+  } 
+
   // Delete the account
   function handleDeleteClick(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.firstname} has removed ${userDet.firstname} ${userDet.lastname} from the database.`;
+    const logs = `${currentUserName.firstname} has removed ${userDet.firstname} ${userDet.lastname} from the database.`;
 
     axiosClient
     .delete(`/deleteuser/${id}`, {
@@ -570,7 +595,36 @@ export default function UserDetailsJLMS(){
     });
   }
 
-  // Popup Button Function
+  // Remove Token
+  function handleDeleteToken(id){
+    setSubmitLoading(true);
+
+    const logs = `${currentUserName.firstname} has removed ${userDet.firstname} session.`;
+
+    axiosClient
+    .delete(`/deletesecurity/${id}`, {
+      params: { logs: logs }
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success</p>
+          <p className="popup-message">Token remove successfully</p>
+        </div>
+      );
+    })
+    .catch(() => {
+      setPopupContent('error');
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
   //Close Popup on Error
   function justClose() {
     setShowPopup(false);
@@ -584,106 +638,87 @@ export default function UserDetailsJLMS(){
   }
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Authorize = codes.includes("HACK") || codes.includes("GSO") || codes.includes("AM") || codes.includes("PM") || codes.includes("DM");
   const SuperAdmin = codes.includes("HACK");
 
   return(
-    Authorize ? (
-      <PageComponent title="Employee Details">
-        {/* Main Content */}
-        <div className="font-roboto">
-          {loadingArea ? (
-            <div className="flex justify-center items-center">
-              <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-              <span className="loading-table">Loading Employee Details</span>
-            </div>
-          ):(
-          <>
-            {/* Button */}
-            <div className="flex">
-              {/* Back to User */}
-              <button className="py-2 px-4 btn-default">
-                <Link to="/userlist">Back to User List</Link>
+    <PageComponent title="Employee Details">
+
+      {/* Preload Screen */}
+      {loading && (
+        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
+          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
+          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="font-roboto">
+
+        {Authorize ? (
+        <>
+          {/* Button */}
+          <div className="flex">
+            {/* Back to User */}
+            <button className="py-2 px-4 btn-default">
+              <Link to="/userlist">Back to User List</Link>
+            </button>
+            {(userDet?.status != 0 && SuperAdmin) && (
+            <>
+              {/* Update Details */}
+              <button onClick={() => { setEditUser(true); setActionInProgress(true);}} 
+                className="ml-2 py-2 px-4 btn-default"
+                disabled={actionInProgress}
+              >
+                Update Details
               </button>
-              {(userDet?.status != 0 && SuperAdmin) ? (
-              <>
-                {/* Update Details */}
-                <button 
-                  onClick={() => {
-                    setEditUser(true); 
-                    setActionInProgress(true);
-                  }} 
-                  className="ml-2 py-2 px-4 btn-default"
-                  disabled={actionInProgress}
-                >
-                  Update Details
+
+              {/* Change Code Clearance */}
+              <button onClick={() => { setChangeCC(true); setActionInProgress(true); }} 
+                className="ml-2 py-2 px-4 btn-default"
+                disabled={actionInProgress}
+              >
+                Change CC
+              </button>
+
+              {/* Change Avatar */}
+              <button onClick={() => { setChangeAvatar(true); setActionInProgress(true); }} 
+                className="ml-2 py-2 px-4 btn-default"
+                disabled={actionInProgress}
+              >
+                Change Avatar
+              </button>
+
+              {/* Change Esig */}
+              <button onClick={() => { setChangeEsig(true); setActionInProgress(true); }} 
+                className="ml-2 py-2 px-4 btn-default"
+                disabled={actionInProgress}
+              >
+                Change Esig
+              </button>
+
+              {/* Change Password */}
+              <button onClick={() => { setChangePassword(true); setActionInProgress(true); }} 
+                className="ml-2 py-2 px-4 btn-default"
+                disabled={actionInProgress}
+              >
+                Change Password
+              </button>
+
+              {/* Delete Account User */}
+              {userDet.id === 1 ? null : (
+                <button onClick={() => handleDeleteConfirmation()} className="ml-2 py-2 px-4 btn-cancel">
+                  Delete User
                 </button>
+              )}
+            </>  
+            )}
+          </div>
 
-                {/* Change Code Clearance */}
-                <button 
-                  onClick={() => {
-                    setChangeCC(true);
-                    setActionInProgress(true);
-                  }} 
-                  className="ml-2 py-2 px-4 btn-default"
-                  disabled={actionInProgress}
-                >
-                  Change CC
-                </button>
-
-                {/* Change Avatar */}
-                <button 
-                  onClick={() => {
-                    setChangeAvatar(true);
-                    setActionInProgress(true);
-                  }} 
-                  className="ml-2 py-2 px-4 btn-default"
-                  disabled={actionInProgress}
-                >
-                  Change Avatar
-                </button>
-
-                {/* Change Esig */}
-                <button 
-                  onClick={() => {
-                    setChangeEsig(true);
-                    setActionInProgress(true);
-                  }} 
-                  className="ml-2 py-2 px-4 btn-default"
-                  disabled={actionInProgress}
-                >
-                  Change Esig
-                </button>
-
-                {/* Change Password */}
-                <button 
-                  onClick={() => {
-                    setChangePassword(true);
-                    setActionInProgress(true);
-                  }} 
-                  className="ml-2 py-2 px-4 btn-default"
-                  disabled={actionInProgress}
-                >
-                  Change Password
-                </button>
-
-                {/* Delete Account User */}
-                {userDet.id === 1 ? null : (
-                  <button
-                    onClick={() => handleDeleteConfirmation()} 
-                    className="ml-2 py-2 px-4 btn-cancel"
-                  >
-                    Delete User
-                  </button>
-                )}
-              </>
-              ):null}
-            </div>
-
-            {/* Employee List */}
-            <div className="grid grid-cols-2 gap-4 mt-10">
+          {/* Employee List */}
+          <div className="grid grid-cols-2 gap-4 mt-10">
 
             {/* User Details */}
             <div className="col-span-1">
@@ -696,29 +731,16 @@ export default function UserDetailsJLMS(){
                   </label> 
                 </div>
                 <div className="w-full pl-1 text-lg">
-                  {userDet?.status != 0 ? ("Active"):("Deleted")}
+                  {userDet?.status == 0 && "Deleted"}
+                  {userDet?.status == 1 && "Active"}
+                  {userDet?.status == 2 && "Need Activate"}
                 </div>
               </div>
 
-              {/* Name (If deleted) */}
               {userDet?.status == 0 ? (
-              <div className="flex items-center mt-5">
-                <div className="w-56">
-                  <label className="block text-lg font-bold leading-6 text-gray-900">
-                    Name:
-                  </label> 
-                </div>
-                <div className="w-full pl-1 text-lg">
-                  {userDet.name}
-                </div>
-                    
-              </div>
-              ):null}
-
-              {userDet?.status != 0 ? (
               <>
                 {/* User ID */}
-                <div className="flex items-center mt-5">
+                <div className="flex items-center mt-4">
                   <div className="w-56">
                     <label className="block text-lg font-bold leading-6 text-gray-900">
                       User ID:
@@ -729,11 +751,37 @@ export default function UserDetailsJLMS(){
                   </div>
                 </div>
 
+                {/* User Name */}
+                <div className="flex items-center mt-4">
+                  <div className="w-56">
+                    <label className="block text-lg font-bold leading-6 text-gray-900">
+                      Name:
+                    </label> 
+                  </div>
+                  <div className="w-full pl-1 text-lg">
+                    {userDet.name}
+                  </div>      
+                </div>
+              </>
+              ):(
+              <>
                 {/* User Details Form */}
                 <form id="user_details" onSubmit={SubmitUserDetails}>
 
+                  {/* User ID */}
+                  <div className="flex items-center mt-4">
+                    <div className="w-56">
+                      <label className="block text-lg font-bold leading-6 text-gray-900">
+                        User ID:
+                      </label> 
+                    </div>
+                    <div className="w-full pl-1 text-lg">
+                      {userDet?.id}
+                    </div>
+                  </div>
+
                   {/* Name */}
-                  <div className="flex items-center mt-5">
+                  <div className="flex items-center mt-4">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         Name:
@@ -785,7 +833,7 @@ export default function UserDetailsJLMS(){
                   </div>
 
                   {/* Position */}
-                  <div className="flex items-center mt-5">
+                  <div className="flex items-center mt-4">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                       Position:
@@ -811,7 +859,7 @@ export default function UserDetailsJLMS(){
                   </div>
 
                   {/* Division */}
-                  <div className="flex items-center mt-5">
+                  <div className="flex items-center mt-4">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                       Division:
@@ -843,7 +891,7 @@ export default function UserDetailsJLMS(){
                   </div>
 
                   {/* Username */}
-                  <div className="flex items-center mt-5">
+                  <div className="flex items-center mt-4">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                       Username:
@@ -871,10 +919,10 @@ export default function UserDetailsJLMS(){
                   </div>
 
                 </form>
-              
+
                 {/* Code Clearance */}
                 <form id="user_code" onSubmit={SubmitCodeClearance}>
-                  <div className="flex items-center mt-5">
+                  <div className="flex items-center mt-4">
                     <div className="w-56">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         Code Clearance:
@@ -1027,24 +1075,6 @@ export default function UserDetailsJLMS(){
                           </div>
                         </div>
 
-                        {/* For Assign Personnel (Neccessary) */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mem-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('AP')}
-                              onChange={(e) => handleCheckboxChange(e, 'AP')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Assign Personnel (AP)
-                            </label> 
-                          </div>
-                        </div>
-
                       </div>
                     ):(
                       <div className="w-full pl-1 text-lg">
@@ -1053,142 +1083,172 @@ export default function UserDetailsJLMS(){
                     )}     
                   </div>
                 </form>
-              </>
-              ):null}
 
-              {/* Avatar */}
-              {enableAvatar && (
-                <form id="user_avatar" onSubmit={SubmitAvatar} method="POST" action="#" encType="multipart/form-data">
-                  <div className="flex items-center mt-5">
-                    <div className="w-36">
-                    <label htmlFor="ppa-avatar" className="block text-base font-medium leading-6 text-black">
-                        Upload Avatar:
-                      </label> 
-                    </div>
+                {/* Esignature */}
+                {enableEsig && (
+                  <form id="user_esig" onSubmit={SubmitEsig} action="#" method="POST" encType="multipart/form-data">
+                    <div className="flex items-center mt-5">
+                      <div className="w-36">
+                      <label htmlFor="ppa-esignature" className="block text-base font-medium leading-6 text-black">
+                          Upload Esig:
+                        </label> 
+                      </div>
 
-                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                      <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                        </svg>
-                        <div className="mt-3 text-sm leading-6 text-gray-600">
-                          <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload your new avatar here</span>
-                            <input 
-                              id="ppa-avatar" 
-                              name="ppa-avatar" 
-                              type="file" 
-                              accept=".png, .jpg, .jpeg"
-                              className="sr-only" 
-                              onChange={handleAvatarChange} 
-                            />
-                          </label>
+                      <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                        <div className="text-center">
+                          <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                          </svg>
+                          <div className="mt-3 text-sm leading-6 text-gray-600">
+                            <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                              <span>Upload your new esig here</span>
+                              <input 
+                                id="ppa-esignature" 
+                                name="ppa-esignature" 
+                                type="file" 
+                                accept=".png"
+                                className="sr-only" 
+                                onChange={handleEsigChange}  
+                              />
+                            </label>
+                          </div>
+                          <p className="pl-1 text-sm">PNG only up to 2MB</p>
+                          {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
                         </div>
-                        <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
-                        {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
                       </div>
                     </div>
-                  </div>
-                </form>
-              )}
+                  </form>
+                )}
 
-              {/* Esignature */}
-              {enableEsig && (
-                <form id="user_esig" onSubmit={SubmitEsig} action="#" method="POST" encType="multipart/form-data">
-                  <div className="flex items-center mt-5">
-                    <div className="w-36">
-                    <label htmlFor="ppa-esignature" className="block text-base font-medium leading-6 text-black">
-                        Upload Esig:
-                      </label> 
-                    </div>
-
-                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                      <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                        </svg>
-                        <div className="mt-3 text-sm leading-6 text-gray-600">
-                          <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload your new esig here</span>
-                            <input 
-                              id="ppa-esignature" 
-                              name="ppa-esignature" 
-                              type="file" 
-                              accept=".png"
-                              className="sr-only" 
-                              onChange={handleEsigChange}  
-                            />
-                          </label>
-                        </div>
-                        <p className="pl-1 text-sm">PNG only up to 2MB</p>
-                        {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              )}
-
-              {/* Password */}
-              {enablePassword && (
-                <form id="user_pwd" onSubmit={SubmitPwd} action="#" method="POST">
-                  <div className="flex items-center mt-10">
-                    <div className="w-36">
-                      <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
-                        Password:
-                      </label> 
-                    </div>
-                    <div className="w-full relative">
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={getpassword}
-                      onChange={ev => setPassword(ev.target.value)}
-                      className="block w-full ppa-form input-placeholder"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                    </button>
-                    </div>
-                  </div>
-                </form>
-              )}
-
-            </div>
-
-            {/* User Avatar and E-sig */}
-            {userDet?.status != 0 ? (
-              <div className="col-span-1 flex flex-col items-center">
                 {/* Avatar */}
-                <div>
-                  <img src={userDet.avatar} onContextMenu={(e) => e.preventDefault()} draggable="false" className="user-image" alt="" />
-                </div>
-                {/* Esig */}
-                <div className="esig-area flex flex-col items-center border-b border-black relative">
-                  <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" onContextMenu={(e) => e.preventDefault()} draggable="false" />
-                  <span className="text-base font-bold ppa-user-name">{userDet.name}</span>
-                </div>
-              </div>
-            ):null}
+                {enableAvatar && (
+                  <form id="user_avatar" onSubmit={SubmitAvatar} method="POST" action="#" encType="multipart/form-data">
+                    <div className="flex items-center mt-5">
+                      <div className="w-36">
+                      <label htmlFor="ppa-avatar" className="block text-base font-medium leading-6 text-black">
+                          Upload Avatar:
+                        </label> 
+                      </div>
+
+                      <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                        <div className="text-center">
+                          <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                          </svg>
+                          <div className="mt-3 text-sm leading-6 text-gray-600">
+                            <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                              <span>Upload your new avatar here</span>
+                              <input 
+                                id="ppa-avatar" 
+                                name="ppa-avatar" 
+                                type="file" 
+                                accept=".png, .jpg, .jpeg"
+                                className="sr-only" 
+                                onChange={handleAvatarChange} 
+                              />
+                            </label>
+                          </div>
+                          <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
+                          {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                )}
+
+                {/* Password */}
+                {enablePassword && (
+                  <form id="user_pwd" onSubmit={SubmitPwd} action="#" method="POST">
+                    <div className="flex items-center mt-10">
+                      <div className="w-36">
+                        <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
+                          Password:
+                        </label> 
+                      </div>
+                      <div className="w-full relative">
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={getpassword}
+                        onChange={ev => setPassword(ev.target.value)}
+                        className="block w-full ppa-form input-placeholder"
+                      />
+                      <button
+                        type="button"
+                        className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                      </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
+
+              </>
+              )}
 
             </div>
 
-            {/* Submit Button */}
-            <div className="flex mt-10">
+            <div className="col-span-1 flex flex-col items-center">
+            {!userDet?.status == 0 && (
+            <>
+              {/* Avatar */}
+              <div>
+                <img src={userDet.avatar} onContextMenu={(e) => e.preventDefault()} draggable="false" className="user-image" alt="" />
+              </div>
+              {/* Esig */}
+              <div className="esig-area flex flex-col items-center border-b border-black relative">
+                <img src={userDet.esig} alt="User Signature" className="ppa-esignature-prf" onContextMenu={(e) => e.preventDefault()} draggable="false" />
+                <span className="text-base font-bold ppa-user-name">{userDet.name}</span>
+              </div>
+            </>
+            )}
+            </div>
+
+          </div>
+
+          {/* For tracking the login */}
+          {getSec.user_id || getSec === 'undefined' ? (
+          <>
+            <div className="w-56 mt-4 mb-2">
+              <label className="block text-lg font-bold leading-6 text-gray-900">
+                User Status:
+              </label> 
+            </div>
+            <table className="ppa-table-user w-3/4">
+              <tbody style={{ backgroundColor: '#fff' }}>
+                <tr key={getSec.id}>
+                  <td className="px-3 py-2 text-center">{getSec.hostingname}</td>
+                  <td className="px-3 py-2 text-center">{getSec.browser}</td>
+                  <td className="px-3 py-2 text-center">
+                    {/* Update Details */}
+                    <button onClick={() => handleDeleteToken(getSec.user_id)} 
+                      className="py-2 px-4 btn-cancel-form"
+                    >
+                      Remove Token
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            
+            </table>
+          </>
+          ):null}
+          {/* Submit Button */}
+          <div className="flex mt-10">
 
             {/* Submit button on Register User's */}
             <div>
+              {/* Edit User Details */}
               {enableEditUser && (
               <>
                 {/* Submit */}
                 <button 
                   form="user_details"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -1201,9 +1261,9 @@ export default function UserDetailsJLMS(){
                   )}
                 </button>
                 
-                {/* Delete Account User */}
+                {/* Cancel */}
                 {!submitLoading && (
-                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                  <button onClick={handleCancel} className="ml-2 btn-cancel-form">
                     Cancel
                   </button>
                 )}
@@ -1220,7 +1280,7 @@ export default function UserDetailsJLMS(){
                 <button 
                   form="user_code"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -1235,7 +1295,7 @@ export default function UserDetailsJLMS(){
                 
                 {/* Delete Account User */}
                 {!submitLoading && (
-                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                  <button onClick={handleCancel} className="ml-2 btn-cancel-form">
                     Cancel
                   </button>
                 )}
@@ -1251,7 +1311,7 @@ export default function UserDetailsJLMS(){
                 <button 
                   form="user_avatar"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -1266,7 +1326,7 @@ export default function UserDetailsJLMS(){
                 
                 {/* Delete Account User */}
                 {!submitLoading && (
-                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                  <button onClick={handleCancel} className="ml-2 btn-cancel-form">
                     Cancel
                   </button>
                 )}
@@ -1282,7 +1342,7 @@ export default function UserDetailsJLMS(){
                 <button 
                   form="user_esig"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -1297,7 +1357,7 @@ export default function UserDetailsJLMS(){
                 
                 {/* Delete Account User */}
                 {!submitLoading && (
-                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                  <button onClick={handleCancel} className="ml-2 btn-cancel-form">
                     Cancel
                   </button>
                 )}
@@ -1313,7 +1373,7 @@ export default function UserDetailsJLMS(){
                 <button 
                   form="user_pwd"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -1328,7 +1388,7 @@ export default function UserDetailsJLMS(){
                 
                 {/* Delete Account User */}
                 {!submitLoading && (
-                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel">
+                  <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel-form">
                     Cancel
                   </button>
                 )}
@@ -1336,28 +1396,28 @@ export default function UserDetailsJLMS(){
               )}
             </div>
 
-            </div>
-          </>
-          )}
-        </div>
-
-        {/* Popup */}
-        {showPopup && (
-          <Popup
-            popupContent={popupContent}
-            popupMessage={popupMessage}
-            user={userDet?.id}
-            handleDeleteUser={handleDeleteClick}
-            justClose={justClose}
-            closePopup={closePopup}
-            submitLoading={submitLoading}
-            submitAnimation={submitAnimation}
-          />
+          </div>
+        </>
+        ):(
+          <Restrict />
         )}
 
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
-  )
+      </div>
+
+      {/* Popup */}
+      {showPopup && (
+        <Popup
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          user={userDet?.id}
+          handleDeleteUser={handleDeleteClick}
+          justClose={justClose}
+          closePopup={closePopup}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+        />
+      )}
+
+    </PageComponent>
+  );
 }

@@ -5,10 +5,11 @@ import Popup from "../../components/Popup";
 import submitAnimation from '/default/ring-loading.gif';
 import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
+import Restrict from "../../components/Restrict";
 
 export default function AllAnnouncements(){
 
-  const { userCode } = useUserStateContext();
+  const { currentUserCode } = useUserStateContext();
 
   // Loading
   const [loadingArea, setLoadingArea] = useState(true);
@@ -191,15 +192,15 @@ export default function AllAnnouncements(){
   }
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
 
   return(
-    Authorize ? (
-      <PageComponent title="All Announcement">
-
-        {/* Main Content */}
+    <PageComponent title="All Announcement">
+  
+      {/* Main Content */}
+      {Authorize ? (
         <div className="font-roboto ppa-form-box">
           <div className="ppa-form-header"> Announcement List </div>
 
@@ -251,7 +252,7 @@ export default function AllAnnouncements(){
                                 <button 
                                   type="submit"
                                   onClick={() => handleSaveClick(event, getData.id)}
-                                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                                  className={`ml-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                                   disabled={submitLoading}
                                 >
                                   {submitLoading ? (
@@ -266,7 +267,7 @@ export default function AllAnnouncements(){
                                 {/* Cancel */}
                                 {!submitLoading && (
                                   <button
-                                    className="px-3 py-2 btn-cancel ml-2"
+                                    className="btn-cancel-form ml-2"
                                     onClick={handleCancelClick}
                                   >
                                     Cancel
@@ -277,14 +278,14 @@ export default function AllAnnouncements(){
                               <>
                                 {/* Edit Button */}
                                 <button 
-                                  className="px-3 py-2 btn-default mr-2"
+                                  className="btn-default-form mr-2"
                                   onClick={() => handleEditClick(getData.id, getData.details)}
                                 >
                                   Edit
                                 </button>
                                 {/* Cancel Button */}
                                 <button 
-                                  className="px-3 py-2 btn-cancel"
+                                  className="btn-cancel-form"
                                   onClick={() => handleDeleteConfirmation(getData.id)}
                                 >
                                   Delete
@@ -308,23 +309,23 @@ export default function AllAnnouncements(){
             )}
 
         </div>
-        
-        {/* Popup */}
-        {showPopup && (
-          <Popup
-            popupContent={popupContent}
-            popupMessage={popupMessage}
-            handleDelete={handleDelete}
-            justClose={justClose}
-            closePopup={closePopup}
-            submitLoading={submitLoading}
-            submitAnimation={submitAnimation}
-          />
-        )}
-        
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
+      ):(
+        <Restrict />
+      )}
+      
+      {/* Popup */}
+      {showPopup && (
+        <Popup
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          handleDelete={handleDelete}
+          justClose={justClose}
+          closePopup={closePopup}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+        />
+      )}
+      
+    </PageComponent>
   );
 }

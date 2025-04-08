@@ -12,7 +12,8 @@ class AssignPersonnelModel extends Model
     protected $fillable = [
         'personnel_id',
         'personnel_name',
-        'assignment'
+        'assignment',
+        'status'
     ];
 
     protected $table = 'assign_personnel';

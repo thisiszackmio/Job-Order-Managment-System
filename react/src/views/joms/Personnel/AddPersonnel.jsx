@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
-import submitAnimation from '../../../assets/loading_nobg.gif';
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import submitAnimation from '/default/ring-loading.gif';
+import loadingAnimation from '/default/loading-new.gif';
+import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faCheckToSlot, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import Popup from "../../../components/Popup";
+import Restrict from "../../../components/Restrict";
 
 export default function AddPersonnel(){
+  const { currentUserName, currentUserCode } = useUserStateContext();
 
-  const { currentUserId, userCode } = useUserStateContext();
-
-  // Variable
-  const [selectPersonnel, setSelectPersonnel] = useState({ id: '', name: '' });
-  const [personnelCategory, setPersonnelCategory] = useState("");
+  // Dev Error Text
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
+    </div>
+  );
 
   // Function
   const [loading, setLoading] = useState(true);
-  const [personnelList, setPersonnelList] = useState([]);
-  const [personnel, setPersonnel] = useState([]);
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [addPersonnel, SetAddPersonnel] = useState(false);
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -57,13 +60,15 @@ export default function AddPersonnel(){
     };
   }, [showPopup, loading]);
 
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
+  const [personnelList, setPersonnelList] = useState([]);
+  const [personnel, setPersonnel] = useState([]);
+
+  // Variable
+  const [selectPersonnel, setSelectPersonnel] = useState({ id: '', name: '' });
+  const [personnelCategory, setPersonnelCategory] = useState("");
+
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   // Get Personnel List
   const fetchPersonnelList = () => {
@@ -98,43 +103,28 @@ export default function AddPersonnel(){
     fetchPersonnel();
   },[]);
 
-  // Removal Popup 
-  const handleRemovalConfirmation = (id) => {
-    setSelectedId(id);
-    setShowPopup(true);
-    setPopupContent('warning');
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">Do you want remove? It cannot be undone.</p>
-      </div>
-    );
-  }
-
-  // Submit the form
-  const submitPersonnel = (event) => {
+  // Assign Personnel
+  function submitPersonnel(event){
     event.preventDefault();
-
     setSubmitLoading(true);
-
-    const logs = `${selectPersonnel.name} has been assigned to the ${personnelCategory}'s list.`
 
     const data = {
       personnel_id: selectPersonnel.id,
       personnel_name: selectPersonnel.name,
       assignment: personnelCategory,
-      logs: logs
+      status: 0
     }
 
     axiosClient
     .post('/assignpersonnel', data)
     .then(() => {
+      SetAddPersonnel(false);
       setShowPopup(true);
       setPopupContent('success');
       setPopupMessage(
         <div>
           <p className="popup-title">Assignment Complete!</p>
-          <p className="popup-message">Your assign {selectPersonnel.name} on {personnelCategory}</p>
+          <p className="popup-message">You assign {selectPersonnel.name} as a {personnelCategory}</p>
         </div>
       );
     })
@@ -148,20 +138,29 @@ export default function AddPersonnel(){
     .finally(() => {
       setSubmitLoading(false);
     });
-
   }
 
-  // Delete the Form
-  const RemovePersonnel = () => {
+  // Removal Popup 
+  function handleRemovalConfirmation(id){
+    setSelectedId(id);
+    setShowPopup(true);
+    setPopupContent('removePersonnel');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">Do you want remove? It cannot be undone.</p>
+      </div>
+    );
+  }
 
+  // Delete Personnel Function
+  function RemovePersonnel(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUserId?.name} has removed one of the assigned personnel from the list.`;
-
     axiosClient
-    .delete(`/removepersonnel/${selectedId}`, {
+    .delete(`/removepersonnel/${id}`, {
       data: {
-        logs: logs
+        authority: currentUserName.name
       }
     })
     .then(() => {
@@ -184,10 +183,50 @@ export default function AddPersonnel(){
     .finally(() => {
       setSubmitLoading(false);
     });
-    
   }
 
-  // Popup Button Function
+  // Set Available Popup
+  function handleAvailableConfirmation(id){
+    setSelectedId(id);
+    setShowPopup(true);
+    setPopupContent('availablePersonnel');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">This personnel is available?</p>
+      </div>
+    );
+  }
+
+  // Set Available Function
+  function AvailableConfirmation(id){
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`/availpersonnel/${id}`, {
+      data: {
+        authority: currentUserName.name
+      }
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Successful</p>
+          <p className="popup-message">The personnel is available</p>
+        </div>
+      );
+    })
+    .catch((error)=>{
+      if (error.response.status === 500) {
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(DevErrorText);
+      }
+    });
+  }
+
   //Close Popup on Error
   const justclose = () => {
     setShowPopup(false);
@@ -195,13 +234,17 @@ export default function AddPersonnel(){
 
   //Close Popup on Success
   const closePopup = () => {
-    setSubmitLoading(false);
     setShowPopup(false);
-    window.location.reload();
+    setLoading(true);
+    setSubmitLoading(false);
+    setSelectPersonnel({ id: '', name: '' });
+    setPersonnelCategory('');
+    fetchPersonnelList();
+    fetchPersonnel();
   }
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
@@ -209,53 +252,142 @@ export default function AddPersonnel(){
   const Access = Admin || GSO || SuperAdmin ;
 
   return(
-    Access ? (
-      <PageComponent title="Personnel">
-        {loading ? (
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-            <img
-              className="mx-auto h-44 w-auto"
-              src={loadingAnimation}
-              alt="Your Company"
-            />
-            <span className="loading-text loading-animation">
-            {Array.from("Loading...").map((char, index) => (
-              <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-            ))}
-            </span>
-          </div>
-        ):(
+    <PageComponent title="Personnel">
+
+      {/* Loading */}
+      {loading && (
+        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
+          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
+          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
+        </div>
+      )}
+
+      {Access ? (
+      <>
+        {/* For Adding Personnel */}
+        {addPersonnel && (
         <>
-          {/* Main Content */}
-          <div className="font-roboto ppa-form-box">
-            <div className="ppa-form-header">Personnel List</div>
+          <div className="ppa-form-header text-base flex justify-between items-center">
+            <div>Assign Personnel</div>
+            <div className="flex space-x-4">
+              <FontAwesomeIcon onClick={() => {
+                SetAddPersonnel(false);
+                setSelectPersonnel({ id: '', name: '' });
+                setPersonnelCategory('');
+              }} className="icon-delete" title="Close" icon={faXmark} />
+            </div>
+          </div>
+          <div className="p-2 ppa-form-box mb-5">
+            <form onSubmit={submitPersonnel}>
+              <div className="flex items-center">
 
-            <div className="p-2">
+                {/* Select Personnnel */}
+                <select 
+                  name="personnel" 
+                  id="personnel" 
+                  value={selectPersonnel.id}
+                  onChange={ev => {
+                    const selectedId = parseInt(ev.target.value);
+                    const selectedPersonnel = personnel.find(staff => staff.id === selectedId);
+                    
+                    setSelectPersonnel(selectedPersonnel ? { id: selectedPersonnel.id, name: selectedPersonnel.name } : { id: '', name: '' });
+                  }}
+                  className="block w-2/5 ppa-form"
+                >
+                  <option value="" disabled>Select a Personnel</option>
+                  {personnel.map(staff => (
+                    <option key={staff.id} value={staff.id}>{staff.name}</option>
+                  ))}
+                </select>
 
-              {/* Table */}
-              <table className="ppa-table w-full mb-10 mt-2">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
-                    <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
-                    <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-                  </tr>
-                </thead>
-                <tbody style={{ backgroundColor: '#fff' }}>
-                {personnelList.map.length > 0 ? (
+                {/* Select Personnnel */}
+                <select 
+                  name="personnel_category" 
+                  id="personnel_category" 
+                  value={personnelCategory}
+                  onChange={ev => {
+                    setPersonnelCategory(ev.target.value);
+                  }}
+                  className="block w-2/5 ppa-form ml-4"
+                >
+                  <option value="" disabled>Select an Assignment </option>
+                  <option value="Driver/Mechanic">Driver/Mechanic</option>
+                  <option value="IT Service">IT Service</option>
+                  <option value="Janitorial Service">Janitorial Service</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Electrical Works">Electrical Works</option>
+                  <option value="Watering Services">Watering Services</option>
+                  <option value="Engeneering Services">Engeneering Services</option>
+                </select>
+
+                {/* Submit */}
+                <button 
+                  type="submit"
+                  className={`ml-3 py-2 px-3 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  disabled={submitLoading || !selectPersonnel.id || !personnelCategory}
+                >
+                {submitLoading ? (
+                  <div className="flex">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Loading</span>
+                  </div>
+                ):(
+                'Submit'
+                )}
+                </button>
+
+              </div>
+            </form>
+          </div>
+        </>
+        )}
+
+        {/* For the Personnel List */}
+        <div className="ppa-form-header text-base flex justify-between items-center">
+          <div>Personnel List</div>
+          <div className="flex space-x-4"> 
+            {!addPersonnel && (
+              <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
+            )}
+          </div>
+        </div>
+        <div className="p-2 ppa-form-box">
+          {/* Table */}
+          <table className="ppa-table w-full mb-10 mt-2">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody style={{ backgroundColor: '#fff' }}>
+              {loading ? (
+              <tr>
+                <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
+                  <div className="flex justify-center items-center">
+                    <span className="loading-table">Fetching Data</span>
+                  </div>
+                </td>
+              </tr>
+              ):(
+                personnelList.map.length > 0 ? (
                   personnelList.map(staffList => (
-                    <tr key={staffList.personnel_id}>
-                      <td className="px-3 py-2 text-center table-font">{staffList.personnel_name}</td>
-                      <td className="px-3 py-2 text-center table-font">{staffList.assignment}</td>
-                      <td className="px-3 py-2 text-center table-font">
-                        <button
-                          onClick={() => handleRemovalConfirmation(staffList.personnel_id)}
-                          className="py-1 px-6"
-                        >
-                          <FontAwesomeIcon className="text-red-500" icon={faTrash} />
-                        </button>
-                      </td>
-                    </tr>
+                      <tr key={staffList.personnel_id}>
+                        <td className="px-3 py-2 text-center table-font">{staffList.personnel_name}</td>
+                        <td className="px-3 py-2 text-center table-font">{staffList.assignment}</td>
+                        <td className="px-3 py-2 text-center table-font">
+                          <strong>{staffList.status == 1 ? ("On Travel"):("Available")}</strong>
+                        </td>
+                        <td className="px-3 py-2 text-center table-font">
+                          {staffList.status == 1 ? (
+                            <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id)} className="icon-avail" title="Available" icon={faCheckToSlot} />
+                          ):(
+                            <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" icon={faTrash} />
+                          )}
+                        </td>
+                      </tr>
                   ))
                 ):(
                   <tr>
@@ -263,184 +395,29 @@ export default function AddPersonnel(){
                       No records found.
                     </td>
                   </tr>
-                )}
-                </tbody>
-              </table>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>
+      ):(<Restrict />)}
 
-            </div>
+      {/* Popup */}
+      {showPopup && (
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          justClose={justclose}
+          closePopup={closePopup}
+          personnelId={selectedId}
+          RemovePersonnel={RemovePersonnel}
+          AvailableConfirmation={AvailableConfirmation}
+        />
+      )}
 
-          </div>
-
-          {/* Add Personnel */}
-          <div className="font-roboto ppa-form-box mt-4">
-            <div className="ppa-form-header">Assign Personnel</div>
-            <div className="p-2">
-
-              <form onSubmit={submitPersonnel}>
-
-                <div className="flex items-center">
-                  {/* Select Personnnel */}
-                  <select 
-                    name="personnel" 
-                    id="personnel" 
-                    value={selectPersonnel.id}
-                    onChange={ev => {
-                      const selectedId = parseInt(ev.target.value);
-                      const selectedPersonnel = personnel.find(staff => staff.id === selectedId);
-                      
-                      setSelectPersonnel(selectedPersonnel ? { id: selectedPersonnel.id, name: selectedPersonnel.name } : { id: '', name: '' });
-                    }}
-                    className="block w-2/5 ppa-form"
-                  >
-                    <option value="" disabled>Select a Personnel</option>
-                    {personnel.map(staff => (
-                      <option key={staff.id} value={staff.id}>{staff.name}</option>
-                    ))}
-                  </select>
-
-                  {/* Select Personnnel */}
-                  <select 
-                    name="personnel_category" 
-                    id="personnel_category" 
-                    value={personnelCategory}
-                    onChange={ev => {
-                      setPersonnelCategory(ev.target.value);
-                    }}
-                    className="block w-2/5 ppa-form ml-4"
-                  >
-                    <option value="" disabled>Select an Assignment </option>
-                    <option value="Driver/Mechanic">Driver/Mechanic</option>
-                    <option value="IT Service">IT Service</option>
-                    <option value="Janitorial Service">Janitorial Service</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Electrical Works">Electrical Works</option>
-                    <option value="Watering Services">Watering Services</option>
-                    <option value="Engeneering Services">Engeneering Services</option>
-                  </select>
-
-                  {/* Submit */}
-                  <div className="w-1/5">
-                  {(selectPersonnel.id && personnelCategory) && (
-                  <>
-                    <button 
-                      type="submit"
-                      className={`ml-3 py-2 px-3 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                      disabled={submitLoading}
-                    >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                    'Submit'
-                    )}
-                    </button>
-                  </>
-                  )}                  
-                  </div>
-                  
-                </div>
-
-              </form>
-
-            </div>
-          </div>
-        </>
-        )}
-
-        {/* Popup */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            {/* Semi-transparent black overlay with blur effect */}
-            <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
-            {/* Popup content */}
-            <div className="absolute p-6 rounded-lg shadow-md bg-white animate-fade-down" style={{ width: '350px' }}>
-              {/* Notification Icons */}
-              <div className="f-modal-alert">
-
-                {/* Error */}
-                {popupContent == 'error' && (
-                  <div className="f-modal-icon f-modal-error animate">
-                    <span className="f-modal-x-mark">
-                      <span className="f-modal-line f-modal-left animateXLeft"></span>
-                      <span className="f-modal-line f-modal-right animateXRight"></span>
-                    </span>
-                  </div>
-                )}
-
-                {/* Warning */}
-                {(popupContent == "warning") && (
-                  <div class="f-modal-icon f-modal-warning scaleWarning">
-                    <span class="f-modal-body pulseWarningIns"></span>
-                    <span class="f-modal-dot pulseWarningIns"></span>
-                  </div>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <div class="f-modal-icon f-modal-success animate">
-                    <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
-                    <span class="f-modal-line f-modal-long animateSuccessLong"></span>
-                  </div>
-                )}
-                
-              </div>
-              {/* Popup Message */}
-              <p className="text-lg text-center"> {popupMessage} </p>
-              {/* Buttons */}
-              <div className="flex justify-center mt-4">
-
-                {/* Error Button */}
-                {popupContent == 'error' && (
-                  <button onClick={justclose} className="w-full py-2 btn-cancel">
-                    Close
-                  </button>
-                )}
-
-                {(popupContent == 'warning') && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    type="submit"
-                    onClick={RemovePersonnel}
-                    className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={justclose} className="w-1/2 py-2 btn-cancel ml-2">
-                      Close
-                    </button>
-                  )}
-                </>
-                )}
-
-                {/* Success */}
-                {popupContent == 'success' && (
-                  <button onClick={closePopup} className="w-full py-2 btn-default">
-                    Close
-                  </button>
-                )}
-
-              </div>
-            </div>
-          </div>
-        )}
-
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
-  )
+    </PageComponent>
+  );
 }

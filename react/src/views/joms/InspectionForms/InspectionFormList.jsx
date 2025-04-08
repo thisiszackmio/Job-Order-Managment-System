@@ -3,14 +3,17 @@ import { Link } from "react-router-dom";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import loading_table from "/default/ring-loading.gif";
+import ppalogo from '/default/ppa_logo-st.png';
+import loadingAnimation from '/default/loading-new.gif';
 import { useUserStateContext } from "../../../context/ContextProvider";
+import Restrict from "../../../components/Restrict";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function InspectionFormList(){
 
-  const { userCode } = useUserStateContext();
+  const { currentUserCode } = useUserStateContext();
 
   //Date Format 
   function formatDate(dateString) {
@@ -74,7 +77,7 @@ export default function InspectionFormList(){
   };
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
@@ -84,17 +87,15 @@ export default function InspectionFormList(){
   const PortManager = codes.includes("PM");
   const Access = Admin || GSO || DivisionManager || SuperAdmin || PortManager || AssignPersonnel;
 
-  return Access ? (
+  return (
     <PageComponent title="Request List">
 
-      {/* Post Repair Form */}
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Pre/Post Repair Inspection Form List </div>
-
-        <div className="p-2 ppa-div-table relative overflow-x-auto shadow-md sm:rounded-lg">
-          
-          {/* Search Filter */}
-          <div className="mt-2 mb-4 flex">
+      {Access ? (
+        <div className="font-roboto ppa-form-box bg-white">
+          <div className="ppa-form-header"> Pre/Post Repair Inspection Form List </div>
+          <div className="p-2 ppa-div-table relative overflow-x-auto shadow-md sm:rounded-lg">
+            {/* Search Filter */}
+            <div className="mt-2 mb-4 flex">
 
             {/* Search */}
             <div className="flex-grow">
@@ -114,86 +115,86 @@ export default function InspectionFormList(){
               </div>
             </div>
 
-          </div>
+            </div>
 
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead className="bg-gray-100">
-              <tr className="bg-gray-100">
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Ctrl ID</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Property Number</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Date</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Cost</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Brand/Model</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Serial/Engine No.</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Type of Property</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Description</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Location</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Complain</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-            {loading ? (
-              <tr>
-                <td colSpan={13} className="px-2 py-2 text-center table-font">
-                  <div className="flex justify-center items-center">
-                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                    <span className="loading-table">Loading</span>
-                  </div>
-                </td>
-              </tr>
-            ):(
-              currentList.length > 0 ? (
-                currentList.map((list)=>(
-                  <tr key={list.id}>
-                    <td className="px-2 py-2 text-lg text-center font-bold table-font">
-                      <Link
-                        to={`/joms/inspection/form/${list.id}`}
-                        className="relative group inline-flex items-center"
-                      >
-                        {/* Initially show the ID */}
-                        <span className="group-hover:hidden">{list.id}</span>
-
-                        {/* Show the View Icon on hover */}
-                        <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
-                          <FontAwesomeIcon icon={faEye} />
-                        </span>
-                      </Link>
-                    </td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{formatDate(list.date_request)}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.property_number ? list.property_number : 'N/A'}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.acquisition_date ? formatDate(list.acquisition_date) : 'N/A'}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">
-                      {list.acquisition_cost ? 
-                        new Intl.NumberFormat('en-PH', {
-                          style: 'currency',
-                          currency: 'PHP'
-                        }).format(list.acquisition_cost) 
-                        : 'N/A'}
-                    </td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.brand_model ? list.brand_model : 'N/A'}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.serial_engine_no ? list.serial_engine_no : 'N/A'}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.type}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.description}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.location}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.complain}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.remarks}</td>
-                  </tr>
-                ))
-              ):(
+            <table className="ppa-table w-full mb-10 mt-2">
+              <thead className="bg-gray-100">
+                <tr className="bg-gray-100">
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Ctrl ID</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Property Number</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Date</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Acquisition Cost</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Brand/Model</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Serial/Engine No.</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Type of Property</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Description</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Location</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Complain</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                </tr>
+              </thead>
+              <tbody style={{ backgroundColor: '#fff' }}>
+              {loading ? (
                 <tr>
-                  <td colSpan={13} className="px-2 py-2 text-center text-sm text-gray-600">
-                    No records found.
+                  <td colSpan={13} className="px-2 py-2 text-center table-font">
+                    <div className="flex justify-center items-center">
+                      <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                      <span className="loading-table">Loading</span>
+                    </div>
                   </td>
                 </tr>
-              )
-            )}
-            </tbody>
-          </table> 
-          {displayPaginationUser && (
+              ):(
+                currentList.length > 0 ? (
+                  currentList.map((list)=>(
+                    <tr key={list.id}>
+                      <td className="px-2 py-2 text-lg text-center font-bold table-font">
+                        <Link
+                          to={`/joms/inspection/form/${list.id}`}
+                          className="relative group inline-flex items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{list.id}</span>
+
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{formatDate(list.date_request)}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.property_number ? list.property_number : 'N/A'}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.acquisition_date ? formatDate(list.acquisition_date) : 'N/A'}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">
+                        {list.acquisition_cost ? 
+                          new Intl.NumberFormat('en-PH', {
+                            style: 'currency',
+                            currency: 'PHP'
+                          }).format(list.acquisition_cost) 
+                          : 'N/A'}
+                      </td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.brand_model ? list.brand_model : 'N/A'}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.serial_engine_no ? list.serial_engine_no : 'N/A'}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.type}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.description}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.location}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.complain}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
+                      <td className="px-2 py-2 text-sm text-left table-font">{list.remarks}</td>
+                    </tr>
+                  ))
+                ):(
+                  <tr>
+                    <td colSpan={13} className="px-2 py-2 text-center text-sm text-gray-600">
+                      No records found.
+                    </td>
+                  </tr>
+                )
+              )}
+              </tbody>
+            </table> 
+            {displayPaginationUser && (
             <ReactPaginate
               previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
               nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -215,13 +216,13 @@ export default function InspectionFormList(){
               nextLinkClassName="page-link"
             />
           )}
+          </div>
         </div>
-
-      </div>
+      ):(
+        <Restrict />
+      )}
 
     </PageComponent>
-  ):(
-    (() => { window.location = '/unauthorize'; return null; })()
-  );
+  )
 
 }

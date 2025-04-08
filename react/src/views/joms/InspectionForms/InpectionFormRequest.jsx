@@ -3,27 +3,62 @@ import submitAnimation from '/default/ring-loading.gif';
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
+import loadingAnimation from '/default/loading-new.gif';
+import ppalogo from '/default/ppa_logo-st.png';
 import Popup from "../../../components/Popup";
 
 export default function RepairRequestForm(){
-  const { currentUserId, userCode } = useUserStateContext();
+  const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
 
-  // Get the avatar
-  const dp = currentUserId?.avatar;
-  const dpname = dp ? dp.substring(dp.lastIndexOf('/') + 1) : null;
+  // Date
+  const today = new Date().toISOString().split('T')[0];
+  const currentDate = new Date().toISOString().split('T')[0];
 
-  const ucode = userCode;
+  //Date Format 
+  function formatDate(dateString) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
   const PortManager = codes.includes("PM");
   const DivisionManager = codes.includes("DM");
 
-  const [loading, setLoading] = useState(true);
-
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
+
+  const [confirmation, setConfirmation] = useState(false);
+  const [buttonHide, setButtonHide] = useState(false);
+
+  // Values
+  const [propertyNo, setPropertyNo] = useState('');
+  const [acquisitionDate, setAcquisitionDate] = useState('');
+  const [acquisitionCost, setAcquisitionCost] = useState('');
+  const [BrandModel, setBrandModel] = useState('');
+  const [SerialEngineNo, setSerialEngineNo] = useState('');
+  const [typeOfProperty, setTypeOfProperty] = useState('');
+  const [propertyDescription, setPropertyDescription] = useState('');
+  const [propertyLocation, setPropertyLocation] = useState('');
+  const [ComplainDefect, setComplainDefect] = useState('');
+  const [selectedSupervisor, setSelectedSupervisor] = useState({ id: '', name: '' });
+
+  const [inputErrors, setInputErrors] = useState({});
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [supervisor, setSupervisor] = useState([]);
+
+  // Dev Error Text
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
+    </div>
+  );
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -49,27 +84,6 @@ export default function RepairRequestForm(){
     };
   }, [showPopup]);
 
-  // Date
-  const today = new Date().toISOString().split('T')[0];
-  const currentDate = new Date().toISOString().split('T')[0];
-
-  // Values
-  const [propertyNo, setPropertyNo] = useState('');
-  const [acquisitionDate, setAcquisitionDate] = useState('');
-  const [acquisitionCost, setAcquisitionCost] = useState('');
-  const [BrandModel, setBrandModel] = useState('');
-  const [SerialEngineNo, setSerialEngineNo] = useState('');
-  const [typeOfProperty, setTypeOfProperty] = useState('');
-  const [propertyDescription, setPropertyDescription] = useState('');
-  const [propertyLocation, setPropertyLocation] = useState('');
-  const [ComplainDefect, setComplainDefect] = useState('');
-  const [selectedSupervisor, setSelectedSupervisor] = useState({ id: '', name: '' });
-
-  const [supervisor, setSupervisor] = useState([]);
-  const [gso, getGSO] = useState([]);
-  const [inputErrors, setInputErrors] = useState({});
-  const [submitLoading, setSubmitLoading] = useState(false);
-
   // Get Supervisor
   useEffect(()=>{
     axiosClient
@@ -92,41 +106,62 @@ export default function RepairRequestForm(){
     });
   },[]);
 
-  // Get GSO for notification
-  useEffect(()=>{
-    axiosClient
-    .get(`/getgso`)
-    .then((response) => {
-      const gsoID = response.data.id;
-      const gsoName = response.data.name;
+  // Confirm Function
+  function handleConfirm(event){
+    event.preventDefault();
 
-      getGSO({gsoID, gsoName});
+    const formData = {
+      form: "Check",
+      user_id: currentUserId,
+      user_name: currentUserName.name,
+      type_of_property: typeOfProperty,
+      property_description: propertyDescription,
+      location: propertyLocation,
+      complain: ComplainDefect,
+      supervisor_id: Admin || DivisionManager || PortManager ? currentUserId : selectedSupervisor.id,
+      supervisor_name: Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name,
+      supervisor_status: Admin || DivisionManager || PortManager ? 1 : 0,
+      admin_status: 0,
+      inspector_status: 0,
+      form_status: DivisionManager || PortManager ? 4 : Admin ? 5 : 0,
+    };
+
+    axiosClient
+    .post("/submitinsprequest", formData)
+    .then((response)=>{
+      console.log();
+      if(response.data.message === "Check"){
+        setConfirmation(true);
+      }
+    })
+    .catch((error)=>{
+      if(error.response.status === 500) {
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(DevErrorText);
+      }else{
+        const responseErrors = error.response.data.errors;
+        setInputErrors(responseErrors);
+      }
     })
     .finally(() => {
-      setLoading(false);
+      setSubmitLoading(false);
     });
-  },[]);
 
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
+  }
 
   // Submit the Form
   function SubmitInspectionForm(event){
     event.preventDefault();
 
+    let remarks = Admin || DivisionManager || PortManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
+
     setSubmitLoading(true);
 
-    let remarks = Admin || DivisionManager || PortManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
-    const notification = Admin || DivisionManager ? `${currentUserId.name} has submitted a request.` : `${currentUserId.name} has a request and needs your approval.`;
-    
     const formData = {
-      user_id: currentUserId.id,
-      user_name: currentUserId.name,
+      form: "Uncheck",
+      user_id: currentUserId,
+      user_name: currentUserName.name,
       property_number: propertyNo,
       acquisition_date: acquisitionDate,
       acquisition_cost: acquisitionCost,
@@ -136,26 +171,19 @@ export default function RepairRequestForm(){
       property_description: propertyDescription,
       location: propertyLocation,
       complain: ComplainDefect,
-      supervisor_id: Admin || DivisionManager || PortManager ? currentUserId.id : selectedSupervisor.id,
-      supervisor_name: Admin || DivisionManager || PortManager ? currentUserId.name : selectedSupervisor.name,
+      supervisor_id: Admin || DivisionManager || PortManager ? currentUserId : selectedSupervisor.id,
+      supervisor_name: Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name,
       supervisor_status: Admin || DivisionManager || PortManager ? 1 : 0,
       admin_status: 0,
       inspector_status: 0,
       form_status: DivisionManager || PortManager ? 4 : Admin ? 5 : 0,
       form_remarks: remarks,
-      
-      //Notifications
-      sender_avatar: dpname,
-      sender_id: currentUserId.id,
-      sender_name: currentUserId.name,
-      notif_message: notification,
-      receiver_id: Admin || DivisionManager || PortManager ? gso.gsoID: selectedSupervisor.id,
-      receiver_name: Admin || DivisionManager || PortManager ? gso.gsoName : selectedSupervisor.name,
     };
 
     axiosClient
     .post("/submitinsprequest", formData)
     .then(() => {
+      setButtonHide(true);
       setShowPopup(true);
       setPopupContent('success');
       setPopupMessage(
@@ -168,22 +196,11 @@ export default function RepairRequestForm(){
         </div>
       );
     })
-    .catch((error)=>{
-      if (error.response.status === 500) {
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }else{
-        const responseErrors = error.response.data.errors;
-        setInputErrors(responseErrors);
-      }
-    })
     .finally(() => {
       setSubmitLoading(false);
     });
   }
 
-  // Popup Button Function
   //Close Popup on Error
   const justClose = () => {
     setShowPopup(false);
@@ -199,13 +216,188 @@ export default function RepairRequestForm(){
   return (
     <PageComponent title="Request Form">
 
-      {/* Main Content */}
+      {/* Preload Screen */}
+      {(loading) && (
+        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
+          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
+          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
+        </div>
+      )}
+
+      {/* Form Content */}
       <div className="font-roboto ppa-form-box bg-white">
         <div className="ppa-form-header"> Request For Pre/Post Inspection Repair </div>
+
         <div className="p-4">
+          {confirmation ? (
+          <>
+            <form onSubmit={SubmitInspectionForm}>
+              {/* Title */}
+              <div>
+                <h2 className="text-base font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
+                <p className="text-xs font-bold text-red-500">This will not be editable once submitted.</p>
+              </div>
 
-          <form onSubmit={SubmitInspectionForm}>
+              <div className="grid grid-cols-2">
 
+                {/* Part A left side */}
+                <div className="col-span-1">
+                  {/* Date */}
+                  <div className="flex items-center mt-6">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900">
+                      Date:
+                      </label> 
+                    </div>
+                    <div className="w-1/2 ppa-form-view h-6">
+                      {formatDate(today)}
+                    </div>
+                  </div>
+
+                  {/* Property No */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Property No: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                    {propertyNo ? propertyNo : "N/A"}
+                    </div>
+                  </div>
+
+                  {/* Acquisition Date */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Date: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                    {acquisitionDate ? formatDate(acquisitionDate) : "N/A"}
+                    </div>
+                  </div>
+
+                  {/* Acquisition Cost */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Cost: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {acquisitionCost ? new Intl.NumberFormat('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP'
+                      }).format(acquisitionCost) : "N/A" }
+                    </div>
+                  </div>
+
+                  {/* Brand/Model */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Brand/Model: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {BrandModel ? BrandModel : "N/A"}
+                    </div>
+                  </div>
+
+                  {/* Serial/Engine No */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Serial/Engine No: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {SerialEngineNo ? SerialEngineNo : "N/A"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Part A left side */}
+                <div className="col-span-1">
+                  {/* Type of Property */}
+                  <div className="flex items-center mt-6">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Type of Property: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {typeOfProperty}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Description: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {propertyDescription}
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Location: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {propertyLocation}
+                    </div>
+                  </div>
+
+                  {/* Supervisor */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label className="block text-base font-bold leading-6 text-gray-900"> Supervisor: </label> 
+                    </div>
+                    <div className="w-1/2 h-6 ppa-form-view">
+                      {Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name}
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* Complain */}
+              <div className="flex items-center mt-2">
+                <div className="w-40">
+                  <label className="block text-base font-bold leading-6 text-gray-900"> Complain: </label> 
+                </div>
+                <div className="w-3/4 h-6 ppa-form-view">
+                  {ComplainDefect}
+                </div>
+              </div>
+
+              {/* Button */}
+              <div className="mt-10">
+              {!buttonHide && (
+              <>
+                {/* Submit */}
+                <button 
+                  // form="fac_submit"
+                  type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                    'Confirm'
+                  )}
+                </button>
+  
+                {/* Cancel */}
+                {!submitLoading && (
+                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
+                    Revise
+                  </button>
+                )}
+              </>
+              )}
+              </div>
+            </form>
+          </>
+          ):(
+          <>
             {/* Part A */}
             <div>
               <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
@@ -219,7 +411,7 @@ export default function RepairRequestForm(){
               <div className="col-span-1">
 
                 {/* Date */}
-                <div className="flex items-center mt-6 ">
+                <div className="flex items-center mt-6">
                   <div className="w-40">
                     <label htmlFor="rep_date" className="block text-base leading-6 text-black"> 
                       Date: 
@@ -239,7 +431,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Property Number */}
-                <div className="flex items-center mt-4 ">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black"> Property Number: </label> 
                   </div>
@@ -251,6 +443,7 @@ export default function RepairRequestForm(){
                       autoComplete="rep_property_no"
                       value={propertyNo}
                       onChange={ev => setPropertyNo(ev.target.value)}
+                      maxLength={255}
                       className="block w-full ppa-form"
                     />
                     {!propertyNo && inputErrors.property_number && (
@@ -260,7 +453,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Acquisition Date */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_acquisition_date" className="block text-base font-medium leading-6 text-black">    
                       Acquisition Date:
@@ -283,7 +476,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Acquisition Cost */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_acquisition_cost" className="block text-base font-medium leading-6 text-black">
                       Acquisition Cost:
@@ -317,7 +510,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Brand/Model */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_brand_model" className="block text-base font-medium leading-6 text-black">
                       Brand/Model:
@@ -330,6 +523,7 @@ export default function RepairRequestForm(){
                       id="rep_brand_model"
                       autoComplete="rep_brand_model"
                       value={BrandModel}
+                      maxLength={255}
                       onChange={ev => setBrandModel(ev.target.value)}
                       className="block w-full ppa-form"
                     />
@@ -340,7 +534,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Serial/Engine No */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_serial_engine_no" className="block text-base font-medium leading-6 text-black">                  
                       Serial/Engine No.:
@@ -353,6 +547,7 @@ export default function RepairRequestForm(){
                       id="rep_serial_engine_no"
                       autoComplete="rep_serial_engine_no"
                       value={SerialEngineNo}
+                      maxLength={255}
                       onChange={ev => setSerialEngineNo(ev.target.value)}
                       className="block w-full ppa-form"
                     />
@@ -397,7 +592,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Description */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_description" className="block text-base font-medium leading-6 text-black">
                       Description:
@@ -409,6 +604,7 @@ export default function RepairRequestForm(){
                       name="rep_description"
                       id="rep_description"
                       value={propertyDescription}
+                      maxLength={255}
                       onChange={ev => setPropertyDescription(ev.target.value)}
                       className="block w-full ppa-form"
                     />
@@ -419,7 +615,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_location" className="block text-base font-medium leading-6 text-black">
                       Location (Div/Section/Unit):
@@ -431,6 +627,7 @@ export default function RepairRequestForm(){
                       name="rep_location"
                       id="rep_location"
                       value={propertyLocation}
+                      maxLength={255}
                       onChange={ev => setPropertyLocation(ev.target.value)}
                       className="block w-full ppa-form"
                     />
@@ -441,7 +638,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Complain / Defect */}
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-2">
                   <div className="w-40">
                     <label htmlFor="rep_complain" className="block text-base font-medium leading-6 text-black">
                       Complain/Defect:
@@ -454,6 +651,7 @@ export default function RepairRequestForm(){
                     rows={3}
                     value={ComplainDefect}
                     style={{ resize: 'none' }}
+                    maxLength={500}
                     onChange={ev => setComplainDefect(ev.target.value)}
                     className="block w-full ppa-form"
                   />
@@ -462,10 +660,10 @@ export default function RepairRequestForm(){
                   )}
                   </div>
                 </div>
-                
+
                 {/* Supervisor */}
                 {(Admin || DivisionManager|| PortManager) ? null : (
-                  <div className="flex items-center mt-4">
+                  <div className="flex items-center mt-2">
                     <div className="w-40">
                       <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
                         Immediate <br /> Supervisor:
@@ -500,29 +698,18 @@ export default function RepairRequestForm(){
 
               </div>
 
+              {/* Button */}
+              <div className="mt-6">
+                {/* Check Form */}
+                <button 
+                  onClick={handleConfirm} 
+                  className="py-2 px-4 btn-default-form">
+                  Submit
+                </button>
+              </div>
             </div>
-
-            {/* Button */}
-            <div className="mt-10">
-              {/* Submit */}
-              <button 
-                type="submit"
-                className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-1">Loading</span>
-                  </div>
-                ):(
-                  'Submit'
-                )}
-              </button>
-            </div>
-
-          </form>
-
+          </>
+          )}
         </div>
       </div>
 
@@ -535,6 +722,7 @@ export default function RepairRequestForm(){
           closePopup={closePopup}
         />
       )}
+
     </PageComponent>
   );
 }

@@ -2,35 +2,43 @@ import React, { useEffect, useState } from "react";
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import submitAnimation from '/default/ring-loading.gif';
-import loadingAnimation from '/default/ppa_logo_animationn_v4.gif';
+import loadingAnimation from '/default/loading-new.gif';
+import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlus, faCheckToSlot, faXmark, faPenToSquare, faCheck } from '@fortawesome/free-solid-svg-icons';
 import Popup from "../../../components/Popup";
+import Restrict from "../../../components/Restrict";
 
 export default function AddVehicleType(){
+  const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
 
-  const { currentUserId, userCode } = useUserStateContext();
+  // Dev Error Text
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
+    </div>
+  );
 
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addVehicle, setAddVehicle] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-
-  // Variable 
-  const [vehicleName, setVehicleName] = useState('');
-  const [vehiclePlate, setVehiclePlate] = useState('');
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
-  // Output
-  const [vehicle, getVehicle] = useState([]);
+  // Variable 
+  const [vehicleName, setVehicleName] = useState('');
+  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [updateVehicleName, setUpdateVehicleName] = useState('');
+  const [updateVehiclePlate, setUpdateVehiclePlate] = useState('');
 
-  // Set Access
-  const [Access, setAccess] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -62,6 +70,9 @@ export default function AddVehicleType(){
     };
   }, [showPopup, loading]);
 
+  // Output
+  const [vehicle, getVehicle] = useState([]);
+
   // Get Vehicle Data
   const fectVehicleData = () => {
     axiosClient
@@ -71,16 +82,6 @@ export default function AddVehicleType(){
 
       getVehicle(VehicleData);
 
-      // Restrictions Condition
-      const ucode = userCode;
-      const codes = ucode.split(',').map(code => code.trim());
-      const Admin = codes.includes("AM");
-      const GSO = codes.includes("GSO");
-      const SuperAdmin = codes.includes("HACK");
-
-      // Conditions
-      setAccess(GSO || Admin || SuperAdmin);
-
     })
     .finally(() => {
       setLoading(false);
@@ -88,37 +89,78 @@ export default function AddVehicleType(){
   }
 
   useEffect(()=>{
-    if(currentUserId?.id){
+    if(currentUserId){
       fectVehicleData();
     }
   },[currentUserId]);
 
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
+  // Default
+  useEffect(() => {
+    // Only update if we are editing the current vehicle
+    if (editingId) {
+      const selectedVehicle = vehicle.find(veh => veh.vehicle_id === editingId);
+      if (selectedVehicle) {
+        setUpdateVehicleName(selectedVehicle.vehicle_name ?? "");
+        setUpdateVehiclePlate(selectedVehicle.vehicle_plate ?? "");
+      }
+    }
+  }, [editingId, vehicle])
 
-  // Submit the Form
-  const GetVehicleDetails = (event) => {
-    event.preventDefault();
+  // Edit Vehicle Details
+  function handleEditClick(id){
+    setEditingId(id);
+  }
 
+  // Save Update Vehicle Details
+  function handleUpdateVehicle(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUserId.name} has just added the vehicle details.`;
+    const data = {
+      authority: currentUserName.name,
+      vehicle_name: updateVehicleName,
+      vehicle_plate: updateVehiclePlate,
+    }
+
+    axiosClient
+    .put(`/editvehicle/${id}`, data)
+    .then(() => {
+      setEditingId(null);
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success!</p>
+          <p className="popup-message">The vehicle has been updated.</p>
+        </div>
+      );
+    })
+    .catch(() => {
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+
+  }
+
+  // Add Vehicle details
+  function GetVehicleDetails(event){
+    event.preventDefault();
+    setSubmitLoading(true);
 
     const data = {
+      authority: currentUserName.name,
       vehicle_name: vehicleName,
       vehicle_plate: vehiclePlate,
-      // Logs
-      logs: logs
+      availability: 0,
     }
 
     axiosClient
     .post('/submitvehtype', data)
     .then(() => {
+      setAddVehicle(false);
       setShowPopup(true);
       setPopupContent('success');
       setPopupMessage(
@@ -147,13 +189,14 @@ export default function AddVehicleType(){
     .finally(() => {
       setSubmitLoading(false);
     });
+
   }
 
-  // Removal Popup 
-  const handleRemovalConfirmation = (id) => {
+  // Popup Remove Vehicle Detail 
+  function handleRemovalConfirmation(id){
     setSelectedId(id);
     setShowPopup(true);
-    setPopupContent('vdd');
+    setPopupContent('removeVehicle');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -162,16 +205,14 @@ export default function AddVehicleType(){
     );
   }
 
-  // Delete the Data
-  const removeVehicleDet = () => {
+  // Remove Vehicle Detail Function
+  function removeVehicleDet(){
     setSubmitLoading(true);
-
-    const logs = `${currentUserId.name} has just removed the vehicle details.`;
 
     axiosClient
     .delete(`/deletevehdet/${selectedId}`,{
       data: {
-        logs: logs
+        authority: currentUserName.name,
       }
     })
     .then(() => {
@@ -181,6 +222,47 @@ export default function AddVehicleType(){
         <div>
           <p className="popup-title">Success!</p>
           <p className="popup-message">The data has been removed from the database.</p>
+        </div>
+      );
+    })
+    .catch(() => {
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true);   
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
+  // Popup on Available Vehicle
+  function handleSetAvailable(id){
+    setSelectedId(id);
+    setShowPopup(true);
+    setPopupContent('availableVehicle');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">This vehicle is available?</p>
+      </div>
+    );
+  }
+
+  // Available Vehicle Function
+  function vacantVehicle(){
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`/availvehicle/${selectedId}`,{
+      authority: currentUserName.name,
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success!</p>
+          <p className="popup-message">The vehicle is available</p>
         </div>
       );
     })
@@ -204,121 +286,47 @@ export default function AddVehicleType(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.reload();
+    setLoading(true);
+    setVehicleName('');
+    setVehiclePlate('');
+    fectVehicleData();
   }
 
-  return loading ? (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-100 z-50">
-      <img
-        className="mx-auto h-44 w-auto"
-        src={loadingAnimation}
-        alt="Your Company"
-      />
-      <span className="loading-text loading-animation">
-      {Array.from("Loading...").map((char, index) => (
-        <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
-      ))}
-      </span>
-    </div>
-  ):(
-    Access ? (   
+  // Restrictions Condition
+  const ucode = currentUserCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const GSO = codes.includes("GSO");
+  const SuperAdmin = codes.includes("HACK");
+  const access = GSO || SuperAdmin;
+
+  return(
     <PageComponent title="Vehicle Information">
-
-      {/* Main Content */}
-      <div className="font-roboto ppa-form-box">
-        <div className="ppa-form-header text-base flex justify-between items-center">
-
-          <span>Vehicle List</span>
-
-          {addVehicle ? (
-            <button onClick={() => { setAddVehicle(false); }}  className="py-1.5 px-3 text-base btn-cancel"> Cancel </button>
-          ):(
-            <button onClick={() => { setAddVehicle(true); }}  className="py-1.5 px-3 text-base btn-default"> Add Vehicle </button>
-          )}
-          
-
+      {/* Loading */}
+      {loading && (
+        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
+          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
+          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
         </div>
+      )}
 
-        <div className="p-2">
-        
-          {/* Table */}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Name</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Plate</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">No of Usage</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-            {vehicle && vehicle?.length > 0 ? (
-              vehicle.map((veh, index) => (
-                <tr key={index}>
-                  <td className="px-3 py-2 text-center text-base">{veh.vehicle_name}</td>
-                  <td className="px-3 py-2 text-center text-base">{veh.vehicle_plate}</td>
-                  <td className="px-3 py-2 text-center text-base">{veh.vehicle_usage}</td>
-                  <td className="px-3 py-2">
-                    <div className="flex justify-center items-center">
-                      {/* Delete */}
-                      <button
-                        onClick={() => handleRemovalConfirmation(veh.vehicle_id)}
-                        className="px-2 py-2 rounded-md bg-red-500"
-                      >
-                        <FontAwesomeIcon className="text-white" icon={faTrash} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ):(
-              <tr>
-                <td colSpan={4} className="px-2 py-2 text-center text-sm text-gray-600">
-                  No records found.
-                </td>
-              </tr>
-            )}
-            </tbody>
-          </table>
-
-        </div>
-
-      </div>
-
-      {/* Add Vehicle */}
-      {addVehicle && (
-        <div className="font-roboto ppa-form-box mt-4">
+      {access ? (
+      <>
+        {addVehicle && (
+        <>
           <div className="ppa-form-header text-base flex justify-between items-center">
-
-            <span>Add Vehicle</span>
-
-            <button 
-              type="submit"
-              form="submitVehicle"
-              className={`ml-3 py-1.5 px-3 text-base ${ submitLoading ? 'process-btn' : 'btn-default' }`}
-              disabled={submitLoading}
-            >
-            {submitLoading ? (
-              <div className="flex">
-                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                <span className="ml-1">Loading</span>
-              </div>
-            ):(
-            'Submit'
-            )}
-            </button>
-
+            <div>Add Vehicle</div>
+            <div className="flex space-x-4">
+              <FontAwesomeIcon onClick={() => {
+                setAddVehicle(false);
+                setVehicleName('');
+                setVehiclePlate('');
+              }} className="icon-delete" title="Close" icon={faXmark} />
+            </div>
           </div>
-
-          <div className="p-2 pt-4 pb-4">
-
+          <div className="p-2 ppa-form-box mb-5">
             <form id="submitVehicle" onSubmit={GetVehicleDetails}>
-
               {/* Form */}
-              <div className="grid grid-cols-2">
-
-                {/* 1st Column */}
-                <div className="col-span-1">
+              <div className="flex items-center">
 
                   {/* Vehicle Name */}
                   <div className="flex items-center">
@@ -336,11 +344,6 @@ export default function AddVehicleType(){
                       />
                     </div>
                   </div>
-
-                </div>
-
-                {/* 2nd Column */}
-                <div className="col-span-1">
 
                   {/* Vehicle Plate */}
                   <div className="flex items-center">
@@ -360,15 +363,164 @@ export default function AddVehicleType(){
                     </div>
                   </div>
 
-                </div>
+                  {/* Button */}
+                  <button 
+                    type="submit"
+                    form="submitVehicle"
+                    className={`ml-3 py-1.5 px-3 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                    disabled={submitLoading}
+                  >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ):(
+                  'Submit'
+                  )}
+                  </button>
 
               </div>
-
             </form>
-
           </div>
+        </>
+        )}
 
+        {/* Header */}
+        <div className="ppa-form-header text-base flex justify-between items-center">
+          <div>Vehicle List</div>
+          <div className="flex space-x-4">
+            {!addVehicle && <FontAwesomeIcon onClick={() => setAddVehicle(true)} className="icon-delete" title="Add Vehicle" icon={faPlus} />}
+          </div>
         </div>
+        <div className="p-2 ppa-form-box">
+          {/* Table */}
+          <table className="ppa-table w-full mb-10 mt-2">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Name</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Plate</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">No of Usage</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody style={{ backgroundColor: '#fff' }}>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
+                  <div className="flex justify-center items-center">
+                    <span className="loading-table">Fetching Data</span>
+                  </div>
+                </td>
+              </tr>
+            ):(
+              vehicle && vehicle?.length > 0 ? (
+                vehicle.map((veh, index) => (
+                  <tr key={index}>
+                    <td className="px-3 py-2 text-center text-base align-middle">
+                      {editingId === veh.vehicle_id ? (
+                        <div className="flex justify-center items-center">
+                          <input
+                            type="text"
+                            name="vehicle_name"
+                            id="vehicle_name"
+                            value={updateVehicleName}
+                            onChange={ev => setUpdateVehicleName(ev.target.value)}
+                            className="ppa-form w-3/4 text-center"
+                          />
+                        </div>
+                      ) : (
+                        veh.vehicle_name
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-center text-base align-middle">
+                      {editingId === veh.vehicle_id ? (
+                        <div className="flex justify-center items-center">
+                          <input
+                            type="text"
+                            name="vehicle_name"
+                            id="vehicle_name"
+                            value={updateVehiclePlate}
+                            onChange={ev => setUpdateVehiclePlate(ev.target.value)}
+                            className="ppa-form w-3/4 text-center"
+                          />
+                        </div>
+                      ) : (
+                        veh.vehicle_plate
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-center text-base">{veh.vehicle_usage}</td>
+                    <td className="px-3 py-2 text-center text-base">
+                      <strong>{veh.vehicle_status == 0 ? ("Available"):("On Travel")}</strong>
+                    </td>
+                    <td className="px-3 py-2">
+                    <div className="flex justify-center items-center space-x-4">
+                      {editingId == veh.vehicle_id ? (
+                        <>
+                          {/* Delete */}
+                          <FontAwesomeIcon
+                              onClick={() => handleUpdateVehicle(veh.vehicle_id)}
+                              className="icon-approve"
+                              title="Remove Vehicle"
+                              icon={faCheck}
+                            />
+                            {/* Close */}
+                            <FontAwesomeIcon
+                              onClick={() => setEditingId(null)}
+                              className="icon-close"
+                              title="Close"
+                              icon={faXmark}
+                            />
+                        </>
+                      ):(
+                        veh.vehicle_status === 0 ? (
+                          <>
+                            {/* Delete */}
+                            <FontAwesomeIcon
+                              onClick={() => editingId === null && handleRemovalConfirmation(veh.vehicle_id)}
+                              className={`icon-remove ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                              title="Remove Vehicle"
+                              icon={faTrash}
+                            />
+                            {/* Edit Vehicle */}
+                            <FontAwesomeIcon
+                              onClick={() => editingId === null && handleEditClick(veh.vehicle_id)}
+                              className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                              title="Edit Vehicle"
+                              icon={faPenToSquare}
+                            />
+                          </>
+                        ):(
+                          <>
+                            {/* Available */}
+                            <FontAwesomeIcon
+                              onClick={() => editingId === null && handleSetAvailable(veh.vehicle_id)}
+                              className={`icon-avail ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                              title="Available Vehicle"
+                              icon={faCheckToSlot}
+                            />
+                          </>
+                        )
+                      )}
+                    </div>
+                  </td>
+                  </tr>
+                ))
+              ):(
+                <tr>
+                  <td colSpan={5} className="px-2 py-2 text-center text-sm text-gray-600">
+                    No records found.
+                  </td>
+                </tr>
+              )
+            )}
+            </tbody>
+          </table>
+        </div>
+      </>
+      ):(
+        <Restrict/>
       )}
 
       {/* Popup */}
@@ -381,12 +533,10 @@ export default function AddVehicleType(){
           justClose={justClose}
           closePopup={closePopup}
           removeVehicleDet={removeVehicleDet}
+          vacantVehicle={vacantVehicle}
         />
       )}
-
+      
     </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
   );
 }

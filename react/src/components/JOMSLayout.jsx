@@ -4,19 +4,26 @@ import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faTableList, faClipboardUser, faVanShuttle } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
+import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../axios";
 import Footer from "./Footer";
+import Popup from "./Popup";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function JOMSLayout() {
+  const { currentUserId, currentUserName, currentUserAvatar, setCurrentUserToken, currentUserCode } = useUserStateContext();
 
-  const { currentUserId, setCurrentId, setUserToken, userCode } = useUserStateContext();
-
-  const [activeAccordion, setActiveAccordion] = useState(null);
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
   const handleToggle = (index) => {
     setActiveAccordion(index === activeAccordion ? null : index);
@@ -28,33 +35,49 @@ export default function JOMSLayout() {
     }
   }, [isSidebarMinimized, setActiveAccordion]);
 
-  // Logout Area
-  const logout = () => {
-    // Perform the logout logic
-    const logMessage = `${currentUserId.name} has logged out of the system.`;
+  // Logout
+  function handleLogout(){
+    setShowPopup(true);
+    setPopupContent('Logout');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Logout Confirmation</p>
+        <p className="popup-message">Are you sure you want to log out?</p>
+      </div>
+    );
+  }
 
-    axiosClient.post('/logout', { logMessage }).then(() => {
-      localStorage.removeItem('USER_ID');
-      localStorage.removeItem('TOKEN');
-      localStorage.removeItem('USER_CODE');
-      localStorage.removeItem('loglevel');
-      localStorage.removeItem('LAST_ACTIVITY');
-      setUserToken(null);
+  function logout(){
+    setSubmitLoading(true);
+    
+    axiosClient
+      .post('/logout')
+      .then(() => {
+        localStorage.removeItem('USER_ID');
+        localStorage.removeItem('TOKEN');
+        localStorage.removeItem('USER_CODE');
+        localStorage.removeItem('USER_DET');
+        localStorage.removeItem('USER_AVATAR');
+        setCurrentUserToken(null);
+        navigate('/login');
+      });
+  }
 
-      // Redirect to the login page
-      navigate('/login');
-    });
-  };
-  
-  const ucode = userCode;
+  //Close Popup on Error
+  const justClose = () => {
+    setShowPopup(false);
+  }
+
+  // Restrictions
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");
-  const GSOOnly = codes.includes("GSO");
-  const AssignPersonnel = codes.includes("AP");
-  const DivisionManager = codes.includes("DM");
-  const AdminManager = codes.includes("AM");
   const PortManager = codes.includes("PM");
-  const AuthorizePerson = codes.includes("AU");
+  const AdminManager = codes.includes("AM");
+  const DivisionManager = codes.includes("DM");
+  const GSO = codes.includes("GSO");
+  const AssignPersonnel = codes.includes("AP");
+  const Authority = codes.includes("AU");
 
   return (
     <div className="w-full h-full font-roboto">
@@ -65,6 +88,7 @@ export default function JOMSLayout() {
           <div className="flex justify-center items-center py-4">
             <img src={ppaLogo} alt="PPA PMO/LNI" className={`transition-width duration-300 ${isSidebarMinimized ? 'w-10' : 'w-4/5 items-center'}`} />
           </div>
+
           {/* Title Text */}
           {!isSidebarMinimized ? (
               <div className="text-title mb-10">
@@ -72,7 +96,7 @@ export default function JOMSLayout() {
                 <span className="first-letter">M</span>anagement <br />
                 <span className="first-letter">S</span>ystem
               </div>
-          ) : (
+          ):(
             <div className="text-title mb-10 vertical-text">
               <span className="block first-letter text-center">J</span>
               <span className="block first-letter text-center">O</span>
@@ -144,11 +168,11 @@ export default function JOMSLayout() {
                 </section>
               )}
             </li>
-            
+
             {/* Request List */}
-            {(SuperAdmin || GSOOnly || AssignPersonnel || DivisionManager || PortManager || AdminManager) && (
+            {(SuperAdmin || GSO || AssignPersonnel || Authority || DivisionManager || PortManager || AdminManager) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
-                
+
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
                 <>
@@ -159,27 +183,32 @@ export default function JOMSLayout() {
                   </label>
                 </>
                 }
-                
+
                 {(activeAccordion === 2 || !isSidebarMinimized) && (
-                    <section>
-                      <ul id="menu2" className="pl-3 mt-4">
-                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                          <Link to="/joms/inspection">Pre/Post Repair Inspection Form</Link>
-                        </li>
+                  <section>
+                    <ul id="menu2" className="pl-3 mt-4">
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/inspection">Pre/Post Repair Inspection Form</Link>
+                      </li>
+                      {(!AssignPersonnel || !Authority) && (
                         <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                           <Link to="/joms/facilityvenue">Facility / Venue Request Form</Link>
                         </li>
+                      )}
+                      {(!AssignPersonnel || Authority || SuperAdmin) && (
                         <li className="flex w-full justify-between text-white cursor-pointer items-center">
                           <Link to="/joms/vehicle">Vehicle Slip Form</Link>
                         </li>
-                      </ul>
-                    </section>
-                  )}
+                      )}
+                    </ul>
+                  </section>
+                )}
+
               </li>
             )}
-            
+
             {/* Personnel */}
-            {(SuperAdmin || GSOOnly || AuthorizePerson) && (
+            {(SuperAdmin || GSO) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/personnel" className="flex items-center">
@@ -191,7 +220,7 @@ export default function JOMSLayout() {
             )}
 
             {/* Vehicle */}
-            {(SuperAdmin || GSOOnly || AuthorizePerson) && (
+            {(SuperAdmin || GSO) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/vehicletype" className="flex items-center">
@@ -205,21 +234,21 @@ export default function JOMSLayout() {
           </ul>
 
           {/* Logout Area */}
-          <ul className="logout-position">
+          <ul className="logout-position mt-6">
             {/* Logout */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-3 mt-3">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 mt-3`}>
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <FontAwesomeIcon icon={faSignOutAlt} />
-                {!isSidebarMinimized && <a onClick={logout} className="text-base  ml-4 leading-4 text-lg">Logout</a>}
+                {!isSidebarMinimized && <a onClick={() => handleLogout()} className="text-base  ml-4 leading-4 text-lg">Logout</a>}
               </div>
             </li>
             {/* Account */}
             <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 ${isSidebarMinimized ? 'mt-5':'mt-3'}`}>
               <div className="flex items-center">
-              <img src={currentUserId?.avatar} className="ppa-display-picture" alt="" />
+              <img src={currentUserAvatar} className="ppa-display-picture" alt="" />
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
-                  <Link to="/user">{currentUserId?.name}</Link>
+                  <Link to="/user">{currentUserName?.name}</Link>
                 </p> 
               : null }  
               </div>
@@ -241,6 +270,18 @@ export default function JOMSLayout() {
         </div>
         <Footer />
       </div>
+
+      {showPopup && (
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          logout={logout}
+          justClose={justClose}
+          userId={currentUserId}
+        />
+      )}
     </div>
   );
 }

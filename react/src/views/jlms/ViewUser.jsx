@@ -16,7 +16,7 @@ export default function UserDetails(){
   // Get the data
   useEffect(() => {
     axiosClient
-    .get(`/userdetail/${currentUserId?.id}`)
+    .get(`/userdetail/${currentUserId}`)
     .then((response) => {
       const userDet = response.data;
 
@@ -25,7 +25,7 @@ export default function UserDetails(){
     .finally(() => {
       setLoadingArea(false);
     });
-  }, [currentUserId?.id]);
+  }, [currentUserId]);
 
   return (
     <PageComponent title="Employee Details">

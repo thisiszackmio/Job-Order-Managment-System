@@ -19,7 +19,8 @@ class NotificationModel extends Model
         'receiver_name',
         'joms_type',
         'joms_id',
-        'status'
+        'status',
+        'form_location'
     ];
 
     protected $table = 'notification';

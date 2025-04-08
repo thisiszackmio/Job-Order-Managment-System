@@ -7,6 +7,7 @@ use App\Models\InspectionModel;
 use App\Models\FacilityVenueModel;
 use App\Models\PPAEmployee;
 use App\Models\VehicleSlipModel;
+use App\Models\NotificationModel;
 
 class JOMSDashboardController extends Controller
 {
@@ -36,7 +37,7 @@ class JOMSDashboardController extends Controller
         // Inspection Data
         $inspectionData = InspectionModel::where('user_id', $id)
             ->whereNotIn('form_status', [1, 3])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($inspectionForm) {
                 return [
@@ -52,7 +53,7 @@ class JOMSDashboardController extends Controller
         // Facility Data
         $facilityData = FacilityVenueModel::where('user_id', $id)
             ->whereIn('admin_approval', [4, 2])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($facilityForm) {
                 return [
@@ -68,7 +69,7 @@ class JOMSDashboardController extends Controller
         // Vehicle Slip Data
         $vehicleData = VehicleSlipModel::where('user_id', $id)
             ->whereNotIn('admin_approval', [9, 4, 3, 2, 1])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($vehicleForm) {
                 return [
@@ -91,7 +92,7 @@ class JOMSDashboardController extends Controller
      *  Pending Approval
      */
     public function PendingApproval($id){
-        $pendingApproval = collect(); 
+        $pendingApproval = collect();
 
         // Notify the Supervisor 
         $inspectionDataSup = InspectionModel::where('supervisor_id', $id)
@@ -103,19 +104,14 @@ class JOMSDashboardController extends Controller
                     'type' => 'Pre/Post Repair Inspection Form',
                     'date_request' => $inspectionForm->created_at,
                     'requestor' => $inspectionForm->user_name,
-                    'remarks' => $inspectionForm->form_remarks,
+                    'remarks' => 'Waiting for your approval',
                 ];
             });
         $pendingApproval = $pendingApproval->merge($inspectionDataSup);
 
         // Notify the GSO
-        $GSORequest = PPAEmployee::where('id', $id)
-        ->where('code_clearance', 'LIKE', "%GSO%")
-        ->first();
-
-        if ($GSORequest) {
-            // If GSO clearance is valid, add GSO-related data
-
+        $GSORequest = PPAEmployee::where('id', $id)->where('code_clearance', 'LIKE', "%GSO%")->first();
+        if ($GSORequest){
             // Inspection Form
             $inspectionDataGSO = InspectionModel::where('supervisor_status', 1) // Approved by Supervisor
                 ->whereIn('form_status', [4, 2, 5]) // Specific Form Status
@@ -134,63 +130,36 @@ class JOMSDashboardController extends Controller
 
             // Facility
             $facilityDataGSO = FacilityVenueModel::where('admin_approval', 2)
-                ->get()
+            ->get()
+            ->map(function ($facilityDataAdmin) {
+                return [
+                    'id' => $facilityDataAdmin->id,
+                    'type' => 'Facility / Venue Form',
+                    'date_request' => $facilityDataAdmin->created_at,
+                    'requestor' => $facilityDataAdmin->user_name,
+                    'remarks' => $facilityDataAdmin->remarks,
+                ];
+            });
+
+            $pendingApproval = $pendingApproval->merge($facilityDataGSO);
+        }
+        
+        // Notify the Admin
+        $AdminManagerRequest = PPAEmployee::where('id', $id)->where('code_clearance', 'LIKE', "%AM%")->first();
+        if ($AdminManagerRequest){
+            // Facility
+            $facilityDataAdmin = FacilityVenueModel::where('admin_approval', 4)->get()
                 ->map(function ($facilityDataAdmin) {
                     return [
                         'id' => $facilityDataAdmin->id,
                         'type' => 'Facility / Venue Form',
                         'date_request' => $facilityDataAdmin->created_at,
                         'requestor' => $facilityDataAdmin->user_name,
-                        'remarks' => 'The form was approved by the Admin Manager.',
+                        'remarks' => "Waiting for your approval",
                     ];
                 });
+            $pendingApproval = $pendingApproval->merge($facilityDataAdmin);
 
-            $pendingApproval = $pendingApproval->merge($facilityDataGSO);
-
-            // Vehicle
-            $vehicleDataGSO = VehicleSlipModel::whereIn('admin_approval', [8, 6, 5])
-                ->get()
-                ->map(function ($vehicleDataGSO) {
-                    return [
-                        'id' => $vehicleDataGSO->id,
-                        'type' => 'Vehicle Slip Form',
-                        'date_request' => $vehicleDataGSO->created_at,
-                        'requestor' => $vehicleDataGSO->user_name,
-                        'remarks' => 'Awaiting for assign vehicle and driver.',
-                    ];
-                });
-
-            $pendingApproval = $pendingApproval->merge($vehicleDataGSO);
-        }
-
-        // Notify the Authoritize Person on Vehicle Slip
-        $AURequest = PPAEmployee::where('id', $id)
-            ->where('code_clearance', 'LIKE', "%AU%")
-            ->first();
-
-        if($AURequest) {
-            // Vehicle
-            $vehicleDataAU = VehicleSlipModel::whereIn('admin_approval', [8, 6, 5])
-                ->get()
-                ->map(function ($vehicleDataAU) {
-                    return [
-                        'id' => $vehicleDataAU->id,
-                        'type' => 'Vehicle Slip Form',
-                        'date_request' => $vehicleDataAU->created_at,
-                        'requestor' => $vehicleDataAU->user_name,
-                        'remarks' => 'Awaiting for assign vehicle and driver.',
-                    ];
-                });
-
-            $pendingApproval = $pendingApproval->merge($vehicleDataAU);
-        }
-
-        // Notify the Admin
-        $AdminManagerRequest = PPAEmployee::where('id', $id)
-        ->where('code_clearance', 'LIKE', "%AM%")
-        ->first();
-
-        if ($AdminManagerRequest) {
             // If Admin Manager clearance is valid, add Admin Manager-related data
             $inspectionDataAM = InspectionModel::where('supervisor_status', 1) // Approved by Supervisor
                 ->where('admin_status', 2) // Specific Form Status
@@ -205,37 +174,6 @@ class JOMSDashboardController extends Controller
                     ];
                 });
             $pendingApproval = $pendingApproval->merge($inspectionDataAM);
-
-            // Facility
-            $facilityDataAdmin = FacilityVenueModel::where('admin_approval', 4)
-                ->get()
-                ->map(function ($facilityDataAdmin) {
-                    return [
-                        'id' => $facilityDataAdmin->id,
-                        'type' => 'Facility / Venue Form',
-                        'date_request' => $facilityDataAdmin->created_at,
-                        'requestor' => $facilityDataAdmin->user_name,
-                        'remarks' => "Waiting for Admin Manager's approval",
-                    ];
-                });
-
-            $pendingApproval = $pendingApproval->merge($facilityDataAdmin);
-
-            // Vehicle
-            $vehicleDataAdmin = VehicleSlipModel::whereIn('admin_approval', [10])
-                ->get()
-                ->map(function ($vehicleDataAdmin) {
-                    return [
-                        'id' => $vehicleDataAdmin->id,
-                        'type' => 'Vehicle Slip Form',
-                        'date_request' => $vehicleDataAdmin->created_at,
-                        'requestor' => $vehicleDataAdmin->user_name,
-                        'remarks' => 'Waiting for your approval',
-                    ];
-                });
-
-            $pendingApproval = $pendingApproval->merge($vehicleDataAdmin);
-
         }
 
         // Notify the Assign Personne
@@ -254,31 +192,109 @@ class JOMSDashboardController extends Controller
             });
         $pendingApproval = $pendingApproval->merge($assignPersonnel);
 
-        // Notify the Port Manager
-        $PortManagerRequest = PPAEmployee::where('id', $id)
-        ->where('code_clearance', 'LIKE', "%PM%")
-        ->first();
-
-        if($PortManagerRequest) {
-            // Vehicle
-            $vehicleDataPM = VehicleSlipModel::whereIn('admin_approval', [11])
-                ->get()
-                ->map(function ($vehicleDataPM) {
-                    return [
-                        'id' => $vehicleDataPM->id,
-                        'type' => 'Vehicle Slip Form',
-                        'date_request' => $vehicleDataPM->created_at,
-                        'requestor' => $vehicleDataPM->user_name,
-                        'remarks' => 'Waiting for your approval',
-                    ];
-                });
-
-            $pendingApproval = $pendingApproval->merge($vehicleDataPM);
-        }
-        
-
         $responseData = $pendingApproval->isEmpty() ? null : $pendingApproval->sortBy('date_request')->values();
-
         return response()->json(['pending_approved' => $responseData]);
     }
+
+         
+
+        
+
+        
+
+    //     if ($GSORequest) {
+    //         // If GSO clearance is valid, add GSO-related data
+
+            
+
+            
+
+    //         // Vehicle
+    //         $vehicleDataGSO = VehicleSlipModel::whereIn('admin_approval', [8, 6, 5])
+    //             ->get()
+    //             ->map(function ($vehicleDataGSO) {
+    //                 return [
+    //                     'id' => $vehicleDataGSO->id,
+    //                     'type' => 'Vehicle Slip Form',
+    //                     'date_request' => $vehicleDataGSO->created_at,
+    //                     'requestor' => $vehicleDataGSO->user_name,
+    //                     'remarks' => 'Awaiting for assign vehicle and driver.',
+    //                 ];
+    //             });
+
+    //         $pendingApproval = $pendingApproval->merge($vehicleDataGSO);
+    //     }
+
+    //     // Notify the Authoritize Person on Vehicle Slip
+    //     $AURequest = PPAEmployee::where('id', $id)
+    //         ->where('code_clearance', 'LIKE', "%AU%")
+    //         ->first();
+
+    //     if($AURequest) {
+    //         // Vehicle
+    //         $vehicleDataAU = VehicleSlipModel::whereIn('admin_approval', [8, 6, 5])
+    //             ->get()
+    //             ->map(function ($vehicleDataAU) {
+    //                 return [
+    //                     'id' => $vehicleDataAU->id,
+    //                     'type' => 'Vehicle Slip Form',
+    //                     'date_request' => $vehicleDataAU->created_at,
+    //                     'requestor' => $vehicleDataAU->user_name,
+    //                     'remarks' => 'Awaiting for assign vehicle and driver.',
+    //                 ];
+    //             });
+
+    //         $pendingApproval = $pendingApproval->merge($vehicleDataAU);
+    //     }
+
+        
+
+    //     if ($AdminManagerRequest) {
+            
+
+            
+
+    //         // Vehicle
+    //         $vehicleDataAdmin = VehicleSlipModel::whereIn('admin_approval', [10])
+    //             ->get()
+    //             ->map(function ($vehicleDataAdmin) {
+    //                 return [
+    //                     'id' => $vehicleDataAdmin->id,
+    //                     'type' => 'Vehicle Slip Form',
+    //                     'date_request' => $vehicleDataAdmin->created_at,
+    //                     'requestor' => $vehicleDataAdmin->user_name,
+    //                     'remarks' => 'Waiting for your approval',
+    //                 ];
+    //             });
+
+    //         $pendingApproval = $pendingApproval->merge($vehicleDataAdmin);
+
+    //     }
+
+        
+
+    //     // Notify the Port Manager
+    //     $PortManagerRequest = PPAEmployee::where('id', $id)
+    //     ->where('code_clearance', 'LIKE', "%PM%")
+    //     ->first();
+
+    //     if($PortManagerRequest) {
+    //         // Vehicle
+    //         $vehicleDataPM = VehicleSlipModel::whereIn('admin_approval', [11])
+    //             ->get()
+    //             ->map(function ($vehicleDataPM) {
+    //                 return [
+    //                     'id' => $vehicleDataPM->id,
+    //                     'type' => 'Vehicle Slip Form',
+    //                     'date_request' => $vehicleDataPM->created_at,
+    //                     'requestor' => $vehicleDataPM->user_name,
+    //                     'remarks' => 'Waiting for your approval',
+    //                 ];
+    //             });
+
+    //         $pendingApproval = $pendingApproval->merge($vehicleDataPM);
+    //     }
+        
+
+        
 }

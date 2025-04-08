@@ -9,6 +9,7 @@ use App\Models\PPAEmployee;
 use App\Models\NotificationModel;
 use App\Http\Requests\InspectionFormRequest;
 use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
 
 class InspectionController extends Controller
 {
@@ -57,7 +58,6 @@ class InspectionController extends Controller
      * Show Inspection Form 
      */
     public function showInspectionForm($id){
-
         // Root URL
         $rootUrl = URL::to('/');
 
@@ -119,9 +119,10 @@ class InspectionController extends Controller
             'supervisor_id' => $InspectionRequest->supervisor_id,
             'supervisor_name' => $InspectionRequest->supervisor_name,
             'form_remarks' => $InspectionRequest->form_remarks,
-            'form_status' => $InspectionRequest->form_status,
+            'sup_status' => $InspectionRequest->supervisor_status,
             'admin_status' => $InspectionRequest->admin_status,
-            'status' => $InspectionRequest->supervisor_status.''.$InspectionRequest->admin_status.''.$InspectionRequest->inspector_status.''.$InspectionRequest->form_status,
+            'insp_status' => $InspectionRequest->inspector_status,
+            'form_status' => $InspectionRequest->form_status,
         ];
 
         $respondData = [
@@ -132,7 +133,8 @@ class InspectionController extends Controller
             'gso_name' => $GSOName,
             'gso_esig' => $GSOEsig,
             'admin_name' => $AdminName,
-            'admin_esig' => $AdminEsig
+            'admin_esig' => $AdminEsig,
+            'gso_id' => $GSOEsigRequest->id
         ];
 
         return response()->json($respondData);
@@ -141,71 +143,113 @@ class InspectionController extends Controller
     /**
      * Store Inspection Form (Part A)
      */
-    public function storeInspectionRequest(InspectionFormRequest $request) {
+    public function storeInspectionRequest(InspectionFormRequest $request){
         $data = $request->validated();
-    
-        // Create and save the deployment data
-        $deploymentData = InspectionModel::create($data);
-    
-        if (!$deploymentData) {
-            return response()->json(['error' => 'Data Error'], 500);
-        }
-    
-        // Create the notification
-        $noti = new NotificationModel();
-        $noti->type_of_jlms = "JOMS";
-        $noti->sender_avatar = $request->input('sender_avatar');
-        $noti->sender_id = $request->input('sender_id');
-        $noti->sender_name = $request->input('sender_name');
-        $noti->message = $request->input('notif_message');
-        $noti->receiver_id = $request->input('receiver_id');
-        $noti->receiver_name = $request->input('receiver_name');
-        $noti->joms_type = 'JOMS_Inspection';
-        $noti->status = 2;
-        $noti->joms_id = $deploymentData->id;
-    
-        // Save the notification and create logs if successful
-        if ($noti->save()) {
-            // Create logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $data['user_name'] . ' has submitted the request for Pre/Post Repair Inspection (Control No. '.$deploymentData->id.')';
-            $logs->save();
-        } else {
-            return response()->json(['error' => 'Failed to save notification'], 500);
-        }
-    
-        return response()->json(['message' => 'Deployment data created successfully'], 200);
+
+        if($request->input('form') === "Check"){
+            return response()->json(['message' => 'Check'], 200);
+        }else{
+            // Get the Requestor Data to get the avatar
+            $req = PPAEmployee::where('id', $data['user_id'])->first();
+            $reqAvatar = $req->avatar;
+            $reqCode = $req->code_clearance;
+            $codeClearance = array_map('trim', explode(',', $reqCode));
+
+            // Get GSO Information
+            $getGSO = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+            $GSOId = $getGSO->id;
+            $GSOName = $getGSO->firstname. ' ' .$getGSO->middlename. '. ' .$getGSO->lastname;
+
+            // Create and save the deployment data
+            $deploymentData = InspectionModel::create($data);
+        
+            if (!$deploymentData) {
+                return response()->json(['error' => 'Data Error'], 500);
+            }
+
+            // Condition Area
+            $allowedCodes = ["AM", "DM", "PM"];
+            $notiMessage = '';
+            $receiverId = '';
+            $receiverName = '';
+
+            if(!empty(array_intersect($allowedCodes, $codeClearance))){
+                $notiMessage = $data['user_name']." has submitted a request.";
+                $receiverId = $GSOId;
+                $receiverName = $GSOName;
+                $form = 5;
+            } else {
+                $notiMessage = $data['user_name']." has submitted a request and needs your approval.";
+                $receiverId = $data['supervisor_id'];
+                $receiverName = $data['supervisor_name'];
+                $form = 6;
+            }
+
+            // Create the notification
+            $noti = new NotificationModel();
+            $noti->type_of_jlms = "JOMS";
+            $noti->sender_avatar = $reqAvatar;
+            $noti->sender_id = $data['user_id'];
+            $noti->sender_name = $data['user_name'];
+            $noti->message = $notiMessage;
+            $noti->receiver_id = $receiverId;
+            $noti->receiver_name = $receiverName;
+            $noti->joms_type = 'JOMS_Inspection';
+            $noti->status = 2;
+            $noti->form_location = $form;
+            $noti->joms_id = $deploymentData->id;
+
+            // Save the notification and create logs if successful
+            if ($noti->save()) {
+                // Create logs
+                $logs = new LogsModel();
+                $logs->category = 'JOMS';
+                $logs->message = $data['user_name'] . ' has submitted the request for Pre/Post Repair Inspection (Control No. '.$deploymentData->id.')';
+                $logs->save();
+            } else {
+                return response()->json(['error' => 'Failed to save notification'], 500);
+            }
+
+            
+            return response()->json(['message' => 'Deployment data created successfully'], 200);
+            }
     }
 
     /**
      * Update Part A Form
      */
     public function updatePartA(Request $request, $id){
-
         $InspectionRequest = InspectionModel::find($id);
+        $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
+        if ($InspectionRequest->supervisor_status === 1 && !in_array("GSO", $codeClearance)) {
+            return response()->json(['message' => 'Closed'], 408);
+        }
+
         if ($InspectionRequest->form_status === 1) {
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
-
             $uPartA = $InspectionRequest->update([
                 'property_number' => $request->input('property_number'),
                 'acquisition_date' => $request->input('acquisition_date'),
                 'acquisition_cost' => $request->input('acquisition_cost'),
                 'brand_model' => $request->input('brand_model'),
-                'serial_engine_no' => $request->input('serial_engine_no')
+                'serial_engine_no' => $request->input('serial_engine_no'),
+                'type_of_property' => $request->input('type_of_property'),
+                'property_description' => $request->input('property_description'),
+                'location' => $request->input('location'),
+                'complain' => $request->input('complain')
             ]);
 
             if($uPartA){
                 // Logs
                 $logs = new LogsModel();
                 $logs->category = 'JOMS';
-                $logs->message = $request->input('logs');
+                $logs->message = $request->input('user_name').' has updated Part A of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
 
                 return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -214,12 +258,15 @@ class InspectionController extends Controller
             }
         }
 
+        return response()->json($InspectionRequest);
     }
 
     /**
      * Submit Part B Form 
      */
     public function submitPartB(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         // Validate the Part B Form
         $validatePartB = $request->validate([
@@ -228,23 +275,35 @@ class InspectionController extends Controller
             'nature_of_last_repair' => 'nullable|string',
             'personnel_id' => 'required|numeric',
             'personnel_name' => 'required|string',
-            'form_remarks' => 'required|string',
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
 
-        $getAM = 'AM';
-        $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first(); 
-
-        $getGSO = 'GSO';
-        $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
-
-        $dataReq = PPAEmployee::where('id', $InspectionRequest->user_id)->first();
-
-        $PersonnelDet = PPAEmployee::find($InspectionRequest->personnel_id);
-
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Get Admin Manager
+        $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first(); 
+        $idAM = $dataAM->id;
+        $avatarAM = $dataAM->avatar;
+        $nameAM = $dataAM->firstname.' '.$dataAM->middlename.'. '.$dataAM->lastname;
+
+        // Get GSO
+        $dataGSO = PPAEmployee::where('id', $request->input('gsoId'))->where('code_clearance', 'LIKE', "%GSO%")->first();
+        $idGSO = $dataGSO->id;
+        $avatarGSO = $dataGSO->avatar;
+        $nameGSO = $dataGSO->firstname.' '.$dataGSO->middlename.'. '.$dataGSO->lastname;
+
+        // Create a Form Remarks
+        if($InspectionRequest->user_id === $dataAM->id){
+            $FormRemarks = 'The GSO has filled out Part B of the form and assigned personnel to check it.';
+            $adminStatus = 2;
+            $inspDet = 0;
+        } else {
+            $FormRemarks = "The GSO has filled out Part B of the form and is waiting for the admin manager's approval.";
+            $adminStatus = 1;
+            $inspDet = 3;
         }
 
         // Update Data
@@ -254,82 +313,109 @@ class InspectionController extends Controller
             'nature_of_last_repair' => $validatePartB['nature_of_last_repair'],
             'personnel_id' => $validatePartB['personnel_id'],
             'personnel_name' => $validatePartB['personnel_name'],
-            'form_remarks' => $validatePartB['form_remarks'],
+            'form_remarks' => $FormRemarks,
             'form_status' => 0,
             'admin_status' => $request->input('admin_status'),
             'inspector_status' => $request->input('inspector_status'),
         ]);
 
+        // Condition Area
+        $notifications = [];
+
+        if($InspectionRequest->user_id === $idAM){
+            $senderAvatar = $avatarGSO;
+            $senderId = $idGSO;
+            $senderName = $nameGSO;
+            $notiMessage = 'Your request has filled out the Part B by the GSO.';
+            $form = 3;
+        }else if($InspectionRequest->user_id === $idGSO){
+            $senderAvatar = $avatarAM;
+            $senderId = $idAM;
+            $senderName = $nameAM;
+            $notiMessage = $InspectionRequest->user_name.' has filled out the Part B Form and is waiting for your approval.';
+            $form = 4;
+        }else{
+            $senderAvatar = $avatarGSO;
+            $senderId = $idGSO;
+            $senderName = $nameGSO;
+            $notiMessage = "Part B of your request has been filled out by the GSO and is now waiting for the Admin Manager's approval.";
+            $form = 4;
+        }
+
         if($sPartB){
+            // Send back to the Requestor
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $senderAvatar,
+                'sender_id' => $senderId,
+                'sender_name' => $senderName,
+                'message' => $notiMessage,
+                'receiver_id' => $InspectionRequest->user_id,
+                'receiver_name' => $InspectionRequest->user_name,
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 2,
+                'form_location' => $form,
+                'joms_id' => $InspectionRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
 
-            if($InspectionRequest->user_id === $dataAM->id){
-                // If Admin (Send a notification)
-                $notiAdmin = new NotificationModel();
-                $notiAdmin->type_of_jlms = "JOMS";
-                $notiAdmin->sender_avatar = $dataGSO->avatar;
-                $notiAdmin->sender_id = $dataGSO->id;
-                $notiAdmin->sender_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiAdmin->message = 'Your request has filled out the Part B by the GSO.' ;
-                $notiAdmin->receiver_id = $dataAM->id;
-                $notiAdmin->receiver_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiAdmin->joms_type = 'JOMS_Inspection';
-                $notiAdmin->status = 2;
-                $notiAdmin->joms_id = $InspectionRequest->id; 
-                $notiAdmin->save();
-
-                // Send to the Assign Personnel
-                $notiPerso = new NotificationModel();
-                $notiPerso->type_of_jlms = "JOMS";
-                $notiPerso->sender_avatar = $dataAM->avatar;
-                $notiPerso->sender_id = $dataAM->id;
-                $notiPerso->sender_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiPerso->message = 'You have been assigned to this task.' ;
-                $notiPerso->receiver_id = $PersonnelDet->id;
-                $notiPerso->receiver_name = $PersonnelDet->firstname. ' ' .$PersonnelDet->middlename. '. ' .$PersonnelDet->lastname;
-                $notiPerso->joms_type = 'JOMS_Inspection';
-                $notiPerso->status = 2;
-                $notiPerso->joms_id = $InspectionRequest->id; 
-                $notiPerso->save();
-            } else if($InspectionRequest->user_id === $dataGSO->id){
-                // If GSO (Send to the Admin Manager)
-                $notiAdmin = new NotificationModel();
-                $notiAdmin->type_of_jlms = "JOMS";
-                $notiAdmin->sender_avatar = $dataGSO->avatar;
-                $notiAdmin->sender_id = $dataGSO->id;
-                $notiAdmin->sender_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiAdmin->message = $InspectionRequest->user_name.' has filled out the Part B Form and is waiting for your approval.' ;
-                $notiAdmin->receiver_id = $dataAM->id;
-                $notiAdmin->receiver_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiAdmin->joms_type = 'JOMS_Inspection';
-                $notiAdmin->status = 2;
-                $notiAdmin->joms_id = $InspectionRequest->id; 
-                $notiAdmin->save();
-            } else {
-                // If Division Manager, Port Manager, GSO and User Personnel (Send to the Admin Manager)
-                $notiReq = new NotificationModel();
-                $notiReq->type_of_jlms = "JOMS";
-                $notiReq->sender_avatar = $dataGSO->avatar;
-                $notiReq->sender_id = $dataGSO->id;
-                $notiReq->sender_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiReq->message = 'The request for '.$InspectionRequest->user_name.' has filled out the form (Part B) by the GSO, and it needs your approval.';
-                $notiReq->receiver_id = $dataAM->id;
-                $notiReq->receiver_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiReq->joms_type = 'JOMS_Inspection';
-                $notiReq->status = 2;
-                $notiReq->joms_id = $InspectionRequest->id; 
-                $notiReq->save();
+            // Send to the Admin Manager
+            if($InspectionRequest->user_id !== $idAM){
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $avatarGSO,
+                    'sender_id' => $idGSO,
+                    'sender_name' => $nameGSO,
+                    'message' => 'The GSO has filled out Part B and is now waiting for your approval.',
+                    'receiver_id' => $idAM,
+                    'receiver_name' => $nameAM,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 4,
+                    'joms_id' => $InspectionRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
             }
 
-            // Logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+            // Send to the Assign Personnel (only if requestor is the Admin Manager)
+            if($InspectionRequest->user_id === $idAM){
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $avatarGSO,
+                    'sender_id' => $idGSO,
+                    'sender_name' => $nameGSO,
+                    'message' => 'You are assigned to this task.',
+                    'receiver_id' => $InspectionRequest->personnel_id,
+                    'receiver_name' => $InspectionRequest->personnel_name,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 4,
+                    'joms_id' => $InspectionRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+            }
 
-            return response()->json(['message' => 'User details updated successfully.'], 200);
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $InspectionRequest->id)
+            ->where('form_location', 5)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
+
         } else {
             return response()->json(['message' => 'There area some missing.'], 204);
         }
+
+        // Logs
+        $logs = new LogsModel();
+        $logs->category = 'JOMS';
+        $logs->message = $nameGSO.' has filled out Part B of the Pre/Post Repair Inspection Form (Control No. '. $InspectionRequest->id.')';
+        $logs->save();
     }
 
     /**
@@ -342,22 +428,21 @@ class InspectionController extends Controller
             return response()->json(['message' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) { 
+        if ($InspectionRequest->form_status === 1) {
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
-
             $uPartB = $InspectionRequest->update([
                 'date_of_last_repair' => $request->input('date_of_last_repair'),
                 'nature_of_last_repair' => $request->input('nature_of_last_repair'),
                 'personnel_id' => $request->input('personnel_id'),
                 'personnel_name' => $request->input('personnel_name')
             ]);
-    
+
             if($uPartB){
                 // Logs
                 $logs = new LogsModel();
                 $logs->category = 'JOMS';
-                $logs->message = $request->input('logs');
+                $logs->message = $request->input('user_name').' has updated Part B of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
                 return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -365,26 +450,23 @@ class InspectionController extends Controller
                 return response()->json(['message' => 'There area some missing.'], 204);
             }
         }
-
     }
 
     /**
      * Submit Part C Form 
      */
     public function submitPartC(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         // Validate the Part C Form
         $validatePartC = $request->validate([
             'before_repair_date' => 'required|date',
             'findings' => 'required|string',
             'recommendations' => 'required|string',
-            'form_remarks' => 'required|string',
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
-
-        $getAM = 'AM';
-        $data = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first(); 
 
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
@@ -395,16 +477,54 @@ class InspectionController extends Controller
             'before_repair_date' =>  $validatePartC['before_repair_date'],
             'findings' => $validatePartC['findings'],
             'recommendations' => $validatePartC['recommendations'],
-            'form_remarks' => $validatePartC['form_remarks'],
+            'form_remarks' => $request->input('user_name').' has finished inspecting your request.',
             'inspector_status' => 2,
         ]);
 
         if($sPartC){
 
+            // Get the Assign Personnel Avatar
+            $dataAss = PPAEmployee::where('id', $InspectionRequest->personnel_id)->first();
+            $avatarAss = $dataAss->avatar;
+
+            // Get GSO
+            $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+            $idGSO = $dataGSO->id;
+            $nameGSO = $dataGSO->firstname.' '.$dataGSO->middlename.'. '.$dataGSO->lastname;
+
+            // Condition Area
+            $notifications = [];
+
+            // Send to the GSO
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $avatarAss,
+                'sender_id' => $InspectionRequest->personnel_id,
+                'sender_name' => $InspectionRequest->personnel_name,
+                'message' => $InspectionRequest->personnel_name.' has finished filling out the Part C.',
+                'receiver_id' => $idGSO,
+                'receiver_name' => $nameGSO,
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 2,
+                'form_location' => 2,
+                'joms_id' => $InspectionRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $InspectionRequest->id)
+            ->where('form_location', 3)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
+
             // Logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
+            $logs->message = $request->input('user_name').' has filled out Part C of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -437,7 +557,7 @@ class InspectionController extends Controller
                 // Logs
                 $logs = new LogsModel();
                 $logs->category = 'JOMS';
-                $logs->message = $request->input('logs');
+                $logs->message = $request->input('user_name').' has updated Part C of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
                 return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -452,12 +572,13 @@ class InspectionController extends Controller
      * Submit Part D Form 
      */
     public function submitPartD(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         // Validate the Part B Form
         $validatePartD = $request->validate([
             'after_reapir_date' => 'required|date',
             'remarks' => 'required|string',
-            'form_remarks' => 'required|string',
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
@@ -470,80 +591,96 @@ class InspectionController extends Controller
         $sPartD = $InspectionRequest->update([
             'after_reapir_date' =>  $validatePartD['after_reapir_date'],
             'remarks' => $validatePartD['remarks'],
-            'form_remarks' => $validatePartD['form_remarks'],
+            'form_remarks' => $request->input('user_name').' has completed the request.',
             'inspector_status' => 1,
             'form_status' => 2
         ]);
 
+        // Get GSO
+        $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+        $idGSO = $dataGSO->id;
+        $nameGSO = $dataGSO->firstname.' '.$dataGSO->middlename.'. '.$dataGSO->lastname;
+
+        // Get Personnel Avatar
+        $dataAP = PPAEmployee::where('id', $InspectionRequest->personnel_id)->first();
+        $avatarAP = $dataAP->avatar;
+
+        // Check if the requestor is the GSO
+        $isRequestorGSO = $InspectionRequest->user_id === $dataGSO->id;
+        $isPersonnel = $InspectionRequest->user_id === $InspectionRequest->personnel_id;
+
+        // For the Requestor
+        if($isPersonnel){
+            $notiMessage = 'The request for '.$InspectionRequest->user_name.' is complete.';
+            $receiverId = $idGSO;
+            $receiverName = $nameGSO;
+        } else {
+            $notiMessage = 'Your request has been completed.';
+            $receiverId = $InspectionRequest->user_id;
+            $receiverName = $InspectionRequest->user_name;
+        }
+
+        // For the GSO
+        if($isRequestorGSO){
+            $notiMessageGSO = 'Your request has been completed.';
+        }else{
+            $notiMessageGSO = 'The request for '.$InspectionRequest->user_name.' is complete.';
+        }
+
+        // Condition Area
+        $notifications = [];
+
         if($sPartD){
-
-            $getGSO = 'GSO';
-            $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first();
-
-            if($InspectionRequest->user_id === $dataGSO->id){
-                // Send back for the GSO
-                $notiGSO = new NotificationModel();
-                $notiGSO->type_of_jlms = "JOMS";
-                $notiGSO->sender_avatar = $request->input('sender_avatar');
-                $notiGSO->sender_id = $request->input('sender_id');
-                $notiGSO->sender_name = $request->input('sender_name');
-                $notiGSO->message = "Your request has been completed.";
-                $notiGSO->receiver_id = $InspectionRequest->user_id;
-                $notiGSO->receiver_name = $InspectionRequest->user_name;
-                $notiGSO->joms_type = 'JOMS_Inspection';
-                $notiGSO->status = 2;
-                $notiGSO->joms_id = $InspectionRequest->id; 
-                $notiGSO->save();
-            } else if($InspectionRequest->user_id === $InspectionRequest->personnel_id){
-                // Send for the GSO
-                $notiGSO = new NotificationModel();
-                $notiGSO->type_of_jlms = "JOMS";
-                $notiGSO->sender_avatar = $request->input('sender_avatar');
-                $notiGSO->sender_id = $request->input('sender_id');
-                $notiGSO->sender_name = $request->input('sender_name');
-                $notiGSO->message = "The request for ".$InspectionRequest->user_name." is complete.";
-                $notiGSO->receiver_id = $dataGSO->id;
-                $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiGSO->joms_type = 'JOMS_Inspection';
-                $notiGSO->status = 2;
-                $notiGSO->joms_id = $InspectionRequest->id; 
-                $notiGSO->save();
-            } else {
-                // Send for the Requestor
-                $noti = new NotificationModel();
-                $noti->type_of_jlms = "JOMS";
-                $noti->sender_avatar = $request->input('sender_avatar');
-                $noti->sender_id = $request->input('sender_id');
-                $noti->sender_name = $request->input('sender_name');
-                $noti->message = "Your request has been completed.";
-                $noti->receiver_id = $InspectionRequest->user_id;
-                $noti->receiver_name = $InspectionRequest->user_name;
-                $noti->joms_type = 'JOMS_Inspection';
-                $noti->status = 2;
-                $noti->joms_id = $InspectionRequest->id; 
-                $noti->save();
-
-                // Send for the GSO
-                $notiGSO = new NotificationModel();
-                $notiGSO->type_of_jlms = "JOMS";
-                $notiGSO->sender_avatar = $request->input('sender_avatar');
-                $notiGSO->sender_id = $request->input('sender_id');
-                $notiGSO->sender_name = $request->input('sender_name');
-                $notiGSO->message = "The request for ".$InspectionRequest->user_name." is complete.";
-                $notiGSO->receiver_id = $dataGSO->id;
-                $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-                $notiGSO->joms_type = 'JOMS_Inspection';
-                $notiGSO->status = 2;
-                $notiGSO->joms_id = $InspectionRequest->id; 
-                $notiGSO->save();
+            if ($isRequestorGSO || !$isPersonnel){
+                // Send back to the GSO
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $avatarAP,
+                    'sender_id' => $InspectionRequest->personnel_id,
+                    'sender_name' => $InspectionRequest->personnel_name,
+                    'message' => $notiMessageGSO,
+                    'receiver_id' => $idGSO,
+                    'receiver_name' => $nameGSO,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 1,
+                    'joms_id' => $InspectionRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
             }
-            
+
+            // Send to the Requestor
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $avatarAP,
+                'sender_id' => $InspectionRequest->personnel_id,
+                'sender_name' => $InspectionRequest->personnel_name,
+                'message' => $notiMessage,
+                'receiver_id' => $receiverId,
+                'receiver_name' => $receiverName,
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 2,
+                'form_location' => 1,
+                'joms_id' => $InspectionRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $InspectionRequest->id)
+            ->where('form_location', 2)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
+
             // Logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
+            $logs->message = $request->input('user_name').' has filled out Part D of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
             $logs->save();
-
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
@@ -573,7 +710,7 @@ class InspectionController extends Controller
                 // Logs
                 $logs = new LogsModel();
                 $logs->category = 'JOMS';
-                $logs->message = $request->input('logs');
+                $logs->message = $request->input('user_name').' has updated Part D of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
                 return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -589,11 +726,13 @@ class InspectionController extends Controller
      * Supervisor Approval Function 
      */
     public function approveSupervisor(Request $request, $id) {
+        // Get the current timestamp
+        $now = Carbon::now();
 
         $ApproveRequest = InspectionModel::find($id);
 
-        $getGSO = 'GSO';
-        $dataGSO = PPAEmployee::where('code_clearance', 'LIKE', "%{$getGSO}%")->first(); // Get the GSO ID
+        // Get GSO Employee
+        $GSOData = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
 
         if (!$ApproveRequest) {
             return response()->json(['message' => 'Inspection request not found'], 404);
@@ -605,72 +744,139 @@ class InspectionController extends Controller
         $ApproveRequest->form_remarks = "This form was approved by the supervisor.";
         $ApproveRequest->save();
 
-        if($ApproveRequest->user_id === $dataGSO->id){
-            // Send Back to the GSO
-            $notiGSO = new NotificationModel();
-            $notiGSO->type_of_jlms = "JOMS";
-            $notiGSO->sender_avatar = $request->input('sender_avatar');
-            $notiGSO->sender_id = $request->input('sender_id');
-            $notiGSO->sender_name = $request->input('sender_name');
-            $notiGSO->message = 'Your request have been approved by ' . $request->input('sender_name') .'.';
-            $notiGSO->receiver_id = $ApproveRequest->user_id;
-            $notiGSO->receiver_name = $ApproveRequest->user_name;
-            $notiGSO->joms_type = 'JOMS_Inspection';
-            $notiGSO->status = 2;
-            $notiGSO->joms_id = $ApproveRequest->id; 
-            $notiGSO->save();
-        } else {
-            // Send to the Requestor
-            $noti = new NotificationModel();
-            $noti->type_of_jlms = "JOMS";
-            $noti->sender_avatar = $request->input('sender_avatar');
-            $noti->sender_id = $request->input('sender_id');
-            $noti->sender_name = $request->input('sender_name');
-            $noti->message = $request->input('notif_message');
-            $noti->receiver_id = $request->input('receiver_id');
-            $noti->receiver_name = $request->input('receiver_name');
-            $noti->joms_type = 'JOMS_Inspection';
-            $noti->status = 2;
-            $noti->joms_id = $ApproveRequest->id; 
-            $noti->save();
+        // Condition Area
+        $notifications = [];
 
-            // Send to the GSO
-            $notiGSO = new NotificationModel();
-            $notiGSO->type_of_jlms = "JOMS";
-            $notiGSO->sender_avatar = $request->input('sender_avatar');
-            $notiGSO->sender_id = $request->input('sender_id');
-            $notiGSO->sender_name = $request->input('sender_name');
-            $notiGSO->message = 'The request for ' .$ApproveRequest->user_name. ' was approved by ' .$ApproveRequest->supervisor_name. '.' ;
-            $notiGSO->receiver_id = $dataGSO->id;
-            $notiGSO->receiver_name = $dataGSO->firstname. ' ' .$dataGSO->middlename. '. ' .$dataGSO->lastname;
-            $notiGSO->joms_type = 'JOMS_Inspection';
-            $notiGSO->status = 2;
-            $notiGSO->joms_id = $ApproveRequest->id; 
-            $notiGSO->save();
+        $notiMessage = 'Your request has been approved.';
+        $receiverId = $ApproveRequest->user_id;
+        $receiverName = $ApproveRequest->user_name;
+
+        // Check if the requestor is the GSO
+        $isRequestorGSO = $ApproveRequest->user_id === $GSOData->id;
+
+        // Get the Supervisor Data to get the avatar
+        $supId = PPAEmployee::where('id', $ApproveRequest->supervisor_id)->where('code_clearance', 'LIKE', "%DM%")->first();
+        $supAvatar = $supId->avatar;
+
+        // If the requestor is NOT GSO, include the supervisor’s name in the message
+        if ($ApproveRequest->user_id !== $GSOData->id) {
+            $notiMessage = 'Your request has been approved by ' . $ApproveRequest->supervisor_name. '.';
         }
 
-        // Logs
+        // Create a Notification if the Requestor is GSO
+        if ($GSOData->id === $ApproveRequest->user_id) {
+            $requestorGSOnotif = 'Your request has been approved by ' . $ApproveRequest->supervisor_name. '.';
+        } else {
+            $requestorGSOnotif = 'The request for ' . $ApproveRequest->user_name . ' has been approved by ' . $ApproveRequest->supervisor_name . '.';
+        }
+
+        if ($ApproveRequest->save()) {
+            // Send to the Requestor
+            if (!$isRequestorGSO) {
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $supAvatar,
+                    'sender_id' => $ApproveRequest->supervisor_id,
+                    'sender_name' => $ApproveRequest->supervisor_name,
+                    'message' => $notiMessage,
+                    'receiver_id' => $receiverId,
+                    'receiver_name' => $receiverName,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 5,
+                    'joms_id' => $ApproveRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+            }
+
+            // Send to the GSO
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $supAvatar,
+                'sender_id' => $ApproveRequest->supervisor_id,
+                'sender_name' => $ApproveRequest->supervisor_name,
+                'message' => $requestorGSOnotif,
+                'receiver_id' => $GSOData->id,
+                'receiver_name' => trim($GSOData->firstname . ' ' . $GSOData->middlename . '. ' . $GSOData->lastname),
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 2,
+                'form_location' => 5,
+                'joms_id' => $ApproveRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $ApproveRequest->id)
+            ->where('form_location', 6)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
+
+        } else {
+            return response()->json(['message' => 'Failed to update the request'], 500);
+        }
+
         $logs = new LogsModel();
         $logs->category = 'JOMS';
-        $logs->message = $request->input('sender_name') . ' has approved the request for Pre/Post Repair Inspection (Control No. ' . $ApproveRequest->id . ').';
+        $logs->message = $ApproveRequest->supervisor_name. ' has approved the request on the Pre/Post Repair Inspection Form (Control No. '. $ApproveRequest->id.').';
         $logs->save();
-
-        return response()->json(['message' => 'Supervisor approval and notification saved successfully'], 200);
+        
+        return response()->json(['message' => 'Form has been approved!'], 200);
     }
 
     /**
      * Supervisor Disapproval Function 
      */
     public function disapproveSupervisor(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         $DisapproveRequest = InspectionModel::find($id);
+
+        if (!$DisapproveRequest) {
+            return response()->json(['message' => 'Inspection request not found'], 404);
+        }
 
         // Send back to the GSO
         $checkQueryGSO = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
 
+        // Get the Requestor Data to get the avatar
+        $req = PPAEmployee::where('id', $DisapproveRequest->user_id)->first();
+        $reqAvatar = $req->avatar;
+
+        // Get the Supervisor Data to get the avatar
+        $supId = PPAEmployee::where('id', $DisapproveRequest->supervisor_id)->where('code_clearance', 'LIKE', "%DM%")->first();
+        $supAvatar = $supId->avatar;
+
+        // Condition Area
+        $notifications = [];
+
+        $notiMessage = 'Your request has been disapproved.';
+        $receiverId = $DisapproveRequest->user_id;
+        $receiverName = $DisapproveRequest->user_name;
+
+        // If the requestor is NOT GSO, include the supervisor’s name in the message
+        if ($DisapproveRequest->user_id !== $checkQueryGSO->id) {
+            $notiMessage = 'Your request has been disapproved by ' . $DisapproveRequest->supervisor_name. '.';
+        }
+
+        // Create a Notification if the Requestor is GSO
+        if ($checkQueryGSO->id === $DisapproveRequest->user_id) {
+            $requestorGSOnotif = 'Your request has been disapproved by ' . $DisapproveRequest->supervisor_name. '.';
+        } else {
+            $requestorGSOnotif = 'The request for ' . $DisapproveRequest->user_name . ' has been disapproved by ' . $DisapproveRequest->supervisor_name . '.';
+        }
+
+        // Check if the requestor is the GSO
+        $isRequestorGSO = $DisapproveRequest->user_id === $checkQueryGSO->id;
+
         // Update Approve
-        $DisapproveRequest->supervisor_status = 2; // Code 2 means Supervisor disapproval
-        $DisapproveRequest->form_status = 1; // Code 4 means Supervisor disapproval
+        $DisapproveRequest->supervisor_status = 2; 
+        $DisapproveRequest->form_status = 1; 
         $reason = $request->input('reason');
         if($reason == 'Others'){
             $DisapproveRequest->form_remarks = "Disapproved by Supervisor (Reason: " .$request->input('otherReason'). ")";
@@ -678,140 +884,186 @@ class InspectionController extends Controller
             $DisapproveRequest->form_remarks = "Disapproved by Supervisor (Reason: " .$request->input('reason'). ")";
         }
 
+        // Notification Function
         if ($DisapproveRequest->save()) {
-
-            if($DisapproveRequest->user_id === $checkQueryGSO->id){
-                // Send to the GSO
-                $notiGSO = new NotificationModel();
-                $notiGSO->type_of_jlms = "JOMS";
-                $notiGSO->sender_avatar = $request->input('sender_avatar');
-                $notiGSO->sender_id = $request->input('sender_id');
-                $notiGSO->sender_name = $request->input('sender_name');
-                $notiGSO->message = 'Your request has been disapproved.';
-                $notiGSO->receiver_id = $checkQueryGSO->id;
-                $notiGSO->receiver_name = $checkQueryGSO->firstname . ' ' . $checkQueryGSO->middlename. '. ' . $checkQueryGSO->lastname;
-                $notiGSO->joms_type = 'JOMS_Inspection';
-                $notiGSO->status = 2;
-                $notiGSO->joms_id = $DisapproveRequest->id; 
-                $notiGSO->save();
-            } else {
-                // Send to the Requestor
-                $noti = new NotificationModel();
-                $noti->type_of_jlms = "JOMS";
-                $noti->sender_avatar = $request->input('sender_avatar');
-                $noti->sender_id = $request->input('sender_id');
-                $noti->sender_name = $request->input('sender_name');
-                $noti->message = $request->input('notif_message');
-                $noti->receiver_id = $request->input('receiver_id');
-                $noti->receiver_name = $request->input('receiver_name');
-                $noti->joms_type = 'JOMS_Inspection';
-                $noti->status = 2;
-                $noti->joms_id = $DisapproveRequest->id; 
-                $noti->save();
-                
-                // Send to the GSO
-                $noti1 = new NotificationModel();
-                $noti1->type_of_jlms = "JOMS";
-                $noti1->sender_avatar = $request->input('sender_avatar');
-                $noti1->sender_id = $request->input('sender_id');
-                $noti1->sender_name = $request->input('sender_name');
-                $noti1->message = 'The request for '.$DisapproveRequest->user_name.' has been disapproved by '.$request->input('sender_name').'. Please see the reason.';
-                $noti1->receiver_id = $checkQueryGSO->id;
-                $noti1->receiver_name = $checkQueryGSO->firstname . ' ' . $checkQueryGSO->middlename. '. ' . $checkQueryGSO->lastname;
-                $noti1->joms_type = 'JOMS_Inspection';
-                $noti1->status = 2;
-                $noti1->joms_id = $DisapproveRequest->id; 
-                $noti1->save();
+            // Send back to the Requestor
+            if (!$isRequestorGSO) {
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $supAvatar,
+                    'sender_id' => $DisapproveRequest->supervisor_id,
+                    'sender_name' => $DisapproveRequest->supervisor_name,
+                    'message' => $notiMessage,
+                    'receiver_id' => $receiverId,
+                    'receiver_name' => $receiverName,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 4,
+                    'form_location' => 0,
+                    'joms_id' => $DisapproveRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
             }
 
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
+            // Receive Notification by the GSO
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $supAvatar,
+                'sender_id' => $DisapproveRequest->supervisor_id,
+                'sender_name' => $DisapproveRequest->supervisor_name,
+                'message' => $requestorGSOnotif,
+                'receiver_id' => $checkQueryGSO->id,
+                'receiver_name' => trim($checkQueryGSO->firstname . ' ' . $checkQueryGSO->middlename . '. ' . $checkQueryGSO->lastname),
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 4,
+                'form_location' => 0,
+                'joms_id' => $DisapproveRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
 
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
+        
+        // Logs
+        $logs = new LogsModel();
+        $logs->category = 'JOMS';
+        $logs->message = $DisapproveRequest->supervisor_name. ' has disapproved the request on the Pre/Post Repair Inspection Form (Control No. '. $DisapproveRequest->id.').';
+        $logs->save();
 
+        return response()->json(['message' => 'Form has been disapproved!'], 200);
     }
 
     /**
      * Admin Approval Function 
      */
     public function approveAdmin(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         $ApproveRequest = InspectionModel::find($id);
 
-        $getAM = 'AM';
-        $dataAM = PPAEmployee::where('code_clearance', 'LIKE', "%{$getAM}%")->first(); 
+        // Get GSO Employee
+        $GSOData = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+
+        if (!$ApproveRequest) {
+            return response()->json(['message' => 'Inspection request not found'], 404);
+        }
+
+        // Get the admin data
+        $AMData = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%AM%")->first();
+
+        if (!$AMData) {
+            return response()->json(['message' => 'Not AM'], 408);
+        }
 
         // Update Approve
         $ApproveRequest->admin_status = 1;
         $ApproveRequest->inspector_status = 3; 
         $ApproveRequest->form_remarks = "This form was approved by the admin manager.";
 
-        // Save Update
-        if ($ApproveRequest->save()) {
+        // Condition Area
+        $notifications = [];
 
-            if($ApproveRequest->user_id === $ApproveRequest->personnel_id){
-                $notiPer = new NotificationModel();
-                $notiPer->type_of_jlms = "JOMS";
-                $notiPer->sender_avatar = $dataAM->avatar;
-                $notiPer->sender_id = $dataAM->id;
-                $notiPer->sender_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiPer->message = "Your request has been approved, and you are to assign for this.";
-                $notiPer->receiver_id = $ApproveRequest->personnel_id;
-                $notiPer->receiver_name = $ApproveRequest->	personnel_name;
-                $notiPer->joms_type = 'JOMS_Inspection';
-                $notiPer->status = 2;
-                $notiPer->joms_id = $ApproveRequest->id; 
-                $notiPer->save();
-            } else {
-                // Send to the Requestor
-                $noti = new NotificationModel();
-                $noti->type_of_jlms = "JOMS";
-                $noti->sender_avatar = $dataAM->avatar;
-                $noti->sender_id = $dataAM->id;
-                $noti->sender_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $noti->message = 'Your request has been approved by the Admin Manager';
-                $noti->receiver_id = $ApproveRequest->user_id;
-                $noti->receiver_name = $ApproveRequest->user_name;
-                $noti->joms_type = 'JOMS_Inspection';
-                $noti->status = 2;
-                $noti->joms_id = $ApproveRequest->id; 
-                $noti->save();
+        // Check if the requestor is the GSO
+        $isRequestorGSO = $ApproveRequest->user_id === $GSOData->id;
+        $assignPersonnel = $ApproveRequest->user_id === $ApproveRequest->personnel_id;
 
-                // Send to the Assign Personnel
-                $notiPer = new NotificationModel();
-                $notiPer->type_of_jlms = "JOMS";
-                $notiPer->sender_avatar = $dataAM->avatar;
-                $notiPer->sender_id = $dataAM->id;
-                $notiPer->sender_name = $dataAM->firstname. ' ' .$dataAM->middlename. '. ' .$dataAM->lastname;
-                $notiPer->message = "You have been assigned to this task.";
-                $notiPer->receiver_id = $ApproveRequest->personnel_id;
-                $notiPer->receiver_name = $ApproveRequest->personnel_name;
-                $notiPer->joms_type = 'JOMS_Inspection';
-                $notiPer->status = 2;
-                $notiPer->joms_id = $ApproveRequest->id; 
-                $notiPer->save();
+        if($ApproveRequest->user_id === $ApproveRequest->personnel_id){
+            $notiMessage = 'Your request has been approved, and you are to assign for this.';
+            $receiverId = $ApproveRequest->personnel_id;
+            $receiverName = $ApproveRequest->personnel_name;
+        } else {
+            $notiMessage = 'Your request has been approved by the Admin Manager';
+            $receiverId = $ApproveRequest->user_id;
+            $receiverName = $ApproveRequest->user_name;
+        }
+
+        if ($ApproveRequest->save()){
+            // Send back to the Requestor
+            if (!$isRequestorGSO){
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $AMData->avatar,
+                    'sender_id' => $AMData->id,
+                    'sender_name' => trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname),
+                    'message' => $notiMessage,
+                    'receiver_id' => $receiverId,
+                    'receiver_name' => $receiverName,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 3,
+                    'joms_id' => $ApproveRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+            }  
+
+            // Send to the Assign Personnel
+            if(!$assignPersonnel){
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $AMData->avatar,
+                    'sender_id' => $AMData->id,
+                    'sender_name' => trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname),
+                    'message' => 'You have been assigned to this task.',
+                    'receiver_id' => $ApproveRequest->personnel_id,
+                    'receiver_name' => $ApproveRequest->personnel_name,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 3,
+                    'joms_id' => $ApproveRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
             }
+
+            // Send to the GSO
+            $notifications[] = [
+                'type_of_jlms' => "JOMS",
+                'sender_avatar' => $AMData->avatar,
+                'sender_id' => $AMData->id,
+                'sender_name' => trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname),
+                'message' => 'The request for '.$ApproveRequest->user_name.' has been approved by the Admin Manager.',
+                'receiver_id' => $GSOData->id,
+                'receiver_name' => trim($GSOData->firstname . ' ' . $GSOData->middlename . '. ' . $GSOData->lastname),
+                'joms_type' => 'JOMS_Inspection',
+                'status' => 2,
+                'form_location' => 3,
+                'joms_id' => $ApproveRequest->id,
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $ApproveRequest->id)
+            ->where('form_location', 4)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Logs
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-
-
+            $logs->message = trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname). ' has approved the request on the Pre/Post Repair Inspection Form (Control No. '. $ApproveRequest->id.').';
+            $logs->save();
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);
         }
-
     }
 
     /**
      * Close Request 
      */
     public function closeRequest(Request $request, $id){
+        // Get the current timestamp
+        $now = Carbon::now();
 
         $ApproveRequest = InspectionModel::find($id);
 
@@ -819,13 +1071,51 @@ class InspectionController extends Controller
         $ApproveRequest->form_status = 1;
         $ApproveRequest->form_remarks = "This form is closed.";
 
+        // Condition Area
+        $notifications = [];
+
+        // Get GSO Employee
+        $GSOData = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+        $avatarGSO = $GSOData->avatar;
+        $idGSO = $GSOData->id;
+        $nameGSO = $GSOData->firstname.' '.$GSOData->middlename.'. '.$GSOData->lastname;
+
+        $isRequestorGSO = $ApproveRequest->user_id === $GSOData->id;
+
         // Save Update
         if ($ApproveRequest->save()) {
+
+            if (!$isRequestorGSO){
+                $notifications[] = [
+                    'type_of_jlms' => "JOMS",
+                    'sender_avatar' => $avatarGSO,
+                    'sender_id' => $idGSO,
+                    'sender_name' => $nameGSO,
+                    'message' => 'Your request has been completed.',
+                    'receiver_id' => $ApproveRequest->user_id,
+                    'receiver_name' => $ApproveRequest->user_name,
+                    'joms_type' => 'JOMS_Inspection',
+                    'status' => 2,
+                    'form_location' => 0,
+                    'joms_id' => $ApproveRequest->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+            }
+
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
+
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $ApproveRequest->id)
+            ->where('form_location', 1)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Log only if saving the notification is successful
             $logs = new LogsModel();
             $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
+            $logs->message = $request->input('user_name').' has closed the request on the Pre/Post Repair Inspection Form (Control No. '.$ApproveRequest->id.').';
             $logs->save();
 
 
@@ -846,25 +1136,21 @@ class InspectionController extends Controller
         $ApproveRequest->admin_status = 0;
         $ApproveRequest->inspector_status = 2;
         $ApproveRequest->form_status = 3;
-        $ApproveRequest->form_remarks = "This form has been delete by the GSO.";
+        $ApproveRequest->form_remarks = "Deleted by the GSO (Reason: ".$request->input('deleteReason').")";
 
         // Save Update
         if ($ApproveRequest->save()) {
 
-            $Noti = NotificationModel::where('joms_id', $ApproveRequest->id)->where('joms_type', 'JOMS_Inspection')->get();
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Inspection')
+            ->where('joms_id', $ApproveRequest->id)
+            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
-            // Loop through each notification and update status
-            foreach ($Noti as $notification) {
-                $notification->status = 0;
-
-                if ($notification->save()) {
-                    // Log only if saving the notification is successful
-                    $logs = new LogsModel();
-                    $logs->category = 'JOMS';
-                    $logs->message = $request->input('logs');
-                    $logs->save();
-                }
-            }
+            // Log only if saving the notification is successful
+            $logs = new LogsModel();
+            $logs->category = 'JOMS';
+            $logs->message = $request->input('user_name').' has deleted the request on the Pre/Post Repair Inspection Form (Control No. '.$ApproveRequest->id.').';
+            $logs->save();
 
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);

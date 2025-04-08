@@ -12,6 +12,7 @@ class PPASecurity extends Model
     protected $fillable = [
         'user_id',
         'hostingname',
+        'browser',
     ];
 
     protected $table = 'ppa_security';

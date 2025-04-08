@@ -200,7 +200,7 @@ export default function Logs() {
                 <button 
                   type="submit"
                   onClick={getLogsInfo}
-                  className="py-2 px-4 $ btn-default"
+                  className="btn-default-form"
                 >
                   Go
                 </button>
@@ -209,7 +209,7 @@ export default function Logs() {
               {logsFunction ? (
                 <div className="flex items-center space-x-4">
                   <button type="button" onClick={handleButtonClick}
-                    className={`px-4 py-2 btn-pdf ${ submitLoading && 'btn-genpdf'}`}
+                    className={`btn-pdf ${ submitLoading && 'btn-genpdf'}`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (

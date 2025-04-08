@@ -12,6 +12,7 @@ class VehicleTypeModel extends Model
     protected $fillable = [
         'vehicle_name',
         'vehicle_plate',
+        'availability'
     ];
 
     protected $table = 'joms_vehicle_type';

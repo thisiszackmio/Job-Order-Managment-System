@@ -4,10 +4,11 @@ import Popup from "../../components/Popup";
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../axios";
 import { useUserStateContext } from "../../context/ContextProvider";
+import Restrict from "../../components/Restrict";
 
 export default function AddAnnouncements(){
 
-  const { userCode } = useUserStateContext();
+  const { currentUserCode } = useUserStateContext();
 
   // Date
   const today = new Date().toISOString().split('T')[0];
@@ -117,14 +118,14 @@ export default function AddAnnouncements(){
   }
 
   // Restrictions Condition
-  const ucode = userCode;
+  const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Authorize = codes.includes("PM") || codes.includes("AM") || codes.includes("DM") || codes.includes("HACK") || codes.includes("GSO");
 
   return (
-    Authorize ? (
-      <PageComponent title="Add Announcement">
-        {/* Main Content */}
+    <PageComponent title="Add Announcement">
+      {/* Main Content */}
+      {Authorize ? (
         <div className="font-roboto ppa-form-box">
           <div className="ppa-form-header"> Announcement Details </div>
           <div style={{ padding: '6px 10px 50px 10px' }}>
@@ -178,7 +179,7 @@ export default function AddAnnouncements(){
                 {/* Submit */}
                 <button 
                   type="submit"
-                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -196,19 +197,19 @@ export default function AddAnnouncements(){
 
           </div>
         </div>
+      ):(
+        <Restrict />
+      )}
 
-        {/* Popup */}
-        {showPopup && (
-          <Popup
-            popupContent={popupContent}
-            popupMessage={popupMessage}
-            justClose={justClose}
-            closePopup={closePopup}
-          />
-        )}
-      </PageComponent>
-    ):(
-      (() => { window.location = '/unauthorize'; return null; })()
-    )
+      {/* Popup */}
+      {showPopup && (
+        <Popup
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          justClose={justClose}
+          closePopup={closePopup}
+        />
+      )}
+    </PageComponent>  
   );
 }

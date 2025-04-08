@@ -45,7 +45,7 @@ export default function MyRequest(){
   // Get the Data
   const fetchRequest = () => {
     axiosClient
-    .get(`/jomsmyrequest/${currentUserId?.id}`)
+    .get(`/jomsmyrequest/${currentUserId}`)
     .then((response) => {
       const responseInspData = response.data.inspection;
       const responseFacData = response.data.facility;
@@ -125,7 +125,7 @@ export default function MyRequest(){
 
   // Get the useEffect
   useEffect(() => {
-    if(currentUserId && currentUserId.id){
+    if(currentUserId){
       fetchRequest();
     }
   }, [currentUserId]);
@@ -161,7 +161,7 @@ export default function MyRequest(){
                 {inspectionForm && inspectionForm?.length > 0 ? (
                   inspectionForm.map((getInspData)=>(
                     <tr key={getInspData.id}>
-                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
                         <Link 
                           to={`/joms/inspection/form/${getInspData.id}`} 
                           className="group flex justify-center items-center"
@@ -226,9 +226,9 @@ export default function MyRequest(){
                 {facilityForm && facilityForm.length > 0 ? (
                   facilityForm.map((getFacData) => (
                     <tr key={getFacData.id}>
-                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
                         <Link 
-                          to={`/joms/facility/form/${getFacData.id}`} 
+                          to={`/joms/facilityvenue/form/${getFacData.id}`} 
                           className="group flex justify-center items-center"
                         >
                           {/* Initially show the ID */}
@@ -296,7 +296,7 @@ export default function MyRequest(){
                 {vehicleForm && vehicleForm?.length > 0 ? (
                   vehicleForm.map((getVehData) => (
                     <tr key={getVehData.id}>
-                      <td className="px-2 py-2 text-lg font-bold text-center table-font">
+                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
                         <Link 
                           to={`/joms/vehicle/form/${getVehData.id}`} 
                           className="group flex justify-center items-center"

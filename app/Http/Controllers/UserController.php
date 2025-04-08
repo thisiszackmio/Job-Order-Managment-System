@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Models\PPASecurity;
 
 class UserController extends Controller
 {
@@ -479,7 +480,7 @@ class UserController extends Controller
         // Get all assigned personnel data
         $assignedPersonnel = AssignPersonnelModel::all();
 
-        // Extract personnel IDs
+        // Extract pers onnel IDs
         $personnelIds = $assignedPersonnel->pluck('personnel_id');
 
         // Map personnel information along with the inspection count
@@ -489,6 +490,7 @@ class UserController extends Controller
                 'personnel_id' => $personnel->id,
                 'personnel_name' => $personnel->personnel_name,
                 'assignment' => $personnel->assignment,
+                'status' => $personnel->status,
             ];
         });
 
@@ -565,6 +567,7 @@ class UserController extends Controller
             'personnel_id' => 'required|numeric',
             'personnel_name' => 'required|string',
             'assignment' => 'required|string',
+            'status' => 'required|numeric'
         ]);
 
         $deploymentData = AssignPersonnelModel::create($personnelData);
@@ -592,7 +595,7 @@ class UserController extends Controller
                     // Creating logs
                     $logs = new LogsModel();
                     $logs->category = 'User';
-                    $logs->message = $request->input('logs');
+                    $logs->message = $personnelData['personnel_name'].' has been assigned to the '.$personnelData['assignment'].' list.';
                     $logs->save();
                 }
 
@@ -607,24 +610,26 @@ class UserController extends Controller
     public function removePersonnel(Request $request, $id) {
         // Find the personnel assignment
         $data = AssignPersonnelModel::find($id);
-    
-        if (!$data) {
+
+        // Data not found
+        if (!$data){
             return response()->json(['message' => 'Personnel not found'], 404);
         }
-    
+
         // Find the associated personnel
         $findPersonnel = PPAEmployee::find($data->personnel_id);
-    
-        if (!$findPersonnel) {
+
+        // Personnel data not found
+        if(!$findPersonnel) {
             return response()->json(['message' => 'Associated personnel not found.'], 404);
         }
-    
+
         // Update the code clearance by removing 'AP'
         $currentClearances = explode(',', $findPersonnel->code_clearance); // Convert to array
-    
+
         // Trim each clearance value to avoid spaces issues
         $currentClearances = array_map('trim', $currentClearances);
-    
+
         // Remove 'AP' from the array
         $currentClearances = array_filter($currentClearances, function($clearance) {
             return $clearance !== 'AP';
@@ -641,17 +646,88 @@ class UserController extends Controller
         // Delete the personnel assignment
         $deleted = $data->delete();
     
-        if (!$deleted) {
+        if(!$deleted) {
             return response()->json(['message' => 'Failed to delete personnel'], 500);
         }
-    
+
         // Creating logs only if both operations are successful
         $logs = new LogsModel();
         $logs->category = 'User';
-        $logs->message = $request->input('logs');
+        $logs->message = $request->input('authority').' has removed one of the assigned personnel from the list.';
         $logs->save();
     
         return response()->json(['message' => 'Personnel deleted and code clearance updated successfully.'], 200);
     }
+
+    /**
+     * Set to Available Assign Personnel
+     */
+    public function availablePersonnel(Request $request, $id){
+        // Find the personnel assignment
+        $data = AssignPersonnelModel::find($id);
+
+        // Data not found
+        if (!$data){
+            return response()->json(['message' => 'Personnel not found'], 404);
+        }
+
+        // Update the status
+        $data->status = 0;
+
+        if($data->save()){
+            // Creating logs only if both operations are successful
+            $logs = new LogsModel();
+            $logs->category = 'User';
+            $logs->message = $request->input('authority').' has set to available.';
+            $logs->save();
+        }
+
+        return response()->json(['message' => 'Personnel Available.'], 200);
+    }
+
+    // ---------- For the Security ---------- //
     
+    // Get Security
+    public function getSecurity(Request $request, $id)
+    {
+        $data = PPASecurity::where('user_id', $id)->first();
+
+        if (!$data) {
+            $security = null;
+        } else {
+            $security = [
+                'id' => $data->id,
+                'user_id' => $data->user_id,
+                'hostingname' => $data->hostingname,
+                'browser' => $data->browser,
+            ];
+        }
+
+        return response()->json($security);
+    }
+
+    // Delete Security
+    public function deleteSecurity(Request $request, $id)
+    {
+        // Delete the security entry based on user_id
+        $data = PPASecurity::where('user_id', $id)->delete();
+
+        // Find the user and revoke all tokens
+        $user = PPAEmployee::find($id);
+        if ($user) {
+            $user->tokens()->delete(); // Deletes all tokens for the user
+        }
+
+        if ($data) {
+            // Creating logs only if deletion was successful
+            $logs = new LogsModel();
+            $logs->category = 'User';
+            $logs->message = $request->input('logs', 'Deleted security entry'); // Default message if not provided
+            $logs->save();
+        }
+
+        return response()->json(['success' => $data > 0, 'deleted_rows' => $data]);
+    }
+
+
 }

@@ -61,11 +61,14 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/userdetail/{id}', [UserController::class, 'employeeDetails']); // Get employee details
   Route::get('/getsupervisor', [UserController::class, 'getSupervisor']); // Get supervisor details
   Route::get('/getgso', [UserController::class, 'getGSO']); // Get GSO details
+  Route::get('/getsecurity/{id}', [UserController::class, 'getSecurity']);
+  Route::delete('/deletesecurity/{id}', [UserController::class, 'deleteSecurity']);
 
   // --- Assign Personnel --- //
   Route::post('/assignpersonnel', [UserController::class, 'storePersonnel']); // Assign Personnel
   Route::delete('/removepersonnel/{id}', [UserController::class, 'removePersonnel']); // Remove personnel on list
   Route::get('/showpersonnel', [UserController::class, 'showPersonnel']); // Show personnel Detail on Personnel Page
+  Route::put('/availpersonnel/{id}', [UserController::class, 'availablePersonnel']);
   Route::get('/getpersonnel', [UserController::class, 'getPersonnel']); // Select personnel during assignment
   Route::get('/displaypersonnel/{id}', [UserController::class, 'displayPersonnel']); // Display personnel on select tag on Part B
 
@@ -73,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
 
   // --- JOMS Inspection Request --- //
+  Route::post('/checkinsprequest', [InspectionController::class, 'CheckInspectionForm']);
   Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']); // Submit the Request on Part A
   Route::put('/supinsprequestapprove/{id}', [InspectionController::class, 'approveSupervisor']); // Supervisor Approval
   Route::put('/supinsprequestdisapprove/{id}', [InspectionController::class, 'disapproveSupervisor']); // Supervisor Disapproval
@@ -92,11 +96,15 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- JOMS Facility / Venue Request --- //
   Route::post('/checkavailability', [FacilityVenueController::class, 'checkAvailability']); // Check the availability
   Route::post('/submitfacrequest', [FacilityVenueController::class, 'storeFacilityRequest']); // Submit the request
+  Route::put('/editfacrequest/{id}', [FacilityVenueController::class, 'editFacilityRequest']);
   Route::put('/oprinstruct/{id}', [FacilityVenueController::class, 'submitOPRInstruction']); // Input OPR Instruction
   Route::put('/opraction/{id}', [FacilityVenueController::class, 'submitOPRAction']); // Input OPR Action
+  Route::put('/editoprinstruct/{id}', [FacilityVenueController::class, 'editOPRInstruction']);
+  Route::put('/editopraction/{id}', [FacilityVenueController::class, 'editOPRAction']);
   Route::put('/adminfacapproval/{id}', [FacilityVenueController::class, 'adminApproval']); // Admin Approve
   Route::put('/adminfacdisapproval/{id}', [FacilityVenueController::class, 'adminDisapproval']); 
   Route::put('/closefacilityforce/{id}', [FacilityVenueController::class, 'closeRequestForce']); // Force close the Form
+  Route::put('/closefacility/{id}', [FacilityVenueController::class, 'closeForce']);
   Route::get('/showfacvenrequest/{id}', [FacilityVenueController::class, 'showFacilityVenueForm']); // Show Facility / Venue Form Details
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 
@@ -114,6 +122,8 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
   Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
   Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
+  Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
+  Route::put('/editvehicle/{id}', [VehicleSlipController::class, 'editVehicle']);
   
 });
 

@@ -21,7 +21,7 @@ axiosClient.interceptors.response.use(
     (response) => response,
     async (error) => {
       if (error.response && error.response.status === 401) {
-        localStorage.clear();  // Clear the session data
+        localStorage.clear();
         window.location.reload();
   
         // Redirect to the login page

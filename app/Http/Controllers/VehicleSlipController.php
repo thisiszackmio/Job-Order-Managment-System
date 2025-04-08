@@ -17,17 +17,18 @@ class VehicleSlipController extends Controller
     /**
      *  Legend
      *  
-     *  1 - Admin Manager's Approval
-     *  2 - Port Manager's Approval
-     *  3 - Admin Manager's Disapproval
-     *  4 - Port Manager's Disapproval
-     *  5 - Admin Manager's Request
-     *  6 - Port Manager's Request
-     *  7 - GSO's and Authority request
-     *  8 - Requestor's request
-     *  9 - Deleted Form
-     *  10 - Pending for Approval
-     *  11 - Pending for Approval on Manager
+     * 0 - Deleted Form
+     * 1 - Close Form
+     * 2 - Admin Manager's Approval
+     * 3 - Port Manager's Approval
+     * 4 - Admin Manager's Disapproval
+     * 5 - Port Manager's Disapproval
+     * 6 - Admin Manager's Request
+     * 7 - Port Manager's Request
+     * 8 - GSO and Authority Request
+     * 9 - Regular Requestor
+     * 10 - Pending for Approval
+     * 11 - Pending for assigning the vehicle and driver
      * 
      */
 
@@ -65,6 +66,7 @@ class VehicleSlipController extends Controller
      *  Submit Vehicle Slip Form
      */
     public function storeVehicleSlip(Request $request){
+        $now = Carbon::now();
 
         //Validation
         $submitVehicleInfo = $request->validate([
@@ -87,7 +89,10 @@ class VehicleSlipController extends Controller
 
         $requestDateTime = Carbon::createFromFormat('Y-m-d H:i', $submitVehicleInfo['date_arrival'].' '.$submitVehicleInfo['time_arrival']);
 
-        // Check if the start date is in the past
+        if($request->input('form') === "Check"){
+            return response()->json(['message' => 'Check'], 200);
+        }
+        
         if ($requestDateTime < $currentDateTime) {
             return response()->json(['error' => 'invalidDate'], 422);
         } 
@@ -104,73 +109,60 @@ class VehicleSlipController extends Controller
         $AMRequest = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first();
         $PMRequest = PPAEmployee::where('code_clearance', 'LIKE', "%PM%")->first();
         $AuthorityRequest = PPAEmployee::where('code_clearance', 'LIKE', "%AU%")->first();
+        $Requestor = PPAEmployee::find($deploymentData->user_id);
 
-        if($deploymentData->user_id == $GSORequest->id || $deploymentData->user_id == $AuthorityRequest->id){
-            if($submitVehicleInfo['type_of_slip'] === 'within'){
-                // If the GSO and Authority create a request (Send directly to the Admin Manager if Within the City)
-                $notiAM = new NotificationModel();
-                $notiAM->type_of_jlms = "JOMS";
-                $notiAM->sender_avatar = $request->input('avatar');
-                $notiAM->sender_id = $request->input('sender_id');
-                $notiAM->sender_name = $request->input('sender_name');
-                $notiAM->message = $request->input('notif_message');
-                $notiAM->receiver_id = $AMRequest->id;
-                $notiAM->receiver_name = $AMRequest->firstname . ' ' . $AMRequest->middlename. '. ' . $AMRequest->lastname;
-                $notiAM->joms_type = 'JOMS_Vehicle';
-                $notiAM->status = 2;
-                $notiAM->joms_id = $deploymentData->id;
-                $notiAM->save();
+
+        if ($deploymentData->user_id == $GSORequest->id || $deploymentData->user_id == $AuthorityRequest->id) {
+            if ($submitVehicleInfo['type_of_slip'] === 'within') {
+                $receivers = [
+                    ['id' => $AMRequest->id, 'name' => trim($AMRequest->firstname . ' ' . $AMRequest->middlename . '. ' . $AMRequest->lastname)]
+                ];
+                $notiMessage = 'There is a request for ' . $deploymentData->user_name . ' and needs your approval.';
+                $form = 5;
             } else {
-                // If the GSO and Authority create a request (Send directly to the Port Manager if Outside the City)
-                $notiPM = new NotificationModel();
-                $notiPM->type_of_jlms = "JOMS";
-                $notiPM->sender_avatar = $request->input('avatar');
-                $notiPM->sender_id = $request->input('sender_id');
-                $notiPM->sender_name = $request->input('sender_name');
-                $notiPM->message = $request->input('notif_message');
-                $notiPM->receiver_id = $PMRequest->id;
-                $notiPM->receiver_name = $PMRequest->firstname . ' ' . $PMRequest->middlename. '. ' . $PMRequest->lastname;
-                $notiPM->joms_type = 'JOMS_Vehicle';
-                $notiPM->status = 2;
-                $notiPM->joms_id = $deploymentData->id;
-                $notiPM->save();
+                $receivers = [
+                    ['id' => $PMRequest->id, 'name' => trim($PMRequest->firstname . ' ' . $PMRequest->middlename . '. ' . $PMRequest->lastname)]
+                ];
+                $notiMessage = 'There is a request for ' . $deploymentData->user_name . ' and needs your approval.';
+                $form = 5;
             }
         } else {
-            // -- Send to the Authorize -- //
-            $notiAU = new NotificationModel();
-            $notiAU->type_of_jlms = "JOMS";
-            $notiAU->sender_avatar = $request->input('avatar');
-            $notiAU->sender_id = $request->input('sender_id');
-            $notiAU->sender_name = $request->input('sender_name');
-            $notiAU->message = $request->input('notif_message');
-            $notiAU->receiver_id = $AuthorityRequest->id;
-            $notiAU->receiver_name = $AuthorityRequest->firstname . ' ' . $AuthorityRequest->middlename. '. ' . $AuthorityRequest->lastname;
-            $notiAU->joms_type = 'JOMS_Vehicle';
-            $notiAU->status = 2;
-            $notiAU->joms_id = $deploymentData->id;
-            $notiAU->save();
-
-            // -- Send to the GSO -- //
-            $notiGSO = new NotificationModel();
-            $notiGSO->type_of_jlms = "JOMS";
-            $notiGSO->sender_avatar = $request->input('avatar');
-            $notiGSO->sender_id = $request->input('sender_id');
-            $notiGSO->sender_name = $request->input('sender_name');
-            $notiGSO->message = $request->input('notif_message');
-            $notiGSO->receiver_id = $GSORequest->id;
-            $notiGSO->receiver_name = $GSORequest->firstname . ' ' . $GSORequest->middlename. '. ' . $GSORequest->lastname;
-            $notiGSO->joms_type = 'JOMS_Vehicle';
-            $notiGSO->status = 2;
-            $notiGSO->joms_id = $deploymentData->id;
-            $notiGSO->save();
+            // Send notification to both GSO and Authority
+            $receivers = [
+                ['id' => $GSORequest->id, 'name' => trim($GSORequest->firstname . ' ' . $GSORequest->middlename . '. ' . $GSORequest->lastname)],
+                ['id' => $AuthorityRequest->id, 'name' => trim($AuthorityRequest->firstname . ' ' . $AuthorityRequest->middlename . '. ' . $AuthorityRequest->lastname)]
+            ];
+            $notiMessage = 'There is a request for ' . $deploymentData->user_name . '.';
+            $form = 6;
         }
+        
+        // Loop through receivers to create separate notifications
+        foreach ($receivers as $receiver) {
+            $notifications[] = [
+                'type_of_jlms'    => "JOMS",
+                'sender_avatar'    => $Requestor->avatar,
+                'sender_id'        => $Requestor->id,
+                'sender_name'      => trim($Requestor->firstname . ' ' . $Requestor->middlename . '. ' . $Requestor->lastname),
+                'message'          => $notiMessage,
+                'receiver_id'      => $receiver['id'],       // Individual ID
+                'receiver_name'    => $receiver['name'],     // Individual Name
+                'joms_type'        => 'JOMS_Vehicle',
+                'status'           => 2,
+                'form_location'    => $form,
+                'joms_id'          => $deploymentData->id,
+                'created_at'       => $now,
+                'updated_at'       => $now
+            ];
+        }        
+
+        // Insert notifications in bulk for efficiency
+        NotificationModel::insert($notifications);
 
         // For LOGS
         $logs = new LogsModel();
         $logs->category = 'JOMS';
-        $logs->message = $request->input('sender_name').' has submitted a request on (Vehicle Slip No. '.$deploymentData->id.').';
+        $logs->message = $deploymentData->user_name.' has submitted a request on Vehicle Slip (No. '.$deploymentData->id.').';
         $logs->save();
-
     }
 
     /**
@@ -189,7 +181,8 @@ class VehicleSlipController extends Controller
             return [
                 'vehicle_id' => $vehicle->id,
                 'vehicle_name' => $vehicle->vehicle_name,
-                'vehicle_plate' => $vehicle->vehicle_plate
+                'vehicle_plate' => $vehicle->vehicle_plate,
+                'availability' => $vehicle->availability
             ];
         });
 
@@ -212,6 +205,7 @@ class VehicleSlipController extends Controller
             return [
                 'driver_id' => $drive->personnel_id,
                 'driver_name' => $drive->personnel_name,
+                'driver_status' => $drive->status,
             ];
         });
 
@@ -312,6 +306,7 @@ class VehicleSlipController extends Controller
      *  Store Vehicle Information
      */
     public function storeVehicleInformation(Request $request, $id){
+        $now = Carbon::now();
 
         //Validation
         $vehicleInfo = $request->validate([
@@ -329,57 +324,48 @@ class VehicleSlipController extends Controller
             return response()->json(['error' => 'Data Error'], 500);
         }
 
-        $remark = '';
-        $approve = 0;
-
-        $GSORequest = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
-        $GSOName = $GSORequest->firstname . ' ' . $GSORequest->middlename. '. ' . $GSORequest->lastname;
-
-        // for the Remarks 
-        if($TypeofTravel === 'within'){
-            if(in_array($Approval, [5, 6])) {
-                $remark = $request->input('assign'). " has assigned a vehicle and a driver for you.";
-            }else {
-                $remark = $request->input('assign'). " has finished assigning the driver and vehicle and is now waiting for the Admin Manager's approval.";
-            }
-        } else {
-            if($Approval == 5 ) {
-                $remark = "Waiting for the Port Manager's approval";
-            } else if($Approval == 6) {
-                $remark = $request->input('assign'). " has assigned a vehicle and a driver for you.";
-            }
-            else {
-                $remark = $request->input('assign'). " has finished assigning the driver and vehicle and is now waiting for the Port Manager's approval.";
-            }
-        }
-
-        // For the Approval
-        if($TypeofTravel === 'within'){
-            if($Approval == 5) {
-                $approve = 1;
-            }
-            else if($Approval == 6){
-                $approve = 2;
-            }
-            else {
-                $approve = 10;
-            }
-        } else {
-            if($Approval == 5) {
-                $approve = 11;
-            }
-            else if($Approval == 6){
-                $approve = 2;
-            }
-            else {
-                $approve = 10;
-            }
-        }
-
         // Check if already assign
         if($DataRequest->vehicle_type && $DataRequest->driver){
             return response()->json(['error' => 'Already'], 409);
         }else{
+
+            // Get Admin Manager and Port Manager
+            $checkAMQuery = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first(); 
+            $checkPMQuery = PPAEmployee::where('code_clearance', 'LIKE', "%PM%")->first(); 
+
+            // Get inform of the assign person
+            $getAssign = PPAEmployee::find($request->input('assign'));
+            $assignName = trim($getAssign->firstname . ' ' . $getAssign->middlename . '. ' . $getAssign->lastname);
+
+            // for the Remarks Content
+            if($TypeofTravel === 'within'){
+                if(in_array($Approval, [5, 6])) {
+                    $remark = $assignName. " has assigned a vehicle and a driver for you.";
+                }else {
+                    $remark = $assignName. " has assigned a vehicle and driver and waiting for Admin Manager's approval.";
+                }
+            }else{
+                if($Approval == 5 ) {
+                    $remark = "Waiting for the Port Manager's approval";
+                } else if($Approval == 6) {
+                    $remark = $assignName. " has assigned a vehicle and a driver for you.";
+                }
+                else {
+                    $remark = $assignName. " has assigned a vehicle and driver and waiting for Port Manager's approval.";
+                }
+            }
+
+            // For the Approval
+            if($TypeofTravel === 'within'){
+                if($Approval == 5) { $approve = 1; }
+                else if($Approval == 6){ $approve = 2; } 
+                else { $approve = 10; }
+            } else {
+                if($Approval == 5) { $approve = 11; }
+                else if($Approval == 6){ $approve = 2; }
+                else { $approve = 10; }
+            }
+
             // Update Data
             $getVehDet = $DataRequest->update([
                 'vehicle_type' => $vehicleInfo['vehicle_type'],
@@ -388,166 +374,171 @@ class VehicleSlipController extends Controller
                 'remarks' => $remark,
                 'admin_approval' => $approve,
             ]);
-        }
 
-        if($getVehDet){
-
-            // Notification
-
-            // Check
-            $checkAMQuery = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first(); 
-            $checkPMQuery = PPAEmployee::where('code_clearance', 'LIKE', "%PM%")->first(); 
-            $checkReqQuery = PPAEmployee::where('id', $DataRequest->user_id)->first(); 
-
-            // If the Requestor is the Port Manager
-            if ($DataRequest->user_id === $checkPMQuery->id){
-                if ($TypeofTravel == 'within') {
-                    $notiAM = new NotificationModel();
-                    $notiAM->type_of_jlms = "JOMS";
-                    $notiAM->sender_avatar = $request->input('avatar');
-                    $notiAM->sender_id = $request->input('sender_id');
-                    $notiAM->sender_name = $request->input('sender_name');
-                    $notiAM->message = "A driver and vehicle have been assigned to your request by " .$request->input('sender_name'). ".";
-                    $notiAM->receiver_id = $checkPMQuery->id;
-                    $notiAM->receiver_name = $checkPMQuery->firstname . ' ' . $checkPMQuery->middlename. '. ' . $checkPMQuery->lastname;
-                    $notiAM->joms_type = 'JOMS_Vehicle';
-                    $notiAM->status = 2;
-                    $notiAM->joms_id = $DataRequest->id;
-                    $notiAM->save();
-                } else {
-                    $notiAM = new NotificationModel();
-                    $notiAM->type_of_jlms = "JOMS";
-                    $notiAM->sender_avatar = $request->input('avatar');
-                    $notiAM->sender_id = $request->input('sender_id');
-                    $notiAM->sender_name = $request->input('sender_name');
-                    $notiAM->message = "A driver and vehicle have been assigned to your request by " .$request->input('sender_name'). ".";
-                    $notiAM->receiver_id = $checkPMQuery->id;
-                    $notiAM->receiver_name = $checkPMQuery->firstname . ' ' . $checkPMQuery->middlename. '. ' . $checkPMQuery->lastname;
-                    $notiAM->joms_type = 'JOMS_Vehicle';
-                    $notiAM->status = 2;
-                    $notiAM->joms_id = $DataRequest->id;
-                    $notiAM->save();
-                } 
-            }
-            // If the Requestor is the Admin Manager
-            else if($DataRequest->user_id === $checkAMQuery->id){
-                if ($TypeofTravel == 'within') {
-                    $notiAM = new NotificationModel();
-                    $notiAM->type_of_jlms = "JOMS";
-                    $notiAM->sender_avatar = $request->input('avatar');
-                    $notiAM->sender_id = $request->input('sender_id');
-                    $notiAM->sender_name = $request->input('sender_name');
-                    $notiAM->message = "A driver and vehicle have been assigned to your request by " .$request->input('sender_name'). ".";
-                    $notiAM->receiver_id = $checkAMQuery->id;
-                    $notiAM->receiver_name = $checkAMQuery->firstname . ' ' . $checkAMQuery->middlename. '. ' . $checkAMQuery->lastname;
-                    $notiAM->joms_type = 'JOMS_Vehicle';
-                    $notiAM->status = 2;
-                    $notiAM->joms_id = $DataRequest->id;
-                    $notiAM->save();
-                } else {
-                    $notiPM = new NotificationModel();
-                    $notiPM->type_of_jlms = "JOMS";
-                    $notiPM->sender_avatar = $checkAMQuery->avatar;
-                    $notiPM->sender_id = $checkAMQuery->id;
-                    $notiPM->sender_name = $checkAMQuery->firstname . ' ' . $checkAMQuery->middlename. '. ' . $checkAMQuery->lastname;
-                    $notiPM->message = "There is a request for ".$DataRequest->user_name." that needs your approval.";
-                    $notiPM->receiver_id = $checkPMQuery->id;
-                    $notiPM->receiver_name = $checkPMQuery->firstname . ' ' . $checkPMQuery->middlename. '. ' . $checkPMQuery->lastname;
-                    $notiPM->joms_type = 'JOMS_Vehicle';
-                    $notiPM->status = 2;
-                    $notiPM->joms_id = $DataRequest->id;
-                    $notiPM->save();
+            if($getVehDet){
+                // For notification
+                if($TypeofTravel == 'within'){
+                    $receiverId = $checkAMQuery->id;
+                    $receiverName = trim($checkAMQuery->firstname . ' ' . $checkAMQuery->middlename . '. ' . $checkAMQuery->lastname);
+                    $notiMessage = "There is a request for ".$DataRequest->user_name." that needs your approval.";
+                }else{
+                    $receiverId = $checkPMQuery->id;
+                    $receiverName = trim($checkPMQuery->firstname . ' ' . $checkPMQuery->middlename . '. ' . $checkPMQuery->lastname);
+                    $notiMessage = "There is a request for ".$DataRequest->user_name." that needs your approval.";
                 }
+
+                $notifications[] = [
+                    'type_of_jlms'    => "JOMS",
+                    'sender_avatar'    => $getAssign->avatar,
+                    'sender_id'        => $getAssign->id,
+                    'sender_name'      => $assignName,
+                    'message'          => $notiMessage,
+                    'receiver_id'      => $receiverId,       
+                    'receiver_name'    => $receiverName,    
+                    'joms_type'        => 'JOMS_Vehicle',
+                    'status'           => 2,
+                    'form_location'    => 7,
+                    'joms_id'          => $DataRequest->id,
+                    'created_at'       => $now,
+                    'updated_at'       => $now
+                ];
+
+                // Insert notifications in bulk for efficiency
+                NotificationModel::insert($notifications);
+
+                // Update Notification (Para ma wala sa notifacion list)
+                NotificationModel::where('joms_type', 'JOMS_Vehicle')
+                ->where('joms_id', $DataRequest->id)
+                ->where('form_location', 6)
+                ->update(['status' => 0]);
+
+                // Logs
+                $logs = new LogsModel();
+                $logs->category = 'JOMS';
+                $logs->message = $assignName." has assigned the driver and vehicle (Vehicle Slip No.".$DataRequest->id.").";
+                $logs->save();
             }
-            // If Others
-            else {
-                if ($TypeofTravel == 'within') {
-                    $notiAM = new NotificationModel();
-                    $notiAM->type_of_jlms = "JOMS";
-                    $notiAM->sender_avatar = $request->input('avatar');
-                    $notiAM->sender_id = $request->input('sender_id');
-                    $notiAM->sender_name = $request->input('sender_name');
-                    $notiAM->message = "There is a request for ".$DataRequest->user_name." that needs your approval.";
-                    $notiAM->receiver_id = $checkAMQuery->id;
-                    $notiAM->receiver_name = $checkAMQuery->firstname . ' ' . $checkAMQuery->middlename. '. ' . $checkAMQuery->lastname;
-                    $notiAM->joms_type = 'JOMS_Vehicle';
-                    $notiAM->status = 2;
-                    $notiAM->joms_id = $DataRequest->id;
-                    $notiAM->save();
-                } else {
-                    $notiPM = new NotificationModel();
-                    $notiPM->type_of_jlms = "JOMS";
-                    $notiPM->sender_avatar = $checkAMQuery->avatar;
-                    $notiPM->sender_id = $checkAMQuery->id;
-                    $notiPM->sender_name = $checkAMQuery->firstname . ' ' . $checkAMQuery->middlename. '. ' . $checkAMQuery->lastname;
-                    $notiPM->message = "There is a request for ".$DataRequest->user_name." that needs your approval.";
-                    $notiPM->receiver_id = $checkPMQuery->id;
-                    $notiPM->receiver_name = $checkPMQuery->firstname . ' ' . $checkPMQuery->middlename. '. ' . $checkPMQuery->lastname;
-                    $notiPM->joms_type = 'JOMS_Vehicle';
-                    $notiPM->status = 2;
-                    $notiPM->joms_id = $DataRequest->id;
-                    $notiPM->save();
-                }
-            }
 
-
-            // Logs
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('logs');
-            $logs->save();
-
-
-            return response()->json(['message' => 'User details updated successfully.'], 200);
-        }else{
-            return response()->json(['message' => 'There something missing.'], 204);
         }
-
     }
 
     /**
      *  Admin Manager and Port Manager Approval
      */
     public function approveRequest(Request $request, $id){
-        $DataRequest = VehicleSlipModel::find($id);
+        $now = Carbon::now();
 
-        if (!$DataRequest) {
+        $vehRequest = VehicleSlipModel::find($id);
+
+        // Get the Approver Details
+        $approverDet = PPAEmployee::find($request->input('approver'));
+        $approverAvatar = $approverDet->avatar;
+        $approverName = trim($approverDet->firstname . ' ' . $approverDet->middlename . '. ' . $approverDet->lastname);
+
+        if (!$vehRequest) {
             return response()->json(['error' => 'Data Error'], 500);
         }
 
-        $approver = '';
+        // -- Receivers -- //
 
-        if($DataRequest->type_of_slip === 'within'){
+        // GSO
+        $GsoDet = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
+        $GsoId = $GsoDet->id;
+        $GsoName = trim($GsoDet->firstname . ' ' . $GsoDet->middlename . '. ' . $GsoDet->lastname);
+
+        // Requestor
+        $ReqId = $vehRequest->user_id;
+        $ReqName = $vehRequest->user_name;
+
+        
+        // For Remarks
+        $typeOfSlip = $vehRequest->type_of_slip;
+
+        if($typeOfSlip === 'within'){
+            $remark = "Approved by the Admin Manager.";
             $approver = 1;
-        } else {
+            $form = 1;
+            $receivers = [
+                ['id' => $GsoId, 
+                 'name' => $GsoName,
+                 'noti' => 'The request for '.$vehRequest->user_name.' has been approved by the Admin Manager.'
+                ],
+                ['id' => $ReqId, 
+                 'name' => $vehRequest->user_name,
+                 'noti' => 'Your request has been approved by the Admin Manager.'
+                ]
+            ];
+        }else{
+            $remark = "Approved by the Port Manager.";
             $approver = 2;
+            $form = 2;
+            $receivers = [
+                ['id' => $GsoId, 
+                 'name' => $GsoName,
+                 'noti' => 'The request for '.$vehRequest->user_name.' has been approved by the Port Manager.'
+                ],
+                ['id' => $ReqId, 
+                 'name' => $vehRequest->user_name,
+                 'noti' => 'Your request has been approved by the Port Manager.'
+                ]
+            ];
         }
 
-        // Update Approve
-        $DataRequest->admin_approval = $approver;
-        $DataRequest->remarks = $request->input('remarks');
+        // Update Table
+        $vehRequest->admin_approval = $approver;
+        $vehRequest->remarks = $remark;
 
-        if($DataRequest->save()){
+        if($vehRequest->save()){
+            // For the Vechicle
+            $VehTypeDet = VehicleTypeModel::where('vehicle_name', $request->input('vehicleName'))
+                        ->where('vehicle_plate', $request->input('vehiclePlate'))
+                        ->first();
+            $VehTypeDet->availability = 1;
 
-            // Notification
-            // Send back to the Requestor
-            $notiReq = new NotificationModel();
-            $notiReq->type_of_jlms = "JOMS";
-            $notiReq->sender_avatar = $request->input('avatar');
-            $notiReq->sender_id = $request->input('sender_id');
-            $notiReq->sender_name = $request->input('sender_name');
-            $notiReq->message = 'Your request has been approve by '.$request->input('sender_name').'.';
-            $notiReq->receiver_id = $DataRequest->user_id;
-            $notiReq->receiver_name = $DataRequest->user_name;
-            $notiReq->joms_type = 'JOMS_Vehicle';
-            $notiReq->status = 2;
-            $notiReq->joms_id = $DataRequest->id;
-            $notiReq->save();
+            //For the Personnel
+            $AssignDet = AssignPersonnelModel::where('personnel_id', $vehRequest->driver_id)->first();
+            $AssignDet->status = 1;
 
-            return response()->json(['message' => 'The Form has been approved'], 200);
 
+            if($VehTypeDet->save() && $AssignDet->save()){
+                // Send Notification to the requestor
+                // Loop through receivers to create separate notifications
+                foreach ($receivers as $receiver) {
+                    $notifications[] = [
+                        'type_of_jlms'    => "JOMS",
+                        'sender_avatar'    => $approverAvatar,
+                        'sender_id'        => $approverDet->id,
+                        'sender_name'      => $approverName,
+                        'message'          => $receiver['noti'],
+                        'receiver_id'      => $receiver['id'],
+                        'receiver_name'    => $receiver['name'],
+                        'joms_type'        => 'JOMS_Vehicle',
+                        'status'           => 2,
+                        'form_location'    => $form,
+                        'joms_id'          => $vehRequest->id,
+                        'created_at'       => $now,
+                        'updated_at'       => $now
+                    ];
+                }  
+
+                // Insert notifications in bulk for efficiency
+                NotificationModel::insert($notifications);
+
+                // Update Notification (Para ma wala sa notifacion list)
+                NotificationModel::where('joms_type', 'JOMS_Vehicle')
+                ->where('joms_id', $vehRequest->id)
+                ->where('form_location', 7)
+                ->update(['status' => 0]);
+
+                // For LOGS
+                $logs = new LogsModel();
+                $logs->category = 'JOMS';
+                $logs->message = $approverName.' has approved the request on Vehicle Slip (No. '.$vehRequest->id.').';
+                $logs->save();
+
+                return response()->json(['message' => 'The Form has been approved'], 200);
+            }
         }
-
     }
 
     /**
@@ -698,6 +689,7 @@ class VehicleSlipController extends Controller
                 'vehicle_id' => $vehicle->id,
                 'vehicle_name' => $vehicle->vehicle_name,
                 'vehicle_plate' => $vehicle->vehicle_plate,
+                'vehicle_status' => $vehicle->availability,
                 'vehicle_usage' => $slipCount
             ];
         });
@@ -714,6 +706,7 @@ class VehicleSlipController extends Controller
         $vehicleValidate = $request->validate([
             'vehicle_name' => 'required|string',
             'vehicle_plate' => 'required|string',
+            'availability' => 'required|numeric'
         ]);
 
         // Create and save the deployment data
@@ -726,7 +719,7 @@ class VehicleSlipController extends Controller
         // For LOGS
         $logs = new LogsModel();
         $logs->category = 'Vehicle';
-        $logs->message = $request->input('logs');
+        $logs->message = $request->input('authority').' just added the vehicle details.';
         $logs->save();
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -745,7 +738,7 @@ class VehicleSlipController extends Controller
         // For LOGS
         $logs = new LogsModel();
         $logs->category = 'Vehicle';
-        $logs->message = $request->input('logs');
+        $logs->message = $request->input('authority').' just removed the vehicle ('.$VehicleDetailRequest->vehicle_name.'-'.$VehicleDetailRequest->vehicle_plate.') on the list.';
         $logs->save();
 
         // Delete the vehicle
@@ -755,6 +748,55 @@ class VehicleSlipController extends Controller
             return response()->json(['error' => 'Failed to delete vehicle'], 500);
         }
 
+    }
+
+    /**
+     *  Available Vehicle Details
+     */
+    public function availableVehicle(Request $request, $id){
+        $VehicleDetailRequest = VehicleTypeModel::find($id);
+
+        if (!$VehicleDetailRequest) {
+            return response()->json(['error' => 'Data Error'], 500);
+        }
+
+        // Update the status
+        $VehicleDetailRequest->availability = 0;
+
+        if($VehicleDetailRequest->save()){
+            // Creating logs only if both operations are successful
+            $logs = new LogsModel();
+            $logs->category = 'Vehicle';
+            $logs->message = $request->input('authority').' has set a vehicle ('.$VehicleDetailRequest->vehicle_name.'-'.$VehicleDetailRequest->vehicle_plate.') to available.';
+            $logs->save();
+        }
+
+        return response()->json(['message' => 'Vehicle Available.'], 200);
+    }
+
+    /**
+     *  Update Vehicle Details
+     */
+    public function editVehicle(Request $request, $id){
+        $VehicleDetailRequest = VehicleTypeModel::find($id);
+
+        if (!$VehicleDetailRequest) {
+            return response()->json(['error' => 'Data Error'], 500);
+        }
+
+        // Update the status
+        $VehicleDetailRequest->vehicle_name = $request->input('vehicle_name');
+        $VehicleDetailRequest->vehicle_plate = $request->input('vehicle_plate');
+
+        if($VehicleDetailRequest->save()){
+            // Creating logs only if both operations are successful
+            $logs = new LogsModel();
+            $logs->category = 'Vehicle';
+            $logs->message = $request->input('authority').' has updated the vehicle.';
+            $logs->save();
+        }
+
+        return response()->json(['message' => 'Vehicle Available.'], 200);
     }
 
 }

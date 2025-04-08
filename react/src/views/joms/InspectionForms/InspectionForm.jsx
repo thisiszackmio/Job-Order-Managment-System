@@ -2190,7 +2190,7 @@ export default function InspectionForm(){
                   <td className="border border-black p-0 font-arial">
                     <div className="border-b text-xs border-black p-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
                     <div className="border-b text-xs border-black p-1">Revision No.: 01</div>
-                    <div className="text-xs p-1">Date of Effectivity: {formatDate(inspectionData?.form?.date_request)}</div>
+                    <div className="text-xs p-1">Date of Effectivity: March 26, 2021</div>
                   </td>
 
                   {/* Blank */}

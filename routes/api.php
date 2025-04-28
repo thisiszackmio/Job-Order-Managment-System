@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
   // --- Logout --- //
   Route::post('/logout', [AuthController::class, 'logout']);
+  Route::get('/superadminsettings', [AuthController::class, 'settingsSuperAdmin']);
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);

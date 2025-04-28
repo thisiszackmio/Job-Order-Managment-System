@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PPAEmployee;
 use App\Models\LogsModel;
 use App\Models\PPASecurity;
+use App\Models\SuperAdminSettingsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;

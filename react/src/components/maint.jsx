@@ -16,7 +16,7 @@ const MaintenancePage = () => {
         {/* Text Section */}
         <div className="w-full ground-color">
           <h1 className="h-tag">BE RIGHT BACK GUYS!</h1>
-          <h2 className="error-h1">JOMS is Under Maintenance</h2>
+          <h2 className="error-h1">JLMS is Under Maintenance</h2>
           <p className="description">
             The system is currently under maintenance. The developer is working hard to provide you with the best experience possible. Please bear with us during this time
           </p>

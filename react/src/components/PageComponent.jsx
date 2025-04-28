@@ -3,6 +3,9 @@ import TopNav from "./TopNav";
 import { useNavigate } from 'react-router-dom';
 import axiosClient from "../axios";
 import { useUserStateContext } from "../context/ContextProvider";
+import MaintenancePage from "./maint";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 const MAIN_LOGOUT_TIME = 3 * 60 * 1000; // 180 seconds
 const POPUP_GRACE_PERIOD = 2 * 60 * 1000; // 120 seconds
@@ -33,21 +36,33 @@ export default function PageComponent({ title, buttons = '', children }) {
 
   
   return (
-  <>
-    <header className="bg-white shadow flex justify-between items-center">
-      <div className="px-4 py-6 sm:px-4 lg:px-4">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 font-roboto">{title}</h1>
-      </div>
-      <TopNav />
-    </header>
-
-    <main>
-      {turnOff ? ("True"):("False")}
-      <div className="px-4 py-6 sm:px-4 lg:px-4">
-        {children}
-      </div>
-    </main>
-
-  </>
-  );
+    <>
+      <header className="bg-white shadow flex justify-between items-center">
+        <div className="px-4 py-6 sm:px-4 lg:px-4">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 font-roboto">{title}</h1>
+        </div>
+        <TopNav />
+      </header>
+  
+      <main>
+        <div className="px-4 py-6 sm:px-4 lg:px-4">
+          {turnOff ? (
+            SuperAdmin ? (
+            <>
+              {turnOff ? 1 : 0}
+              {children}
+            </>
+            ):(
+              <MaintenancePage />
+            )
+          ) : (
+          <>
+            {children}
+          </>
+          )}
+        </div>
+      </main>
+  
+    </>
+    );
 }

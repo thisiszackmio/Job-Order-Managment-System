@@ -12,13 +12,24 @@ const RELOAD_KEY = "pending-logout";
 
 export default function PageComponent({ title, buttons = '', children }) {
 
-  const { currentUserId, userCode, setCurrentId, setUserToken } = useUserStateContext();
-  const navigate = useNavigate();
+  const { userCode } = useUserStateContext();
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [isTabActive, setIsTabActive] = useState(true);
-  const [timeRemaining, setTimeRemaining] = useState(MAIN_LOGOUT_TIME);
-  const [popupCountdown, setPopupCountdown] = useState(POPUP_GRACE_PERIOD);
+  const ucode = userCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const SuperAdmin = ucode.includes("HACK");
+
+  const [turnOff, setTurnOff] = useState(null);
+
+  // // Get Data
+  // useEffect(() => {
+  //   axiosClient
+  //   .get('/superadminsettings')
+  //   .then((response) => {
+  //     const maintainance = response.data.maintainance;
+
+  //     setTurnOff(maintainance);
+  //   });
+  // }, []);
 
   
   return (

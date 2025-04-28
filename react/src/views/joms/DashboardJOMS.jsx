@@ -34,32 +34,6 @@ export default function DashboardJOMS(){
   const [pending, getPending] = useState([]);
   const [pendingApproval, getPendingApproval] = useState([]);
 
-  // Disable the Scroll on Popup
-  useEffect(() => {
-  
-    // Define the classes to be added/removed
-    const loadingClass = 'loading-show';
-
-    // Function to add the class to the body
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
-
-    // Function to remove the class from the body
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
-
-    // Add or remove the class based on showPopup state
-    if(loading) {
-      addLoadingClass();
-    }
-    else {
-      removeLoadingClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removeLoadingClass();
-    };
-  }, [loading]);
-
   // Set Delay for Loading
   useEffect(() => {
     // Simulate an authentication check

@@ -20,16 +20,16 @@ export default function PageComponent({ title, buttons = '', children }) {
 
   const [turnOff, setTurnOff] = useState(null);
 
-  // // Get Data
-  // useEffect(() => {
-  //   axiosClient
-  //   .get('/superadminsettings')
-  //   .then((response) => {
-  //     const maintainance = response.data.maintainance;
+  // Get Data
+  useEffect(() => {
+    axiosClient
+    .get('/superadminsettings')
+    .then((response) => {
+      const maintainance = response.data.maintainance;
 
-  //     setTurnOff(maintainance);
-  //   });
-  // }, []);
+      setTurnOff(maintainance);
+    });
+  }, []);
 
   
   return (
@@ -42,6 +42,7 @@ export default function PageComponent({ title, buttons = '', children }) {
     </header>
 
     <main>
+      {turnOff ? ("True"):("False")}
       <div className="px-4 py-6 sm:px-4 lg:px-4">
         {children}
       </div>

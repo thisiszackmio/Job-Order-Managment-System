@@ -205,5 +205,28 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Get the Superadmin Settings
+     */
+    public function settingsSuperAdmin() {
+        // Retrieve all settings from the database
+        $getSettings = SuperAdminSettingsModel::all();
+    
+        // Check if there are any settings available
+        if ($getSettings->isEmpty()) {
+            return response()->json([
+                'error' => 'Settings not found.'
+            ], 404);  // Return 404 if no settings are found
+        }
+    
+        // Extract the 'enable_main' setting value
+        $respondData = [
+            'maintainance' => $getSettings->first()->enable_main  // Assuming the first record holds the setting
+        ];
+    
+        // Return the response
+        return response()->json($respondData);
+    }
+
     
 }

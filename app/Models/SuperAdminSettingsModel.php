@@ -5,16 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VehicleTypeModel extends Model
+class SuperAdminSettingsModel extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'vehicle_name',
-        'vehicle_plate',
-        'form_id',
-        'availability'
+        'enable_main',
     ];
 
-    protected $table = 'joms_vehicle_type';
+    protected $table = 'superadminsettings';
 }

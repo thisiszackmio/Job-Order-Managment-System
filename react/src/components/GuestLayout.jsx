@@ -5,9 +5,9 @@ export default function GuestLayout(){
 
     const { currentUserToken } = useUserStateContext();
 
-    if(currentUserToken){
-        return <Navigate to='/' />
-    }
+    // if(currentUserToken){
+    //     return <Navigate to='/' />
+    // }
 
     return(
         <div>

@@ -26,11 +26,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
   // --- Logout --- //
   Route::post('/logout', [AuthController::class, 'logout']);
+  Route::get('/superadminsettings', [AuthController::class, 'settingsSuperAdmin']);
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
-  Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
-  Route::get('/jomspendingapproval/{id}', [JOMSDashboardController::class, 'PendingApproval']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -41,7 +40,6 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- Notification --- //
   Route::put('/read/{id}', [NotificationController::class, 'readNotifications']);
   Route::put('/unread/{id}', [NotificationController::class, 'updateOldNotifications']);
-  Route::delete('/delete/{id}', [NotificationController::class, 'deleteOldNotifications']);
 
   // --- Announcement --- //
   Route::post('/addannouncements', [AnnounceController::class, 'storeAnnouncements']);
@@ -109,22 +107,19 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 
   // --- JOMS Vehicle Slip Request --- //
+  Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
+  Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
   Route::get('/allvehicleslip', [VehicleSlipController::class, 'index']);
   Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
-  Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
+  Route::put('/storevehinfo/{id}', [VehicleSlipController::class, 'storeVehicleInformation']);
+  Route::put('/vehreqapprove/{id}', [VehicleSlipController::class, 'approveRequest']);
   Route::put('/admindecline/{id}', [VehicleSlipController::class, 'submitAdminDeclineRequest']);
   Route::get('/getvehdet', [VehicleSlipController::class, 'getVehicleDetails']);
   Route::get('/getdriverdet', [VehicleSlipController::class, 'getDriverDetails']);
-  Route::put('/storevehinfo/{id}', [VehicleSlipController::class, 'storeVehicleInformation']);
-  Route::put('/vehreqapprove/{id}', [VehicleSlipController::class, 'approveRequest']);
-  Route::put('/forceclose/{id}', [VehicleSlipController::class, 'forceCloseRequest']);
-  Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
   Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
-  Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
-  Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
+  Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
+  Route::put('/availvehicledriver/{id}', [VehicleSlipController::class, 'availableVehicleDriver']);
   Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
-  Route::put('/editvehicle/{id}', [VehicleSlipController::class, 'editVehicle']);
-  
 });
 
 // --- Login --- //

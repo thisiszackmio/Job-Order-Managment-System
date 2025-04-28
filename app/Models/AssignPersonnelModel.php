@@ -13,6 +13,7 @@ class AssignPersonnelModel extends Model
         'personnel_id',
         'personnel_name',
         'assignment',
+        'form_id',
         'status'
     ];
 

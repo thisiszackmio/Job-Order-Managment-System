@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const { currentUserToken } = useUserStateContext();
 
   if (!currentUserToken) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/joms/login" />;
   }
 
   return children;

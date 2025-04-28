@@ -3,6 +3,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animation Loading */
+span.loading {
+  font-size: 25px;
+  font-weight: bold;
+}
+.gear {
+  animation: spin 3s linear infinite;
+  font-size: 2rem;
+  color: #132E51;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+}
+
+/* Scroll lock */
+body.loading-show {
+  overflow: hidden;
+}
+
 /* Restrict */
 .res-container {
   width: 100%;
@@ -230,6 +260,9 @@ span.system-generated {
   align-items: center;
   justify-content: center;
   display: flex;
+}
+.h-tag {
+  font-size: 22px;
 }
 .error span.triangle {
   top: 70%;
@@ -514,6 +547,14 @@ img.img-minimize { width: auto; height: 40px; }
 .ppa-accordion > li > section p { margin: 15px 0; padding: 0 20px; font-size: 12px; line-height: 1.5; }
 
 /* Forms */
+.status-sec {
+  background-color: #d9edf7;
+  padding: 10px;
+  border-radius: 5px;
+  color: #31708f;
+  border-color: #bce8f1;
+  border-width: 1px;
+}
 .disable-form {
   font-style: italic !important;
 }
@@ -544,8 +585,6 @@ span.ass {
   cursor: pointer;
 }
 .icon-form {
-  width: 20px;
-  height: 20px;
   color: #808080;
   transition: 200ms;
 }
@@ -668,7 +707,7 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 /* JOMS CSS */
 .joms-dashboard-title { background-color: #132E51; color: #fff; padding: 5px; font-size: calc(17px + (18 - 17) * ((100vw - 1366px) / (1920 - 1366))); font-weight: 600; }
 .joms-count { font-size: 3rem; font-weight: 600; padding-left: 10px; color: #272727; }
-.joms-word-count { position: relative; top: -10px; left: 10px; font-family: cursive; font-weight: 100; }
+.joms-word-count { position: relative; top: -10px; left: 10px; }
 
 /* Joms Pending Style */
 .pending-title { font-size: 20px; font-weight: 900; }

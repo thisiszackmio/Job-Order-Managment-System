@@ -21,32 +21,6 @@ export default function AllAnnouncements(){
   const [selectedIdForDelete, setSelectedIdForDelete] = useState(null);
   const textareaRef = useRef(null);
 
-  // Disable the Scroll on Popup
-  useEffect(() => {
-    
-    // Define the classes to be added/removed
-    const popupClass = 'popup-show';
-
-    // Function to add the class to the body
-    const addPopupClass = () => document.body.classList.add(popupClass);
-
-    // Function to remove the class from the body
-    const removePopupClass = () => document.body.classList.remove(popupClass);
-
-    // Add or remove the class based on showPopup state
-    if (showPopup) {
-      addPopupClass();
-    } 
-    else {
-      removePopupClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removePopupClass();
-    };
-  }, [showPopup]);
-
   const [submitLoading, setSubmitLoading] = useState(false);
   const [announceList, setAnnounceList] = useState([]);
 
@@ -203,13 +177,6 @@ export default function AllAnnouncements(){
       {Authorize ? (
         <div className="font-roboto ppa-form-box">
           <div className="ppa-form-header"> Announcement List </div>
-
-            {loadingArea ? (
-              <div className="flex py-4 justify-center items-center">
-                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                <span className="loading-table">Loading Announcement List</span>
-              </div>
-            ):(
               <div style={{ padding: '6px 10px 10px 10px' }}>
                 {/* Table */}
                 <table className="ppa-table w-full mb-10 mt-2">
@@ -306,8 +273,6 @@ export default function AllAnnouncements(){
                   </tbody>
                 </table>
               </div>
-            )}
-
         </div>
       ):(
         <Restrict />

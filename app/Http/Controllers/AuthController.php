@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PPAEmployee;
+use App\Models\SuperAdminSettingsModel;
 use App\Models\LogsModel;
 use App\Models\PPASecurity;
 use Illuminate\Http\Request;
@@ -90,6 +91,7 @@ class AuthController extends Controller
         }
     }
 
+
     /**
      * Login on the system
      */
@@ -115,44 +117,61 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid'], 422);
         }
 
-        // Check if the user token if exist
-        $token = PersonalAccessToken::where('tokenable_id', $user->id)->first();
-        if($token){ return response()->json(['error' => 'TokenExist'], 422); }
-
         // Check if the user is need to change pass
         if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
 
-        // Check if the user is active
+        // Check if the user is not active anymore
         if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
 
-        $userdata = [
-            'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
-            'firstname' => $user->firstname,
-            'gender' => $user->gender,
-        ];
+        // Check if the user logs in even the token is active
+        $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
+        $method = $request->input('method');
 
-        // Store on the security database to get the PC Name for tracking
-        $security = new PPASecurity();
-        $security->user_id = $user->id;
-        $security->hostingname = $pcName;
-        $security->browser = $agent->browser();
+        if($existingToken && $method === 'login'){
+            return response()->json(['error' => 'TokenExist'], 404);
+        }else if($existingToken && $method === 'continue')
+
+            if ($existingToken) {
+                $existingToken->delete();
+            }
+
+            // Create a fresh token
+            $token = $user->createToken('PPA_Token')->plainTextToken;
+
+            // User details
+            $userdata = [
+                'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
+                'firstname' => $user->firstname,
+                'gender' => $user->gender,
+            ];
+
+            // Handle security info
+            $security = PPASecurity::where('user_id', $user->id)->first();
+            if (!$security) {
+                $security = new PPASecurity();
+                $security->user_id = $user->id;
+            }
+
+            $security->hostingname = $pcName;
+            $security->browser = $agent->browser();
+
+            if ($security->save()) {
+                // Add to logs
+                $logs = new LogsModel();
+                $logs->category = 'User';
+                $logs->message = $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname .
+                                 ' has logged into the system on device ' . $pcName . ' using the ' .$agent->browser(). ' browser.';
+                $logs->save();
+            }
+
+            return response([
+                'userId' => $user->id,
+                'userDet' => $userdata,
+                'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
+                'code' => $user->code_clearance,
+                'token' => $token
+            ]);
         
-        if($security->save()){
-            // LOGS
-            $logs = new LogsModel();
-            $logs->category = 'SYS';
-            $logs->message = $user->firstname.' '.$user->middlename.'. '.$user->lastname.' has logged into the system using '.$pcName.'.';
-            $logs->save();
-        }
-
-        return response([
-            'userId' => $user->id,
-            'userDet' => $userdata,
-            'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
-            'code' => $user->code_clearance,
-            'token' => $user->createToken('main')->plainTextToken
-        ]);
-    
     }
 
     /**
@@ -204,7 +223,7 @@ class AuthController extends Controller
 
         // LOGS
         $logs = new LogsModel();
-        $logs->category = 'SYS';
+        $logs->category = 'User';
         $logs->message = $fullName .' has logged out on the system using '.$pcName.'.';
 
         if($logs->save() === True){
@@ -215,6 +234,29 @@ class AuthController extends Controller
         return response([
             'success' => true
         ]);
+    }
+
+    /**
+     * Get the Superadmin Settings
+     */
+    public function settingsSuperAdmin() {
+        // Retrieve all settings from the database
+        $getSettings = SuperAdminSettingsModel::all();
+    
+        // Check if there are any settings available
+        if ($getSettings->isEmpty()) {
+            return response()->json([
+                'error' => 'Settings not found.'
+            ], 404);  // Return 404 if no settings are found
+        }
+    
+        // Extract the 'enable_main' setting value
+        $respondData = [
+            'maintainance' => $getSettings->first()->enable_main  // Assuming the first record holds the setting
+        ];
+    
+        // Return the response
+        return response()->json($respondData);
     }
 
     

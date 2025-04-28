@@ -646,14 +646,6 @@ export default function UserDetailsJLMS(){
   return(
     <PageComponent title="Employee Details">
 
-      {/* Preload Screen */}
-      {loading && (
-        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
-        </div>
-      )}
-
       {/* Main Content */}
       <div className="font-roboto">
 
@@ -663,7 +655,7 @@ export default function UserDetailsJLMS(){
           <div className="flex">
             {/* Back to User */}
             <button className="py-2 px-4 btn-default">
-              <Link to="/userlist">Back to User List</Link>
+              <Link to="/joms/userlist">Back to User List</Link>
             </button>
             {(userDet?.status != 0 && SuperAdmin) && (
             <>

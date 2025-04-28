@@ -1,26 +1,31 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import TopNav from "./TopNav";
-import { useNavigate } from 'react-router-dom';
 import axiosClient from "../axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
+import Maint from "./Maint";
 import { useUserStateContext } from "../context/ContextProvider";
 
-const MAIN_LOGOUT_TIME = 3 * 60 * 1000; // 180 seconds
-const POPUP_GRACE_PERIOD = 2 * 60 * 1000; // 120 seconds
-const LOGOUT_DELAY = 5 * 60 * 1000; // Inactivity limit in milliseconds
-const LOGOUT_KEY = "logout-timestamp";
-const RELOAD_KEY = "pending-logout";
-
 export default function PageComponent({ title, buttons = '', children }) {
+  const { currentUserCode } = useUserStateContext();
 
-  const { currentUserId, userCode, setCurrentId, setUserToken } = useUserStateContext();
-  const navigate = useNavigate();
+  const [turnOff, setTurnOff] = useState(null);
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [isTabActive, setIsTabActive] = useState(true);
-  const [timeRemaining, setTimeRemaining] = useState(MAIN_LOGOUT_TIME);
-  const [popupCountdown, setPopupCountdown] = useState(POPUP_GRACE_PERIOD);
+  const ucode = currentUserCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const SuperAdmin = ucode.includes("HACK");
 
-  
+  // Get Data
+  useEffect(() => {
+    axiosClient
+    .get('/superadminsettings')
+    .then((response) => {
+      const maintainance = response.data.maintainance;
+
+      setTurnOff(maintainance);
+    });
+  }, []);
+
   return (
   <>
     <header className="bg-white shadow flex justify-between items-center">
@@ -32,7 +37,29 @@ export default function PageComponent({ title, buttons = '', children }) {
 
     <main>
       <div className="px-4 py-6 sm:px-4 lg:px-4">
-        {children}
+        {turnOff === null ? (
+          <div className="flex items-left h-20 space-x-4">
+            {/* Loading Animation */}
+            <FontAwesomeIcon
+              icon={faGear}
+              className="text-4xl text-blue-700 gear"
+            />
+            <span className="loading">Loading...</span>
+          </div>
+        ):( turnOff ? (
+          SuperAdmin ? (
+          <>
+            {turnOff ? 1 : 0}
+            {children}
+          </>
+          ):(
+            <Maint />
+          )
+        ) : (
+        <>
+          {children}
+        </>
+        ) )}
       </div>
     </main>
 

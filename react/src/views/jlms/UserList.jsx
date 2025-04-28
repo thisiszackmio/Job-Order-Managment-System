@@ -110,14 +110,6 @@ export default function UserListJLMS(){
   return(
     <PageComponent title="Employee List">
 
-      {/* Preload Screen */}
-      {loading && (
-        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
-        </div>
-      )}
-
       {Authorize ? (
         <div className="font-roboto">
 
@@ -174,7 +166,7 @@ export default function UserListJLMS(){
                     <tr key={getData.id}>
                       <td className="px-3 py-2 text-center">{getData.id}</td>
                       <td className="px-3 py-2 text-center table-font w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
-                      <td className="px-3 py-2 text-left table-font"><Link to={`/userdetails/${getData.id}`}>{getData.name}</Link></td>
+                      <td className="px-3 py-2 text-left table-font"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
                       <td className="px-3 py-2 text-center table-font">{getData.division}</td>
                       <td className="px-3 py-2 text-center table-font">{getData.position}</td>
                       <td className="px-3 py-2 text-center table-font">{getData.username}</td>

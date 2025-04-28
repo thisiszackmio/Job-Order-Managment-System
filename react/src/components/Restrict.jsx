@@ -6,7 +6,7 @@ export default function Restrict(){
       <div className="res-title">Access Denied</div>
       <div className="res-des">You are not allowed to access this page. If you need access, contact the developer for permission. (IP Phone: 4084)</div>
       <div className="res-btnarea">
-        <Link to={'/'}>
+        <Link to={'/joms'}>
           <button className="btn-default res-btn" title="View Request">
             Back to Dashboard
           </button>

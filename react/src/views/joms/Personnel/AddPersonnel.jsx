@@ -204,9 +204,7 @@ export default function AddPersonnel(){
 
     axiosClient
     .put(`/availpersonnel/${id}`, {
-      data: {
-        authority: currentUserName.name
-      }
+      authority: currentUserName.name
     })
     .then(() => {
       setShowPopup(true);

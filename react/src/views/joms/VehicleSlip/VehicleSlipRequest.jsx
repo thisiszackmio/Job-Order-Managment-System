@@ -178,7 +178,7 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO || PersonAuthority ? 8 : Admin ? 6 : PortManager ? 7 : 8,
+      admin_approval : GSO || PersonAuthority ? 7 : Admin ? 5 : PortManager ? 6 : 8,
       remarks : remarks,
     }
 
@@ -196,6 +196,7 @@ export default function FacilityVenueForm(){
       );
     })
     .catch(()=>{
+      setButtonHide(true)
       setShowPopup(true);
       setPopupContent('error');
       setPopupMessage(DevErrorText);
@@ -239,12 +240,12 @@ export default function FacilityVenueForm(){
           <form id="vehicleslip" onSubmit={SubmitVehicleForm}>
             {/* Title */}
             <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
-              <p className="text-xs font-bold text-red-500">This will not be editable once submitted.</p>
+              <h2 className="text-lg font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
+              <p className="text-sm font-bold text-red-500">NOTE: This will not be editable once submitted.</p>
             </div>
 
             {/* Date */}
-            <div className="flex items-center mt-6">
+            <div className="flex items-center mt-4">
               <div className="w-40">
                 <label className="block text-base font-bold leading-6 text-gray-900">
                 Date:
@@ -361,29 +362,29 @@ export default function FacilityVenueForm(){
             {/* Button */}
             <div className="mt-10 font-roboto">
               {!buttonHide && (
-              <>
-              {/* Submit */}
-              <button type="submit"
-                className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex items-center justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-1">Processing...</span>
-                  </div> 
-                ) : (
-                  'Submit'
-                )}
-              </button>
+                <>
+                {/* Submit */}
+                <button type="submit"
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex items-center justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Processing...</span>
+                    </div> 
+                  ) : (
+                    'Submit'
+                  )}
+                </button>
 
-                {/* Cancel */}
-                {!submitLoading && (
-                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
-                    Revise
-                  </button>
-                )}
-              </>
+                  {/* Cancel */}
+                  {!submitLoading && (
+                    <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
+                      Revise
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </form>
@@ -392,12 +393,12 @@ export default function FacilityVenueForm(){
         <>
           {/* Title */}
           <div>
-            <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-            <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+            <h2 className="text-lg font-bold leading-7 text-gray-900"> Fill up the Form </h2>
+            <p className="text-sm font-bold text-red-500">NOTE: This form cannot be edited after you submit your request.</p>
           </div>
 
           {/* Date */}
-          <div className="flex items-center mt-10 font-roboto">
+          <div className="flex items-center mt-4 font-roboto">
             <div className="w-48">
               <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
                 Date:
@@ -477,7 +478,12 @@ export default function FacilityVenueForm(){
                 id="vr_purpose"
                 autoComplete="vr_purpose"
                 value={VRPurpose}
-                onChange={ev => setVRPurpose(ev.target.value)}
+                onChange={(ev) => {
+                  const input = ev.target.value;
+                  const formatted =
+                    input.charAt(0).toUpperCase() + input.slice(1);
+                    setVRPurpose(formatted);
+                }}
                 maxLength={500}
                 className={`block w-full ${(!VRPurpose && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
               />
@@ -501,7 +507,12 @@ export default function FacilityVenueForm(){
                 id="vr_place"
                 autoComplete="vr_place"
                 value={VRPlace}
-                onChange={ev => setVRPlace(ev.target.value)}
+                onChange={(ev) => {
+                  const input = ev.target.value;
+                  const formatted =
+                  input.charAt(0).toUpperCase() + input.slice(1);
+                    setVRPlace(formatted);
+                }}
                 className={`block w-full ${(!VRPlace && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
                 maxLength={255}
               />
@@ -578,7 +589,7 @@ export default function FacilityVenueForm(){
                   {vehicleDet?.map((vehDet) => (
                     <option 
                       key={vehDet.vehicle_id} 
-                      value={`${vehDet.vehicle_name} - ${vehDet.vehicle_plate}`} 
+                      value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
                       disabled={vehDet.availability == 1}
                       className={`${vehDet.availability == 1 ? "disable-form":''}`}
                     >
@@ -646,10 +657,23 @@ export default function FacilityVenueForm(){
                 name="vr_passengers"
                 rows={7}
                 value={VRPassenger}
-                onChange={ev => setVRPassenger(ev.target.value)}
+                onChange={(ev) => {
+                  const formattedValue = ev.target.value
+                    .split('\n')
+                    .map(line =>
+                      line
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(' ')
+                    )
+                    .join('\n');
+              
+                  setVRPassenger(formattedValue);
+                }}
                 style={{ resize: 'none' }}
                 maxLength={1000}
                 className="block w-full ppa-form"
+                placeholder="Input name of passenger (press 'Enter' for another passenger)"
               />
               <p className="text-gray-500 text-xs">List each name on a separate line without numbering. If there are no passengers, leave it blank.</p>
             </div>

@@ -75,7 +75,7 @@ const NotFound = () => {
           <h2 className="error-h1">The page doesn't exist</h2>
           <p className="description">We can't seem to find the page you're looking for</p>
           <div className="btn-area">
-            <Link to={'/'}>
+            <Link to={'/joms'}>
               <button 
                 className="bg-blue-700 text-lg hover-bg-green-700 text-white font-bold py-3 px-6 rounded"
                 title="View Request"

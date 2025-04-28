@@ -3,20 +3,15 @@ import PageComponent from "../../../components/PageComponent";
 import Restrict from "../../../components/Restrict";
 import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrash, faFilePdf, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faFilePdf, faHouse, faGear, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 export default function VehicleSlip(){
   const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
-
-  // Get the ID
-  const {id} = useParams();
 
   // Restrictions Condition
   const ucode = currentUserCode;
@@ -25,8 +20,35 @@ export default function VehicleSlip(){
   const GSO = codes.includes("GSO");
   const PersonAuthority = codes.includes("AU");
   const PortManager = codes.includes("PM");
+  const SuperAdmin = codes.includes("HACK");
   const roles = ["AM", "GSO", "HACK", "DM", "PM", "AU"];
   const accessOnly = roles.some(role => codes.includes(role));
+
+  // Set Access
+  const [Access, setAccess] = useState('');
+
+  const [loading, setLoading] = useState(true);
+  const [loadingForm, setLoadingForm] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const [dataAccess, setDataAccess] = useState(null);
+  const [buttonHide, setButtonHide] = useState(false);
+
+  // Dev Error Text
+  const DevErrorText = (
+    <div>
+      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
+    </div>
+  );
+ 
+  // Get the ID
+  const {id} = useParams();
 
   //Date Format 
   function formatDate(dateString) {
@@ -55,85 +77,18 @@ export default function VehicleSlip(){
     return formattedTime;
   }
 
-  const [loading, setLoading] = useState(true);
-  const [buttonHide, setButtonHide] = useState(false);
-
-  // Popup
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
-
-  // Variable
-  const [vehicalName, setVehicleName] = useState('');
-  const [adminReason, setAdminReason] = useState('');
-  const [pointDriver, setPointDriver] = useState({ did: '', dname: '' });
-
-  // Set Access
-  const [Access, setAccess] = useState('');
-  const [dataAccess, setDataAccess] = useState(null);
+  const [editDetail, setEditDetail] = useState(true);
+  const [adminDisapproval, setAdminDisapproval] = useState(false);
 
   // Function
   const [vehicleData, setVehicleData] = useState([]);
-  const [vehicleDet, setVehicleDet] = useState([]);
-  const [driverName, setDriverName] = useState([]);
+  const [vacant, setVacant] = useState([]);
   const [passenger, setPassenger] = useState([]);
   const [requestor, setRequestor] = useState([]);
   const [admin, setAdmin] = useState([]);
 
-  const [editDetail, setEditDetail] = useState(true);
-  const [adminApproval, setAdminApproval] = useState(false);
-
-  // Update
-  const [updatePurpose, setUpdatePurpose] = useState('');
-  const [updateVisited, setUpdateVisited] = useState('');
-  const [updateArrivalDate, setUpdateArrivalDate] = useState('');
-  const [updateArrivalTime, setUpdateArrivalTime] = useState('');
-  const [updateVehicle, setUpdateVehicle] = useState('');
-  const [updatePassengers, setUpdatePassengers] = useState('');
-
-  const [submitLoading, setSubmitLoading] = useState(false);
-
-  // Disable the Scroll on Popup
-  useEffect(() => {
-  
-    // Define the classes to be added/removed
-    const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
-
-    // Function to add the class to the body
-    const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
-
-    // Function to remove the class from the body
-    const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
-
-    // Add or remove the class based on showPopup state
-    if (showPopup) {
-      addPopupClass();
-    } 
-    else if(loading) {
-      addLoadingClass();
-    }
-    else {
-      removePopupClass();
-      removeLoadingClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removePopupClass();
-      removeLoadingClass();
-    };
-  }, [showPopup, loading]);
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
-    </div>
-  );
+  const [vehicleDet, setVehicleDet] = useState([]);
+  const [driverName, setDriverName] = useState([]);
 
   // Get the Data
   const fetchData = () => {
@@ -150,8 +105,11 @@ export default function VehicleSlip(){
       const pmName = responseData.pmName;
       const pmEsig = responseData.pmEsig;
       const driverEsig = responseData.driverEsig;
+      const driverAvail = responseData.driverAvail;
+      const vehicleDet = responseData.vehicleDet;
 
       setVehicleData(FormData);
+      setVacant({driverAvail, vehicleDet})
       setPassenger(passengerData);
       setRequestor({requestorPosData, requestorEsig, driverEsig});
       setAdmin({adminName, adminEsig, pmName, pmEsig});
@@ -159,15 +117,14 @@ export default function VehicleSlip(){
       // Restrictions Condition
       const myAccess = FormData?.user_id == currentUserId || accessOnly ? "Access" : "Denied";
       setDataAccess(null);
-      //console.log(myAccess)
 
       setAccess(myAccess);
     })
     .catch((error) => {
-      if(error.response.data.error == "No-Form"){ // The Form doesn't exist
+      if(error.response?.data?.error == "No-Form"){
         setDataAccess('Not-Found');
         window.location = '/404';
-      } else { // Developer Issue
+      } else {
         setShowPopup(true);
         setPopupContent('error');
         setPopupMessage(DevErrorText);
@@ -175,6 +132,7 @@ export default function VehicleSlip(){
     })
     .finally(() => {
       setLoading(false);
+      setShowPopup(false);
     });
   }
 
@@ -216,16 +174,25 @@ export default function VehicleSlip(){
     }
   }, [id, currentUserId]);
 
+  // Variable
+  const [vehicalName, setVehicleName] = useState('');
+  const [pointDriver, setPointDriver] = useState({ did: '', dname: '' });
+
   // Submit Vehicle Information
   function SubmitVehicleInfo(event){
     event.preventDefault();
     setSubmitLoading(true);
+
+    const VehName = vehicalName?.split(/ \(([^)]+)\)/)?.[0];
+    const VehPlate = vehicalName?.split(/ \(([^)]+)\)/)?.[1];
 
     const vehData = {
       assign: currentUserId,
       vehicle_type : vehicalName,
       driver_id : pointDriver.did, 
       driver : pointDriver.dname,
+      vehicleName: VehName,
+      vehiclePlate: VehPlate,
     }
 
     if(!vehicalName && !pointDriver.did){
@@ -254,15 +221,17 @@ export default function VehicleSlip(){
       })
       .catch((error)=>{
         if (error.response.status === 409) {
+          setButtonHide(true);
           setPopupContent("error");
           setPopupMessage(
             <div>
               <p className="popup-title">Oops!</p>
-              <p className="popup-message">This slip has already assign the vehicle and driver. Please reload the page.</p>
+              <p className="popup-message">This slip has already assign the vehicle and driver.</p>
             </div>
           );
           setShowPopup(true);
         } else {
+          setButtonHide(true);
           setShowPopup(true);
           setPopupContent('error');
           setPopupMessage(DevErrorText);
@@ -274,10 +243,87 @@ export default function VehicleSlip(){
     }
   }
 
-  // Approval Confirmation
-  const handleAdminConfirmation = () => {
+  // Update
+  const [updatePurpose, setUpdatePurpose] = useState('');
+  const [updateVisited, setUpdateVisited] = useState('');
+  const [updateArrivalDate, setUpdateArrivalDate] = useState('');
+  const [updateArrivalTime, setUpdateArrivalTime] = useState('');
+  const [updateVehicle, setUpdateVehicle] = useState('');
+  const [updatePassengers, setUpdatePassengers] = useState('');
+  const [updatePointDriver, setUpdatePointDriver] = useState({ did: '', dname: '' });
+
+  // Default Checkboxes
+  useEffect(() => {
+    setUpdatePurpose(vehicleData?.purpose ?? "");
+    setUpdateVisited(vehicleData?.place_visited ?? "");
+    setUpdateArrivalDate(vehicleData?.date_arrival ?? "");
+    setUpdateArrivalTime(vehicleData?.time_arrival ?? "");
+    setUpdatePassengers(vehicleData?.passengers ?? "");
+  },[
+    vehicleData?.purpose,
+    vehicleData?.place_visited,
+    vehicleData?.date_arrival,
+    vehicleData?.time_arrival,
+    vehicleData?.passengers,
+  ]);
+
+  // Update the Form
+  function UpdateVehicleForm(){
+    setSubmitLoading(true);
+
+    const data = {
+      authority: currentUserName.name,
+      purpose: updatePurpose,
+      passengers: updatePassengers,
+      place_visited: updateVisited,
+      date_arrival: updateArrivalDate,
+      time_arrival: updateArrivalTime,
+      vehicle_type: updateVehicle ? updateVehicle : vehicleData?.vehicle_type,
+      driver_id: updatePointDriver.did ? updatePointDriver.did : vehicleData?.driver_id,
+      driver: updatePointDriver.dname ? updatePointDriver.dname : vehicleData?.driver 
+    }
+
+    axiosClient
+    .put(`/updatevehicleslip/${id}`, data)
+    .then(() => {
+      setButtonHide(true);
+      setPopupContent("success");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success!</p>
+          <p className="popup-message">The form has been updated.</p>
+        </div>
+      );
+      setShowPopup(true);
+      setEditDetail(true);
+    })
+    .catch((error) => {
+      if (error.response.status === 409) {
+        setEditDetail(true);
+        setPopupContent("error");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Sorry!</p>
+            <p className="popup-message">This request form is no longer editable.</p>
+          </div>
+        );
+        setShowPopup(true);
+      } else {
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true); 
+      }
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+
+  }
+
+  // Approval Popup Confirmation
+  function handleAdminConfirmation(){
     setShowPopup(true);
-    setPopupContent('adminVehApproval');
+    setPopupContent('adminApproval');
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
@@ -303,12 +349,117 @@ export default function VehicleSlip(){
     axiosClient
     .put(`/vehreqapprove/${id}`, data)
     .then(() => {
+      setButtonHide(true);
       setShowPopup(true);
       setPopupContent('success');
       setPopupMessage(
         <div>
           <p className="popup-title">Approve Confirm</p>
           <p className="popup-message">The request has been confirmed.</p>
+        </div>
+      );
+    })
+    .catch(()=>{
+      setButtonHide(true);
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(DevErrorText);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+
+  }
+
+  const [adminReason, setAdminReason] = useState('');
+
+  // Disapproval Confirmation
+  const handleAdminDecline = () => {
+
+    if(adminReason){
+      setShowPopup(true);
+      setPopupContent('adminDisapproval');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Are you sure?</p>
+          <p className="popup-message">Do you want to disapprove this request? This action cannot be undone.</p>
+        </div>
+      );
+    }else{
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Error!</p>
+          <p className="popup-message">You have entered an empty field.</p>
+        </div>
+      );
+    }
+    
+  }
+
+  // Submit Disapproval
+  function SubmitAdminReason(event){
+    event.preventDefault();
+    setSubmitLoading(true);
+
+    const data = {
+      authority: currentUserName.name,
+      reason: adminReason,
+      approver: currentUserId
+    }
+
+    axiosClient
+      .put(`/admindecline/${id}`, data)
+      .then(() => {
+        setButtonHide(true);
+        setAdminDisapproval(false);
+        setShowPopup(true);
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Submission Complete!</p>
+            <p className="popup-message">The request has been disapproved</p>
+          </div>
+        );
+      })
+      .catch(()=>{
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(DevErrorText);
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      });
+  }
+
+  // Arrival Popup Confirm
+  function handleArrivalCheck(){
+    setShowPopup(true);
+    setPopupContent('subAvailability');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">The driver and vehicle arrived at the permisis?</p>
+      </div>
+    );
+  }
+
+  // Arrival Function
+  function SubmitAvailability(id){
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`/availvehicledriver/${id}`,{
+      authority: currentUserName.name
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Availability Confirm</p>
+          <p className="popup-message">The driver and vehicle are available for assignment.</p>
         </div>
       );
     })
@@ -320,29 +471,58 @@ export default function VehicleSlip(){
     .finally(() => {
       setSubmitLoading(false);
     });
-
   }
 
-  // Force Closed Function
-  function handleCloseForm(event, id){
-    event.preventDefault();
-
-    alert("Hi");
+  // Cancel Form Confirmation
+  function handleCancelForm(){
+    setShowPopup(true);
+    setPopupContent('cancelForm');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">Do you want to cancel this form? It cannot be restore.</p>
+      </div>
+    );
   }
 
-  // Popup Button Function
-  //Close Popup on Error
-  const justClose = () => {
-    setShowPopup(false);
-  }
+  // Cancel Form Function
+  function cancelForm(){
+    setSubmitLoading(true);
 
-  //Close Popup on Success
-  const closePopup = () => {
-    setShowPopup(false);
-    setSubmitLoading(false);
-    setLoading(true);
-    fetchData();
-    setButtonHide(false);
+    axiosClient
+    .put(`/cancelrequest/${id}`,{
+      authority: currentUserName.name
+    })
+    .then(() => {
+      setButtonHide(true);
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Success!</p>
+          <p className="popup-message">The request has been canceled.</p>
+        </div>
+      );
+    })
+    .catch((error) => {
+      if (error.response.status === 409) {
+        setPopupContent("error");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Invalid!</p>
+            <p className="popup-message">This form is already closed!</p>
+          </div>
+        );
+        setShowPopup(true);
+      } else {
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);
+      }   
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
   }
 
   //Generate PDF
@@ -356,13 +536,13 @@ export default function VehicleSlip(){
     documentTitle: `Vehicle-Slip-No:${id}`
   });
 
-  const handleButtonClick = () => {
+  const handlePDFClick = () => {
     setIsVisible(true); 
     setSeconds(3);
-    setLoading(true);
+    setLoadingForm(true);
     setTimeout(() => {
+      setLoadingForm(false);
       generatePDF();
-      setLoading(false);
       setIsVisible(false); 
     }, 2000);
   };
@@ -388,399 +568,561 @@ export default function VehicleSlip(){
     }
   }, [seconds]);
 
+  // Popup Button Function
+  //Close Popup on Error
+  const justClose = () => {
+    setShowPopup(false);
+    fetchData();
+  }
+
+  //Close Popup on Success
+  const closePopup = () => {
+    setShowPopup(false);
+    setSubmitLoading(false);
+    setLoading(true);
+    window.location.reload();
+  }
+
   return (
     <PageComponent title="Vehicle Slip">
-      {(loading || vehicleData === undefined) && (
-        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
+      {loading ? (
+        <div className="flex items-left h-20 space-x-4">
+          {/* Loading Animation */}
+          <FontAwesomeIcon
+            icon={faGear}
+            className="text-4xl text-blue-700 gear"
+          />
+          <span className="loading">Loading...</span>
         </div>
-      )}
-
-      {/* Header */}
-      <div className="ppa-form-header text-base flex justify-between items-center">
-        <span>Slip No: <span className="px-2 ppa-form-view">{vehicleData?.id}</span></span> 
-        <div className="flex space-x-4"> 
-        {!loading && (
-          Admin && vehicleData?.admin_approval == 10 ? (
-          <div className="flex justify-end space-x-2">
-            {/* Approve */}
-            <button  onClick={handleAdminConfirmation} className="px-4 btn-default-form text-base">
-              Approve
-            </button>
-            {/* Decline onClick={() => setAdminApproval(true)} */}
-            <button className="ml-2 py-2 px-4 btn-cancel-form text-base">
-              Disapprove
-            </button>
-          </div>
-          ):(
+      ):(
+      dataAccess != 'Not-Found' ? (
+        Access == "Denied" ? (
+          <Restrict />
+        ):(
           <>
-            <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-          </>
-          )
-        // <> 
-          
-        //   
-        // </>
-        )}
-        </div>
-      </div>
-
-      {/* Form */}
-      <div className="px-2 pt-6 pb-6 ppa-form-box bg-white mb-6">
-  
-        {/* Date Request */}
-        <div className="flex items-center mt-2">
-          <div className="w-44">
-            <label className="block text-base font-bold leading-6 text-black">
-              Date of Request:
-            </label> 
-          </div>
-          <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-            {!loading && formatDate(vehicleData?.created_at)}
-          </div>
-        </div>
-
-        {/* Purpose */}
-        <div className="flex items-center mt-2">
-          <div className="w-44">
-            <label className="block text-base font-bold leading-6 text-black">
-              Purpose:
-            </label> 
-          </div>
-          <div className={`w-1/2 ${vehicleData?.purpose ? '' : 'h-6'} ${editDetail ? 'ppa-form-view text-left pl-2' : 'pt-1' }`}>
-            {editDetail ? (
-              !loading && vehicleData?.purpose
-            ):(
-              <input
-                type="text"
-                name="update_purpose"
-                id="update_purpose"    
-                value={updatePurpose ? updatePurpose : vehicleData?.purpose}
-                onChange={ev => setUpdatePurpose(ev.target.value)}
-                placeholder="Enter a purpose"
-                className="block w-full ppa-form-edit"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Place/s to be Visited */}
-        <div className="flex items-center mt-2">
-          <div className="w-44">
-            <label className="block text-base font-bold leading-6 text-black">
-              Place/s to be Visited:
-            </label> 
-          </div>
-          <div className={`w-1/2 ${vehicleData?.place_visited ? '' : 'h-6'} ${editDetail ? 'ppa-form-view text-left pl-2' : 'pt-1' }`}>
-            {editDetail ? (
-              !loading && vehicleData?.place_visited
-            ):(
-              <input
-                type="text"
-                name="update_visited"
-                id="update_visited"    
-                value={updateVisited ? updateVisited : vehicleData?.place_visited}
-                onChange={ev => setUpdateVisited(ev.target.value)}
-                placeholder={vehicleData?.place_visited}
-                className="block w-full ppa-form-edit"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Date/Time of Arrival */}
-        <div className="flex items-center mt-2">
-          <div className="w-44">
-            <label className="block text-base font-bold leading-6 text-black">
-              Date/Time of Arrival:
-            </label> 
-          </div>
-          <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
-            {editDetail ? (
-            <> {!loading && `${formatDate(vehicleData?.date_arrival)} @ ${formatTime(vehicleData?.time_arrival)}`} </>
-            ):(
-            <>
-              {/* Date */}
-              <div>
-                <input
-                  type="date"
-                  name="update_date"
-                  id="update_date"    
-                  value={updateArrivalDate ? updateArrivalDate : vehicleData?.date_arrival}
-                  onChange={ev => setUpdateArrivalDate(ev.target.value)}
-                  className="block w-full ppa-form-edit"
-                />
-              </div>
-              
-              {/* Time */}
-              <div className="pt-4">
-                <input
-                  type="time"
-                  name="update_time"
-                  id="update_time"    
-                  value={updateArrivalTime ? updateArrivalTime : vehicleData?.time_arrival}
-                  onChange={ev => setUpdateArrivalTime(ev.target.value)}
-                  className="block w-full ppa-form-edit"
-                />
-              </div>
-            </>
-            )}
-          </div>
-        </div>
-
-        {(vehicleData?.vehicle_type && vehicleData?.driver) && (
-        <>
-          {/* Type of Vehicle */}
-          {!loading && (
-          <div className="flex items-center mt-2">
-            <div className="w-44">
-              <label className="block text-base font-bold leading-6 text-black">
-                {editDetail ? "Type of Vehicle:" : vehicleData?.vehicle_type ? "Type of Vehicle:" : null}
-              </label> 
-            </div>
-            <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
-              {editDetail ? (
-                !loading && vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null
+            {/* Header */}
+            <div className="ppa-form-header text-base flex justify-between items-center">
+              <span>Slip No: <span className="px-2 ppa-form-view">{vehicleData?.id}</span></span> 
+              <div className="flex space-x-4">
+              {Admin && (vehicleData?.admin_approval == 3 || vehicleData?.admin_approval == 7) ? (
+                !buttonHide && !adminDisapproval && (
+                  <div className="flex justify-end space-x-2">
+                    {/* Approve */}
+                    <button onClick={handleAdminConfirmation} className="px-4 btn-default-form text-sm">
+                      Approve
+                    </button>
+                    {/* Decline */}
+                    <button onClick={() => setAdminDisapproval(true)} className="ml-2 py-2 px-4 btn-cancel-form text-sm">
+                      Disapprove
+                    </button>
+                  </div>
+                )
+              ):PortManager && (vehicleData?.admin_approval == 4 || vehicleData?.admin_approval == 7) ? (
+                !buttonHide && !adminDisapproval && (
+                  <div className="flex justify-end space-x-2">
+                    {/* Approve */}
+                    <button onClick={handleAdminConfirmation} className="px-4 btn-default-form text-sm">
+                      Approve
+                    </button>
+                    {/* Decline */}
+                    <button onClick={() => setAdminDisapproval(true)} className="ml-2 py-2 px-4 btn-cancel-form text-sm">
+                      Disapprove
+                    </button>
+                  </div>
+                )
               ):(
-                vehicleData?.vehicle_type ? (
-                  <select 
-                    name="update_vehicle" 
-                    id="update_vehicle" 
-                    value={updateVehicle}
-                    onChange={ev => { setUpdateVehicle(ev.target.value); }}
-                    className="block w-full ppa-form"
-                  >
-                    <option value="" disabled>{vehicleData?.vehicle_type}</option>
-                    {vehicleDet?.map((vehDet) => (
-                      <option key={vehDet.vehicle_id} value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`}>
-                        {vehDet.vehicle_name} ({vehDet.vehicle_plate})
-                      </option>
-                    ))}
-                  </select>
-                ) : null
-              )}
-            </div>
-          </div>
-          )}
-
-          {/* Plate Number */}
-          {editDetail && !loading && (
-            <div className="flex items-center mt-2">
-              <div className="w-44">
-                <label className="block text-base font-bold leading-6 text-black">
-                Plate Number:
-                </label> 
-              </div>
-              <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-                {!loading && vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
-              </div>
-            </div>
-          )}
-
-          {/* Driver */}
-          <div className="flex items-center mt-2">
-            <div className="w-44">
-              <label className="block text-base font-bold leading-6 text-black">
-              {editDetail ? "Driver:" : vehicleData?.driver ? "Driver:" : null}
-              </label> 
-            </div>
-            <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : 'pt-2' }`}>
-              {editDetail ? (
-                vehicleData?.driver
-              ):(
-                vehicleData?.driver ? (
-                  <select 
-                    name="update_driver" 
-                    id="update_driver" 
-                    value={pointDriver.did}
-                    onChange={ev => {
-                      const personnelId = parseInt(ev.target.value);
-                      const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
-
-                      setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
-                    }}
-                    className="block w-full ppa-form"
-                  >
-                    <option value="" disabled>{vehicleData?.driver}</option>
-                    {driverName?.map((driverDet) => (
-                      <option key={driverDet.driver_id} value={driverDet.driver_id}>
-                        {driverDet.driver_name}
-                      </option>
-                    ))}
-                  </select>
-                ):null
-              )}
-            </div>
-          </div>
-        </>
-        )}
-
-        {/* Requested By */}
-        {editDetail && (
-          <div className="flex items-center mt-2">
-            <div className="w-44">
-              <label className="block text-base font-bold leading-6 text-black">
-              Requested By:
-              </label> 
-            </div>
-            <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
-              {!loading && vehicleData?.user_name}
-            </div>
-          </div>
-        )}
-
-        {/* Passengers */}
-        {!loading && (
-        <div className="flex items-center">
-          <div className="w-44">
-            <label className="block text-base font-bold leading-6 text-black">
-            {editDetail ? (passenger == "None" ? null : 'Passengers:'):('Passengers:')}
-            </label> 
-          </div>
-          {editDetail ? (
-            passenger == "None" ? null:(
-              <div style={{ columnCount: passenger.length > 5 ? 2 : 1 }} className="w-full ppa-form-view-border text-left mt-2">
-                {passenger?.map((data, index) => (
-                  <div key={index} className="flex mt-1">
-                    <div className="w-6">
-                      <label className="block text-base font-bold leading-6 text-gray-900">
-                      {index + 1}.
-                      </label> 
-                    </div>
-                    <div className="w-7/12 ppa-form-view text-left h-6 mr-2">
-                      {data}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )
-          ):(
-          <>
-            <textarea
-              id="vr_passengers"
-              name="vr_passengers"
-              rows={7}
-              value={updatePassengers ? updatePassengers : vehicleData?.passengers}
-              onChange={ev => setUpdatePassengers(ev.target.value)}
-              style={{ resize: 'none' }}
-              maxLength={1000}
-              className="block w-full ppa-form"
-            />
-            <p className="text-gray-500 text-xs mt-2">Separate name on next line (If no passengers just leave it blank)</p>
-          </>
-          )}
-        </div>
-        )}
-
-        {/* Status */}
-        {!loading && (
-        <div className="flex items-center mt-6">
-          <div className="w-20">
-            <label className="block text-base font-bold leading-6 text-black">
-              Status:
-            </label> 
-          </div>
-          <div className="w-full ppa-form-view text-left pl-2 h-6">
-            {vehicleData?.remarks}
-          </div>
-        </div>
-        )}
-        
-        {/* Get Driver and Vehicle Details */}
-        {!loading && !buttonHide && vehicleData?.admin_approval == 8 && (GSO || PersonAuthority) && (
-        <div className="mt-10">
-          <h2 className="text-base font-bold leading-7 text-black"> Assign Vehicle and Driver </h2>
-          <form id="vehicleInfo" onSubmit={SubmitVehicleInfo}>
-            <div className="grid grid-cols-2 mt-2">
-
-              <div className="col-span-1">
-                  {/* Vehicle Type */}
-                  <div className="flex items-center">
-                    <div className="w-40">
-                      <label htmlFor="rep_type_of_property" className="block text-base font-bold leading-6 text-black">
-                        Vehicle Type:
-                      </label> 
-                    </div>
-                    <div className="w-3/5">
-                      <select 
-                      name="rep_type_of_property" 
-                      id="rep_type_of_property" 
-                      autoComplete="rep_type_of_property"
-                      value={vehicalName}
-                      onChange={ev => { setVehicleName(ev.target.value); }}
-                      className="block w-full ppa-form"
-                      >
-                        <option value="" disabled>Vehicle Select</option>
-                        {vehicleDet?.map((vehDet) => (
-                          <option key={vehDet.vehicle_id} value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`}>
-                            {vehDet.vehicle_name} ({vehDet.vehicle_plate})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>   
-              </div>
-
-              <div className="col-span-1">
-                {/* Driver Details */}
-                <div className="flex items-center">
-                  <div className="w-24">
-                    <label htmlFor="rep_type_of_property" className="block text-base font-bold leading-6 text-black">
-                      Driver:
-                    </label> 
-                  </div>
-                  <div className="w-3/5">
-                    <select 
-                    name="rep_type_of_property" 
-                    id="rep_type_of_property" 
-                    autoComplete="rep_type_of_property"
-                    value={pointDriver.did}
-                    onChange={ev => {
-                      const personnelId = parseInt(ev.target.value);
-                      const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
-
-                      setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
-                    }}
-                    className="block w-full ppa-form"
-                    >
-                      <option value="" disabled>Driver Select</option>
-                      {driverName?.map((driverDet) => (
-                        <option key={driverDet.driver_id} value={driverDet.driver_id}>
-                          {driverDet.driver_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-              
-            </div>
-
-            {/* Button */}
-            <div className="mt-4">
-              <button 
-                type="submit"
-                form="vehicleInfo"
-                className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Loading</span>
-                  </div>
-                ):(
-                  'Submit'
+                <>
+                {/* For the GSO and Authorize Person */}
+                {/* Arrived Button */}
+                {(vacant?.driverAvail || vacant?.driverAvail) && (GSO || PersonAuthority) && (
+                  <FontAwesomeIcon onClick={handleArrivalCheck} className="icon-delete" title="Arrived" icon={faHouse} />
                 )}
-              </button>
+                {/* Editable */}
+                {(GSO || SuperAdmin) && editDetail && vehicleData?.admin_approval != 0 && vehicleData?.admin_approval != 1 && vehicleData?.admin_approval != 2 && (
+                  <FontAwesomeIcon  onClick={(event) => {event.preventDefault(); setEditDetail(false); }} className="icon-delete" title="Edit Form" icon={faPenToSquare} />
+                )}
+                {/* Generate PDF */}
+                {GSO && editDetail && vehicleData?.admin_approval != 0 && (
+                  <FontAwesomeIcon onClick={handlePDFClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                )}
+                {/* Cancel Form */}
+                {GSO && editDetail && vehicleData?.admin_approval != 0 && vehicleData?.admin_approval != 1 && vehicleData?.admin_approval != 2 && vehicleData?.admin_approval != 3 && vehicleData?.admin_approval != 4 && (
+                  <FontAwesomeIcon onClick={() => handleCancelForm()} className="icon-delete" title="Cancel Form" icon={faCircleXmark} />
+                )}
+                {/* For the Regular Requestor */}
+                {(vehicleData?.user_id == currentUserId && vehicleData?.admin_approval == 1 && !GSO && (
+                  <FontAwesomeIcon onClick={handlePDFClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                ))}
+                </>
+              )}
+              </div>
             </div>
 
-          </form>
-        </div>
-        )}
+            {/* Form */}
+            <div className="px-2 pt-4 pb-6 ppa-form-box bg-white mb-6">
 
-      </div>
+              {loadingForm ? (
+                <div className="flex justify-center text-lg font-bold items-center space-x-4">
+                  Generating PDF
+                </div>
+              ):(
+                adminDisapproval ? (
+                <>
+                  {/* Disapproved Function */}
+                  <form id="vr_reason" onSubmit={SubmitAdminReason}>
+                    <label htmlFor="rep_location" className="block text-base font-bold leading-6 text-black">
+                      Reason for disapproval:
+                    </label>
+                    <div className="w-full mt-2">
+                      <input
+                        type="text"
+                        name="rep_location"
+                        id="rep_location"
+                        value={adminReason}
+                        onChange={ev => setAdminReason(ev.target.value)}
+                        placeholder="Input the reason"
+                        className="block w-full ppa-form"
+                      />
+                    </div>
+                  </form>
+
+                  {/* Button */}
+                  <div className="mt-4">
+                    {!buttonHide && (
+                    <>
+                      {/* Submit */}
+                      <button onClick={handleAdminDecline} className="py-2 px-4 btn-default-form">
+                        Submit
+                      </button>
+
+                      {/* Cancel */}
+                      {!submitLoading && (
+                        <button onClick={() => { setAdminDisapproval(false); setAdminReason(''); }} className="ml-2 py-2 px-4 btn-cancel-form">
+                          Cancel
+                        </button>
+                      )}
+                    </>
+                    )}
+                  </div>
+                </>
+                ):(
+                <>
+                  {/* Header */}
+                  {editDetail ? (
+                  <>
+                    {/* Status */}
+                    <div className="status-sec">
+                      <strong>Status:</strong> {vehicleData?.remarks}
+                    </div>
+                  </>
+                  ):(
+                  <>
+                    {/* Title */}
+                    <div>
+                      <h2 className="text-base font-bold leading-7 text-gray-900"> UPDATE THE FORM ENABLED </h2>
+                    </div>
+                  </>
+                  )}    
+
+                  {/* Date Request */}
+                  <div className="flex items-center mt-4">
+                    <div className="w-44">
+                      <label className="block text-base font-bold leading-6 text-black">
+                        Date of Request:
+                      </label> 
+                    </div>
+                    <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                      {!loading && formatDate(vehicleData?.created_at)}
+                    </div>
+                  </div>
+
+                  {/* Purpose */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-44">
+                      <label className={`block text-base font-bold leading-6 text-black ${editDetail ? '' : '' }`}>
+                        Purpose:
+                      </label> 
+                    </div>
+                    <div className={`w-1/2 ${editDetail ? 'h-6 ppa-form-view text-left pl-2' : '' }`}>
+                      {editDetail ? (
+                        !loading && vehicleData?.purpose
+                      ):(
+                        <input
+                          type="text"
+                          name="update_purpose"
+                          id="update_purpose"    
+                          value={updatePurpose}
+                          onChange={ev => setUpdatePurpose(ev.target.value)}
+                          className="block w-full ppa-form"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Place/s to be Visited */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-44">
+                      <label className="block text-base font-bold leading-6 text-black">
+                        Place/s to be Visited:
+                      </label> 
+                    </div>
+                    <div className={`w-1/2 ${editDetail ? 'h-6 ppa-form-view text-left pl-2' : '' }`}>
+                      {editDetail ? (
+                        !loading && vehicleData?.place_visited
+                      ):(
+                        <input
+                          type="text"
+                          name="update_visited"
+                          id="update_visited"    
+                          value={updateVisited}
+                          onChange={ev => setUpdateVisited(ev.target.value)}
+                          className="block w-full ppa-form"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Date/Time of Arrival */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-44">
+                      <label className="block text-base font-bold leading-6 text-black">
+                        Date/Time of Arrival:
+                      </label> 
+                    </div>
+                    <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : '' }`}>
+                      {editDetail ? (
+                      <> {!loading && `${formatDate(vehicleData?.date_arrival)} @ ${formatTime(vehicleData?.time_arrival)}`} </>
+                      ):(
+                      <>
+                        {/* Date */}
+                        <div>
+                          <input
+                            type="date"
+                            name="update_date"
+                            id="update_date"    
+                            value={updateArrivalDate}
+                            onChange={ev => setUpdateArrivalDate(ev.target.value)}
+                            className="block w-full ppa-form"
+                          />
+                        </div>
+                        
+                        {/* Time */}
+                        <div className="pt-2">
+                          <input
+                            type="time"
+                            name="update_time"
+                            id="update_time"    
+                            value={updateArrivalTime}
+                            onChange={ev => setUpdateArrivalTime(ev.target.value)}
+                            className="block w-full ppa-form"
+                          />
+                        </div>
+                      </>
+                      )}
+                    </div>
+                  </div>
+
+                  {(vehicleData?.vehicle_type && vehicleData?.driver) && (
+                  <>
+                    {/* Type of Vehicle */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-black">
+                          {editDetail ? "Type of Vehicle:" : vehicleData?.vehicle_type ? "Type of Vehicle:" : null}
+                        </label> 
+                      </div>
+                      <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : '' }`}>
+                        {editDetail ? (
+                          !loading && vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0] : null
+                        ):(
+                          vehicleData?.vehicle_type ? (
+                            <select 
+                              name="update_vehicle" 
+                              id="update_vehicle" 
+                              value={updateVehicle}
+                              onChange={ev => { setUpdateVehicle(ev.target.value); }}
+                              className="block w-full ppa-form"
+                            >
+                              <option value="" disabled>{vehicleData?.vehicle_type}</option>
+                              {vehicleDet
+                                ?.filter(vehDet => `${vehDet.vehicle_name} (${vehDet.vehicle_plate})` !== vehicleData?.vehicle_type)
+                                .map((vehDet) => (
+                                  <option 
+                                    key={vehDet.vehicle_id} 
+                                    value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
+                                    disabled={vehDet.availability == 1}
+                                    className={vehDet.availability == 1 ? "disable-form" : ''}
+                                  >
+                                    {vehDet.vehicle_name} ({vehDet.vehicle_plate}) {vehDet.availability == 1 ? "(On Travel)" : null}
+                                  </option>
+                              ))}
+                            </select>
+                          ) : null
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Plate Number */}
+                    {editDetail && (
+                      <div className="flex items-center mt-2">
+                        <div className="w-44">
+                          <label className="block text-base font-bold leading-6 text-black">
+                          Plate Number:
+                          </label> 
+                        </div>
+                        <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                          {!loading && vehicleData?.vehicle_type ? vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1] : null}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Driver */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-black">
+                        {editDetail ? "Driver:" : vehicleData?.driver ? "Driver:" : null}
+                        </label> 
+                      </div>
+                      <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2 h-6' : '' }`}>
+                        {editDetail ? (
+                          vehicleData?.driver
+                        ):(
+                          vehicleData?.driver ? (
+                            <select 
+                              name="update_driver" 
+                              id="update_driver" 
+                              value={updatePointDriver.did}
+                              onChange={ev => {
+                                const personnelId = parseInt(ev.target.value);
+                                const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
+
+                                setUpdatePointDriver(
+                                  selectedPersonnel 
+                                    ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } 
+                                    : { did: '', dname: '' }
+                                );
+                              }}
+                              className="block w-full ppa-form"
+                            >
+                              <option value="" disabled>{vehicleData?.driver}</option>
+                              {driverName
+                                ?.filter(driverDet => driverDet.driver_name !== vehicleData?.driver)
+                                .map((driverDet) => (
+                                  <option 
+                                    key={driverDet.driver_id} 
+                                    value={driverDet.driver_id}
+                                    disabled={driverDet.driver_status == 1}
+                                    className={driverDet.driver_status == 1 ? "disable-form" : ''}
+                                  >
+                                    {driverDet.driver_name} {driverDet.driver_status == 1 ? "(On Travel)" : null}
+                                  </option>
+                              ))}
+                            </select>
+                          ):null
+                        )}
+                      </div>
+                    </div>
+          
+                  </>
+                  )}
+
+                  {/* Requested By */}
+                  {editDetail && (
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="block text-base font-bold leading-6 text-black">
+                        Requested By:
+                        </label> 
+                      </div>
+                      <div className="w-1/2 ppa-form-view text-left pl-2 h-6">
+                        {!loading && vehicleData?.user_name}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Passengers */}
+                  <div className="flex items-center mt-2">
+                    <div className="w-44">
+                      <label className="block text-base font-bold leading-6 text-black">
+                      {editDetail ? (passenger == "None" ? null : 'Passengers:'):('Passengers:')}
+                      </label> 
+                    </div>
+                    {editDetail ? (
+                      passenger == "None" ? null:(
+                        <div style={{ columnCount: passenger.length > 5 ? 2 : 1 }} className="w-1/2 ppa-form-view-border text-left">
+                          {passenger?.map((data, index) => (
+                              <div key={index} className="w-full ppa-form-view text-left h-6 mb-2">
+                                <label className="block text-base leading-6 text-gray-900">
+                                  <strong>{index + 1}.</strong> {data}
+                                </label> 
+                              </div>
+                          ))}
+                        </div>
+                      )
+                    ):(
+                    <>
+                      <textarea
+                        id="vr_passengers"
+                        name="vr_passengers"
+                        rows={7}
+                        value={updatePassengers}
+                        onChange={ev => setUpdatePassengers(ev.target.value)}
+                        style={{ resize: 'none' }}
+                        maxLength={1000}
+                        className="block w-1/2 ppa-form"
+                      />
+                    </>
+                    )}
+                  </div>
+
+                  {/* Edit Button */}
+                  {!editDetail && (
+                    !buttonHide && (
+                      <div className="mt-6">
+                        {/* Submit */}
+                        <button 
+                          type="submit" 
+                          onClick={() => UpdateVehicleForm()}
+                          className={`py-2 px-3 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                          disabled={submitLoading}
+                        >
+                          {submitLoading ? (
+                            <div className="flex">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-2">Loading</span>
+                            </div>
+                          ) : (
+                            'Submit'
+                          )}
+                        </button>
+
+                        {/* Decline */}
+                        {!submitLoading && (
+                          <button 
+                            type="button" 
+                            onClick={() => setEditDetail(true)} 
+                            className="ml-2 py-2 px-4 btn-cancel-form"
+                          >
+                            Close
+                        </button>
+                        )}
+                        
+                      </div>
+                    )
+                  )}
+
+                  {/* Insert Vehicle and Driver Details */}
+                  {!buttonHide && (vehicleData?.admin_approval == 8 || vehicleData?.admin_approval == 6 || vehicleData?.admin_approval == 5 ) && editDetail && (GSO || PersonAuthority) && (
+                    <div className="mt-10 border-t border-gray-300">
+                      <h2 className="text-base font-bold leading-7 text-black mt-2"> Assign Vehicle and Driver </h2>
+
+                      <form id="vehicleInfo" onSubmit={SubmitVehicleInfo}>
+                        <div className="grid grid-cols-2 mt-2">
+                          {/* Vehicle Type */}
+                          <div className="col-span-1">
+                            <div className="flex items-center">
+                              <div className="w-40">
+                                <label htmlFor="rep_type_of_property" className="block text-base font-bold leading-6 text-black">
+                                  Vehicle Type:
+                                </label> 
+                              </div>
+                              <div className="w-3/5">
+                                <select 
+                                name="rep_type_of_property" 
+                                id="rep_type_of_property" 
+                                autoComplete="rep_type_of_property"
+                                value={vehicalName}
+                                onChange={ev => { setVehicleName(ev.target.value); }}
+                                className="block w-full ppa-form"
+                                >
+                                  <option value="" disabled>Vehicle Select</option>
+                                  {vehicleDet?.map((vehDet) => (
+                                    <option 
+                                      key={vehDet.vehicle_id} 
+                                      value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
+                                      disabled={vehDet.availability == 1}
+                                      className={`${vehDet.availability == 1 ? "disable-form":''}`}
+                                    >
+                                      {vehDet.vehicle_name} ({vehDet.vehicle_plate}) {vehDet.availability == 1 ? "(On Travel)":null}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div> 
+                          </div>
+
+                          {/* Driver Details */}
+                          <div className="col-span-1">
+                            <div className="flex items-center">
+                              <div className="w-24">
+                                <label htmlFor="rep_type_of_property" className="block text-base font-bold leading-6 text-black">
+                                  Driver:
+                                </label> 
+                              </div>
+                              <div className="w-3/5">
+                                <select 
+                                name="rep_type_of_property" 
+                                id="rep_type_of_property" 
+                                autoComplete="rep_type_of_property"
+                                value={pointDriver.did}
+                                onChange={ev => {
+                                  const personnelId = parseInt(ev.target.value);
+                                  const selectedPersonnel = driverName.find(staff => staff.driver_id === personnelId);
+
+                                  setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                                }}
+                                className="block w-full ppa-form"
+                                >
+                                  <option value="" disabled>Driver Select</option>
+                                  {driverName?.map((driverDet) => (
+                                    <option 
+                                      key={driverDet.driver_id} 
+                                      value={driverDet.driver_id}
+                                      disabled={driverDet.driver_status == 1}
+                                      className={`${driverDet.driver_status == 1 ? "disable-form":''}`}
+                                    >
+                                      {driverDet.driver_name} {driverDet.driver_status == 1 ? "(On Travel)":null}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Button */}
+                        <div className="mt-4">
+                          {!buttonHide && (
+                            <button 
+                              type="submit"
+                              form="vehicleInfo"
+                              className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-2">Loading</span>
+                                </div>
+                              ):(
+                                'Submit'
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </>
+                )
+              )}
+
+            </div>
+          </>
+        )
+      ):(
+        null
+      )
+      )}
 
       {/* Popup */}
       {showPopup && (
@@ -791,10 +1133,13 @@ export default function VehicleSlip(){
           submitAnimation={submitAnimation}
           justClose={justClose}
           closePopup={closePopup}
+          vehicle={vehicleData?.id}
+          CancelForm={cancelForm}
           SubmitApproval={SubmitApproval}
+          SubmitAvailability={SubmitAvailability}
+          SubmitAdminReason={SubmitAdminReason}
           // form={"vr_reason"}
           // handleCloseForm={handleCloseForm}
-          vehicle={vehicleData?.id}
         />
       )}
 
@@ -932,11 +1277,13 @@ export default function VehicleSlip(){
 
                       {/* Driver */}
                       <td className="w-1/3 pt-10 relative">
-                        <img
-                          src={requestor?.driverEsig}
-                          className="ppa-esig-driver-vs"
-                          alt="Signature"
-                        />
+                        {requestor?.driverEsig ? (
+                          <img
+                            src={requestor?.driverEsig}
+                            className="ppa-esig-driver-vs"
+                            alt="Signature"
+                          />
+                        ):null}
                         <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
                         <p className="text-sm text-center font-arial">Driver</p>
                       </td>
@@ -1148,11 +1495,13 @@ export default function VehicleSlip(){
 
                       {/* Driver */}
                       <td className="w-1/3 pt-10 relative">
-                        <img
-                          src={requestor?.driverEsig}
-                          className="ppa-esig-driver-vs"
-                          alt="Signature"
-                        />
+                        {requestor?.driverEsig ? (
+                          <img
+                            src={requestor?.driverEsig}
+                            className="ppa-esig-driver-vs"
+                            alt="Signature"
+                          />
+                        ):null}
                         <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
                         <p className="text-sm text-center font-arial">Driver</p>
                       </td>

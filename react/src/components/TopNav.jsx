@@ -62,9 +62,22 @@ const TopNav = () =>{
     });
   }
 
+  // Unread Notification Request
+  const fetchUnreadNotification = () => {
+    axiosClient
+    .put(`/unread/${currentUserId}`)
+    .then(response => {
+      console.log(response.data.message); // Show success message
+    })
+    .catch(error => {
+      console.error("Error updating notifications:", error);
+    });
+  }
+
   useEffect(()=>{
     if(currentUserId){
       fetchNotification();
+      fetchUnreadNotification();
     }
   },[currentUserId]);
 

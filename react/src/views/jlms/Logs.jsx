@@ -156,7 +156,7 @@ export default function Logs() {
 
       {/* Main */}
       <div className="font-roboto ppa-form-box">
-        <div className="ppa-form-header h-10"></div>
+        <div className="ppa-form-header">Log Details</div>
         <div style={{ padding: '6px 10px 10px 10px' }}>
 
           {/* Date Range */}
@@ -286,7 +286,7 @@ export default function Logs() {
               {/* Title */}
               <div>
                 <div className="logs-title-company">Philippine Ports Authority - PMO Lanao Del Norte / Iligan</div>
-                <div className="logs-title-system"> Joint Local Management System Logs </div>
+                <div className="logs-title-system"> Job Order Management System Logs </div>
                 <div className="logs-title-date"> {fromDate} to {toDate} </div>
               </div>
 

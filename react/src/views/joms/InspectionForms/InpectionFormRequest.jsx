@@ -216,14 +216,6 @@ export default function RepairRequestForm(){
   return (
     <PageComponent title="Request Form">
 
-      {/* Preload Screen */}
-      {(loading) && (
-        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
-        </div>
-      )}
-
       {/* Form Content */}
       <div className="font-roboto ppa-form-box bg-white">
         <div className="ppa-form-header"> Request For Pre/Post Inspection Repair </div>
@@ -234,8 +226,8 @@ export default function RepairRequestForm(){
             <form onSubmit={SubmitInspectionForm}>
               {/* Title */}
               <div>
-                <h2 className="text-base font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
-                <p className="text-xs font-bold text-red-500">This will not be editable once submitted.</p>
+                <h2 className="text-lg font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
+                <p className="text-sm font-bold text-red-500">NOTE: This will not be editable once submitted.</p>
               </div>
 
               <div className="grid grid-cols-2">
@@ -400,8 +392,8 @@ export default function RepairRequestForm(){
           <>
             {/* Part A */}
             <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
-              <p className="text-xs text-red-500 font-bold">Please double check the form before submitting </p>
+              <h2 className="text-lg font-bold leading-7 text-gray-900"> Part A: To be filled-up by Requesting Party </h2>
+              <p className="text-sm font-bold text-red-500">NOTE: This form cannot be edited after you submit your request.</p>
             </div>
 
             {/* Form */}
@@ -411,7 +403,7 @@ export default function RepairRequestForm(){
               <div className="col-span-1">
 
                 {/* Date */}
-                <div className="flex items-center mt-6">
+                <div className="flex items-center mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_date" className="block text-base leading-6 text-black"> 
                       Date: 
@@ -563,7 +555,7 @@ export default function RepairRequestForm(){
               <div className="col-span-1">
 
                 {/* Type of Property */}
-                <div className="flex items-center mt-6">
+                <div className="flex items-center mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_type_of_property" className="block text-base font-medium leading-6 text-black">
                       Type of Property:

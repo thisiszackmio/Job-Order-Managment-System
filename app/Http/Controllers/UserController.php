@@ -594,7 +594,7 @@ class UserController extends Controller
                 if($findPersonnel->save()) {
                     // Creating logs
                     $logs = new LogsModel();
-                    $logs->category = 'User';
+                    $logs->category = 'Personnel';
                     $logs->message = $personnelData['personnel_name'].' has been assigned to the '.$personnelData['assignment'].' list.';
                     $logs->save();
                 }
@@ -652,7 +652,7 @@ class UserController extends Controller
 
         // Creating logs only if both operations are successful
         $logs = new LogsModel();
-        $logs->category = 'User';
+        $logs->category = 'Personnel';
         $logs->message = $request->input('authority').' has removed one of the assigned personnel from the list.';
         $logs->save();
     
@@ -673,12 +673,13 @@ class UserController extends Controller
 
         // Update the status
         $data->status = 0;
+        $data->form_id = 0;
 
         if($data->save()){
             // Creating logs only if both operations are successful
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('authority').' has set to available.';
+            $logs->category = 'Personnel';
+            $logs->message = $request->input('authority').' has set '.$data->personnel_name.' to available.';
             $logs->save();
         }
 

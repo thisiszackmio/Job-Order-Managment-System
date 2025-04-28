@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faTableList, faClipboardUser, faVanShuttle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faFileLines, faTableList, faClipboardUser, faVanShuttle, faScroll, faUserTie } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../axios";
@@ -108,20 +108,10 @@ export default function JOMSLayout() {
           {/* Nav */}
           <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
 
-            {/* Back to JLMS */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to="/" className="flex items-center">
-                  <FontAwesomeIcon icon={faHouse} />
-                  {!isSidebarMinimized && <p className="ml-4 text-lg">Back to JLMS</p>}
-                </Link>
-              </div>
-            </li>
-
             {/* Dashboard */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to="/joms" className="flex items-center">
+                <Link to="/joms/dashboard" className="flex items-center">
                   <FontAwesomeIcon icon={faTachometerAlt} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">Dashboard</p>}
                 </Link>
@@ -129,7 +119,7 @@ export default function JOMSLayout() {
             </li>
 
             {/* My Request */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6">
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                 <Link to={`/joms/myrequest`} className="flex items-center">
                   <FontAwesomeIcon icon={faTableList} />
@@ -139,7 +129,7 @@ export default function JOMSLayout() {
             </li>
 
             {/* Request Forms */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-6 mt-6"> 
+            <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4"> 
               
               <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
               {!isSidebarMinimized && 
@@ -171,7 +161,7 @@ export default function JOMSLayout() {
 
             {/* Request List */}
             {(SuperAdmin || GSO || AssignPersonnel || Authority || DivisionManager || PortManager || AdminManager) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
 
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
@@ -203,13 +193,12 @@ export default function JOMSLayout() {
                     </ul>
                   </section>
                 )}
-
               </li>
             )}
 
             {/* Personnel */}
             {(SuperAdmin || GSO) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/personnel" className="flex items-center">
                     <FontAwesomeIcon icon={faClipboardUser} />
@@ -221,7 +210,7 @@ export default function JOMSLayout() {
 
             {/* Vehicle */}
             {(SuperAdmin || GSO) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-6">
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/vehicletype" className="flex items-center">
                     <FontAwesomeIcon icon={faVanShuttle} />
@@ -231,10 +220,74 @@ export default function JOMSLayout() {
               </li>
             )}
 
+            {/* Announcements */}
+            {(SuperAdmin || PortManager || AdminManager || DivisionManager || GSO) && (
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+                <FontAwesomeIcon icon={faScroll} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
+                {!isSidebarMinimized && 
+                  <>
+                    <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
+                    <label htmlFor="toggle3" className="w-full justify-between text-white cursor-pointer items-center text-lg">
+                      <span className="ml-4">Announcements</span>
+                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                    </label>
+                  </>
+                }
+
+                {(activeAccordion === 3 || !isSidebarMinimized) && (
+                  <section>
+                    <ul id="menu1" className="pl-3 mt-4">
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/allannouncement">All Announcements Lists</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/addannouncement">Add Announcements Data</Link>
+                      </li>
+                    </ul>
+                  </section>
+                )}
+                
+              </li>
+            )}
+
+            {/* Superadmin Settings */}
+            {SuperAdmin && (
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+                <FontAwesomeIcon icon={faUserTie} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
+                {!isSidebarMinimized && 
+                  <>
+                    <input id="toggle4" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 4} onChange={() => handleToggle(4)} />
+                    <label htmlFor="toggle4" className="w-full justify-between text-white cursor-pointer items-center text-lg">
+                      <span className="ml-4">Hacker Settings</span>
+                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
+                    </label>
+                  </>
+                }
+
+                {(activeAccordion === 4 || !isSidebarMinimized) && (
+                  <section>
+                    <ul id="menu1" className="pl-3 mt-4">
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/logs">Logs</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/userlist">All Employee Lists</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/addemployee">Add Employee Data</Link>
+                      </li>
+
+                    </ul>
+                  </section>
+                )}
+              </li>
+            )}
+
+
           </ul>
 
           {/* Logout Area */}
-          <ul className="logout-position mt-6">
+          <ul className="logout-position mt-10">
             {/* Logout */}
             <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 mt-3`}>
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>

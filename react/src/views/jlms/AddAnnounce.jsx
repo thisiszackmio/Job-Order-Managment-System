@@ -26,28 +26,6 @@ export default function AddAnnouncements(){
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
-  // Disable the Scroll on Popup
-  useEffect(() => {
-    // Define the class to be added/removed
-    const popupClass = 'popup-show';
-    // Function to add the class to the body
-    const addPopupClass = () => document.body.classList.add(popupClass);
-    // Function to remove the class from the body
-    const removePopupClass = () => document.body.classList.remove(popupClass);
-
-    // Add or remove the class based on showPopup state
-    if (showPopup) {
-      addPopupClass();
-    } else {
-      removePopupClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removePopupClass();
-    };
-  }, [showPopup]);
-
   // Dev Error Text
   const DevErrorText = (
     <div>
@@ -114,7 +92,7 @@ export default function AddAnnouncements(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.href = '/allannouncement';
+    window.location.href = '/joms/allannouncement';
   }
 
   // Restrictions Condition

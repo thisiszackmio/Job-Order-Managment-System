@@ -75,7 +75,7 @@ export default function Forbidden(){
           <h2 className="error-h1">Forbidden</h2>
           <p className="description">We are sorry, but you do not have access to this page or resource</p>
           <div className="btn-area">
-            <Link to={'/'}>
+            <Link to={'/joms'}>
               <button 
                 className="bg-blue-700 text-lg hover-bg-green-700 text-white font-bold py-3 px-6 rounded"
                 title="View Request"

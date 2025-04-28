@@ -2,12 +2,10 @@ import axiosClient from "../axios";
 import { useEffect, useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
+import ppabg from '/default/ppa_bg.png';
 
 export default function Login() {
-
   const { setCurrentUserId, setCurrentUserName, setCurrentUserAvatar, setCurrentUserToken, setCurrentUserCode } = useUserStateContext();
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [userExist, setUserExist] = useState(false);
 
   // Variable
   const [username, setUsername] = useState('');
@@ -15,17 +13,48 @@ export default function Login() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [changeMethod, setChangeMethod] = useState('');
 
-  const [inputErrors, setInputErrors] = useState('');
-  const [showPopup, setShowPopup] = useState(false);
+  const [userExist, setUserExist] = useState(false);
   const [changePass, setChangePass] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
+  const [inputErrors, setInputErrors] = useState('');
   const [logoutMessage, setLogoutMessage] = useState("");
 
-  // Submit the login
-  const onSubmit = async (ev) => {
-    ev.preventDefault();
+  // Disable RightClick
+  useEffect(() => {
+    // Disable Right-Click
+    const disableRightClick = (e) => {
+      e.preventDefault();
+    };
+    window.addEventListener("contextmenu", disableRightClick);
+
+    // Disable Developer Tools Shortcuts
+    const disableDevToolsShortcuts = (e) => {
+      if (
+        e.key === "F12" || // F12 Key
+        (e.ctrlKey && e.shiftKey && e.key === "I") || // Ctrl+Shift+I
+        (e.ctrlKey && e.shiftKey && e.key === "C") || // Ctrl+Shift+C
+        (e.ctrlKey && e.shiftKey && e.key === "J") || // Ctrl+Shift+J
+        (e.ctrlKey && e.key === "U") // Ctrl+U (View Page Source)
+      ) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("keydown", disableDevToolsShortcuts);
+
+    // Cleanup the event listeners on component unmount
+    return () => {
+      window.removeEventListener("contextmenu", disableRightClick);
+      window.removeEventListener("keydown", disableDevToolsShortcuts);
+    };
+  }, []);
+
+  // Login Function
+  const onLogin = async (ev) =>{
+    if (ev) ev.preventDefault();
     setSubmitLoading(true);
     setInputErrors(''); // Clear previous errors
     setLogoutMessage('');
@@ -34,6 +63,7 @@ export default function Login() {
         const response = await axiosClient.post("/login", {
             username,
             password,
+            method: changeMethod,
         });
 
         // Assuming the response contains these fields
@@ -49,12 +79,13 @@ export default function Login() {
         localStorage.removeItem("logoutReason");
 
         // Redirect to home page or dashboard
-        window.location.href = '/';
+        window.location.href = '/joms';
     } catch (error) {
       const responseData = error.response?.data?.error;
 
       if(responseData == "TokenExist"){
-        setUserExist(true)
+        setUserExist(true);
+        setChangeMethod('continue');
       }
       else if(responseData == "Invalid"){
         setInputErrors('Invalid Username / Password');
@@ -69,6 +100,7 @@ export default function Login() {
     } finally {
       setSubmitLoading(false);
     }
+
   };
 
   // Update Password
@@ -107,103 +139,48 @@ export default function Login() {
       .finally(() => {
         setSubmitLoading(false);
       });
-  }
-  
-  //Close Popup on Error
-  function justClose() {
-    setShowPopup(false);
-    setUsername('');
-    setPassword('');
-  }
+  } 
 
-  // Disable RightClick
-  useEffect(() => {
-    // Disable Right-Click
-    const disableRightClick = (e) => {
-      e.preventDefault();
-    };
-    window.addEventListener("contextmenu", disableRightClick);
-
-    // Disable Developer Tools Shortcuts
-    const disableDevToolsShortcuts = (e) => {
-      if (
-        e.key === "F12" || // F12 Key
-        (e.ctrlKey && e.shiftKey && e.key === "I") || // Ctrl+Shift+I
-        (e.ctrlKey && e.shiftKey && e.key === "C") || // Ctrl+Shift+C
-        (e.ctrlKey && e.shiftKey && e.key === "J") || // Ctrl+Shift+J
-        (e.ctrlKey && e.key === "U") // Ctrl+U (View Page Source)
-      ) {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("keydown", disableDevToolsShortcuts);
-
-    // Cleanup the event listeners on component unmount
-    return () => {
-      window.removeEventListener("contextmenu", disableRightClick);
-      window.removeEventListener("keydown", disableDevToolsShortcuts);
-    };
-  }, []);
-
-  // Logout Reason
-  useEffect(() => {
-    // Check for a logout reason in localStorage
-    const reason = localStorage.getItem("logoutReason");
-    if (reason) {
-      setLogoutMessage(reason);
-      // Clear the reason after displaying it
-      localStorage.removeItem("logoutReason");
-    }
-  }, []);
-
-  return (
-    <>
-    {/* Login Page */}
-    <div 
-      className="min-h-screen ppa-cover font-roboto items-center justify-center flex flex-1 flex-col lg:flex-row"
-      style={{ backgroundImage: "url('default/ppa_bg.png')" }}
-    >
+  return(
+    <div className="min-h-screen ppa-cover bg-cover bg-center bg-no-repeat bg-[url('/default/ppa_bg.png')] flex flex-1 font-roboto items-center justify-center flex-col lg:flex-row">
       <div className="w-3/4 ppa-login p-10 flex flex-wrap">
         {/* 1st Column */}
         <div className="lw-full lg:w-1/2 relative">
           <div className="login-welcome mb-2">
             Welcome to
           </div>
-          <img className="login-logo mb-3" src="default/ppa_logo.png" alt="Your Company" />
+          <img className="login-logo mb-3" src="/default/ppa_logo.png" alt="Your Company" />
           <div className="login-title">
-            <div>Joint Local Management System</div>
+            <div>Job Order Management System</div>
           </div>
           <div className="absolute top-0 right-0 h-8 w-[2px] bg-white lg:h-[320px]"></div>
         </div>
         {/* 2nd Column */}
         <div className="w-full lg:w-1/2 items-center justify-center relative">
           <div className="login-wrap">
-          <div className="login-word mb-6"> {userExist ? "Still Login" : changePass ? "Update Credentials" : "Login"} </div>
-
+            <div className="login-word mb-6"> {userExist ? "Still Login" : changePass ? "Update Credentials" : "Login"} </div>
             {/* Error Code */}
             {logoutMessage && (
               <div className="login-error mb-8 mt-2"> {logoutMessage} </div>
             )}
-
             {inputErrors && (
               <div className="login-error mb-8 mt-2"> {inputErrors} </div>
             )}
-
             {userExist ? (
             <>
               <div className="login-exist-message">
-              It seems this account is active on another device or in a different browser. Please log out there before signing in on this device. If you need assistance, please contact the developer to reset the account. <br/> (IP Phone: <b>4084</b>)
+              This account is currently active on another computer or browser. If you proceed, this device will become active instead.
               </div>  
-              <button type="button" onClick={() => setUserExist(false)}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                Back
+              <button type="button" onClick={() => { onLogin(); setChangeMethod("continue"); }}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                Continue
               </button>
-              </>
+              <p className="loginMessage text-center">Click here to <a onClick={() => {setUserExist(false)}} style={{ color: 'blue', cursor: 'pointer'}}>Login</a> </p>
+            </>
             ):(
               changePass ? (
                 <form onSubmit={onUpdateLogin} className="space-y-4" action="#" method="POST">
                   {/* Current Password*/}
                   <div className="relative">
-                    
                     {/* Label with animated position */}
                     <label
                       htmlFor="old_password"
@@ -225,10 +202,10 @@ export default function Login() {
                       onBlur={() => setIsFocused(false)}
                       className="block w-full ppa-form-login"
                     />
-
                   </div>
+
                   {/* New Password*/}
-                  <div className="relative" style={{ marginTop: '1.75rem' }}>
+                  <div className="relative">
                     
                     {/* Label with animated position */}
                     <label
@@ -253,8 +230,9 @@ export default function Login() {
                     />
 
                   </div>
+
                   {/* Confirm Password*/}
-                  <div className="relative" style={{ marginTop: '1.75rem' }}>
+                  <div className="relative">
                     
                     {/* Label with animated position */}
                     <label
@@ -280,6 +258,7 @@ export default function Login() {
 
                   </div>
                   <p className="loginMessage">Password must contain at least one uppercase letter, one number, one symbol, and be at least 8 characters long. </p>
+
                   {/* Submit Button */}
                   <div>
                     <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
@@ -295,7 +274,7 @@ export default function Login() {
                   </div>
                 </form>
               ):(
-                <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
+                <form onSubmit={onLogin} className="space-y-6" action="#" method="POST">
                   {/* Username */}
                   <div className="relative">
                     <label
@@ -319,6 +298,7 @@ export default function Login() {
                     />
 
                   </div>
+
                   {/* Password */}
                   <div className="relative">
                     <label
@@ -340,9 +320,10 @@ export default function Login() {
                       className="block w-full ppa-form-login"
                     />
                   </div>
+
                   {/* Button */}
                   <div>
-                    <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                    <button type="submit" onClick={() => setChangeMethod("login")} className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
                       {submitLoading ? (
                         <div className="flex w-full items-center justify-center">
                           <span className="ml-1">Processing</span>
@@ -355,12 +336,10 @@ export default function Login() {
                 </form>
               )
             )}
-
           </div>
         </div>
       </div>
     </div>
-    </>
   )
 }
   

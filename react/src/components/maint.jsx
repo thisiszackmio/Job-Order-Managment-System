@@ -4,22 +4,21 @@ const MaintenancePage = () => {
   return (
     <div
       className="min-h-screen ppa-cover font-roboto items-center justify-center flex flex-col"
-      style={{ backgroundImage: "url('default/ppa_bg.png')" }}
     >
       <div className="container-fluid flex flex-col items-center text-center">
         {/* Image Section */}
         <img
           className="under-main mb-5"
-          src="default/under.png"
+          src="/default/zack-vector.png"
           alt="Under Maintenance"
         />
 
         {/* Text Section */}
         <div className="w-full ground-color">
-          <h2 className="error-h1">Under Construction</h2>
+          <h1 className="h-tag">BE RIGHT BACK GUYS!</h1>
+          <h2 className="error-h1">JOMS is Under Maintenance</h2>
           <p className="description">
-            The system is under construction. We are working very hard to give you
-            the best experience with this one.
+            The system is currently under maintenance. The developer is working hard to provide you with the best experience possible. Please bear with us during this time
           </p>
         </div>
       </div>

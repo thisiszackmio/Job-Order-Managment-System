@@ -27,23 +27,12 @@ export default function InspectionForm(){
   const currentDate = new Date().toISOString().split('T')[0];
 
   // Get the ID
-  const {id} = useParams();
-
-  // Restrictions Condition
-  const ucode = currentUserCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const DivisionManager = codes.includes("DM");
-  const SuperAdmin = codes.includes("HACK");
-  const roles = ["AM", "GSO", "HACK", "DM", "PM", "AU", "AP"];
-  const accessOnly = roles.some(role => codes.includes(role)); 
+  const {id} = useParams(); 
 
   // Functions
   const [loading, setLoading] = useState(false);
 
   // Set Access
-  const [access, setAccess] = useState('');
   const [dataAccess, setDataAccess] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -214,8 +203,8 @@ export default function InspectionForm(){
         gso_id
       })
 
-      const myAccess = form?.user_id == currentUserId || accessOnly ? "Access" : "Denied";
-      setAccess(myAccess);
+      // const myAccess = form?.user_id == currentUserId || accessOnly ? "Access" : "Denied";
+      // setAccess(myAccess);
       setDataAccess(null);
 
     })
@@ -865,12 +854,23 @@ export default function InspectionForm(){
       setSubmitLoading(false);
     }
   }, [seconds]);
+
+  // Restrictions Condition
+  const ucode = currentUserCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const Admin = codes.includes("AM");
+  const GSO = codes.includes("GSO");
+  const DivisionManager = codes.includes("DM");
+  const SuperAdmin = codes.includes("HACK");
+  const roles = ["AM", "GSO", "HACK", "PM", "DM", "AU", "AP"];
+  const accessOnly = roles.some(role => codes.includes(role));
+  const clearance = inspectionData?.form?.user_id == currentUserId || accessOnly;
   
   return (
     <PageComponent title="Pre/Post Repair Inspection Form">
       {dataAccess != 'Not-Found' ? (
-        (access == "Access") ? (
-        <>
+        clearance ? (
+          <>
           {/* Form */}
           <div className="font-roboto">
 
@@ -2091,7 +2091,7 @@ export default function InspectionForm(){
           
         </>
         ):<Restrict />
-      ):null}     
+      ):null}    
 
       {/* Popup */}
       {showPopup && (

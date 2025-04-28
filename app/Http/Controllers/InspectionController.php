@@ -1136,7 +1136,7 @@ class InspectionController extends Controller
         $ApproveRequest->admin_status = 0;
         $ApproveRequest->inspector_status = 2;
         $ApproveRequest->form_status = 3;
-        $ApproveRequest->form_remarks = "Deleted by the GSO (Reason: ".$request->input('deleteReason').")";
+        $ApproveRequest->form_remarks = $request->input('user_name'). ' has canceled this form.';
 
         // Save Update
         if ($ApproveRequest->save()) {

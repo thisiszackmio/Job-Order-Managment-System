@@ -19,6 +19,7 @@ const Popup = ({
   personnelId,
   RemovePersonnel,
   AvailableConfirmation,
+  CloseForceRequest,
   removeVehicleDet,
   vacantVehicle,
   inspectionData,
@@ -282,6 +283,36 @@ const Popup = ({
               </button>
             )}
           </>  
+          )}
+
+          {/* --- For Inspection Form Request --- */}
+
+          {/* GSO Force Close */}
+          {popupContent == "gsofc" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              onClick={() => CloseForceRequest(inspectionData)}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
           )}
 
           {/* --- Sup Approval --- */}

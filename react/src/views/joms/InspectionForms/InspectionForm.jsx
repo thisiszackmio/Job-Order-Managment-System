@@ -2337,7 +2337,7 @@ export default function InspectionForm(){
                               <div className="w-56 text-pdf">
                                 <span>Location (Div/Section/Unit)</span> 
                               </div>
-                              <div className="w-64 border-b border-black pl-4 text-pdf">
+                              <div className="w-64 border-b border-black pl-2 text-pdf">
                                 <span>{inspectionData?.form?.location}</span>
                               </div>
                             </div>
@@ -2366,14 +2366,14 @@ export default function InspectionForm(){
                           {/* For Requestor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> REQUESTED BY:</label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                 <img 
                                   src={inspectionData?.requestor_esig} 
                                   alt="User Signature" 
                                   className="ppa-esignature-form" 
                                 />
-                                <span className="text-base font-bold">{inspectionData?.form?.user_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.form?.user_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> End-User </label>
                             </div>
@@ -2382,14 +2382,14 @@ export default function InspectionForm(){
                           {/* For Supervisor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                 <img 
                                   src={inspectionData?.supervisor_esig} 
                                   alt="User Signature" 
                                   className="ppa-esignature-form" 
                                 />
-                                <span className="text-base font-bold">{inspectionData?.form?.supervisor_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.form?.supervisor_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> Immediate Supervisor</label>
                             </div>
@@ -2456,14 +2456,14 @@ export default function InspectionForm(){
                           {/* For Requestor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> REQUESTED BY:</label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                 <img 
                                   src={inspectionData?.gso_esig} 
                                   alt="User Signature" 
                                   className="ppa-esignature-form" 
                                 />
-                                <span className="text-base font-bold">{inspectionData?.gso_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.gso_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-xs text-center font-medium italic"> End-User </label>
                             </div>
@@ -2472,7 +2472,7 @@ export default function InspectionForm(){
                           {/* For Supervisor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1" style={{ position: 'relative' }}>
                                 {inspectionData?.form?.status === '1111' && (
                                   <img 
@@ -2481,7 +2481,7 @@ export default function InspectionForm(){
                                     className="ppa-esignature-form" 
                                   />
                                 )}
-                                <span className="text-base font-bold">{inspectionData?.admin_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.admin_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Acting Admin Division Manager </label>
                             </div>
@@ -2536,7 +2536,7 @@ export default function InspectionForm(){
                           {/* Date */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> DATE INSPECTED:</label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
                                 <span className="text-base">{inspectionData?.form?.status === '1111' && formatDate(inspectionData?.form?.before_repair_date)}</span>
                               </div>
@@ -2546,7 +2546,7 @@ export default function InspectionForm(){
                           {/* For Supervisor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
                                 {inspectionData?.form?.status === '1111' && (
                                   <img 
@@ -2555,7 +2555,7 @@ export default function InspectionForm(){
                                     className="ppa-esignature-form" 
                                   />
                                 )}
-                                <span className="text-base font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Property Inspector </label>
                             </div>
@@ -2598,7 +2598,7 @@ export default function InspectionForm(){
                           {/* For Requestor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> DATE INSPECTED:</label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
                                 <span className="text-base">{inspectionData?.form?.status === '1111' && formatDate(inspectionData?.form?.after_reapir_date)}</span>
                               </div>
@@ -2608,7 +2608,7 @@ export default function InspectionForm(){
                           {/* For Supervisor Signature */}
                           <div className="col-span-1">
                             <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
-                            <div className="mt-5">
+                            <div className="mt-3">
                               <div className="w-64 mx-auto border-b text-center border-black pl-1 h-7" style={{ position: 'relative' }}>
                                 {inspectionData?.form?.status === '1111' && (
                                   <img 
@@ -2617,7 +2617,7 @@ export default function InspectionForm(){
                                     className="ppa-esignature-form" 
                                   />
                                 )}
-                                <span className="text-base font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
+                                <span className="text-pdf font-bold">{inspectionData?.form?.status === '1111' && inspectionData?.form?.personnel_name}</span>
                               </div>
                               <label htmlFor="type_of_property" className="block text-center font-normal italic text-xs"> Property Inspector </label>
                             </div>

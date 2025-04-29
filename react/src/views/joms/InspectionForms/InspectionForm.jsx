@@ -2170,7 +2170,7 @@ export default function InspectionForm(){
             <div className="relative" style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
 
               {/* Control Number */}
-              <div className="title-area font-arial pr-6 text-right pb-2 pt-2">
+              <div className="title-area font-arial pr-6 text-right pt-2">
                 <span>Control No:</span>{" "}
                 <span style={{ textDecoration: "underline", fontWeight: "900" }}>    
                 ___{inspectionData?.form?.id}___
@@ -2185,17 +2185,17 @@ export default function InspectionForm(){
                     <img src={ppa_logo} alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
                   </td>
                   <td className="border w-7/12 border-black font-arial text-center">
-                    <div className="text-[20px]">PRE-REPAIR/POST REPAIR INSPECTION FORM</div>
-                    <div className="">PMO - LANAO DEL NORTE/ILIGAN</div>
+                    <div className="text-[18px]">PRE-REPAIR/POST REPAIR INSPECTION FORM</div>
+                    <div className="text-[15px]">PMO - LANAO DEL NORTE/ILIGAN</div>
                   </td>
                   <td className="border border-black p-0 font-arial">
-                    <div className="border-b text-xs border-black p-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
-                    <div className="border-b text-xs border-black p-1">Revision No.: 00</div>
-                    <div className="text-xs p-1 text-white">Date of Effectivity: March 26, 2021</div>
+                    <div className="text-xs border-black pl-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
+                    <div className="text-xs border-black pl-1 pt-1">Revision No.: 00</div>
+                    {/* <div className="text-xs p-1 text-white">Date of Effectivity: March 26, 2021</div> */}
                   </td>
 
                   {/* Blank */}
-                  <tr> <td colSpan={3} className="border border-black p-1.5 font-arial"></td> </tr>
+                  <tr> <td colSpan={3} className="border border-black p-1 font-arial"></td> </tr>
 
                   {/* Part A Label */}
                   <tr>
@@ -2227,7 +2227,7 @@ export default function InspectionForm(){
                         <div className="col-span-1">
 
                           {/* Property Number */}
-                          <div className="mt-6">
+                          <div className="mt-4">
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Property No</span> 
@@ -2239,7 +2239,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Acquisition Date */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Acquisition Date</span>
@@ -2251,7 +2251,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Acquisition Cost */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Acquisition Cost</span> 
@@ -2263,7 +2263,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Brand/Model */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Brand/Model</span> 
@@ -2275,7 +2275,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Serial/Engine No. */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Serial/Engine No.</span> 
@@ -2292,7 +2292,7 @@ export default function InspectionForm(){
                         <div className="col-span-1">
 
                           {/* Type of Property */}
-                          <div className="mt-6">
+                          <div className="mt-4">
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Type of Property</span> 
@@ -2320,7 +2320,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Description */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-28 text-pdf">
                                 <span>Description</span> 
@@ -2332,7 +2332,7 @@ export default function InspectionForm(){
                           </div>
 
                           {/* Location */}
-                          <div className="mt-1">
+                          <div>
                             <div className="flex">
                               <div className="w-56 text-pdf">
                                 <span>Location (Div/Section/Unit)</span> 
@@ -2348,7 +2348,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* Complain */}
-                      <div className="mt-1">
+                      <div>
                         <div className="flex">
                           <div className="w-32 text-pdf">
                             <span>Complain/Defect</span>
@@ -2360,7 +2360,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* For Signature */}
-                      <div className="mt-4">
+                      <div className="mt-2">
                         <div className="grid grid-cols-2 gap-4">
 
                           {/* For Requestor Signature */}
@@ -2426,7 +2426,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* Date of Last Repair */}
-                      <div className="mt-1">
+                      <div>
                         <div className="flex">
                           <div className="w-36 text-pdf">
                             <span>Date of Last Repair</span> 
@@ -2438,7 +2438,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* Nature of Repair */}
-                      <div className="mt-1">
+                      <div>
                         <div className="flex">
                           <div className="w-44 text-pdf">
                             <span>Nature of Last Repair</span>
@@ -2450,7 +2450,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* For Signature */}
-                      <div className="mt-4">
+                      <div className="mt-3">
                         <div className="grid grid-cols-2 gap-4">
 
                           {/* For Requestor Signature */}
@@ -2518,7 +2518,7 @@ export default function InspectionForm(){
                       </div>
 
                       {/* Recommendations */}
-                      <div className="mt-1">
+                      <div>
                         <div className="flex">
                           <div className="w-44 text-pdf">
                             <span>Recommendation/s</span>

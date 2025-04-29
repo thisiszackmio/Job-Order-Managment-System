@@ -145,15 +145,13 @@ img.login-logo { width: 50%; margin-left: auto; margin-right: auto; }
 }
 span.system-generated {
   font-size: 12px;
-  position: absolute;
-  bottom: 0px;
   color: #272727;
   font-style: italic;
 }
 .ppa-esig-driver-vs {
   position: absolute;
-  width: 200px;
-  top: 0px;
+  width: 150px;
+  top: -35px;
   left: 0px;
 }
 
@@ -995,10 +993,10 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 .title-area{ font-size: 11px; }
 .text-pdf { font-size: 13px; }
 .ppa-esignature-form {
-  width: 200px;
+  width: 170px;
   position: absolute;
-  top: -40px;
-  left: 30px;
+  top: -33px;
+  left: 45px;
 }
 .ppa-esignature-form-fac {
   width: 200px;
@@ -1008,9 +1006,9 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 }
 .ppa-esig-user-vs {
   position: absolute;
-  width: 200px;
-  top: -5px;
-  left: 30px;
+  width: 170px;
+  top: -10px;
+  left: 55px;
 }
 
 /* Media Query */

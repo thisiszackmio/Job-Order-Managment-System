@@ -54,6 +54,7 @@ class VehicleSlipController extends Controller
                 'driver' => $vehicleSlip->driver,
                 'passengers' => $passengerCount,
                 'admin_approval' => $vehicleSlip->admin_approval,
+                'remarks' => $vehicleSlip->remarks,
                 'requestor' => $vehicleSlip->user_name,
             ];
         });

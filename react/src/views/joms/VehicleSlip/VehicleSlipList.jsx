@@ -159,16 +159,7 @@ export default function VehicleSlipList(){
                         <td className="px-2 py-2 text-sm text-left table-font">{list.vehicle_type ? list.vehicle_type : "None"}</td>
                         <td className="px-2 py-2 text-sm w-1 text-center table-font">{list.passengers}</td>
                         <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                        <td className="px-2 py-2 text-sm text-center table-font">
-                          {list.admin_approval == 1 && ("Approved by Admin Manager")}
-                          {list.admin_approval == 2 && ("Approved by Port Manager")}
-                          {list.admin_approval == 3 && ("Disapproved by Admin Manager")}
-                          {list.admin_approval == 4 && ("Disapproved by Port Manager")}
-                          {list.admin_approval == 9 && ("Deleted")}
-                          {list.admin_approval == 10 && ("Waiting for Admin Manager's Approval")}
-                          {list.admin_approval == 11 && ("Waiting for Port Manager's Approval")}
-                          {[5, 6, 7, 8].includes(list?.admin_approval) && ("Pending")}
-                        </td>
+                        <td className="px-2 py-2 text-sm text-center table-font">{list.remarks}</td>
                       </tr>
                     ))
                   ):(

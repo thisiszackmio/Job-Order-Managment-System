@@ -2184,13 +2184,14 @@ export default function InspectionForm(){
                   <td className="border border-black p-1 text-center" style={{ width: '100px' }}>
                     <img src={ppa_logo} alt="My Image" className="mx-auto" style={{ width: 'auto', height: '65px' }} />
                   </td>
-                  <td className="border text-lg w-7/12 border-black font-arial text-center">
-                    <b>PRE-REPAIR/POST REPAIR INSPECTION FORM</b>
+                  <td className="border w-7/12 border-black font-arial text-center">
+                    <div className="text-[20px]">PRE-REPAIR/POST REPAIR INSPECTION FORM</div>
+                    <div className="">PMO - LANAO DEL NORTE/ILIGAN</div>
                   </td>
                   <td className="border border-black p-0 font-arial">
                     <div className="border-b text-xs border-black p-1">Form No.: PM:VEC:LNI:WEN:FM:03</div>
-                    <div className="border-b text-xs border-black p-1">Revision No.: 01</div>
-                    <div className="text-xs p-1">Date of Effectivity: March 26, 2021</div>
+                    <div className="border-b text-xs border-black p-1">Revision No.: 00</div>
+                    <div className="text-xs p-1 text-white">Date of Effectivity: March 26, 2021</div>
                   </td>
 
                   {/* Blank */}
@@ -2198,7 +2199,7 @@ export default function InspectionForm(){
 
                   {/* Part A Label */}
                   <tr>
-                    <td colSpan={3} className="border border-black pl-1 pt-0 font-arial">
+                    <td colSpan={3} className="border border-black pl-1 pt-0 font-arial bg-[#CECECE]">
                       <h3 className="text-sm font-normal">PART A: To be filled-up by Requesting Party</h3>
                     </td>
                   </tr>
@@ -2403,7 +2404,7 @@ export default function InspectionForm(){
 
                   {/* Part B Label */}
                   <tr>
-                    <td colSpan={3} className="border border-black pl-1 font-arial">
+                    <td colSpan={3} className="border border-black pl-1 font-arial bg-[#CECECE]">
                     <h3 className="text-sm font-normal">PART B: To be filled-up by Administrative Division</h3>
                     </td>
                   </tr>
@@ -2495,7 +2496,7 @@ export default function InspectionForm(){
 
                   {/* Part C Label */}
                   <tr>
-                    <td colSpan={3} className="border border-black pl-1 font-arial">
+                    <td colSpan={3} className="border border-black pl-1 font-arial bg-[#CECECE]">
                     <h3 className="text-sm font-normal">PART C: To be filled-up by the DESIGNATED INSPECTOR before repair job.</h3>
                     </td>
                   </tr>
@@ -2569,7 +2570,7 @@ export default function InspectionForm(){
 
                   {/* Part D Label */}
                   <tr>
-                    <td colSpan={3} className="border border-black pl-1 font-arial">
+                    <td colSpan={3} className="border border-black pl-1 font-arial bg-[#CECECE]">
                     <h3 className="text-sm font-normal">PART D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.</h3>
                     </td>
                   </tr>

@@ -16,18 +16,14 @@ class FacilityVenueController extends Controller
     /**
      *  Legend
      * 
-     *  0 - Form Closed
-     *  1 - GSO
-     *  2 - Admin Approval
-     *  3 - Admin Disapprovel
-     *  4 - Pending Approval
-     *  5 - Deleted
-     * 
-     *  For the Notification (form_location)
-     *  3 - Form submit if not Admin Manager
-     *  2 - Admin Manager (Form submit and OPR Instruct)
-     *  1 - GSO (OPR Action)
-     *  0 - Form Closed
+     *  0 - Form Cancel
+     *  1 - Form Close
+     *  2 - GSO Filed the OPR Comment
+     *  3 - Form Aproved
+     *  4 - Form Disapproved
+     *  5 - Port Manager Request
+     *  6 - Admin Manager Request
+     *  7 - Regular Request
      * 
      */
 
@@ -110,14 +106,14 @@ class FacilityVenueController extends Controller
             $facilityStartDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_start.' '.$facility->time_start);
             $facilityEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $facility->date_end.' '.$facility->time_end);
 
-            if($facility->admin_approval === 4){
+            if($facility->admin_approval === 5 || $facility->admin_approval === 6 || $facility->admin_approval === 7){
                 if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
                 ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
                     return response()->json(['message' => 'Pending']);
                 }
             }
 
-            if($facility->admin_approval === 1 || $facility->admin_approval === 0){
+            if($facility->admin_approval === 2 || $facility->admin_approval === 1 || $facility->admin_approval === 0){
                 if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
                 ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
                     return response()->json(['message' => 'Not Vacant']);
@@ -168,12 +164,10 @@ class FacilityVenueController extends Controller
             $notiMessage = $nameReq.' has submitted a request.';
             $receiverId = $IdGSO;
             $receiverName = $nameGSO;
-            $form = 2;
         } else {
             $notiMessage = $nameReq.' has submitted a request and is waiting for your approval.';
             $receiverId = $IdAM;
             $receiverName = $nameAM;
-            $form = 3;
         }
 
         $notifications[] = [
@@ -186,7 +180,7 @@ class FacilityVenueController extends Controller
             'receiver_name' => $receiverName,
             'joms_type' => 'JOMS_Facility',
             'status' => 2,
-            'form_location' => $form,
+            'form_location' => $data['admin_approval'],
             'joms_id' => $deploymentData->id,
             'created_at' => $now,
             'updated_at' => $now
@@ -197,8 +191,8 @@ class FacilityVenueController extends Controller
 
         // Create logs
         $logs = new LogsModel();
-        $logs->category = 'JOMS';
-        $logs->message = $nameReq. ' has submitted the request for Facility/Venue Request Form (Control No. '.$deploymentData->id.').';
+        $logs->category = 'FVF';
+        $logs->message = $nameReq. ' has submitted the request.';
         $logs->save();
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -273,7 +267,7 @@ class FacilityVenueController extends Controller
         if($facilityData->save()){
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'JOMS';
+            $logs->category = 'FVF';
             $logs->message = $request->input('user_name'). ' has update the form on Facility/Venue Form (Control No. '.$facilityData->id.').';
             $logs->save();
 
@@ -341,7 +335,7 @@ class FacilityVenueController extends Controller
         }
 
         // check if the request form was already deleted
-        if($facilityRequest->admin_approval == 5){
+        if($facilityRequest->admin_approval == 4 || $facilityRequest->admin_approval == 0){
             return response()->json(['error' => 'Deleted'], 408);
         }
 
@@ -357,7 +351,7 @@ class FacilityVenueController extends Controller
 
         // Update the OPR instruction
         $facilityRequest->obr_instruct = $CheckOPR['oprInstruct'];
-        $facilityRequest->admin_approval = 2;
+        $facilityRequest->admin_approval = 3;
         $facilityRequest->date_approve = today();
         $facilityRequest->remarks = "The Admin Manager has approved this request.";
 
@@ -387,7 +381,7 @@ class FacilityVenueController extends Controller
                 'receiver_name' => $nameGSO,
                 'joms_type' => 'JOMS_Facility',
                 'status' => 2,
-                'form_location' => 2,
+                'form_location' => 3,
                 'joms_id' => $facilityRequest->id,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -405,7 +399,7 @@ class FacilityVenueController extends Controller
                     'receiver_name' => $facilityRequest->user_name,
                     'joms_type' => 'JOMS_Facility',
                     'status' => 2,
-                    'form_location' => 2,
+                    'form_location' => 3,
                     'joms_id' => $facilityRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -419,12 +413,12 @@ class FacilityVenueController extends Controller
            NotificationModel::where('receiver_id', $checkAM->id)
                         ->where('joms_type', 'JOMS_Facility')
                         ->where('joms_id', $facilityRequest->id)
-                        ->where('form_location', 3)
+                        ->whereIn('form_location', [5, 6, 7])
                         ->update(['status' => 0]); // Change to 0 for delete the Notification
 
            // Create logs
            $logs = new LogsModel();
-           $logs->category = 'JOMS';
+           $logs->category = 'FVF';
            $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has approved the request on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
            $logs->save();
 
@@ -459,7 +453,7 @@ class FacilityVenueController extends Controller
         if ($facilityRequest->save()) {
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'JOMS';
+            $logs->category = 'FVF';
             $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has updated the OPR Instruction on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         } else {
@@ -474,6 +468,10 @@ class FacilityVenueController extends Controller
     public function submitOPRAction(Request $request, $id) {
         // Get the current timestamp
         $now = Carbon::now();
+
+        $CheckOPR = $request->validate([
+            'oprAction' => 'required|string'
+        ]);
 
         // Get the sender's data (If GSO)
         $sender = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%GSO%")->first();
@@ -490,8 +488,8 @@ class FacilityVenueController extends Controller
         if (!$facilityRequest) { return response()->json(['message' => 'Facility request not found.'], 404); }
 
         // Update the OPR comment
-        $facilityRequest->obr_comment = $request->input('oprAction');
-        $facilityRequest->admin_approval = 1;
+        $facilityRequest->obr_comment = $CheckOPR['oprAction'];
+        $facilityRequest->admin_approval = 2;
 
         $reqGSO = $senderId === $facilityRequest->user_id;
 
@@ -526,12 +524,12 @@ class FacilityVenueController extends Controller
             NotificationModel::whereIn('receiver_id', [$senderId, $facilityRequest->user_id])
                         ->where('joms_type', 'JOMS_Facility')
                         ->where('joms_id', $facilityRequest->id)
-                        ->where('form_location', 2)
+                        ->where('form_location', 3)
                         ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'JOMS';
+            $logs->category = 'FVF';
             $logs->message = $senderName.' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
 
@@ -565,7 +563,7 @@ class FacilityVenueController extends Controller
         if($facilityRequest->save()){
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'JOMS';
+            $logs->category = 'FVF';
             $logs->message = $checkGSO->firstname. ' ' .$checkGSO->middlename. '. ' .$checkGSO->lastname . ' has updated the OPR Action on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         }
@@ -580,7 +578,7 @@ class FacilityVenueController extends Controller
 
         $facilityRequest = FacilityVenueModel::find($id);
 
-        $facilityRequest->admin_approval = 3;
+        $facilityRequest->admin_approval = 4;
         $facilityRequest->date_approve = today();
         $facilityRequest->remarks = "Disapproved (Reason: ".$request->input('remarks'). ")";
         
@@ -656,12 +654,12 @@ class FacilityVenueController extends Controller
             NotificationModel::where('receiver_id', $idAM)
                             ->where('joms_type', 'JOMS_Facility')
                             ->where('joms_id', $facilityRequest->id)
-                            ->where('form_location', 3)
+                            ->whereIn('form_location', [5, 6, 7])
                             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'JOMS';
+            $logs->category = 'FVF';
             $logs->message = $nameAM.' has disapproved the request on the Facility / Venue Request Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         
@@ -674,37 +672,45 @@ class FacilityVenueController extends Controller
     /**
      * Close Request 
      */
-    function closeForce(Request $request, $id){
-        $facilityRequest = FacilityVenueModel::find($id);
+    function closeRequest(Request $request, $id){
+        $twentyFourHoursAgo = Carbon::now()->subHours(24);
 
-        // Update Approve
-        $facilityRequest->admin_approval = 0;
-        $facilityRequest->remarks = "Form Closed";
+        $FacilityRequest = FacilityVenueModel::where('id', $id)
+                                        ->where('admin_approval', 2)
+                                        ->where('updated_at', '<', $twentyFourHoursAgo)
+                                        ->first();
 
-        if ($facilityRequest->save()) {
-            // Log only if saving the notification is successful
-            $logs = new LogsModel();
-            $logs->category = 'JOMS';
-            $logs->message = $request->input('user_name').' has closed the request on Facility / Venue Request Form (Control No. '.$facilityRequest->id.')';
-            $logs->save();
+        if ($FacilityRequest) {
+            // Update the record
+            $FacilityRequest->admin_approval = 1;
+            $FacilityRequest->remarks = 'Form is closed';
+
+            if($FacilityRequest->save()){
+                // Log the action
+                $logs = new LogsModel();
+                $logs->category = 'FVF';
+                $logs->message = 'The system has closed the Facility / Venue Request Form (Control No. ' . $FacilityRequest->id . ').';
+                $logs->save();
+            }
+
         }
     }
 
     /**
-     * Delete Form
+     * Cancel Form
      */
-    public function closeRequestForce(Request $request, $id){
+    public function cancelRequest(Request $request, $id){
 
         $facilityRequest = FacilityVenueModel::find($id);
 
         // Check if the Request is already approve
-        if($facilityRequest->admin_approval == 2){
+        if($facilityRequest->admin_approval == 0){
             return response()->json(['message' => 'Already'], 408);
         }
 
         // Update Approve
-        $facilityRequest->admin_approval = 5;
-        $facilityRequest->remarks = "Deleted by the GSO: Reason(".$request->input('deleteReason').").";
+        $facilityRequest->admin_approval = 0;
+        $facilityRequest->remarks = $request->input('user_name'). ' canceled the form request.';
 
         // Save Update
         if ($facilityRequest->save()) {
@@ -718,8 +724,8 @@ class FacilityVenueController extends Controller
                 if ($notification->save()) {
                     // Log only if saving the notification is successful
                     $logs = new LogsModel();
-                    $logs->category = 'JOMS';
-                    $logs->message = $request->input('user_name').' has deleted the form on Facility / Venue Request Form (Control Number:'.$facilityRequest->id.').';
+                    $logs->category = 'FVF';
+                    $logs->message = $request->input('user_name').' has canceled the form on Facility / Venue Request Form (Control Number:'.$facilityRequest->id.').';
                     $logs->save();
                 }
             }

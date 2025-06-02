@@ -17,7 +17,7 @@ export default function DashboardJLMS(){
         <img
           src={ppalogo}
           alt="PPA PMO/LNI"
-          className="transition-width duration-300 w-40 h-40 object-contain"
+          className="transition-width duration-300 w-[300px] h-[300px] object-contain"
         />
         <div className="flex flex-col">
           <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-none">
@@ -36,6 +36,7 @@ export default function DashboardJLMS(){
       {/* First Row: AMS, JOMS, PPS */}
       <div className="grid grid-cols-3 gap-4">
         {/* AMS */}
+        <Link to={`/ams`}> 
         <div className="relative text-center">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/asset.gif" alt="Your Company" />
@@ -51,6 +52,7 @@ export default function DashboardJLMS(){
             🚧 Coming Soon
           </div>
         </div>
+        </Link>
 
         {/* JOMS */}
         <Link to={`/joms`}> 
@@ -127,7 +129,7 @@ export default function DashboardJLMS(){
       </div>
 
       <footer className="text-sm font-bold p-5 text-right font-roboto mt-10">
-        <p>&copy; 2025 All rights reserved. Developed by PPA PMO/LNI - IT Team (v.1.2.0) </p>
+        <p>&copy; 2025 All rights reserved. Developed by PPA PMO/LNI - IT Team </p>
       </footer>
 
     </div>

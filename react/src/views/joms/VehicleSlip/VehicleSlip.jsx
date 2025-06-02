@@ -7,6 +7,7 @@ import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
+import ppa_logo from '/default/ppa_logo.png'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faFilePdf, faHouse, faGear, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -102,6 +103,7 @@ export default function VehicleSlip(){
       const requestorEsig = responseData.requestorEsig;
       const adminName = responseData.adminName;
       const adminEsig = responseData.adminEsig;
+      const pmId = responseData.pmId;
       const pmName = responseData.pmName;
       const pmEsig = responseData.pmEsig;
       const driverEsig = responseData.driverEsig;
@@ -112,7 +114,7 @@ export default function VehicleSlip(){
       setVacant({driverAvail, vehicleDet})
       setPassenger(passengerData);
       setRequestor({requestorPosData, requestorEsig, driverEsig});
-      setAdmin({adminName, adminEsig, pmName, pmEsig});
+      setAdmin({adminName, adminEsig, pmName, pmId, pmEsig});
 
       // Restrictions Condition
       const myAccess = FormData?.user_id == currentUserId || accessOnly ? "Access" : "Denied";
@@ -642,11 +644,15 @@ export default function VehicleSlip(){
                   <FontAwesomeIcon  onClick={(event) => {event.preventDefault(); setEditDetail(false); }} className="icon-delete" title="Edit Form" icon={faPenToSquare} />
                 )}
                 {/* Generate PDF */}
-                {GSO && editDetail && vehicleData?.admin_approval != 0 && (
+                {(GSO || Admin) && editDetail && vehicleData?.admin_approval != 0 && (
                   <FontAwesomeIcon onClick={handlePDFClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
                 )}
                 {/* Cancel Form */}
                 {GSO && editDetail && vehicleData?.admin_approval != 0 && vehicleData?.admin_approval != 1 && vehicleData?.admin_approval != 2 && vehicleData?.admin_approval != 3 && vehicleData?.admin_approval != 4 && (
+                  <FontAwesomeIcon onClick={() => handleCancelForm()} className="icon-delete" title="Cancel Form" icon={faCircleXmark} />
+                )}
+                {/* Cancel Form on Requestor */}
+                {vehicleData?.user_id == currentUserId && [5, 6 , 7, 8].includes(vehicleData?.admin_approval) && (
                   <FontAwesomeIcon onClick={() => handleCancelForm()} className="icon-delete" title="Cancel Form" icon={faCircleXmark} />
                 )}
                 {/* For the Regular Requestor */}
@@ -1155,42 +1161,45 @@ export default function VehicleSlip(){
 
                 {/* Copy for the Admin Manager */}
                 <div className="col-span-1">
-
                   <table className="w-full mt-4 mb-10">
 
                     {/* Header */}
-                    <tr>
-                      <td colSpan={2} className="w-1/3 text-left text-sm font-arial">
-                        <span>Doc. Ref. Code:PM:VEC:LNI:WEN:FM:01</span>
-                      </td>
-                      <td className="w-1/3 text-right text-sm font-arial">
-                        <span>"Annex D"</span>
-                      </td>
-                    </tr>
-
-                    {/* Agency Name */}
-                    <tr>
-                      <td colSpan={3} className="text-center text-sm font-arial pt-6">
-                        <p>Republic of the Philippines</p>
-                        <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
-                        <p>PMO-<u className="underline-text">Lanao Del Norte/Iligan</u></p>
-                      </td>
-                    </tr>
-
-                    {/* Date */}
-                    <tr>
-                      <td className="w-1/3"></td>
-                      <td className="w-1/3"></td>
-                      <td className="w-1/3 pt-4">
-                        <p className="border-b border-black text-sm text-center font-arial">{formatDate(vehicleData?.created_at)}</p>
-                        <p className="text-sm text-center font-arial">Date</p>
-                      </td>
-                    </tr>
+                    <td className="border w-[80px] border-black p-1 text-center">
+                      <img src={ppa_logo} alt="My Image" className="mx-auto w-[45px] absolute ml-3" />
+                    </td>
+                    <td className="border w-7/12 border-black p-1 font-arial">
+                      <div className="text-center relative">
+                        <div className="text-[18px]">VEHICLE REQUEST SLIP</div>
+                        <div className="text-[10px]">PMO - LANAO DEL NORTE/ILIGAN</div>
+                      </div>
+                    </td>
+                    <td className="border border-black font-arial">
+                      <div className="text-[7px] border-black pl-1 mt-3">Doc.Ref.Code: PM:VEC:LNI:WEN:FM:01</div>
+                      <div className="text-[7px] border-black pl-1 pt-1">Revision No.: 00</div>
+                    </td>
 
                     {/* Main Content */}
                     <tr>
                       <td colSpan={3}>
 
+                        {/* Agency Name */}
+                        <div className="text-center text-sm font-arial pt-3">
+                          <p>Republic of the Philippines</p>
+                          <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
+                          <p>PMO-<u className="underline-text">Lanao Del Norte/Iligan</u></p>
+                        </div>
+
+                        {/* Date */}
+                        <div className="flex justify-end mt-1">
+                          <div className="flex flex-col items-center">
+                            <p className="w-[150px] border-b border-black text-sm text-center font-arial">
+                              {formatDate(vehicleData?.created_at)}
+                            </p>
+                            <p className="text-sm text-center font-arial">Date</p>
+                          </div>
+                        </div>
+
+                        {/* Title */}
                         <div className="font-arial font-bold text-center text-sm">
                           <span>VEHICLE REQUEST SLIP</span>
                         </div>
@@ -1200,7 +1209,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Passenger */}
-                        <div className="mt-4">
+                        <div className="mt-3">
                           <div className="flex">
                             <div className="w-44 font-arial text-sm">
                               <span>PASSENGERS/s:</span>
@@ -1222,7 +1231,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Purpose */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-44 font-arial text-sm">
                               <span>PURPOSE:</span>
@@ -1234,7 +1243,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Place */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-72 font-arial text-sm">
                               <span>PLACE/s TO BE VISITED:</span>
@@ -1246,7 +1255,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Date Time */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-72 font-arial text-sm">
                               <span>DATE/TIME OF ARRIVAL:</span>
@@ -1257,158 +1266,162 @@ export default function VehicleSlip(){
                           </div>
                         </div>
 
-                      </td>
-                    </tr>
+                        {/* Vehicle Information */}
+                        <div className="grid grid-cols-3 gap-6">
 
-                    {/* Driver Information */}
-                    <tr>
+                          {/* Vehicle */}
+                          <div className="col-span-1 mt-8">
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
+                            <p className="text-sm text-center font-arial">Type of Vehicle</p>
+                          </div>
 
-                      {/* Vehicle Type */}
-                      <td className="w-1/3 pt-10">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
-                        <p className="text-sm text-center font-arial">Type of Vehicle</p>
-                      </td>
+                          {/* Plate Number */}
+                          <div className="col-span-1 mt-8">
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
+                            <p className="text-sm text-center font-arial">Plate No.</p>
+                          </div>
 
-                      {/* Plate No */}
-                      <td className="w-1/3 pt-10 px-8">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
-                        <p className="text-sm text-center font-arial">Plate No.</p>
-                      </td>
-
-                      {/* Driver */}
-                      <td className="w-1/3 pt-10 relative">
-                        {requestor?.driverEsig ? (
-                          <img
-                            src={requestor?.driverEsig}
-                            className="ppa-esig-driver-vs"
-                            alt="Signature"
-                          />
-                        ):null}
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
-                        <p className="text-sm text-center font-arial">Driver</p>
-                      </td>
-
-                    </tr>
-
-                    {/* Requestor */}
-                    <tr>
-                      <td colSpan={2} className="w-1/3 pt-5">
-
-                        <div className="w-3/4 text-sm font-arial font-bold">
-                          REQUESTED BY:
-                        </div>
-
-                        <div className="relative pt-2">
-                          <img
-                            src={requestor?.requestorEsig}
-                            className="ppa-esig-user-vs"
-                            alt="Signature"
-                          />
-                        </div>
-                        <div className=" w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                          {vehicleData?.user_name}
-                        </div>
-                        <div className="w-3/4 text-center text-sm relative">
-                          {requestor?.requestorPosData}
-                        </div> 
-                        
-                      </td>
-                    </tr>
-
-                    {/* Admin Manager or Port Manager */}
-                    <tr>
-                      <td colSpan={2} className="pt-4">
-
-                        <div className="w-3/4 text-sm font-arial font-bold">
-                          {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) ? ("APPROVED:"):
-                          (vehicleData?.admin_approval == 3 || vehicleData?.admin_approval == 4) ? ("DISAPPROVED:"):"APPROVED:"}
-                        </div>
-                        
-                        {vehicleData?.type_of_slip == 'within' ? (
-                        <>
-                          <div className="relative pt-2">
-                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                          {/* Driver */}
+                          <div className="col-span-1 mt-8 relative">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2 || vehicleData?.admin_approval == 10 || vehicleData?.admin_approval == 11) && (
                               <img
-                                src={admin?.adminEsig}
-                                className="ppa-esig-user-vs"
+                                src={requestor?.driverEsig}
+                                className="ppa-esig-driver-vs"
                                 alt="Signature"
                               />
                             )}
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
+                            <p className="text-sm text-center font-arial">Driver</p>
                           </div>
-                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                            {admin?.adminName}
-                          </div> 
-                          <div className="w-3/4 text-center text-sm relative">
-                            Acting Adminstrative Division Manager
-                          </div> 
-                        </>
-                        ):(
-                        <>
-                          <div className="relative pt-2">
-                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+
+                        </div>
+
+                        {/* Requestor */}
+                        <div className="mt-6">
+                          <div className="text-sm font-arial font-bold">
+                            REQUESTED BY:
+                          </div>
+                          <div className="w-[280px]">
+                            <div className="relative pt-2">
                               <img
-                                src={admin?.pmEsig}
+                                src={requestor?.requestorEsig}
                                 className="ppa-esig-user-vs"
                                 alt="Signature"
                               />
+                            </div>
+                            <div className="text-center font-bold border-b border-black text-sm relative mt-4">
+                              {vehicleData?.user_name}
+                            </div>
+                            <div className="text-center text-sm relative">
+                              {requestor?.requestorPosData}
+                            </div> 
+                          </div>
+                        </div>
+
+                        {/* Approver */}
+                        <div className="mt-5 mb-5">
+                          <div className="text-sm font-arial font-bold">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) ? ("APPROVED:"):
+                            (vehicleData?.admin_approval == 3 || vehicleData?.admin_approval == 4) ? ("DISAPPROVED:"):"APPROVED:"}
+                          </div>
+                          <div className="w-[280px]">
+                            {vehicleData?.type_of_slip == 'within' ? (
+                            <>
+                              <div className="relative pt-2">
+                                {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                                  vehicleData.user_id == admin?.pmId ? (
+                                    <img
+                                      src={admin?.pmEsig}
+                                      className="ppa-esig-user-vs"
+                                      alt="Signature"
+                                  />
+                                  ):(
+                                    <img
+                                    src={admin?.adminEsig}
+                                    className="ppa-esig-user-vs"
+                                    alt="Signature"
+                                  />
+                                  )
+                                )}
+                              </div>
+                              <div className="text-center font-bold border-b border-black text-sm relative mt-5">
+                                {vehicleData.user_id == admin?.pmId ? admin?.pmName : admin?.adminName}
+                              </div> 
+                              <div className="text-center text-sm relative">
+                                {vehicleData.user_id == admin?.pmId ? 'Acting Port Manager' : 'Acting Adminstrative Division Manager'}
+                              </div> 
+                            </>
+                            ):(
+                            <>
+                              <div className="relative pt-2">
+                                {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                                  <img
+                                    src={admin?.pmEsig}
+                                    className="ppa-esig-user-vs"
+                                    alt="Signature"
+                                  />
+                                )}
+                              </div>
+                              <div className="text-center font-bold border-b border-black text-sm relative mt-5">
+                                {admin?.pmName}
+                              </div> 
+                              <div className="text-center text-sm relative">
+                                Acting Port Manager
+                              </div> 
+                            </>
                             )}
                           </div>
-                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                            {admin?.pmName}
-                          </div> 
-                          <div className="w-3/4 text-center text-sm relative">
-                            Acting Port Manager
-                          </div> 
-                        </>
-                        )}
+                        </div>
+
+                        <span className="system-generated">Joint Local Management System - This is system-generated.</span>
 
                       </td>
                     </tr>
 
                   </table>
-
-                  <span className="system-generated">Joint Local Management System - This is system-generated.</span>
-
                 </div>
 
                 {/* Copy for GSO */}
                 <div className="col-span-1">
-
                   <table className="w-full mt-4 mb-10">
 
                     {/* Header */}
-                    <tr>
-                      <td colSpan={2} className="w-1/3 text-left text-sm font-arial">
-                        <span>Doc. Ref. Code:PM:VEC:LNI:WEN:FM:01</span>
-                      </td>
-                      <td className="w-1/3 text-right text-sm font-arial">
-                        <span>"Annex D"</span>
-                      </td>
-                    </tr>
-
-                    {/* Agency Name */}
-                    <tr>
-                      <td colSpan={3} className="text-center text-sm font-arial pt-6">
-                        <p>Republic of the Philippines</p>
-                        <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
-                        <p>PMO-<u className="underline-text">Lanao Del Norte/Iligan</u></p>
-                      </td>
-                    </tr>
-
-                    {/* Date */}
-                    <tr>
-                      <td className="w-1/3"></td>
-                      <td className="w-1/3"></td>
-                      <td className="w-1/3 pt-4">
-                        <p className="border-b border-black text-sm text-center font-arial">{formatDate(vehicleData?.created_at)}</p>
-                        <p className="text-sm text-center font-arial">Date</p>
-                      </td>
-                    </tr>
+                    <td className="border w-[80px] border-black p-1 text-center">
+                      <img src={ppa_logo} alt="My Image" className="mx-auto w-[45px] absolute ml-3" />
+                    </td>
+                    <td className="border w-7/12 border-black p-1 font-arial">
+                      <div className="text-center relative">
+                        <div className="text-[18px]">VEHICLE REQUEST SLIP</div>
+                        <div className="text-[10px]">PMO - LANAO DEL NORTE/ILIGAN</div>
+                      </div>
+                    </td>
+                    <td className="border border-black font-arial">
+                      <div className="text-[7px] border-black pl-1 mt-3">Doc.Ref.Code: PM:VEC:LNI:WEN:FM:01</div>
+                      <div className="text-[7px] border-black pl-1 pt-1">Revision No.: 00</div>
+                    </td>
 
                     {/* Main Content */}
                     <tr>
                       <td colSpan={3}>
 
+                        {/* Agency Name */}
+                        <div className="text-center text-sm font-arial pt-3">
+                          <p>Republic of the Philippines</p>
+                          <p><b>PHILIPPINE PORTS AUTHORITY</b></p>
+                          <p>PMO-<u className="underline-text">Lanao Del Norte/Iligan</u></p>
+                        </div>
+
+                        {/* Date */}
+                        <div className="flex justify-end mt-1">
+                          <div className="flex flex-col items-center">
+                            <p className="w-[150px] border-b border-black text-sm text-center font-arial">
+                              {formatDate(vehicleData?.created_at)}
+                            </p>
+                            <p className="text-sm text-center font-arial">Date</p>
+                          </div>
+                        </div>
+
+                        {/* Title */}
                         <div className="font-arial font-bold text-center text-sm">
                           <span>VEHICLE REQUEST SLIP</span>
                         </div>
@@ -1418,7 +1431,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Passenger */}
-                        <div className="mt-4">
+                        <div className="mt-3">
                           <div className="flex">
                             <div className="w-44 font-arial text-sm">
                               <span>PASSENGERS/s:</span>
@@ -1440,7 +1453,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Purpose */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-44 font-arial text-sm">
                               <span>PURPOSE:</span>
@@ -1452,7 +1465,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Place */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-72 font-arial text-sm">
                               <span>PLACE/s TO BE VISITED:</span>
@@ -1464,7 +1477,7 @@ export default function VehicleSlip(){
                         </div>
 
                         {/* Date Time */}
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <div className="flex">
                             <div className="w-72 font-arial text-sm">
                               <span>DATE/TIME OF ARRIVAL:</span>
@@ -1475,118 +1488,111 @@ export default function VehicleSlip(){
                           </div>
                         </div>
 
-                      </td>
-                    </tr>
+                        {/* Vehicle Information */}
+                        <div className="grid grid-cols-3 gap-6">
 
-                    {/* Driver Information */}
-                    <tr>
+                          {/* Vehicle */}
+                          <div className="col-span-1 mt-8">
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
+                            <p className="text-sm text-center font-arial">Type of Vehicle</p>
+                          </div>
 
-                      {/* Vehicle Type */}
-                      <td className="w-1/3 pt-10">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[0]}</p>
-                        <p className="text-sm text-center font-arial">Type of Vehicle</p>
-                      </td>
+                          {/* Plate Number */}
+                          <div className="col-span-1 mt-8">
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
+                            <p className="text-sm text-center font-arial">Plate No.</p>
+                          </div>
 
-                      {/* Plate No */}
-                      <td className="w-1/3 pt-10 px-8">
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.vehicle_type?.split(/ \(([^)]+)\)/)?.[1]}</p>
-                        <p className="text-sm text-center font-arial">Plate No.</p>
-                      </td>
-
-                      {/* Driver */}
-                      <td className="w-1/3 pt-10 relative">
-                        {requestor?.driverEsig ? (
-                          <img
-                            src={requestor?.driverEsig}
-                            className="ppa-esig-driver-vs"
-                            alt="Signature"
-                          />
-                        ):null}
-                        <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
-                        <p className="text-sm text-center font-arial">Driver</p>
-                      </td>
-
-                    </tr>
-
-                    {/* Requestor */}
-                    <tr>
-                      <td colSpan={2} className="w-1/3 pt-5">
-
-                        <div className="w-3/4 text-sm font-arial font-bold">
-                          REQUESTED BY:
-                        </div>
-
-                        <div className="relative pt-2">
-                          <img
-                            src={requestor?.requestorEsig}
-                            className="ppa-esig-user-vs"
-                            alt="Signature"
-                          />
-                        </div>
-                        <div className=" w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                          {vehicleData?.user_name}
-                        </div>
-                        <div className="w-3/4 text-center text-sm relative">
-                          {requestor?.requestorPosData}
-                        </div> 
-                        
-                      </td>
-                    </tr>
-
-                    {/* Admin Manager or Port Manager */}
-                    <tr>
-                      <td colSpan={2} className="pt-4">
-
-                        <div className="w-3/4 text-sm font-arial font-bold">
-                        {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) ? ("APPROVED:"):
-                          (vehicleData?.admin_approval == 3 || vehicleData?.admin_approval == 4) ? ("DISAPPROVED:"):"APPROVED:"}
-                        </div>
-                        
-                        {vehicleData?.type_of_slip == 'within' ? (
-                        <>
-                          <div className="relative pt-2">
-                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                          {/* Driver */}
+                          <div className="col-span-1 mt-8 relative">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2 || vehicleData?.admin_approval == 10 || vehicleData?.admin_approval == 11) && (
                               <img
-                                src={admin?.adminEsig}
-                                className="ppa-esig-user-vs"
+                                src={requestor?.driverEsig}
+                                className="ppa-esig-driver-vs"
                                 alt="Signature"
                               />
                             )}
+                            <p className="border-b border-black text-xs text-center font-arial">{vehicleData?.driver}</p>
+                            <p className="text-sm text-center font-arial">Driver</p>
                           </div>
-                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                            {admin?.adminName}
-                          </div> 
-                          <div className="w-3/4 text-center text-sm relative">
-                            Acting Adminstrative Division Manager
-                          </div> 
-                        </>
-                        ):(
-                        <>
-                          <div className="relative pt-2">
-                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+
+                        </div>
+
+                        {/* Requestor */}
+                        <div className="mt-6">
+                          <div className="text-sm font-arial font-bold">
+                            REQUESTED BY:
+                          </div>
+                          <div className="w-[280px]">
+                            <div className="relative pt-2">
                               <img
-                                src={admin?.pmEsig}
+                                src={requestor?.requestorEsig}
                                 className="ppa-esig-user-vs"
                                 alt="Signature"
                               />
+                            </div>
+                            <div className="text-center font-bold border-b border-black text-sm relative mt-4">
+                              {vehicleData?.user_name}
+                            </div>
+                            <div className="text-center text-sm relative">
+                              {requestor?.requestorPosData}
+                            </div> 
+                          </div>
+                        </div>
+
+                        {/* Approver */}
+                        <div className="mt-5 mb-5">
+                          <div className="text-sm font-arial font-bold">
+                            {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) ? ("APPROVED:"):
+                            (vehicleData?.admin_approval == 3 || vehicleData?.admin_approval == 4) ? ("DISAPPROVED:"):"APPROVED:"}
+                          </div>
+                          <div className="w-[280px]">
+                            {vehicleData?.type_of_slip == 'within' ? (
+                            <>
+                              <div className="relative pt-2">
+                                {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                                  <img
+                                    src={admin?.adminEsig}
+                                    className="ppa-esig-user-vs"
+                                    alt="Signature"
+                                  />
+                                )}
+                              </div>
+                              <div className="text-center font-bold border-b border-black text-sm relative mt-5">
+                                {admin?.adminName}
+                              </div> 
+                              <div className="text-center text-sm relative">
+                                Acting Adminstrative Division Manager
+                              </div> 
+                            </>
+                            ):(
+                            <>
+                              <div className="relative pt-2">
+                                {(vehicleData?.admin_approval == 1 || vehicleData?.admin_approval == 2) && (
+                                  <img
+                                    src={admin?.pmEsig}
+                                    className="ppa-esig-user-vs"
+                                    alt="Signature"
+                                  />
+                                )}
+                              </div>
+                              <div className="text-center font-bold border-b border-black text-sm relative mt-5">
+                                {admin?.pmName}
+                              </div> 
+                              <div className="text-center text-sm relative">
+                                Acting Port Manager
+                              </div> 
+                            </>
                             )}
                           </div>
-                          <div className="w-3/4 text-center font-bold border-b border-black text-sm relative mt-7">
-                            {admin?.pmName}
-                          </div> 
-                          <div className="w-3/4 text-center text-sm relative">
-                            Acting Port Manager
-                          </div> 
-                        </>
-                        )}
+                        </div>
+
+                        <span className="system-generated">Joint Local Management System - This is system-generated.</span>
 
                       </td>
                     </tr>
 
                   </table>
-
-                  <span className="system-generated">Joint Local Management System - This is system-generated.</span>
-
                 </div>
 
               </div>

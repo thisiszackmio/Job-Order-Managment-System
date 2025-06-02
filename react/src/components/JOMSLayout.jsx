@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import ppaLogo from '/default/ppa_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faHouse, faFileLines, faTableList, faClipboardUser, faVanShuttle, faScroll, faUserTie } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faTableList, faClipboardUser, faVanShuttle, faScroll, faUserTie, faUserGear } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../axios";
@@ -24,6 +24,18 @@ export default function JOMSLayout() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
+
+  const [showLink, setShowLink] = useState(false);
+
+  useEffect(() => {
+    const now = new Date();
+    const startDate = new Date("2025-05-30");
+    const endDate = new Date("2025-06-14");
+
+    if (now >= startDate && now <= endDate) {
+      setShowLink(true);
+    }
+  }, []);
 
   const handleToggle = (index) => {
     setActiveAccordion(index === activeAccordion ? null : index);
@@ -107,6 +119,18 @@ export default function JOMSLayout() {
 
           {/* Nav */}
           <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
+
+            {/* Relase Note */}
+            {showLink && (
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
+                  <Link to="/joms/systemupdate" className="flex items-center">
+                    <FontAwesomeIcon icon={faUserGear} />
+                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Upate Note</p>}
+                  </Link>
+                </div>
+              </li>
+            )}
 
             {/* Dashboard */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
@@ -197,7 +221,7 @@ export default function JOMSLayout() {
             )}
 
             {/* Personnel */}
-            {(SuperAdmin || GSO) && (
+            {(SuperAdmin || GSO || AssignPersonnel) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/personnel" className="flex items-center">
@@ -209,7 +233,7 @@ export default function JOMSLayout() {
             )}
 
             {/* Vehicle */}
-            {(SuperAdmin || GSO) && (
+            {(SuperAdmin || GSO || AssignPersonnel) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/vehicletype" className="flex items-center">
@@ -268,6 +292,9 @@ export default function JOMSLayout() {
                   <section>
                     <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/settings">General Settings</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/joms/logs">Logs</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
@@ -301,7 +328,7 @@ export default function JOMSLayout() {
               <img src={currentUserAvatar} className="ppa-display-picture" alt="" />
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
-                  <Link to="/user">{currentUserName?.name}</Link>
+                  <Link to="/joms/user">{currentUserName?.name}</Link>
                 </p> 
               : null }  
               </div>

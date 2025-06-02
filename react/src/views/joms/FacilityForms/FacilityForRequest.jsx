@@ -39,6 +39,7 @@ export default function FacilityVenueForm(){
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Admin = codes.includes("AM");
+  const PortManager = codes.includes("PM");
 
   const today = new Date().toISOString().split('T')[0];
   const [disableForm, setDisableForm] = useState(false);
@@ -110,34 +111,26 @@ export default function FacilityVenueForm(){
   
     // Define the classes to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
     } 
-    else if(loading) {
-      addLoadingClass();
-    }
     else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
-      removeLoadingClass();
     };
-  }, [showPopup, loading]);
+  }, [showPopup]);
 
   useEffect(()=>{
     const totalChecked = [
@@ -205,11 +198,10 @@ export default function FacilityVenueForm(){
     setNoOfMicrophone(inputValue);
   };
 
-
   // Dev Error Text
   const DevErrorText = (
     <div>
-      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-title">Error</p>
       <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
     </div>
   );
@@ -313,7 +305,7 @@ export default function FacilityVenueForm(){
         setPopupContent("error");
         setPopupMessage(
           <div>
-            <p className="popup-title">Oops!</p>
+            <p className="popup-title">Invalid</p>
             <p className="popup-message">The date you entered is invalid. Please check the End Date and End Time of the activity.</p>
           </div>
         );
@@ -350,7 +342,7 @@ export default function FacilityVenueForm(){
           setPopupContent('error');
           setPopupMessage(
             <div>
-              <p className="popup-title">Wait Wait Wait!</p>
+              <p className="popup-title">Invalid</p>
               <p className="popup-message">You haven’t selected any checkboxes.</p>
             </div>
           );
@@ -369,7 +361,7 @@ export default function FacilityVenueForm(){
           setPopupContent('error');
           setPopupMessage(
             <div>
-              <p className="popup-title">Wait Wait Wait!</p>
+              <p className="popup-title">Invalid</p>
               <p className="popup-message">Please enter the details of the guest.</p>
             </div>
           );
@@ -416,7 +408,7 @@ export default function FacilityVenueForm(){
       name_male: getMale ? getMale : null,
       name_female: getFemale ? getFemale : null,
       other_details: otherDetails ? otherDetails: null,
-      admin_approval: Admin ? 2 : 4,
+      admin_approval: PortManager ? 5 : Admin ? 6 : 7,
       obr_instruct: Admin ? oprInstruct : null,
       date_approve: Admin ? today : null,
       remarks: remark
@@ -430,7 +422,7 @@ export default function FacilityVenueForm(){
       setPopupContent('success');
       setPopupMessage(
         <div>
-          <p className="popup-title">Submission Complete!</p>
+          <p className="popup-title">Success</p>
           {Admin ? (
             <p className="popup-message">Form submitted successfully.</p>
           ):(
@@ -512,7 +504,7 @@ export default function FacilityVenueForm(){
             {/* Form */}
             <div className="mr-28 pb-10">
               {/* Date */}
-              <div className="flex items-center mt-10">
+              <div className="flex items-center mt-4">
                 <div className="w-[380px]">
                   <label className="block text-base font-bold leading-6 text-gray-900">
                   Date:
@@ -826,16 +818,17 @@ export default function FacilityVenueForm(){
             ):null}
 
             {/* For OPR Instruction */}
-            <div className="border-t border-gray">
-              {/* Caption */}
-              <div>
-                <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * OPR Instruction </h2>
+            {(enableDormitory || enableFacility) && Admin && (
+              <div className="border-t border-gray">
+                {/* Caption */}
+                <div>
+                  <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * OPR Instruction </h2>
+                </div>
+                <div className="w-full ppa-form-view h-6 mt-4">
+                {oprInstruct}
+                </div>
               </div>
-              <div className="w-full ppa-form-view h-6 mt-4">
-              {oprInstruct}
-              </div>
-              
-            </div>
+            )}
 
             {/* Button */}
             <div className="mt-10">
@@ -845,7 +838,7 @@ export default function FacilityVenueForm(){
               <button 
                 // form="fac_submit"
                 type="submit"
-                className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                 disabled={submitLoading}
               >
                 {submitLoading ? (
@@ -860,7 +853,7 @@ export default function FacilityVenueForm(){
 
               {/* Cancel */}
               {!submitLoading && (
-                <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
+                <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
                   Revise
                 </button>
               )}
@@ -915,7 +908,7 @@ export default function FacilityVenueForm(){
                   autoComplete="rf_request"
                   value={reqOffice}
                   onChange={ev => setRegOffice(ev.target.value)}
-                  className={`block w-full ppa-form`}
+                  className={`block w-full ${(!reqOffice && fieldMissing.request_office) ? "ppa-form-error":"ppa-form"}`}
                 />
                 {!reqOffice && fieldMissing.request_office && (
                   <p className="form-validation">This form is required</p>
@@ -938,7 +931,7 @@ export default function FacilityVenueForm(){
                   autoComplete="rep_title"
                   value={titleReq}
                   onChange={ev => setTitleReq(ev.target.value)}
-                  className={`block w-full ppa-form`}
+                  className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form"}`}
                 />
                 {!titleReq && fieldMissing.title_of_activity && (
                   <p className="form-validation">This form is required</p>
@@ -964,7 +957,7 @@ export default function FacilityVenueForm(){
                     setDateEndMin(ev.target.value);
                   }}
                   min={today}
-                  className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
+                  className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form"} ${disableForm ? 'disable-ppa-form' : ''}`}
                   readOnly={disableForm}
                 />
                 {!DateStart && fieldMissing.date_start && (
@@ -987,7 +980,7 @@ export default function FacilityVenueForm(){
                   id="time_start"
                   value={timeStart}
                   onChange={ev => setTimeStart(ev.target.value)}
-                  className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
+                  className={`block w-full ${(!timeStart && fieldMissing.time_start) ? "ppa-form-error":"ppa-form"} ${disableForm ? 'disable-ppa-form' : ''}`}
                   readOnly={disableForm}
                 />
                 {!timeStart && fieldMissing.time_start && (
@@ -1017,7 +1010,7 @@ export default function FacilityVenueForm(){
                     }
                   }}
                   min={DateEndMin}
-                  className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
+                  className={`block w-full ${(!DateEnd && fieldMissing.date_end) ? "ppa-form-error":"ppa-form"} ${disableForm ? 'disable-ppa-form' : ''}`}
                   readOnly={disableForm}
                 />
                 {!DateEnd && fieldMissing.date_end && (
@@ -1040,7 +1033,7 @@ export default function FacilityVenueForm(){
                   id="time_end"
                   value={timeEnd}
                   onChange={ev => setTimeEnd(ev.target.value)}
-                  className={`block w-full ppa-form ${disableForm ? 'disable-ppa-form' : ''}`}
+                  className={`block w-full ${(!timeEnd && fieldMissing.time_end) ? "ppa-form-error":"ppa-form"} ${disableForm ? 'disable-ppa-form' : ''}`}
                   readOnly={disableForm}
                 />
                 {!timeEnd && fieldMissing.time_end && (
@@ -1169,7 +1162,7 @@ export default function FacilityVenueForm(){
                 </div>
               </div>
 
-              {/* 3rd Column */}
+              {/* 4th Column */}
               <div className="col-span-1">
                 {/* Other */}
                 <div className="relative flex items-center font-roboto">
@@ -1644,12 +1637,12 @@ export default function FacilityVenueForm(){
               {/* Check Form */}
               <button 
                 onClick={handleConfirm} 
-                className="py-2 px-4 btn-default-form">
+                className="py-2 px-4 text-sm btn-default-form">
                 Submit
               </button>
 
               {/* Cancel */}
-              <button onClick={handleCancel} className="ml-2 py-2 px-4 btn-cancel-form">
+              <button onClick={handleCancel} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
                 Cancel
               </button>
             </>
@@ -1659,7 +1652,7 @@ export default function FacilityVenueForm(){
               <button 
                 type="submit"
                 onClick={checkAvailability}
-                className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                 disabled={submitLoading}
               >
                 {submitLoading ? (

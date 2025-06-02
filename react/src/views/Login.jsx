@@ -172,7 +172,7 @@ export default function Login() {
               This account is currently active on another computer or browser. If you proceed, this device will become active instead.
               </div>  
               <button type="button" onClick={() => { onLogin(); setChangeMethod("continue"); }}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                Continue
+                Proceed
               </button>
               <p className="loginMessage text-center">Click here to <a onClick={() => {setUserExist(false)}} style={{ color: 'blue', cursor: 'pointer'}}>Login</a> </p>
             </>

@@ -26,6 +26,7 @@ class VehicleSlipController extends Controller
      *  7 - GSO and Authority Sent Request
      *  8 - Regular Sent Request
      * 
+     * 
      *  For the Notifications
      *  0 - CLosed
      *  1 - Approval/Disapproval
@@ -134,7 +135,7 @@ class VehicleSlipController extends Controller
 
         // For LOGS
         $logs = new LogsModel();
-        $logs->category = 'Vehicle Slip';
+        $logs->category = 'VSLIP';
         $logs->message = $deploymentVehicleData->user_name.' has submitted a Vehicle Slip request.';
         $logs->save();
     }
@@ -182,7 +183,7 @@ class VehicleSlipController extends Controller
 
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'Vehicle Slip';
+                $logs->category = 'VSLIP';
                 $logs->message = $request->input('authority')." has updated ".$VehicleSlipData->user_name."'s request on Vehicle Slip No.".$VehicleSlipData->id.".";
                 $logs->save();
 
@@ -246,6 +247,7 @@ class VehicleSlipController extends Controller
 
         // Get the Port Manager Detail
         $PMRequest = PPAEmployee::where('code_clearance', 'LIKE', "%PM%")->first();
+        $PMId = $PMRequest->id;
         $PMName = $PMRequest->firstname . ' ' . $PMRequest->middlename. '. ' . $PMRequest->lastname;
         $PMEsig = $rootUrl . '/storage/displayesig/' . $PMRequest->esign;
 
@@ -274,6 +276,7 @@ class VehicleSlipController extends Controller
 
         $respondData = [
             'form' => $VehicleSlipForm,
+            'pmId' => $PMId,
             'pmName' => $PMName,
             'pmEsig' => $PMEsig,
             'adminName' => $AdminName,
@@ -454,7 +457,7 @@ class VehicleSlipController extends Controller
 
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'Vehicle Slip';
+                $logs->category = 'VSLIP';
                 $logs->message = $assignName." has assigned a driver and vehicle to ".$VehicleDataRequest->user_name."'s request on Vehicle Slip No.".$VehicleDataRequest->id.".";
                 $logs->save();
             }
@@ -498,16 +501,25 @@ class VehicleSlipController extends Controller
             $remark = "Approved by the Admin Manager.";
             $approver = 1;
             $form = 1;
-            $receivers = [
-                ['id' => $GsoId, 
-                 'name' => $GsoName,
-                 'noti' => 'The request for '.$VehicleDataRequest->user_name.' has been approved by the Admin Manager.'
-                ],
-                ['id' => $ReqId, 
-                 'name' => $VehicleDataRequest->user_name,
-                 'noti' => 'Your request has been approved by the Admin Manager.'
-                ]
-            ];
+            if($ReqId == $GsoId){
+                $receivers = [
+                    ['id' => $ReqId, 
+                     'name' => $VehicleDataRequest->user_name,
+                     'noti' => 'Your request has been approved by the Admin Manager.'
+                    ]
+                ];
+            }else{
+                $receivers = [
+                    ['id' => $GsoId, 
+                     'name' => $GsoName,
+                     'noti' => 'The request for '.$VehicleDataRequest->user_name.' has been approved by the Admin Manager.'
+                    ],
+                    ['id' => $ReqId, 
+                     'name' => $VehicleDataRequest->user_name,
+                     'noti' => 'Your request has been approved by the Admin Manager.'
+                    ]
+                ];
+            }
         }else{
             $remark = "Approved by the Port Manager.";
             $approver = 1;
@@ -583,7 +595,7 @@ class VehicleSlipController extends Controller
 
                 // For LOGS
                 $logs = new LogsModel();
-                $logs->category = 'Vehicle Slip';
+                $logs->category = 'VSLIP';
                 $logs->message = $approverName." has approved ".$VehicleDataRequest->user_name."'s request on Vehicle Slip No.".$VehicleDataRequest->id.".";
                 $logs->save();
 
@@ -697,7 +709,7 @@ class VehicleSlipController extends Controller
 
             // For LOGS
             $logs = new LogsModel();
-            $logs->category = 'Vehicle Slip';
+            $logs->category = 'VSLIP';
             $logs->message = $request->input('authority')." has dispprove ".$VehicleDataRequest->user_name."'s request on Vehicle Slip No.".$VehicleDataRequest->id.".";
             $logs->save();
         }
@@ -733,7 +745,7 @@ class VehicleSlipController extends Controller
 
                 // Save a single log entry after all notifications are updated
                 $logs = new LogsModel();
-                $logs->category = 'Vehicle Slip';
+                $logs->category = 'VSLIP';
                 $logs->message = $request->input('authority') . " has canceled " . $VehicleDataRequest->user_name . "'s request on Vehicle Slip No." . $VehicleDataRequest->id . ".";
                 $logs->save();              
 
@@ -840,7 +852,7 @@ class VehicleSlipController extends Controller
 
         // For LOGS
         $logs = new LogsModel();
-        $logs->category = 'Vehicle Type';
+        $logs->category = 'VTYPE';
         $logs->message = $request->input('authority').' just added the vehicle details.';
         $logs->save();
 
@@ -859,7 +871,7 @@ class VehicleSlipController extends Controller
 
         // For LOGS
         $logs = new LogsModel();
-        $logs->category = 'Vehicle Type';
+        $logs->category = 'VTYPE';
         $logs->message = $request->input('authority').' just removed the vehicle ('.$VehicleDetailRequest->vehicle_name.'-'.$VehicleDetailRequest->vehicle_plate.') on the list.';
         $logs->save();
 
@@ -893,7 +905,7 @@ class VehicleSlipController extends Controller
         if($VehicleDetailRequest->save() && $DriverDet->save()){
             // Creating logs only if both operations are successful
             $logs = new LogsModel();
-            $logs->category = 'Vehicle Type';
+            $logs->category = 'VTYPE';
             $logs->message = $request->input('authority').' set the driver ('.$VehicleSlipForm->driver.') and vehicle ('.$VehicleSlipForm->vehicle_type.').';
             $logs->save();
         }
@@ -918,7 +930,7 @@ class VehicleSlipController extends Controller
         if($VehicleDetailRequest->save()){
             // Creating logs only if both operations are successful
             $logs = new LogsModel();
-            $logs->category = 'Vehicle Type';
+            $logs->category = 'VTYPE';
             $logs->message = $request->input('authority').' has updated the vehicle.';
             $logs->save();
         }
@@ -943,7 +955,7 @@ class VehicleSlipController extends Controller
         if($VehicleDetailRequest->save()){
             // Creating logs only if both operations are successful
             $logs = new LogsModel();
-            $logs->category = 'Vehicle Type';
+            $logs->category = 'VTYPE';
             $logs->message = $request->input('authority').' set the vehicle ('.$VehicleDetailRequest->vehicle_name.' - '.$VehicleDetailRequest->vehicle_plate.') to available.';
             $logs->save();
         }

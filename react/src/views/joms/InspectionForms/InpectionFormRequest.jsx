@@ -3,8 +3,6 @@ import submitAnimation from '/default/ring-loading.gif';
 import PageComponent from "../../../components/PageComponent";
 import axiosClient from "../../../axios";
 import { useUserStateContext } from "../../../context/ContextProvider";
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
 import Popup from "../../../components/Popup";
 
 export default function RepairRequestForm(){
@@ -48,14 +46,13 @@ export default function RepairRequestForm(){
 
   const [inputErrors, setInputErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const [supervisor, setSupervisor] = useState([]);
 
   // Dev Error Text
   const DevErrorText = (
     <div>
-      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-title">Error</p>
       <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
     </div>
   );
@@ -100,9 +97,6 @@ export default function RepairRequestForm(){
 
       setSupervisor({supervisorData});
       //console.log(supervisorData);
-    })
-    .finally(() => {
-      setLoading(false);
     });
   },[]);
 
@@ -120,10 +114,7 @@ export default function RepairRequestForm(){
       complain: ComplainDefect,
       supervisor_id: Admin || DivisionManager || PortManager ? currentUserId : selectedSupervisor.id,
       supervisor_name: Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name,
-      supervisor_status: Admin || DivisionManager || PortManager ? 1 : 0,
-      admin_status: 0,
-      inspector_status: 0,
-      form_status: DivisionManager || PortManager ? 4 : Admin ? 5 : 0,
+      form_status: PortManager ? 8 : Admin ? 9 : DivisionManager ? 10 : 11,
     };
 
     axiosClient
@@ -173,10 +164,7 @@ export default function RepairRequestForm(){
       complain: ComplainDefect,
       supervisor_id: Admin || DivisionManager || PortManager ? currentUserId : selectedSupervisor.id,
       supervisor_name: Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name,
-      supervisor_status: Admin || DivisionManager || PortManager ? 1 : 0,
-      admin_status: 0,
-      inspector_status: 0,
-      form_status: DivisionManager || PortManager ? 4 : Admin ? 5 : 0,
+      form_status: PortManager ? 8 : Admin ? 9 : DivisionManager ? 10 : 11,
       form_remarks: remarks,
     };
 
@@ -188,10 +176,10 @@ export default function RepairRequestForm(){
       setPopupContent('success');
       setPopupMessage(
         <div>
-          <p className="popup-title">Submission Complete!</p>
+          <p className="popup-title">Success</p>
           {Admin || DivisionManager || PortManager ? 
           <p className="popup-message">Waiting for the GSO to fill up the Part B form.</p> : 
-          <p className="popup-message">Please wait for the supervisor's approval.</p>
+          <p className="popup-message">Waiting for the supervisor's approval.</p>
           }
         </div>
       );
@@ -218,7 +206,9 @@ export default function RepairRequestForm(){
 
       {/* Form Content */}
       <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Request For Pre/Post Inspection Repair </div>
+        <div className="ppa-form-header text-base flex justify-between items-center"> 
+          Request For Pre/Post Inspection Repair 
+        </div>
 
         <div className="p-4">
           {confirmation ? (
@@ -300,14 +290,14 @@ export default function RepairRequestForm(){
                   </div>
                 </div>
 
-                {/* Part A left side */}
+                {/* Part A right side */}
                 <div className="col-span-1">
                   {/* Type of Property */}
                   <div className="flex items-center mt-6">
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Type of Property: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {typeOfProperty}
                     </div>
                   </div>
@@ -317,7 +307,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Description: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {propertyDescription}
                     </div>
                   </div>
@@ -327,7 +317,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Location: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {propertyLocation}
                     </div>
                   </div>
@@ -351,20 +341,20 @@ export default function RepairRequestForm(){
                 <div className="w-40">
                   <label className="block text-base font-bold leading-6 text-gray-900"> Complain: </label> 
                 </div>
-                <div className="w-3/4 h-6 ppa-form-view">
+                <div className="w-3/4 ppa-form-view">
                   {ComplainDefect}
                 </div>
               </div>
 
               {/* Button */}
-              <div className="mt-10">
+              <div className="mt-6">
               {!buttonHide && (
               <>
                 {/* Submit */}
                 <button 
                   // form="fac_submit"
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -379,7 +369,7 @@ export default function RepairRequestForm(){
   
                 {/* Cancel */}
                 {!submitLoading && (
-                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
+                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
                     Revise
                   </button>
                 )}
@@ -570,7 +560,7 @@ export default function RepairRequestForm(){
                     onChange={ev => {
                       setTypeOfProperty(ev.target.value);
                     }}
-                    className="block w-full ppa-form"
+                    className={`block w-full ${(!typeOfProperty && inputErrors.type_of_property) ? "ppa-form-error":"ppa-form"}`}
                     >
                       <option value="" disabled>Select an option</option>
                       <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
@@ -598,7 +588,7 @@ export default function RepairRequestForm(){
                       value={propertyDescription}
                       maxLength={255}
                       onChange={ev => setPropertyDescription(ev.target.value)}
-                      className="block w-full ppa-form"
+                      className={`block w-full ${(!propertyDescription && inputErrors.property_description) ? "ppa-form-error":"ppa-form"}`}
                     />
                     {!propertyDescription && inputErrors.property_description && (
                       <p className="form-validation">This form is required</p>
@@ -621,7 +611,7 @@ export default function RepairRequestForm(){
                       value={propertyLocation}
                       maxLength={255}
                       onChange={ev => setPropertyLocation(ev.target.value)}
-                      className="block w-full ppa-form"
+                      className={`block w-full ${(!propertyLocation && inputErrors.location) ? "ppa-form-error":"ppa-form"}`}
                     />
                     {!propertyLocation && inputErrors.location && (
                       <p className="form-validation">This form is required</p>
@@ -645,7 +635,7 @@ export default function RepairRequestForm(){
                     style={{ resize: 'none' }}
                     maxLength={500}
                     onChange={ev => setComplainDefect(ev.target.value)}
-                    className="block w-full ppa-form"
+                    className={`block w-full ${(!ComplainDefect && inputErrors.complain) ? "ppa-form-error":"ppa-form"}`}
                   />
                   {!ComplainDefect && inputErrors.complain && (
                     <p className="form-validation">This form is required</p>
@@ -672,7 +662,7 @@ export default function RepairRequestForm(){
                         
                         setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
                       }}
-                      className="block w-full ppa-form"
+                      className={`block w-full ${(!selectedSupervisor.id && inputErrors.supervisor_id) ? "ppa-form-error":"ppa-form"}`}
                       >
                         <option value="" disabled>Select your supervisor</option>
                         {supervisor?.supervisorData?.map((Data) => (
@@ -691,11 +681,11 @@ export default function RepairRequestForm(){
               </div>
 
               {/* Button */}
-              <div className="mt-6">
+              <div className="mt-4">
                 {/* Check Form */}
                 <button 
                   onClick={handleConfirm} 
-                  className="py-2 px-4 btn-default-form">
+                  className="py-2 px-4 text-sm btn-default-form">
                   Submit
                 </button>
               </div>

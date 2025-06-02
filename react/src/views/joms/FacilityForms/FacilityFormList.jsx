@@ -7,6 +7,7 @@ import { useUserStateContext } from "../../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-svg-icons';
+import Restrict from "../../../components/Restrict";
 
 export default function FacilityVenueFormList(){
 
@@ -124,10 +125,9 @@ export default function FacilityVenueFormList(){
   const PortManager = codes.includes("PM");
   const Access = Admin || GSO || DivisionManager || PortManager || SuperAdmin;
 
-  return Access ? (
+  return(
     <PageComponent title="Request List">
-
-      {/* Post Repair Form */}
+      {Access ? (
       <div className="font-roboto ppa-form-box bg-white">
         <div className="ppa-form-header"> Facility / Venue Form List </div>
 
@@ -248,10 +248,10 @@ export default function FacilityVenueFormList(){
         </div>
 
       </div>
-
+      ):(
+        <Restrict />
+      )}
     </PageComponent>
-  ):(
-    (() => { window.location = '/unauthorize'; return null; })()
   );
 
 }

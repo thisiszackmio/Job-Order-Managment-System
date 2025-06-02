@@ -9,21 +9,19 @@ import { useUserStateContext } from "../context/ContextProvider";
 export default function PageComponent({ title, buttons = '', children }) {
   const { currentUserCode } = useUserStateContext();
 
-  const [turnOff, setTurnOff] = useState(null);
+  const [maintenance, setMaintenance] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = ucode.includes("HACK");
 
-  // Get Data
+  // For Maintenance Mode
   useEffect(() => {
-    axiosClient
-    .get('/superadminsettings')
-    .then((response) => {
-      const maintainance = response.data.maintainance;
-
-      setTurnOff(maintainance);
-    });
+    axiosClient.get("/settings/maintenance").then(response => {
+      setMaintenance(response.data.maintenance);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
   return (
@@ -37,7 +35,7 @@ export default function PageComponent({ title, buttons = '', children }) {
 
     <main>
       <div className="px-4 py-6 sm:px-4 lg:px-4">
-        {turnOff === null ? (
+        {loading ? (
           <div className="flex items-left h-20 space-x-4">
             {/* Loading Animation */}
             <FontAwesomeIcon
@@ -46,20 +44,29 @@ export default function PageComponent({ title, buttons = '', children }) {
             />
             <span className="loading">Loading...</span>
           </div>
-        ):( turnOff ? (
-          SuperAdmin ? (
-          <>
-            {turnOff ? 1 : 0}
-            {children}
-          </>
-          ):(
-            <Maint />
-          )
         ) : (
-        <>
-          {children}
-        </>
-        ) )}
+          maintenance ? (
+            SuperAdmin ? (
+            <>
+              {maintenance && (
+              <>
+                {/* Status */}
+                <div className="status-sec mb-4">
+                  <strong>Enable Maintenance Mode!</strong>
+                </div>
+              </>
+              )}
+              {children}
+            </>
+            ):(
+              <Maint />
+            )
+          ):(
+            <>
+              {children}
+            </>
+          )
+        )}
       </div>
     </main>
 

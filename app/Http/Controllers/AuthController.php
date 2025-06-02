@@ -69,8 +69,8 @@ class AuthController extends Controller
 
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'User';
-                $logs->message = $request->input('firstname') . ' ' . $request->input('middlename') . '. ' . $request->input('lastname') . ' has been added to the system database ';
+                $logs->category = 'USER';
+                $logs->message = $request->input('firstname') . ' ' . $request->input('middlename') . '. ' . $request->input('lastname') . ' has been added to the system database.';
                 $logs->save();
                 
                 return response()->json([
@@ -90,7 +90,6 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
 
     /**
      * Login on the system
@@ -158,7 +157,7 @@ class AuthController extends Controller
             if ($security->save()) {
                 // Add to logs
                 $logs = new LogsModel();
-                $logs->category = 'User';
+                $logs->category = 'USER';
                 $logs->message = $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname .
                                  ' has logged into the system on device ' . $pcName . ' using the ' .$agent->browser(). ' browser.';
                 $logs->save();
@@ -223,7 +222,7 @@ class AuthController extends Controller
 
         // LOGS
         $logs = new LogsModel();
-        $logs->category = 'User';
+        $logs->category = 'USER';
         $logs->message = $fullName .' has logged out on the system using '.$pcName.'.';
 
         if($logs->save() === True){
@@ -239,25 +238,25 @@ class AuthController extends Controller
     /**
      * Get the Superadmin Settings
      */
-    public function settingsSuperAdmin() {
-        // Retrieve all settings from the database
-        $getSettings = SuperAdminSettingsModel::all();
+    // public function settingsSuperAdmin() {
+    //     // Retrieve all settings from the database
+    //     $getSettings = SuperAdminSettingsModel::all();
     
-        // Check if there are any settings available
-        if ($getSettings->isEmpty()) {
-            return response()->json([
-                'error' => 'Settings not found.'
-            ], 404);  // Return 404 if no settings are found
-        }
+    //     // Check if there are any settings available
+    //     if ($getSettings->isEmpty()) {
+    //         return response()->json([
+    //             'error' => 'Settings not found.'
+    //         ], 404);  // Return 404 if no settings are found
+    //     }
     
-        // Extract the 'enable_main' setting value
-        $respondData = [
-            'maintainance' => $getSettings->first()->enable_main  // Assuming the first record holds the setting
-        ];
+    //     // Extract the 'enable_main' setting value
+    //     $respondData = [
+    //         'maintainance' => $getSettings->first()->enable_main  // Assuming the first record holds the setting
+    //     ];
     
-        // Return the response
-        return response()->json($respondData);
-    }
+    //     // Return the response
+    //     return response()->json($respondData);
+    // }
 
     
 }

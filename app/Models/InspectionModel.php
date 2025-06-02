@@ -33,9 +33,6 @@ class InspectionModel extends Model
         'supervisor_name',
         'personnel_id',
         'personnel_name',
-        'supervisor_status',
-        'admin_status',
-        'inspector_status',
         'form_status',
         'form_remarks',
     ];

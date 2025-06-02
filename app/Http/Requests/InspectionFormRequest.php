@@ -45,9 +45,6 @@ class InspectionFormRequest extends FormRequest
             'supervisor_name' => 'required|string',
             'personnel_id' => 'nullable|numeric',
             'personnel_name' => 'nullable|string',
-            'supervisor_status' => 'required|numeric',
-            'admin_status' => 'required|numeric',
-            'inspector_status' => 'required|numeric',
             'form_status' => 'required|numeric',
             'form_remarks' => 'nullable|string'
         ];

@@ -26,7 +26,20 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
   // --- Logout --- //
   Route::post('/logout', [AuthController::class, 'logout']);
-  Route::get('/superadminsettings', [AuthController::class, 'settingsSuperAdmin']);
+
+  // --- Maintenance Mode --- //
+  Route::get('/settings/maintenance', function() {
+    $mode = DB::table('superadminsettings')->where('key_name', 'maintenance_mode')->value('key_value');
+    return response()->json(['maintenance' => $mode === 'on']);
+  });
+  Route::post('/settings/maintenance/update', function(Request $request) {
+    $mode = $request->input('mode');
+    DB::table('superadminsettings')->updateOrInsert(
+      ['key_name' => 'maintenance_mode'],
+      ['key_value' => $mode]
+    );
+    return response()->json(['success' => true, 'mode' => $mode]);
+  });
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
@@ -74,22 +87,22 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
 
   // --- JOMS Inspection Request --- //
-  Route::post('/checkinsprequest', [InspectionController::class, 'CheckInspectionForm']);
-  Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']); // Submit the Request on Part A
-  Route::put('/supinsprequestapprove/{id}', [InspectionController::class, 'approveSupervisor']); // Supervisor Approval
-  Route::put('/supinsprequestdisapprove/{id}', [InspectionController::class, 'disapproveSupervisor']); // Supervisor Disapproval
-  Route::put('/admininsprequestapprove/{id}', [InspectionController::class, 'approveAdmin']); // Admin Approval
-  Route::put('/updateinsprequestparta/{id}', [InspectionController::class, 'updatePartA']); // Update Part A Form
-  Route::put('/updateinsprequestpartb/{id}', [InspectionController::class, 'updatePartB']); // Update Part B Form
-  Route::put('/updateinsprequestpartc/{id}', [InspectionController::class, 'updatePartC']); // Update Part C Form
-  Route::put('/updateinsprequestpartd/{id}', [InspectionController::class, 'updatePartD']); // Update Part D Form
-  Route::put('/submitinsprequestpartb/{id}', [InspectionController::class, 'submitPartB']); // Submit Part B Form
-  Route::put('/submitinsprequestpartc/{id}', [InspectionController::class, 'submitPartC']); // Submit Part C Form
-  Route::put('/submitinsprequestpartd/{id}', [InspectionController::class, 'submitPartD']); // Submit Part D Form
-  Route::put('/closeinspectionrequest/{id}', [InspectionController::class, 'closeRequest']); // Close the Form
-  Route::put('/closeinspectionforce/{id}', [InspectionController::class, 'closeRequestForce']); // Force close the Form
-  Route::get('/showinsprequest/{id}', [InspectionController::class, 'showInspectionForm']); // Show Inspection Form Details
-  Route::get('/allinspection', [InspectionController::class, 'index']); // Show All Details
+  Route::get('/allinspection', [InspectionController::class, 'index']);
+  Route::get('/showinsprequest/{id}', [InspectionController::class, 'showInspectionForm']);
+  Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']);
+  Route::put('/updateinsprequestparta/{id}', [InspectionController::class, 'updatePartA']);
+  Route::put('/supinsprequestapprove/{id}', [InspectionController::class, 'approveSupervisor']);
+  Route::put('/supinsprequestdisapprove/{id}', [InspectionController::class, 'disapproveSupervisor']);
+  Route::put('/submitinsprequestpartb/{id}', [InspectionController::class, 'submitPartB']);
+  Route::put('/updateinsprequestpartb/{id}', [InspectionController::class, 'updatePartB']);
+  Route::put('/admininsprequestapprove/{id}', [InspectionController::class, 'approveAdmin']);
+  Route::put('/submitinsprequestpartc/{id}', [InspectionController::class, 'submitPartC']);
+  Route::put('/updateinsprequestpartc/{id}', [InspectionController::class, 'updatePartC']);
+  Route::put('/submitinsprequestpartd/{id}', [InspectionController::class, 'submitPartD']);
+  Route::put('/updateinsprequestpartd/{id}', [InspectionController::class, 'updatePartD']);
+  Route::get('/idleinspectionrequest/{id}', [InspectionController::class, 'personnelIdle']);
+  Route::get('/closeinspectionrequest/{id}', [InspectionController::class, 'closeRequest']);
+  Route::put('/cancelinspectionrequest/{id}', [InspectionController::class, 'cancelRequest']);
 
   // --- JOMS Facility / Venue Request --- //
   Route::post('/checkavailability', [FacilityVenueController::class, 'checkAvailability']); // Check the availability
@@ -101,8 +114,8 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/editopraction/{id}', [FacilityVenueController::class, 'editOPRAction']);
   Route::put('/adminfacapproval/{id}', [FacilityVenueController::class, 'adminApproval']); // Admin Approve
   Route::put('/adminfacdisapproval/{id}', [FacilityVenueController::class, 'adminDisapproval']); 
-  Route::put('/closefacilityforce/{id}', [FacilityVenueController::class, 'closeRequestForce']); // Force close the Form
-  Route::put('/closefacility/{id}', [FacilityVenueController::class, 'closeForce']);
+  Route::put('/closefacilityforce/{id}', [FacilityVenueController::class, 'cancelRequest']); // Force close the Form
+  Route::get('/closefacility/{id}', [FacilityVenueController::class, 'closeRequest']);
   Route::get('/showfacvenrequest/{id}', [FacilityVenueController::class, 'showFacilityVenueForm']); // Show Facility / Venue Form Details
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 

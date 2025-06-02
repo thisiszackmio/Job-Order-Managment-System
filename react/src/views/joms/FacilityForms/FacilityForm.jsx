@@ -4,14 +4,13 @@ import { useParams } from "react-router-dom";
 import { useUserStateContext } from "../../../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import ppa_logo from '/default/ppa_logo.png'
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
+import loading_table from "/default/ring-loading.gif";
 import axiosClient from "../../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../../components/Popup";
 import Restrict from "../../../components/Restrict";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrash, faFilePdf, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faCircleXmark, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 
 export default function FacilityForm(){
   // Get the ID
@@ -56,16 +55,9 @@ export default function FacilityForm(){
     return `${hours}:${minutes}`; // Return H:i format
   }
 
-  // Restrictions Condition
-  const ucode = currentUserCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const SuperHacker = codes.includes("HACK");
-  const roles = ["AM", "GSO", "HACK", "DM", "PM"];
-  const accessOnly = roles.some(role => codes.includes(role));
-
   const [loading, setLoading] = useState(true);
+  const [loadingPDF, setLoadingPDF] = useState(false);
+
   const [facData, setFacData] = useState([]);
   const [enableAdminDecline, setEnableAdminDecline] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -200,82 +192,36 @@ export default function FacilityForm(){
   // Dev Error Text
   const DevErrorText = (
     <div>
-      <p className="popup-title">Something Wrong!</p>
+      <p className="popup-title">Error</p>
       <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
     </div>
   );
-
-  // OPR Instruction
-  useEffect(() => {
-    const hasFilledFieldsAM = [
-      oprInstruct, 
-    ].some(value => value?.trim() !== "");
-  
-    // Show button if at least one field has a value
-    setEnableApprove(!hasFilledFieldsAM);
-  }, [
-    oprInstruct, 
-  ]);
-
-  // OPR Form Disapproval
-  useEffect(() => {
-    const hasFilledFieldsAMDis = [
-      declineReason,
-      deleteReason 
-    ].some(value => value?.trim() !== "");
-  
-    // Show button if at least one field has a value
-    setEnableDisapprove(!hasFilledFieldsAMDis);
-  }, [
-    declineReason,
-    deleteReason 
-  ]);
-
-  // OPR Action
-  useEffect(() => {
-    const hasFilledFieldsGSO = [
-      oprAction, 
-    ].some(value => value?.trim() !== "");
-  
-    // Show button if at least one field has a value
-    setEnableGSO(!hasFilledFieldsGSO);
-  }, [
-    oprAction, 
-  ]);
 
   // Disable the Scroll on Popup
   useEffect(() => {
     
     // Define the classes to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
     } 
-    else if(loading) {
-      addLoadingClass();
-    }
     else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
     return () => {
       removePopupClass();
-      removeLoadingClass();
     };
-  }, [showPopup, loading]);
+  }, [showPopup]);
 
   // Get the Data on the database
   const fecthFacilityVenue = () => {
@@ -368,7 +314,7 @@ export default function FacilityForm(){
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
+          <p className="popup-title">Success</p>
           <p className="popup-message">Form update successfully!</p>
         </div>
       );
@@ -379,7 +325,7 @@ export default function FacilityForm(){
         setPopupContent("success");
         setPopupMessage(
           <div>
-            <p className="popup-title">Ooops!</p>
+            <p className="popup-title">Invalid</p>
             <p className="popup-message">This request has been disapproved by the Admin Manager.</p>
           </div>
         );
@@ -389,7 +335,7 @@ export default function FacilityForm(){
         setPopupContent("success");
         setPopupMessage(
           <div>
-            <p className="popup-title">Ooops!</p>
+            <p className="popup-title">Invalid</p>
             <p className="popup-message">You can no longer edit this request.</p>
           </div>
         );
@@ -399,7 +345,7 @@ export default function FacilityForm(){
         setPopupContent("success");
         setPopupMessage(
           <div>
-            <p className="popup-title">Ooops!</p>
+            <p className="popup-title">Invalid</p>
             <p className="popup-message">This form has already been deleted!</p>
           </div>
         );
@@ -425,8 +371,8 @@ export default function FacilityForm(){
   }
 
   // Submit OPR Instruct for the Admin
-  function oprInstructSubmit(ev, id){
-    ev.preventDefault();
+  function oprInstructSubmit(event){
+    event.preventDefault();
     setSubmitLoading(true);
 
     axiosClient
@@ -439,7 +385,7 @@ export default function FacilityForm(){
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
+          <p className="popup-title">Success</p>
           <p className="popup-message">The OPR instruction has been completed, and the form has been approved.</p>
         </div>
       );
@@ -451,12 +397,15 @@ export default function FacilityForm(){
         setPopupContent("success");
         setPopupMessage(
           <div>
-            <p className="popup-title">Oops!</p>
+            <p className="popup-title">Invalid</p>
             <p className="popup-message">This form has already been deleted by the GSO.</p>
           </div>
         );
         setShowPopup(true);
-      }else{
+      }else if(error.response.data.errors){
+        setFieldMissing(error.response.data.errors);
+      }
+      else{
         setPopupContent("error");
         setPopupMessage(DevErrorText);
         setShowPopup(true);  
@@ -468,9 +417,10 @@ export default function FacilityForm(){
   }
 
   // Edit OPR Instruct for the Admin
-  function oprEditInstruct(ev, id){
-    ev.preventDefault();
+  function oprEditInstruct(event){
+    event.preventDefault();
     setSubmitLoading(true);
+
     axiosClient
     .put(`/editoprinstruct/${id}`,{
       oprInstruct:oprInstruct,
@@ -481,7 +431,7 @@ export default function FacilityForm(){
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
+          <p className="popup-title">Success</p>
           <p className="popup-message">The OPR instruction has been completed, and the form has been approved.</p>
         </div>
       );
@@ -504,8 +454,8 @@ export default function FacilityForm(){
   }
 
   // Submit OPR Action for the GSO
-  function oprActionSubmit(ev, id){
-    ev.preventDefault();
+  function oprActionSubmit(event){
+    event.preventDefault();
     setSubmitLoading(true);
 
     axiosClient
@@ -518,16 +468,20 @@ export default function FacilityForm(){
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
+          <p className="popup-title">Success</p>
           <p className="popup-message">The OPR Action has been stored in the database.</p>
         </div>
       );
       setShowPopup(true);
     })
-    .catch(() => {
-      setPopupContent("error");
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);   
+    .catch((error) => {
+      if(error.response.data.errors){
+        setFieldMissing(error.response.data.errors);
+      }else{
+        setPopupContent("error");
+        setPopupMessage(DevErrorText);
+        setShowPopup(true);   
+      } 
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -535,8 +489,8 @@ export default function FacilityForm(){
   }
 
   // Edit OPR Action for the GSO
-  function oprEditAction(ev, id){
-    ev.preventDefault();
+  function oprEditAction(event){
+    event.preventDefault();
     setSubmitLoading(true);
 
     axiosClient
@@ -549,7 +503,7 @@ export default function FacilityForm(){
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
+          <p className="popup-title">Success</p>
           <p className="popup-message">The OPR Action has been stored in the database.</p>
         </div>
       );
@@ -608,7 +562,7 @@ export default function FacilityForm(){
         setPopupContent("success");
         setPopupMessage(
           <div>
-            <p className="popup-title">Success!</p>
+            <p className="popup-title">Success</p>
             <p className="popup-message">The form has been disapproved</p>
           </div>
         );
@@ -638,22 +592,20 @@ export default function FacilityForm(){
   }
 
   // Delete Form
-  function DeleteFormRequest(ev){
-    ev.preventDefault();
+  function DeleteFormRequest(id){
     setSubmitLoading(true);
 
     axiosClient
     .put(`/closefacilityforce/${id}`, {
       user_name: currentUserName.name,
-      deleteReason: deleteReason
     })
     .then(() => {
       setButtonHide(true);
       setPopupContent("success");
       setPopupMessage(
         <div>
-          <p className="popup-title">Success!</p>
-          <p className="popup-message">The form has been deleted.</p>
+          <p className="popup-title">Success</p>
+          <p className="popup-message">The form has been canceled.</p>
         </div>
       );
       setShowPopup(true);
@@ -679,46 +631,6 @@ export default function FacilityForm(){
     });
   }
 
-  // Close Form Popup 
-  const handleCloseForm = () => {
-    setShowPopup(true);
-    setPopupContent('gsofcv');
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Confirmation?</p>
-        <p className="popup-message">Do you want to close the request?</p>
-      </div>
-    );
-  }
-
-  // Close Form Function
-  function CloseForm(id){
-    setSubmitLoading(true);
-    
-    axiosClient
-    .put(`/closefacility/${id}`, {
-      user_name:currentUserName.name
-    })
-    .then(() => {
-      setPopupContent("success");
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Success!</p>
-          <p className="popup-message">The form is closed.</p>
-        </div>
-      );
-      setShowPopup(true);
-    })
-    .catch(() => {
-      setPopupContent("error");
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);   
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-  }
-
   //Close Popup on Error
   function justClose() {
     setShowPopup(false);
@@ -731,9 +643,24 @@ export default function FacilityForm(){
     window.location.reload();
   }
 
+  // Auto close request
+  const setFormClosed = () => {
+    axiosClient
+    .get(`/closefacility/${id}`)
+    .then(response => {
+      console.log(response.data.message); // Show success message
+    })
+    .catch(error => {
+      setPopupContent("error");
+      setPopupMessage(DevErrorText);
+      setShowPopup(true); 
+    });
+  }
+
   useEffect(() => { 
     if(currentUserId){
       fecthFacilityVenue();
+      setFormClosed();
     }
     
   }, [id, currentUserId]);
@@ -752,10 +679,10 @@ export default function FacilityForm(){
   const handleButtonClick = () => {
     setIsVisible(true); 
     setSeconds(3);
-    setLoading(true);
+    setLoadingPDF(true);
     setTimeout(() => {
       generatePDF();
-      setLoading(false);
+      setLoadingPDF(false);
       setIsVisible(false); 
     }, 2000);
   };
@@ -781,1303 +708,246 @@ export default function FacilityForm(){
     }
   }, [seconds]);
 
+    // Restrictions Condition
+    const ucode = currentUserCode;
+    const codes = ucode.split(',').map(code => code.trim());
+    const Admin = codes.includes("AM");
+    const GSO = codes.includes("GSO");
+    const SuperHacker = codes.includes("HACK");
+    const roles = ["AM", "GSO", "HACK", "DM", "PM"];
+    const accessOnly = roles.some(role => codes.includes(role));
+    const clearance = facData?.form?.user_id == currentUserId || accessOnly;
+
  return(
   <PageComponent title="Facility / Venue Request Form">
-    {/* Form */}
-    {loading && (
-      <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-        <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-        <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
-      </div>
-    )}
 
     {dataAccess != 'Not-Found' ? (
-      (loading || access === "Access") ? (
-        <div className="font-roboto">
-
-          {/* Status */}
-          <div className="text-right">
-            {(facData?.form?.admin_approval == 0 || facData?.form?.admin_approval == 2 || facData?.form?.admin_approval == 1) && ("Status: Approve")}
-            {facData?.form?.admin_approval == 3 && ("Status: Disapprove")}
-            {facData?.form?.admin_approval == 4 && ("Status: Pending Approval")}
-            {facData?.form?.admin_approval == 5 && ("Status: Deleted")}
+      (loading) ? (
+        <div className="flex justify-center items-center py-4">
+          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+          <span className="loading-table">Loading Pre/Post Repair Inspection Form</span>
+        </div>
+      ):(
+        clearance ? (
+        <>
+          {/* Notification for auto close and for the GSO */}
+          <div className="text-sm flex justify-end items-center w-full">
+          {GSO && facData?.form?.admin_approval == 2 && ("The form becomes non-editable after 24 hours.")}
           </div>
 
           {/* Header */}
           <div className="ppa-form-header text-base flex justify-between items-center">
             <span>Control No: <span className="px-2 ppa-form-view">{facData?.form?.id}</span></span>
-            <div className="flex space-x-4"> 
-              {/* For the GSO */}
-              {GSO && (
-              <>
-                {/* Delete Form */}
-                {facData?.form?.admin_approval != 0 && facData?.form?.admin_approval != 1 && facData?.form?.admin_approval != 3 && facData?.form?.admin_approval != 5 && (
-                  <FontAwesomeIcon
+            <div className="flex space-x-3">
+            {enableForm ? (
+            <>
+              {/* Update */}
+                <button 
+                  type="submit"
+                  form="editForm"
+                  className={`py-2 px-3 text-sm ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Loading</span>
+                    </div>
+                  ) : (
+                    'Update'
+                  )}
+                </button>
+                {/* Back */}
+                {!submitLoading && (
+                  <button 
                     onClick={() => {
-                      setEnableDelete(true); 
-                      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                    }}
-                    className="icon-delete" title="Delete request" icon={faTrash} />
-                
+                      setEnableForm(false);
+                      handleDefaultForm();
+                    }} 
+                    className="py-2 px-4 btn-cancel-form text-sm"
+                  >
+                    Cancel
+                  </button>
                 )}
-                {/* Closed Form */}
-                {facData?.form?.admin_approval == 1 && (
-                  <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Close request" icon={faLock} />
+            </>
+            ):((facData?.form?.admin_approval == 3 || facData?.form?.admin_approval == 6) && GSO) ? (
+              !buttonHide && (
+              // Button for submit the OPR Action
+              <button 
+                type="submit"
+                onClick={oprActionSubmit}
+                className={`text-sm ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-1">Loading</span>
+                  </div>
+                ) : (
+                  'Submit'
                 )}
-                {/* Generate PDF */}
-                {facData?.form?.admin_approval != 1 && facData?.form?.admin_approval != 2 && (
-                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-                )}
-              </>
+              </button>
+              )
+            ):(
+            <>
+              {/* Admin */}
+              {Admin && (
+                !buttonHide && (
+                <>
+                  {/* Button for approve and disapprove */}
+                  {(facData?.form?.admin_approval == 7 || facData?.form?.admin_approval == 5) && (
+                    enableAdminDecline ? (
+                    <>
+                      {/* Button for the decline form */}
+                      {/* Confirmation */}
+                      <button onClick={() => handleAdminDeclineConfirmation()} className="py-2 px-4 text-sm btn-default-form" disabled={enableDisapprove}>
+                        Submit
+                      </button>
+                      {/* Cancel */}
+                      {!submitLoading && (
+                        <button onClick={() => { setEnableAdminDecline(false); setDeclineReason(''); }} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
+                          Cancel
+                        </button>
+                      )}
+                    </> 
+                    ):(
+                    <>
+                      {/* Submit and Approve */}
+                      <button 
+                        type="submit"
+                        onClick={oprInstructSubmit}
+                        className={`text-sm ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                        disabled={submitLoading}
+                      >
+                        {submitLoading ? (
+                          <div className="flex">
+                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                            <span className="ml-1">Loading</span>
+                          </div>
+                        ) : (
+                          'Submit and Approve'
+                        )}
+                      </button>
+
+                      {/* Decline */}
+                      {!submitLoading && (
+                        <button 
+                          onClick={() => {
+                            setEnableAdminDecline(true);
+                          }} 
+                          className="text-sm btn-cancel-form"
+                        >
+                          Decline
+                        </button>
+                      )}
+                    </>
+                    )
+                  )}
+                  {/* Button for the edit*/}
+                  {enableAmOPR && (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      type="submit"
+                      onClick={oprEditInstruct}
+                      className={`text-sm ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ) : (
+                        'Save'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button 
+                        onClick={() => {
+                          setEnableAmOPR(false);
+                          setFieldMissing('');
+                        }} 
+                        className="text-sm btn-cancel-form"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+                </>
+                )
               )}
-              {/* For the Requestor on Generate PDF */}
-              {(facData?.form?.user_id == currentUserId || SuperHacker) && facData?.form?.admin_approval == 0 && !GSO && (
-                <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF (A4 size)" icon={faFilePdf} />
+              {/* GSO */}
+              {GSO && (
+                !buttonHide && (
+                  enableGsoOPR ? (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      type="submit"
+                      onClick={oprEditAction}
+                      className={`text-sm ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
+                    </button>
+                    
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button 
+                        onClick={() => {
+                          setEnableGsoOPR(false);
+                          setFieldMissing('');
+                        }}
+                        className="text-sm btn-cancel-form"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </> 
+                  ):(
+                  <>
+                    {/* Generate PDF */}
+                    {facData?.form?.admin_approval != 0 && facData?.form?.admin_approval != 4 && GSO &&(
+                      <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                    )}
+                  </>
+                  )
+                )
               )}
-              {/* For the GSO and SuperHacker Edit the Form */}
-              {(SuperHacker || GSO) && !enableForm && facData?.form?.admin_approval != 0 && facData?.form?.admin_approval != 3 && facData?.form?.admin_approval != 2 && facData?.form?.admin_approval != 1 && facData?.form?.admin_approval != 5 && (
+              {/* Edit the Form */}
+              {(GSO || SuperHacker) && [2, 3, 5, 6, 7].includes(facData?.form?.admin_approval) && (
                 <FontAwesomeIcon onClick={() => setEnableForm(true)} className="icon-delete" title="Edit" icon={faPenToSquare} />
               )}
+              {/* Form Cancel */}
+              {[5, 6, 7].includes(facData?.form?.admin_approval) && (GSO || facData?.form?.user_id == currentUserId) && (
+                <FontAwesomeIcon onClick={() => { handleDeleteFormContirmation(); }} className="icon-delete" title="Delete request" icon={faCircleXmark} />
+              )}
+            </>
+            )}
             </div>
           </div>
 
-          <div className="ppa-form-box bg-white">
-            <form id="editForm" onSubmit={editFacilityForm}>
+          {/* Form */}
+          <div className="pl-4 pt-6 pb-6 pr-4 ppa-form-box bg-white mb-6">
 
-              {/* Part A */}
-              <div className="p-4 pr-64">
-                {enableForm ? (
-                <>
-                  <div className="text-sm mb-5"> <span className="ass">*</span> - forms that are editable</div>
-
-                  {/* Date */}
-                  <div className="flex items-center font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                        Date:
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={formatDate(facData?.form?.created_at)}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Requesting Office/Division */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-black">
-                        <span className="ass">*</span> Requesting Office/Division:
-                      </label>
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rf_request"
-                        id="rf_request"
-                        autoComplete="rf_request"
-                        defaultValue={facData?.form?.request_office}
-                        onChange={ev => setRegOffice(ev.target.value)}
-                        className={`block w-full ppa-form-edit`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Title/Purpose of Activity */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_title" className="block text-base font-bold leading-6 text-black">
-                      <span className="ass">*</span> Title/Purpose of Activity:
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_title"
-                        id="rep_title"
-                        autoComplete="rep_title"
-                        defaultValue={facData?.form?.title_of_activity}
-                        onChange={ev => setTitleReq(ev.target.value)}
-                        className={`block w-full ppa-form-edit`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Date Start */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                        Date of Activity (Start):
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={formatDate(facData?.form?.date_start)}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Time Start */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                      Time of Activity (Start):
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                    <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={formatTime(facData?.form?.time_start)}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Date End */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold font-bold leading-6 text-black">
-                      Date of Activity (End):
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={formatDate(facData?.form?.date_end)}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Time End */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                      Time of Activity (End):
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={formatTime(facData?.form?.time_end)}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Facility */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                        Facility Request:
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={
-                          facData?.form?.mph ? "Multi-Purpose Hall (MPH)" :
-                          facData?.form?.conference ? "Conference Room" :
-                          facData?.form?.dorm ? "Dormitory" :
-                          facData?.form?.other ? "Other" : ""
-                        }
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  {/* Requestor */}
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-56">
-                      <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
-                        Requestor:
-                      </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="rep_date"
-                        id="rep_date"
-                        value={facData?.form?.user_name}
-                        className="block w-full ppa-form-edit"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                </>
-                ):(
-                <>
-                  {/* Date */}
-                  <div className="flex items-center">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900">
-                      Date:
-                      </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6">
-                      {!loading && formatDate(facData?.form?.created_at)}
-                    </div>
-                  </div>
-
-                  {/* Request Office */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Requesting Office/Division: </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6"> 
-                      {!loading && facData?.form?.request_office}
-                    </div>
-                  </div>
-
-                  {/* Title of Activity */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Title of Activity: </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6"> 
-                      {!loading && facData?.form?.title_of_activity}
-                    </div>
-                  </div>
-
-                  {/* Date of Activity */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Date of Activity: </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6"> 
-                    {!loading && (
-                      facData?.form?.date_start === facData?.form?.date_end ? (
-                        formatDate(facData?.form?.date_start)
-                      ):(
-                        `${formatDate(facData?.form?.date_start)} to ${formatDate(facData?.form?.date_end)}`
-                      )
-                    )}
-                    </div>
-                  </div>
-
-                  {/* Time of Activity */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Time of Activity (START and END): </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6"> 
-                      {!loading && (
-                        facData?.form?.date_start === facData?.form?.date_end ? (
-                          `${formatTime(facData?.form?.time_start)} to ${formatTime(facData?.form?.time_end)}`
-                        ):(
-                          `${formatDate(facData?.form?.date_start)} (${formatTime(facData?.form?.time_start)}) to ${formatDate(facData?.form?.date_end)} (${formatTime(facData?.form?.time_end)})`
-                        )
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Facility Request */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Facility Request: </label> 
-                    </div>
-                    <div className="w-full ppa-form-view h-6"> 
-                    {!loading && (
-                    <>
-                      {facData?.form?.mph ? ("Multi-Purpose Hall (MPH)"):null}
-                      {facData?.form?.conference ? ("Conference Room"):null}
-                      {facData?.form?.dorm ? ("Dormitory"):null}
-                      {facData?.form?.other ? ("Other"):null}
-                    </>
-                    )}
-                    </div>
-                  </div>
-
-                  {/* Requestor */}
-                  <div className="flex items-center mt-2">
-                    <div className="w-[430px]">
-                      <label className="block text-base font-bold leading-6 text-gray-900"> Requestor: </label> 
-                    </div>
-                    <div className="w-full font-bold ppa-form-view h-6"> 
-                      {!loading && facData?.form?.user_name}
-                    </div>
-                  </div>
-                </>
-                )}
-              </div>
-
-              {/* Facilities */}
-              {(facData?.form?.mph || facData?.form?.conference || facData?.form?.other) ? (
-                <div className="mt-4 p-4 border-t border-gray">
-                  {/* Caption */}
-                  <div> <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2> </div>
-
-                  {/* Form */}
-                  {enableForm ? (
-                    <div className="grid grid-cols-2">
-                      {/* 1st Column */}
-                      <div className="col-span-1 ml-10">
-                        {/* Table */}
-                        <div className="relative flex items-center mt-4">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mph-checktable"
-                              name="mph-checktable"
-                              type="checkbox"
-                              checked={checkTable}
-                              onChange={() => {
-                                setCheckTable(prev => !prev);
-                                if (!checkTable) {
-                                  setNoOfTable('');
-                                }
-                              }}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                              Tables
-                            </label> 
-                          </div>
-                          {checkTable && (
-                            <div className="flex items-center w-32 ml-2">
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                                (No. 
-                              </label> 
-                              <input
-                                type="number"
-                                name="no-of-table"
-                                id="no-of-table"
-                                defaultValue={facData?.form?.no_table}
-                                onChange={handleInputTableChange}
-                                className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                              />
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                                ) 
-                              </label>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Chair */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mph-checkchair"
-                              name="mph-checkchair"
-                              type="checkbox"
-                              checked={checkChairs}
-                              onChange={() => {
-                                setCheckChairs(prev => !prev);
-                                if (!checkChairs) {
-                                  setNoOfChairs('');
-                                }
-                              }}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                              Chair
-                            </label> 
-                          </div>
-                          {checkChairs && (
-                            <div className="flex items-center w-32 ml-2">
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                                (No. 
-                              </label> 
-                              <input
-                                type="number"
-                                name="no-of-chair"
-                                id="no-of-chair"
-                                defaultValue={facData?.form?.no_chair}
-                                onChange={handleInputChairChange}
-                                className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                              />
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                                ) 
-                              </label>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Projector */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="checkbox-projector"
-                              type="checkbox"
-                              checked={checkProjector}
-                              onChange={() => setCheckProjector(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Projector
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* Projector Screen */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkProjectorScreen}
-                              onChange={() => setCheckProjectorScreen(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Projector Screen
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* Document Camera */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkDocumentCamera}
-                              onChange={() => setCheckDocumentCamera(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Document Camera
-                            </label> 
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 2nd Column */}
-                      <div className="col-span-1 ml-10">
-                        {/* Laptop */}
-                        <div className="relative flex items-center mt-4">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkLaptop}
-                              onChange={() => setCheckLaptop(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Laptop
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* Television */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkTelevision}
-                              onChange={() => setCheckTelevision(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Television
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* Sound System */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkSoundSystem}
-                              onChange={() => setCheckSoundSystem(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Sound System
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* Videoke */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="other-checkbox"
-                              type="checkbox"
-                              checked={checkVideoke}
-                              onChange={() => setCheckVideoke(prev => !prev)}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Videoke
-                            </label> 
-                          </div>
-                        </div>
-                            
-                        {/* Microphone */}
-                        <div className="relative flex items-center mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mph-checkmicrophone"
-                              name="mph-checkmicrophone"
-                              type="checkbox"
-                              checked={checkMicrphone}
-                              onChange={() => {
-                                setCheckMicrphone(prev => !prev);
-                                if (!checkMicrphone) {
-                                  setNoOfMicrophone('');
-                                }
-                              }}
-                              className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                            Microphone
-                            </label> 
-                          </div>
-                          {checkMicrphone && (
-                            <div className="flex items-center w-32 ml-2">
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                                (No. 
-                              </label> 
-                              <input
-                                type="number"
-                                name="no-of-microphone"
-                                id="no-of-microphone"
-                                defaultValue={facData?.form?.no_microphone}
-                                onChange={handleInputMicrophoneChange}
-                                className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                              />
-                              <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                                ) 
-                              </label>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Other */}
-                      <div className="relative flex items-center mt-2 ml-10">
-                        <div className="flex items-center h-5">
-                          <input
-                            id="mph-checkmicrophone"
-                            name="mph-checkmicrophone"
-                            type="checkbox"
-                            defaultChecked={Boolean(facData.form.others)}
-                            onChange={() => {
-                              setCheckOther(!checkOther);
-                            }}
-                            className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
-                          />
-                        </div>
-                        <div className="ml-3">
-                          <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                          Others
-                          </label> 
-                        </div>
-                        {checkOther && (
-                          <div className="flex items-center w-full ml-2">
-                            <input
-                              type="text"
-                              name="other-specfic"
-                              id="other-specfic"
-                              placeholder="Please Specify"
-                              defaultValue={facData?.form?.specify}
-                              onChange={ev => setOtherField(ev.target.value)}
-                              className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                            />
-                            <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                            </label>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ):(
-                  <>
-                    <div className="grid grid-cols-2">
-                      {/* Left */}
-                      <div className="col-span-1 ml-10">
-                        {/* Table */}
-                        <div className="mt-4">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.table ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 font-bold justify-center">
-                              <span>Tables</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {facData?.form?.no_table ? facData?.form?.no_table : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Chair */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.chair ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 font-bold justify-center">
-                              <span>Chairs</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {facData?.form?.no_chair ? facData?.form?.no_chair : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Projector */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.projector ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 font-bold justify-center">
-                              <span>Projector</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Projector Screen */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.projector_screen ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Projector Screen</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Document Camera */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.document_camera ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Document Camera</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right */}
-                      <div className="col-span-1">
-                        {/* Laptop */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.laptop ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Laptop</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Television */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.television ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Television</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Sound System */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.sound_system ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Sound System</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Videoke */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.videoke ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Videoke</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Microphone */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {facData?.form?.microphone ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 font-bold justify-center">
-                              <span>Microphone</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {facData?.form?.no_microphone ? facData?.form?.no_microphone : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-                      </div> 
-                    </div>
-
-                    {/* Others */}
-                    <div className="mt-2 ml-10">
-                      <div className="w-full">
-                        <div className="mt-1">
-                          <div className="flex items-center">
-                            <div className="w-12 ppa-checklist">
-                              {facData?.form?.others === 1 ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 font-bold justify-center">
-                              <span>Others</span>
-                            </div>
-                            <div className="w-1/2 h-6 border-b p-0 pl-2 border-black text-sm text-left ml-4 ">
-                            <span className=""> {facData?.form?.specify ? facData?.form?.specify:null} </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                  )}
-                </div>
-              ):null}
-
-              {/* For Dormitory */}
-              {facData?.form?.dorm ? (
-                <div className="mt-4 p-4 border-t border-gray">
-                  {/* Caption */}
-                  <div> <h2 className="text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2> </div>
-
-                  {enableForm ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Male */}
-                      <div className="col-span-1">
-                        <div className="mt-6">
-                          <div className="mb-4">
-                            <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Male guests:</strong> </label>
-                          </div>
-                          {/* Show on the Form */}
-                          <textarea
-                            id="dorm-male-list"
-                            name="dorm-male-list"
-                            rows={5}
-                            value={getMale}
-                            onChange={ev => setGetMale(ev.target.value)}
-                            style={{ resize: 'none' }}
-                            className="block w-10/12 ppa-form"
-                          />
-                          <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-                        <div>
-                        </div>
-                        </div>
-                      </div>
-
-                      {/* Female */}
-                      <div className="col-span-1">
-                        <div className="mt-6">
-                          <div className="mb-4">
-                            <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Female guests:</strong> </label>
-                          </div>
-                          {/* Show on the Form */}
-                          <textarea
-                            id="dorm-female-list"
-                            name="dorm-female-list"
-                            rows={5}
-                            value={getFemale}
-                            onChange={ev => setGetFemale(ev.target.value)}
-                            style={{ resize: 'none' }}
-                            className="block w-10/12 ppa-form"
-                          />
-                          <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* For Other */}
-                    <div className="flex mt-10">
-                      <div className="w-40">
-                        <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
-                          Other Details :
-                        </label>
-                      </div>
-                      <div className="w-3/4">
-                        <textarea
-                          id="recomendations"
-                          name="recomendations"
-                          rows={3}
-                          style={{ resize: "none" }}
-                          value={otherDetails}
-                          onChange={ev => setOtherDetails(ev.target.value)}
-                          className="block w-full ppa-form"
-                        />
-                        <p className="text-red-500 text-xs mt-1">Leave blank if none</p>
-                      </div>  
-                    </div>
-                  </>
-                  ):(
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* For Male */}
-                      <div className="col-span-1">
-
-                        {/* Male Guest */}
-                        <div className="mt-6">
-                          <div className="flex items-center">
-                            <div className="font-bold">
-                              Number of Male Guest:
-                            </div>
-                            <div className="w-10 ppa-form-list text-center font-bold ml-4 h-6">
-                              <span>
-                                {facData?.maleGuest ? facData?.maleCount?.length : null}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Male Guest List */}
-                        <div className="w-3/4 p-2">
-                        {Array.from({ length: 6 }).map((_, index) => (
-                          <div key={index} className="flex items-center mt-2">
-                            <span className="font-bold">{`${index + 1}.`}</span>
-                            <div className="w-full ppa-form-list ml-3 h-6">
-                              {facData?.maleCount?.[index] 
-                                ? facData.maleCount[index].replace(/^\d+\.\s*/, '') 
-                                : ''} {/* Empty when data is missing */}
-                            </div>
-                          </div>
-                        ))}
-                        </div>
-
-                      </div>
-
-                      {/* Female Guest */}
-                      <div className="col-span-1">
-
-                      {/* Female Guest */}
-                      <div className="mt-6">
-                        <div className="flex items-center">
-                          <div className="font-bold">
-                            Number of Female Guest:
-                          </div>
-                          <div className="w-10 ppa-form-list text-center font-bold ml-4 h-6">
-                            <span>
-                              {facData?.femaleGuest ? facData?.femaleCount?.length : null}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Female Guest List */}
-                      <div className="w-3/4 p-2">
-                      {Array.from({ length: 6 }).map((_, index) => (
-                        <div key={index} className="flex items-center mt-2">
-                          <span className="font-bold">{`${index + 1}.`}</span>
-                          <div className="w-full ppa-form-list ml-3 h-6">
-                            {facData?.femaleCount?.[index] 
-                              ? facData.femaleCount[index].replace(/^\d+\.\s*/, '') 
-                              : ''} {/* Empty when data is missing */}
-                          </div>
-                        </div>
-                      ))}
-                      </div>
-
-                      </div>
-                    </div>
-
-                    {/* Other Details */}
-                    <div className="mt-4 ml-16">
-                      <div className="flex">
-                        <div className="w-28 text-base">
-                          <span>Other Details:</span>
-                        </div>
-                        <div className="w-3/4 border-b border-black font-regular text-base text-left pl-2">
-                        {facData?.form?.other_details}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                  )}
-                </div>
-              ):null}
-
-            </form>
-
-            {/* Button */}
-            {enableForm && (
-              <div className="ml-4 mt-10">
-                {!buttonHide && (
-                <>
-                  <div className="text-sm mb-4"> <span className="ass font-bold">Note: The form cannot be edited once the Admin Manager approves it.</span></div>
-                  {/* Update */}
-                  <button 
-                    type="submit"
-                    form="editForm"
-                    className={`py-2 px-3 mr-2 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ) : (
-                      'Update'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button 
-                      onClick={() => {
-                        setEnableForm(false);
-                        handleDefaultForm();
-                      }} 
-                      className="py-2 px-4 btn-cancel-form"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </>
-              )}
-              </div>
-            )}
-
-            {/* OPR */}
-            {(facData?.form?.mph || facData?.form?.conference || facData?.form?.dorm || facData?.form?.other) && (
-              <div className="grid grid-cols-2 mt-4 border-t border-gray">
-                {/* OPR Instruction */}
-                <div className="col-span-1 border-r border-gray">
-                  <div className="p-4 items-center">
-                    <div className="w-80 flex">
-                      <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
-                        Instruction for the OPR for Action:
-                      </label> 
-                      {Admin && (facData?.form?.admin_approval == 2 || facData?.form?.admin_approval == 1) && !enableAmOPR && (
-                        <FontAwesomeIcon onClick={() => { setEnableAmOPR(true); }} className="icon-form" title="Edit" icon={faPenToSquare} />
-                      )}
-                    </div>
-                    {enableAmOPR ? (
-                    <>
-                      {/* Edit */}
-                      <form 
-                        id="oprinstruct" 
-                        className="mt-2" 
-                        onSubmit={ev => oprEditInstruct(ev, facData?.form?.id)}
-                      >
-                        <textarea
-                          id="recomendations"
-                          name="recomendations"
-                          rows={2}
-                          style={{ resize: "none" }}
-                          defaultValue={facData?.form?.obr_instruct}
-                          onChange={ev => setOprInstruct(ev.target.value)}
-                          className="block w-full ppa-form"
-                          maxLength={255}
-                          placeholder="Input here"
-                        />
-                        {!oprInstruct && fieldMissing.oprInstruct && (
-                          <p className="form-validation">Please update the data. If not, please cancel the edit.</p>
-                        )}
-                      </form>
-
-                      {/* Button */}
-                      <div className="mt-2">
-                      {!buttonHide && (
-                      <>
-                        {/* Submit */}
-                        <button 
-                          type="submit"
-                          form="oprinstruct"
-                          className={`py-2 px-3 mr-2 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
-                          disabled={submitLoading || enableApprove}
-                        >
-                          {submitLoading ? (
-                            <div className="flex">
-                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-1">Loading</span>
-                            </div>
-                          ) : (
-                            'Save'
-                          )}
-                        </button>
-
-                        {/* Cancel */}
-                        {!submitLoading && (
-                          <button 
-                            onClick={() => {
-                              setEnableAmOPR(false);
-                              setFieldMissing('');
-                            }} 
-                            className="py-2 px-4 btn-cancel-form"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </>
-                      )}
-                      </div>
-                    </>
-                    ):(
-                      (!facData?.form?.obr_instruct && facData?.form?.admin_approval == 4) && Admin ? (
-                      <>
-                        {/* Form Input the OPR Instruction */}
-                        <form 
-                          id="oprinstruct" 
-                          className="mt-2" 
-                          onSubmit={ev => oprInstructSubmit(ev, facData?.form?.id)}
-                        >
-                          <textarea
-                            id="recomendations"
-                            name="recomendations"
-                            rows={2}
-                            style={{ resize: "none" }}
-                            value={oprInstruct}
-                            onChange={ev => setOprInstruct(ev.target.value)}
-                            className="block w-full ppa-form"
-                            maxLength={255}
-                            placeholder={!enableAdminDecline && "Input here"}
-                            disabled = {enableAdminDecline}
-                          />
-                        </form>
-
-                        {/* Button */}
-                        <div className="mt-2">
-                          {!enableAdminDecline && (
-                          <>
-                            {!buttonHide && (
-                            <>
-                              {/* Submit and Approve */}
-                              <button 
-                                type="submit"
-                                form="oprinstruct"
-                                className={`py-2 px-3 mr-2 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
-                                disabled={submitLoading || enableApprove}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ) : (
-                                  'Submit and Approve'
-                                )}
-                              </button>
-
-                              {/* Decline */}
-                              {!submitLoading && (
-                                <button 
-                                  onClick={() => {
-                                    setEnableAdminDecline(true);
-                                  }} 
-                                  className="py-2 px-4 btn-cancel-form"
-                                >
-                                  Decline
-                                </button>
-                              )}
-                            </>
-                            )}
-                          </>
-                          )}
-                        </div>
-                      </>
-                      ):(
-                        <div className="w-full ppa-form-request mt-2 ppa-form-remarks p-2" style={{ minHeight: '60px' }}>
-                          {facData?.form?.obr_instruct}
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                {/* OPR Action */}
-                <div className="col-span-1 ml-3">
-                  <div className="p-4 items-center">
-                    <div className="w-80 flex">
-                      <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
-                      OPR Action:
-                      </label> 
-                      {GSO && facData?.form?.admin_approval == 1 && !enableGsoOPR && (
-                        <FontAwesomeIcon onClick={() => { setEnableGsoOPR(true); }} className="icon-form" title="Edit" icon={faPenToSquare} />
-                      )}
-                    </div>
-                    {enableGsoOPR ? (
-                    <>
-                      <form 
-                        id="opraction" 
-                        className="mt-2" 
-                        onSubmit={ev => oprEditAction(ev, facData?.form?.id)}
-                      >
-                        <textarea
-                          id="recomendations"
-                          name="recomendations"
-                          rows={2}
-                          style={{ resize: "none" }}
-                          defaultValue={facData?.form?.obr_comment}
-                          onChange={ev => setOprAction(ev.target.value)}
-                          className="block w-full ppa-form"
-                          maxLength={255}
-                          placeholder="Input here"
-                        />
-                        {!oprAction && fieldMissing.oprAction && (
-                          <p className="form-validation">Please update the data. If not, please cancel the edit.</p>
-                        )}
-                      </form>
-
-                      <div className="mt-2">
-                      {!buttonHide && (
-                      <>
-                        {/* Submit */}
-                        <button 
-                          type="submit"
-                          form="opraction"
-                          className={`py-2 px-3 mr-2 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
-                          disabled={submitLoading || enableGSO}
-                        >
-                          {submitLoading ? (
-                            <div className="flex">
-                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-1">Loading</span>
-                            </div>
-                          ) : (
-                            'Save'
-                          )}
-                        </button>
-                        {/* Cancel */}
-
-                        {!submitLoading && (
-                          <button 
-                            onClick={() => {
-                              setEnableGsoOPR(false);
-                              setFieldMissing('');
-                            }}
-                            className="py-2 px-4 btn-cancel-form"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </>
-                      )}
-                      </div>
-                    </>
-                    ):(
-                      GSO && (!facData?.form?.obr_comment && facData?.form?.admin_approval == 2) ? (
-                      <>
-                        <form 
-                          id="opraction" 
-                          className="mt-2" 
-                          onSubmit={ev => oprActionSubmit(ev, facData?.form?.id)}
-                        >
-                          <textarea
-                            id="recomendations"
-                            name="recomendations"
-                            rows={2}
-                            style={{ resize: "none" }}
-                            value={oprAction}
-                            onChange={ev => setOprAction(ev.target.value)}
-                            className="block w-full ppa-form"
-                            maxLength={255}
-                            placeholder="Input here"
-                          />
-                        </form>
-
-                        <div className="mt-2">
-                          {!buttonHide && (
-                          <>
-                            <button 
-                              type="submit"
-                              form="opraction"
-                              className={`py-2 px-3 ${submitLoading ? 'process-btn-form' : 'btn-default-form'}`}
-                              disabled={submitLoading || enableGSO}
-                            >
-                              {submitLoading ? (
-                                <div className="flex">
-                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                  <span className="ml-1">Loading</span>
-                                </div>
-                              ) : (
-                                'Submit'
-                              )}
-                            </button>
-                          </>
-                          )}
-                        </div>
-                      </>
-                      ):(
-                        <div className="w-full ppa-form-request mt-2 ppa-form-remarks p-2" style={{ minHeight: '60px' }}>
-                          {facData?.form?.obr_comment}
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Form Disapproval by the Admin Manager */}
-          {enableAdminDecline && (
-            <div className="font-roboto mt-4">
-              {/* Caption */}
-              <div className="ppa-form-header text-base flex justify-between items-center">
-                <span> Form Disapproval </span>
-              </div>
-
-              {/* Form */}
-              <div className="px-2 py-4 ppa-form-box bg-white">
+            {enableAdminDecline ? (
+              <div>
                 <form id="adminDecline" onSubmit={submitAdminDecline} action="">
+                  <label htmlFor="rep_location" className="block text-base font-bold leading-6 text-black">
+                    Reason for disapproval:
+                  </label>
                   <div className="w-full">
                     <input
                       type="text"
@@ -2090,93 +960,1072 @@ export default function FacilityForm(){
                     />
                   </div>
                 </form>
-
-                {/* Button */}
-                <div className="mt-4">
-                {!buttonHide && (
-                <>
-                  {/* Confirmation */}
-                  <button onClick={() => handleAdminDeclineConfirmation()} className="py-2 px-4 btn-default-form" disabled={enableDisapprove}>
-                    Submit
-                  </button>
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { setEnableAdminDecline(false); setDeclineReason(''); }} className="ml-2 py-2 px-4 btn-cancel-form">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
+              </div>
+            ):(
+              loadingPDF ? (
+                <div className="flex justify-center text-lg font-bold items-center space-x-4">
+                  Generating PDF
                 </div>
-              </div>
-            </div>
-          )}
+              ):(
+              <>
+                <form id="editForm" onSubmit={editFacilityForm}>
 
-          {/* Form Disapproval by the Admin Manager */}
-          {enableDelete && (
-            <div className="font-roboto mt-4" id="DeleteForm">
-              {/* Caption */}
-              <div className="ppa-form-header text-base flex justify-between items-center">
-                <span> Form Deletion </span>
-              </div>
+                  {enableForm ? (
+                  <>
+                    <div className="text-sm mb-5"> <span className="ass">*</span> - forms that are editable</div>
 
-              {/* Form */}
-              <div className="px-2 py-4 ppa-form-box bg-white">
-                <form id="gsoDeleteForm" onSubmit={DeleteFormRequest} action="">
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="reason"
-                      id="reason"
-                      value={deleteReason}
-                      onChange={ev => setDeleteReason(ev.target.value)}
-                      placeholder="Input your reasons"
-                      className="block w-full ppa-form"
-                    />
-                  </div>
+                    {/* Date */}
+                    <div className="flex items-center font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                          Date:
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={formatDate(facData?.form?.created_at)}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Requesting Office/Division */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rf_request" className="block text-base font-bold leading-6 text-black">
+                          <span className="ass">*</span> Requesting Office/Division:
+                        </label>
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rf_request"
+                          id="rf_request"
+                          autoComplete="rf_request"
+                          defaultValue={facData?.form?.request_office}
+                          onChange={ev => setRegOffice(ev.target.value)}
+                          className={`block w-full ppa-form-edit`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Title/Purpose of Activity */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_title" className="block text-base font-bold leading-6 text-black">
+                        <span className="ass">*</span> Title/Purpose of Activity:
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_title"
+                          id="rep_title"
+                          autoComplete="rep_title"
+                          defaultValue={facData?.form?.title_of_activity}
+                          onChange={ev => setTitleReq(ev.target.value)}
+                          className={`block w-full ppa-form-edit`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Date Start */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                          Date of Activity (Start):
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={formatDate(facData?.form?.date_start)}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Time Start */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                        Time of Activity (Start):
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                      <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={formatTime(facData?.form?.time_start)}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Date End */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold font-bold leading-6 text-black">
+                        Date of Activity (End):
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={formatDate(facData?.form?.date_end)}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Time End */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                        Time of Activity (End):
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={formatTime(facData?.form?.time_end)}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Facility */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                          Facility Request:
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={
+                            facData?.form?.mph ? "Multi-Purpose Hall (MPH)" :
+                            facData?.form?.conference ? "Conference Room" :
+                            facData?.form?.dorm ? "Dormitory" :
+                            facData?.form?.other ? "Other" : ""
+                          }
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                    {/* Requestor */}
+                    <div className="flex items-center mt-2 font-roboto">
+                      <div className="w-56">
+                        <label htmlFor="rep_date" className="block text-base font-bold leading-6 text-black">
+                          Requestor:
+                        </label> 
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          name="rep_date"
+                          id="rep_date"
+                          value={facData?.form?.user_name}
+                          className="block w-full ppa-form-edit"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+
+                  </>
+                  ):(
+                  <>
+                    {/* Status */}
+                    <div className="status-sec mb-4">
+                      <strong>Status: </strong> {facData?.form?.remarks}
+                    </div>
+
+                    {/* Date */}
+                    <div className="flex items-center">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900">
+                        Date:
+                        </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6">
+                        {!loading && formatDate(facData?.form?.created_at)}
+                      </div>
+                    </div>
+
+                    {/* Request Office */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Requesting Office/Division: </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6"> 
+                        {!loading && facData?.form?.request_office}
+                      </div>
+                    </div>
+
+                    {/* Title of Activity */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Title of Activity: </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6"> 
+                        {!loading && facData?.form?.title_of_activity}
+                      </div>
+                    </div>
+
+                    {/* Date of Activity */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Date of Activity: </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6"> 
+                      {!loading && (
+                        facData?.form?.date_start === facData?.form?.date_end ? (
+                          formatDate(facData?.form?.date_start)
+                        ):(
+                          `${formatDate(facData?.form?.date_start)} to ${formatDate(facData?.form?.date_end)}`
+                        )
+                      )}
+                      </div>
+                    </div>
+
+                    {/* Time of Activity */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Time of Activity (START and END): </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6"> 
+                        {!loading && (
+                          facData?.form?.date_start === facData?.form?.date_end ? (
+                            `${formatTime(facData?.form?.time_start)} to ${formatTime(facData?.form?.time_end)}`
+                          ):(
+                            `${formatDate(facData?.form?.date_start)} (${formatTime(facData?.form?.time_start)}) to ${formatDate(facData?.form?.date_end)} (${formatTime(facData?.form?.time_end)})`
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Facility Request */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Facility Request: </label> 
+                      </div>
+                      <div className="w-full ppa-form-view h-6"> 
+                      {!loading && (
+                      <>
+                        {facData?.form?.mph ? ("Multi-Purpose Hall (MPH)"):null}
+                        {facData?.form?.conference ? ("Conference Room"):null}
+                        {facData?.form?.dorm ? ("Dormitory"):null}
+                        {facData?.form?.other ? ("Other"):null}
+                      </>
+                      )}
+                      </div>
+                    </div>
+
+                    {/* Requestor */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-[430px]">
+                        <label className="block text-base font-bold leading-6 text-gray-900"> Requestor: </label> 
+                      </div>
+                      <div className="w-full font-bold ppa-form-view h-6"> 
+                        {!loading && facData?.form?.user_name}
+                      </div>
+                    </div>
+                    
+                  </>
+                  )}
+
+                  {/* Facilities */}
+                  {(facData?.form?.mph || facData?.form?.conference || facData?.form?.other) ? (
+                    <div className="mt-8 border-t border-gray">
+
+                      {/* Caption */}
+                      <div> <h2 className="text-base font-bold leading-7 text-gray-900 mt-2"> * For the Multi-Purpose Hall / Conference Room / Others </h2> </div>
+
+                      {/* Form */}
+                      {enableForm ? (
+                      <>
+                        <div className="grid grid-cols-2">
+
+                          {/* 1st Column */}
+                          <div className="col-span-1 ml-10">
+                            {/* Table */}
+                            <div className="relative flex items-center mt-4">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="mph-checktable"
+                                  name="mph-checktable"
+                                  type="checkbox"
+                                  checked={checkTable}
+                                  onChange={() => {
+                                    setCheckTable(prev => !prev);
+                                    if (!checkTable) {
+                                      setNoOfTable('');
+                                    }
+                                  }}
+                                  className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                  Tables
+                                </label> 
+                              </div>
+                              {checkTable && (
+                                <div className="flex items-center w-32 ml-2">
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                                    (No. 
+                                  </label> 
+                                  <input
+                                    type="number"
+                                    name="no-of-table"
+                                    id="no-of-table"
+                                    defaultValue={facData?.form?.no_table}
+                                    onChange={handleInputTableChange}
+                                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                                  />
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                                    ) 
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Chair */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="mph-checkchair"
+                                  name="mph-checkchair"
+                                  type="checkbox"
+                                  checked={checkChairs}
+                                  onChange={() => {
+                                    setCheckChairs(prev => !prev);
+                                    if (!checkChairs) {
+                                      setNoOfChairs('');
+                                    }
+                                  }}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                  Chair
+                                </label> 
+                              </div>
+                              {checkChairs && (
+                                <div className="flex items-center w-32 ml-2">
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                                    (No. 
+                                  </label> 
+                                  <input
+                                    type="number"
+                                    name="no-of-chair"
+                                    id="no-of-chair"
+                                    defaultValue={facData?.form?.no_chair}
+                                    onChange={handleInputChairChange}
+                                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                                  />
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                                    ) 
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Projector */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="checkbox-projector"
+                                  type="checkbox"
+                                  checked={checkProjector}
+                                  onChange={() => setCheckProjector(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Projector
+                                </label> 
+                              </div>
+                            </div>
+
+                            {/* Projector Screen */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkProjectorScreen}
+                                  onChange={() => setCheckProjectorScreen(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Projector Screen
+                                </label> 
+                              </div>
+                            </div>
+
+                            {/* Document Camera */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkDocumentCamera}
+                                  onChange={() => setCheckDocumentCamera(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Document Camera
+                                </label> 
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2nd Column */}
+                          <div className="col-span-1 ml-10">
+                            {/* Laptop */}
+                            <div className="relative flex items-center mt-4">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkLaptop}
+                                  onChange={() => setCheckLaptop(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Laptop
+                                </label> 
+                              </div>
+                            </div>
+
+                            {/* Television */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkTelevision}
+                                  onChange={() => setCheckTelevision(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Television
+                                </label> 
+                              </div>
+                            </div>
+
+                            {/* Sound System */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkSoundSystem}
+                                  onChange={() => setCheckSoundSystem(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Sound System
+                                </label> 
+                              </div>
+                            </div>
+
+                            {/* Videoke */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="other-checkbox"
+                                  type="checkbox"
+                                  checked={checkVideoke}
+                                  onChange={() => setCheckVideoke(prev => !prev)}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Videoke
+                                </label> 
+                              </div>
+                            </div>
+                                
+                            {/* Microphone */}
+                            <div className="relative flex items-center mt-2">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="mph-checkmicrophone"
+                                  name="mph-checkmicrophone"
+                                  type="checkbox"
+                                  checked={checkMicrphone}
+                                  onChange={() => {
+                                    setCheckMicrphone(prev => !prev);
+                                    if (!checkMicrphone) {
+                                      setNoOfMicrophone('');
+                                    }
+                                  }}
+                                  className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                                Microphone
+                                </label> 
+                              </div>
+                              {checkMicrphone && (
+                                <div className="flex items-center w-32 ml-2">
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                                    (No. 
+                                  </label> 
+                                  <input
+                                    type="number"
+                                    name="no-of-microphone"
+                                    id="no-of-microphone"
+                                    defaultValue={facData?.form?.no_microphone}
+                                    onChange={handleInputMicrophoneChange}
+                                    className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                                  />
+                                  <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                                    ) 
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Other */}
+                          <div className="relative flex items-center mt-2 ml-10">
+                            <div className="flex items-center h-5">
+                              <input
+                                id="mph-checkmicrophone"
+                                name="mph-checkmicrophone"
+                                type="checkbox"
+                                defaultChecked={Boolean(facData.form.others)}
+                                onChange={() => {
+                                  setCheckOther(!checkOther);
+                                }}
+                                className={`focus:ring-gray-400 h-6 w-6 border-black-500 rounded`}
+                              />
+                            </div>
+                            <div className="ml-3">
+                              <label htmlFor="rf_request" className="block text-base leading-6 text-black">
+                              Others
+                              </label> 
+                            </div>
+                            {checkOther && (
+                              <div className="flex items-center w-full ml-2">
+                                <input
+                                  type="text"
+                                  name="other-specfic"
+                                  id="other-specfic"
+                                  placeholder="Please Specify"
+                                  defaultValue={facData?.form?.specify}
+                                  onChange={ev => setOtherField(ev.target.value)}
+                                  className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                                />
+                                <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                      ):(
+                      <>
+                        <div className="grid grid-cols-2">
+
+                          {/* Left */}
+                          <div className="col-span-1 ml-10">
+
+                            {/* Table */}
+                            <div className="mt-4">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.table ? 'X':null}
+                                </div>
+                                <div className="w-12 ml-1 font-bold justify-center">
+                                  <span>Tables</span>
+                                </div>
+                                <div className="w-30 ml-2">
+                                (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                                  {facData?.form?.no_table ? facData?.form?.no_table : null} 
+                                </span>)
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Chair */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.chair ? 'X':null}
+                                </div>
+                                <div className="w-12 ml-1 font-bold justify-center">
+                                  <span>Chairs</span>
+                                </div>
+                                <div className="w-30 ml-2">
+                                (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                                  {facData?.form?.no_chair ? facData?.form?.no_chair : null} 
+                                </span>)
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Projector */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.projector ? 'X':null}
+                                </div>
+                                <div className="w-12 ml-1 font-bold justify-center">
+                                  <span>Projector</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Projector Screen */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.projector_screen ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Projector Screen</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Document Camera */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.document_camera ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Document Camera</span>
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          {/* Right */}
+                          <div className="col-span-1">
+
+                            {/* Laptop */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.laptop ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Laptop</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Television */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.television ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Television</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Sound System */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.sound_system ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Sound System</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Videoke */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.videoke ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Videoke</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Microphone */}
+                            <div className="mt-2">
+                              <div className="flex items-center">
+                                <div className="ppa-checklist">
+                                {facData?.form?.microphone ? 'X':null}
+                                </div>
+                                <div className="w-22 ml-1 font-bold justify-center">
+                                  <span>Microphone</span>
+                                </div>
+                                <div className="w-30 ml-2">
+                                (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                                  {facData?.form?.no_microphone ? facData?.form?.no_microphone : null} 
+                                </span>)
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                        {/* Others */}
+                        <div className="mt-2 ml-10">
+                          <div className="w-full">
+                            <div className="mt-1">
+                              <div className="flex items-center">
+                                <div className="w-12 ppa-checklist">
+                                  {facData?.form?.others === 1 ? 'X':null}
+                                </div>
+                                <div className="w-12 ml-1 font-bold justify-center">
+                                  <span>Others</span>
+                                </div>
+                                <div className="w-1/2 h-6 border-b p-0 pl-2 border-black text-sm text-left ml-4 ">
+                                <span className=""> {facData?.form?.specify ? facData?.form?.specify:null} </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                      )}
+                      
+                    </div>
+                  ):null}
+
+                  {/* For Dormitory */}
+                  {facData?.form?.dorm ? (
+                    <div className="mt-6 border-t border-gray">
+                      {/* Caption */}
+                      <div> <h2 className="text-base mt-4 font-bold leading-7 text-gray-900"> * For the Dormitory </h2> </div>
+
+                      {enableForm ? (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Male */}
+                          <div className="col-span-1">
+                            <div className="mt-6">
+                              <div className="mb-4">
+                                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Male guests:</strong> </label>
+                              </div>
+                              {/* Show on the Form */}
+                              <textarea
+                                id="dorm-male-list"
+                                name="dorm-male-list"
+                                rows={5}
+                                value={getMale}
+                                onChange={ev => setGetMale(ev.target.value)}
+                                style={{ resize: 'none' }}
+                                className="block w-10/12 ppa-form"
+                              />
+                              <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+                            <div>
+                            </div>
+                            </div>
+                          </div>
+
+                          {/* Female */}
+                          <div className="col-span-1">
+                            <div className="mt-6">
+                              <div className="mb-4">
+                                <label htmlFor="type_of_property" className="block text-base font-medium leading-6 text-gray-900"> <strong>Female guests:</strong> </label>
+                              </div>
+                              {/* Show on the Form */}
+                              <textarea
+                                id="dorm-female-list"
+                                name="dorm-female-list"
+                                rows={5}
+                                value={getFemale}
+                                onChange={ev => setGetFemale(ev.target.value)}
+                                style={{ resize: 'none' }}
+                                className="block w-10/12 ppa-form"
+                              />
+                              <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* For Other */}
+                        <div className="flex mt-10">
+                          <div className="w-40">
+                            <label htmlFor="recomendations" className="block text-base font-bold leading-6 text-gray-900">
+                              Other Details :
+                            </label>
+                          </div>
+                          <div className="w-3/4">
+                            <textarea
+                              id="recomendations"
+                              name="recomendations"
+                              rows={3}
+                              style={{ resize: "none" }}
+                              value={otherDetails}
+                              onChange={ev => setOtherDetails(ev.target.value)}
+                              className="block w-full ppa-form"
+                            />
+                            <p className="text-red-500 text-xs mt-1">Leave blank if none</p>
+                          </div>  
+                        </div>
+                      </>
+                      ):(
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* For Male */}
+                          <div className="col-span-1">
+
+                            {/* Male Guest */}
+                            <div className="mt-6">
+                              <div className="flex items-center">
+                                <div className="font-bold">
+                                  Number of Male Guest:
+                                </div>
+                                <div className="w-10 ppa-form-list text-center font-bold ml-4 h-6">
+                                  <span>
+                                    {facData?.maleGuest ? facData?.maleCount?.length : null}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Male Guest List */}
+                            <div className="w-3/4 p-2">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                              <div key={index} className="flex items-center mt-2">
+                                <span className="font-bold">{`${index + 1}.`}</span>
+                                <div className="w-full ppa-form-list ml-3 h-6">
+                                  {facData?.maleCount?.[index] 
+                                    ? facData.maleCount[index].replace(/^\d+\.\s*/, '') 
+                                    : ''} {/* Empty when data is missing */}
+                                </div>
+                              </div>
+                            ))}
+                            </div>
+
+                          </div>
+
+                          {/* Female Guest */}
+                          <div className="col-span-1">
+
+                          {/* Female Guest */}
+                          <div className="mt-6">
+                            <div className="flex items-center">
+                              <div className="font-bold">
+                                Number of Female Guest:
+                              </div>
+                              <div className="w-10 ppa-form-list text-center font-bold ml-4 h-6">
+                                <span>
+                                  {facData?.femaleGuest ? facData?.femaleCount?.length : null}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Female Guest List */}
+                          <div className="w-3/4 p-2">
+                          {Array.from({ length: 6 }).map((_, index) => (
+                            <div key={index} className="flex items-center mt-2">
+                              <span className="font-bold">{`${index + 1}.`}</span>
+                              <div className="w-full ppa-form-list ml-3 h-6">
+                                {facData?.femaleCount?.[index] 
+                                  ? facData.femaleCount[index].replace(/^\d+\.\s*/, '') 
+                                  : ''} {/* Empty when data is missing */}
+                              </div>
+                            </div>
+                          ))}
+                          </div>
+
+                          </div>
+                        </div>
+
+                        {/* Other Details */}
+                        <div className="mt-4 ml-16">
+                          <div className="flex">
+                            <div className="w-28 text-base">
+                              <span>Other Details:</span>
+                            </div>
+                            <div className="w-3/4 border-b border-black font-regular text-base text-left pl-2">
+                            {facData?.form?.other_details}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                      )}
+                    </div>
+                  ):null}
+
+                  {/* OPR */}
+                  {(facData?.form?.mph || facData?.form?.conference || facData?.form?.dorm || facData?.form?.other) && (
+                    <div className="grid grid-cols-2 mt-4 border-t border-gray">
+
+                      {/* OPR Instruction */}
+                      <div className="col-span-1 border-r border-gray">
+                        <div className="p-4 items-center">
+                          <div className="w-80 flex">
+                            <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
+                              Instruction for the OPR for Action:
+                            </label> 
+                            {Admin && (facData?.form?.admin_approval == 3) && !enableAmOPR && (
+                              <FontAwesomeIcon onClick={() => { setEnableAmOPR(true); }} className="icon-form" title="Edit" icon={faPenToSquare} />
+                            )}
+                          </div>
+                          {enableAmOPR ? (
+                          <>
+                            {/* Edit */}
+                            <textarea
+                              id="recomendations"
+                              name="recomendations"
+                              rows={2}
+                              style={{ resize: "none" }}
+                              defaultValue={facData?.form?.obr_instruct}
+                              onChange={ev => setOprInstruct(ev.target.value)}
+                              className={`block w-full mt-2 ${(!oprInstruct && fieldMissing.oprInstruct) ? "ppa-form-error":"ppa-form"}`}
+                              maxLength={255}
+                              placeholder="Input here"
+                            />
+                            {!oprInstruct && fieldMissing.oprInstruct && (
+                              <p className="form-validation">Please update the data. If not, please cancel the edit.</p>
+                            )}
+                          </>
+                          ):(
+                            (!facData?.form?.obr_instruct && (facData?.form?.admin_approval == 7 || facData?.form?.admin_approval == 5)) && Admin ? (
+                            <>
+                              <textarea
+                                type="text"
+                                name="oprI"
+                                id="oprI"
+                                value={oprInstruct}
+                                onChange={ev => setOprInstruct(ev.target.value)}
+                                placeholder="Input OPR Instruction"
+                                className={`block w-full mt-2 ${(!oprInstruct && fieldMissing.oprInstruct) ? "ppa-form-error":"ppa-form"}`}
+                                style={{ resize: "none" }}
+                              />
+                              {!oprInstruct && fieldMissing.oprInstruct && (
+                                <p className="form-validation">This form is required</p>
+                              )}
+                            </>
+                            ):(
+                            <>
+                              <div className="w-full ppa-form-request mt-2 ppa-form-remarks p-2" style={{ minHeight: '60px' }}>
+                                {facData?.form?.obr_instruct}
+                              </div>
+                            </>
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                      {/* OPR Action */}
+                      <div className="col-span-1 ml-3">
+                        <div className="p-4 items-center">
+                          <div className="w-80 flex">
+                            <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
+                            OPR Action:
+                            </label> 
+                            {GSO && facData?.form?.admin_approval == 2 && !enableGsoOPR && (
+                              <FontAwesomeIcon onClick={() => { setEnableGsoOPR(true); }} className="icon-form" title="Edit" icon={faPenToSquare} />
+                            )}
+                          </div>
+                          {enableGsoOPR ? (
+                          <>
+                            <textarea
+                              id="recomendations"
+                              name="recomendations"
+                              rows={2}
+                              style={{ resize: "none" }}
+                              defaultValue={facData?.form?.obr_comment}
+                              onChange={ev => setOprAction(ev.target.value)}
+                              className={`block w-full mt-2 ${(!oprAction && fieldMissing.oprAction) ? "ppa-form-error":"ppa-form"}`}
+                              maxLength={255}
+                              placeholder="Input here"
+                            />
+                            {!oprAction && fieldMissing.oprAction && (
+                              <p className="form-validation">Please update the data. If not, please cancel the edit.</p>
+                            )}
+                          </>
+                          ):(
+                            GSO && (!facData?.form?.obr_comment && (facData?.form?.admin_approval == 3 || facData?.form?.admin_approval == 6)) ? (
+                            <>
+                              <textarea
+                                id="recomendations"
+                                name="recomendations"
+                                rows={2}
+                                style={{ resize: "none" }}
+                                value={oprAction}
+                                onChange={ev => setOprAction(ev.target.value)}
+                                className={`block w-full mt-2 ${(!oprAction && fieldMissing.oprAction) ? "ppa-form-error":"ppa-form"}`}
+                                maxLength={255}
+                                placeholder="Input here"
+                              />
+                              {!oprAction && fieldMissing.oprAction && (
+                                 <p className="form-validation">This form is required</p>
+                              )}
+                            </>
+                            ):(
+                              <div className="w-full ppa-form-request mt-2 ppa-form-remarks p-2" style={{ minHeight: '60px' }}>
+                                {facData?.form?.obr_comment}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
                 </form>
+              </>
+              )
+            )}
 
-                {/* Button */}
-                <div className="mt-4">
-                {!showPopup && (
-                <>
-                  {/* Confirmation */}
-                  <button onClick={() => handleDeleteFormContirmation()} className="py-2 px-4 btn-default-form" disabled={enableDisapprove}>
-                    Submit
-                  </button>
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { setEnableDelete(false); setDeleteReason(''); }} className="ml-2 py-2 px-4 btn-cancel-form">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Disapproval Reason */}
-          {(facData?.form?.admin_approval == 3 || facData?.form?.admin_approval == 5) && (
-            <div className="px-2 py-4 ppa-form-box bg-white mt-4">
-              <div className="items-center">
-                <div className="w-80 flex">
-                  <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
-                    {facData?.form?.admin_approval == 3 ? 
-                    ("Reason for Disapproval:"):
-                    ("Reason for Deletion:")}
-                  </label> 
-                </div>
-                {facData?.form?.remarks}
-              </div>
-            </div>
-          )}
-
-        </div>
-      ):<Restrict />
+          </div>
+        </>
+        ):(
+          <Restrict />
+        )
+      )
     ):null}
-
+    
     {/* Popup */}
     {showPopup && (
       <Popup 
@@ -2185,8 +2034,7 @@ export default function FacilityForm(){
         justClose={justClose}
         closePopup={closePopup}
         facility={facData?.form?.id}
-        FacDeleteRequest={"gsoDeleteForm"}
-        CloseForm={CloseForm}
+        DeleteFormRequest={DeleteFormRequest}
         submitLoading={submitLoading}
         submitAnimation={submitAnimation}
         form={"adminDecline"}

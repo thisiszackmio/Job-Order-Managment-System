@@ -188,7 +188,7 @@ export default function VehicleSlipList(){
                         <td className="px-2 py-2 text-sm text-left table-font">{list.vehicle_type ? list.vehicle_type : "None"}</td>
                         <td className="px-2 py-2 text-sm w-1 text-center table-font">{list.passengers}</td>
                         <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                        <td className="px-2 py-2 text-sm text-center table-font">{list.remarks}</td>
+                        <td className="px-2 py-2 text-sm text-left table-font">{list.remarks}</td>
                       </tr>
                     ))
                   ):(

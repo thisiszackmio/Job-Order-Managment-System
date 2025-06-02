@@ -365,7 +365,7 @@ export default function FacilityVenueForm(){
                 <>
                 {/* Submit */}
                 <button type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -380,7 +380,7 @@ export default function FacilityVenueForm(){
 
                   {/* Cancel */}
                   {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 btn-cancel-form">
+                    <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
                       Revise
                     </button>
                   )}
@@ -682,7 +682,7 @@ export default function FacilityVenueForm(){
           {/* Button */}
           <button 
             onClick={handleConfirm} 
-            className="py-2 px-4 btn-default-form">
+            className="py-2 px-4 text-sm btn-default-form">
             Submit
           </button>
 

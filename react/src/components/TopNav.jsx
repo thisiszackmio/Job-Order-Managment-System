@@ -16,6 +16,8 @@ const TopNav = () =>{
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [count, setCount] = useState([]);
 
+  const [maintenance, setMaintenance] = useState(false);
+
   //Time stamp notification
   function formatTimeDifference(timestamp) {
     const now = new Date();
@@ -43,6 +45,13 @@ const TopNav = () =>{
       return 'Just now';
     }
   }
+
+  // For Maintenance Mode
+  useEffect(() => {
+    axiosClient.get("settings/maintenance").then(response => {
+      setMaintenance(response.data.maintenance);
+    });
+  }, []);
 
   // Get Notification Request
   const fetchNotification = () => {
@@ -124,11 +133,14 @@ const TopNav = () =>{
                   <BellIcon className="h-7 w-7" aria-hidden="true" />
                 </Menu.Button>
 
-                {count?.count ? (
-                  <span className="notifications">
-                      {count?.count > 10 ? '10+' : count?.count}
-                  </span>
-                ) : null}
+                {!maintenance && (
+                  count?.count ? (
+                    <span className="notifications">
+                      
+                        {count?.count > 10 ? '10+' : count?.count}
+                    </span>
+                  ) : null
+                )}
 
               </div>
 
@@ -145,47 +157,53 @@ const TopNav = () =>{
                 >
 
                   <Menu.Items className="absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <p className="notification-text font-roboto pl-3">Notifications</p>
-                    {loadingNotifications ? (
-                      <div className="flex p-8 justify-center items-center">
-                        <img className="h-7 w-auto mr-1" src={loading_table} alt="Loading" />
-                        <span className="loading-table">Loading Notification</span>
-                      </div>
+                    {maintenance ? (
+                      <p className="text-base font-bold text-center leading-7 py-4">Notification is disable on Maint Mode</p>
                     ):(
-                      notifications?.length > 0 ? (
-                        notifications?.map((NofiData) => (
-                          <div>
-                            <div key={NofiData?.id} className="notification-item">
-                              <a onClick={() => OpenLink(NofiData?.id, NofiData?.joms_id, NofiData?.joms_type)} className="noti-link">
-                                <div className="flex notification-container p-3 font-roboto">
-                                  {/* Image and Icon */}
-                                  <div className="w-32 items-center relative">
-                                    <img src={NofiData?.sender_avatar} className="notification_avatar" alt={`${NofiData?.sender_name}'s avatar`} />
-                                    <img src={
-                                      NofiData?.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
-                                      NofiData?.joms_type == "JOMS_Inspection" ? repair : 
-                                      NofiData?.joms_type == "JOMS_Facility" ? facilityicon : 
-                                      null
-                                    } className="notification_icon" alt={`${NofiData?.sender_name}'s avatar`} /> 
-                                  </div>
-                                  {/* Message */}
-                                  <div className="w-full">
-                                    <h4 className={`noti-type ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>
-                                      {NofiData?.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData?.joms_id})`}
-                                      {NofiData?.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData?.joms_id})`}
-                                      {NofiData?.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData?.joms_id})`}
-                                    </h4>
-                                    <h3 className={`noti-message ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>{NofiData?.message}</h3>
-                                    <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData?.date_request)}</h4>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-                          </div>
-                        ))
+                    <>
+                      <p className="notification-text font-roboto pl-3">Notifications</p>
+                      {loadingNotifications ? (
+                        <div className="flex p-8 justify-center items-center">
+                          <img className="h-7 w-auto mr-1" src={loading_table} alt="Loading" />
+                          <span className="loading-table">Loading Notification</span>
+                        </div>
                       ):(
-                        <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
-                      )
+                        notifications?.length > 0 ? (
+                          notifications?.map((NofiData) => (
+                            <div>
+                              <div key={NofiData?.id} className="notification-item">
+                                <a onClick={() => OpenLink(NofiData?.id, NofiData?.joms_id, NofiData?.joms_type)} className="noti-link">
+                                  <div className="flex notification-container p-3 font-roboto">
+                                    {/* Image and Icon */}
+                                    <div className="w-32 items-center relative">
+                                      <img src={NofiData?.sender_avatar} className="notification_avatar" alt={`${NofiData?.sender_name}'s avatar`} />
+                                      <img src={
+                                        NofiData?.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                        NofiData?.joms_type == "JOMS_Inspection" ? repair : 
+                                        NofiData?.joms_type == "JOMS_Facility" ? facilityicon : 
+                                        null
+                                      } className="notification_icon" alt={`${NofiData?.sender_name}'s avatar`} /> 
+                                    </div>
+                                    {/* Message */}
+                                    <div className="w-full">
+                                      <h4 className={`noti-type ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>
+                                        {NofiData?.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData?.joms_id})`}
+                                        {NofiData?.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData?.joms_id})`}
+                                        {NofiData?.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData?.joms_id})`}
+                                      </h4>
+                                      <h3 className={`noti-message ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>{NofiData?.message}</h3>
+                                      <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData?.date_request)}</h4>
+                                    </div>
+                                  </div>
+                                </a>
+                              </div>
+                            </div>
+                          ))
+                        ):(
+                          <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
+                        )
+                      )}
+                    </>
                     )}
                   </Menu.Items>
 

@@ -36,9 +36,6 @@ return new class extends Migration
             $table->string('supervisor_name');
             $table->smallInteger('personnel_id')->nullable();
             $table->string('personnel_name')->nullable();
-            $table->boolean('supervisor_status')->default(false);
-            $table->boolean('admin_status')->default(false);
-            $table->boolean('inspector_status')->default(false);
             $table->boolean('form_status')->default(false);
             $table->string('form_remarks', 500);
             $table->timestamps();

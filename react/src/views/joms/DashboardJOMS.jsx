@@ -2,13 +2,12 @@ import PageComponent from "../../components/PageComponent";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
-import loading_table from "/default/ring-loading.gif";
 import VehicleSlip from "/default/Vehicle_Slip.png";
+import repair from "/default/mechanic.png"
+import facilityicon from "/default/schedule.png"
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 
 export default function DashboardJOMS(){
   const { currentUserId, currentUserCode } = useUserStateContext();
@@ -23,17 +22,11 @@ export default function DashboardJOMS(){
 
   // loading Function
   const [loading, setLoading] = useState(true);
-  const [loadingArea, setLoadingArea] = useState(true);
 
   // Variable
   const [inspectionForm, getInspectionForm] = useState([]);
   const [facilityForm, getFacilityForm] = useState([]);
   const [vehicleForm, getVehicleForm] = useState([]);
-  const [onTravel, getOnTravel] = useState([]);
-
-  const [pending, getPending] = useState([]);
-  const [pendingApproval, getPendingApproval] = useState([]);
-
   const [announceList, setAnnounceList] = useState([]);
 
   // Get All the Data on Announcements
@@ -65,7 +58,6 @@ export default function DashboardJOMS(){
     })
     .finally(() => {
       setLoading(false);
-      setLoadingArea(false);
     });
   };
 
@@ -75,17 +67,16 @@ export default function DashboardJOMS(){
     .get(`/jomsdashboard`)
     .then((response) => {
       const responseData = response.data;
-      // const InspectionForm = responseData.inspection_count;
-      // const FacilityForm = responseData.facility_count;
+      const InspectionForm = responseData.inspection;
+      const FacilityForm = responseData.facility;
       const VehicleForm = responseData.vehicle;
 
-      // getInspectionForm(InspectionForm);
-      // getFacilityForm(FacilityForm);
+      getInspectionForm(InspectionForm);
+      getFacilityForm(FacilityForm);
       getVehicleForm(VehicleForm);
     })
     .finally(() => {
       setLoading(false);
-      setLoadingArea(false);
     });
   }
 
@@ -122,7 +113,6 @@ export default function DashboardJOMS(){
     })
     .finally(() => {
       setLoading(false);
-      setLoadingArea(false);
     });
   };
 
@@ -149,7 +139,6 @@ export default function DashboardJOMS(){
     })
     .finally(() => {
       setLoading(false);
-      setLoadingArea(false);
     });
   };
 
@@ -162,15 +151,6 @@ export default function DashboardJOMS(){
       fetchTeam();
     }
   }, [currentUserId]);
-
-  const ucode = currentUserCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const PersonAuthority = codes.includes("AU");
-  const SuperAdmin = codes.includes("HACK");
-  const roles = ["AM", "GSO", "DM", "PM", "AP", "AU"];
-  const accessOnly = roles.some(role => codes.includes(role));
 
   return(
     <PageComponent title="JOMS Dashboard">
@@ -223,24 +203,31 @@ export default function DashboardJOMS(){
             {/* For Repair */}
             <div className="col-span-1 ppa-widget relative">
               <div className="joms-dashboard-title"> Pre/Post Repair Inspection Form </div>
+              <img className="joms-icons h-[80px] mt-3" src={repair} alt="Your Company"/>
+              <div className="joms-count">{inspectionForm?.count}</div>
+              <div className="joms-word-count">Completed: <strong>{inspectionForm?.complete}</strong></div>
+              <div className="joms-word-count">Pending: <strong>{inspectionForm?.pending}</strong></div>
+              <div className="joms-word-count">Canceled: <strong>{inspectionForm?.cancel}</strong></div>
             </div>
 
             {/* For Facility */}
             <div className="col-span-1 ppa-widget relative">
               <div className="joms-dashboard-title"> Facility / Venue Form </div>
+              <img className="mx-auto joms-icons h-[80px] mt-3" src={facilityicon} alt="Your Company"/>
+              <div className="joms-count">{facilityForm?.count}</div>
+              <div className="joms-word-count">Completed: <strong>{facilityForm?.complete}</strong></div>
+              <div className="joms-word-count">Pending: <strong>{facilityForm?.pending}</strong></div>
+              <div className="joms-word-count">Canceled: <strong>{facilityForm?.cancel}</strong></div>
             </div>
 
-            {/* For Vehicle Slip */}
+            {/* For Vehicle Slip  */}
             <div className="col-span-1 ppa-widget relative">
               <div className="joms-dashboard-title"> Vehicle Slip </div>
-              <img className="mx-auto joms-icons" src={VehicleSlip} alt="Your Company"/>
+              <img className="mx-auto joms-icons h-[100px]" src={VehicleSlip} alt="Your Company"/>
               <div className="joms-count">{vehicleForm?.count}</div>
-              <div className="joms-word-count">Approve Form: <strong>{vehicleForm?.approval}</strong></div>
-              <div className="joms-word-count">Disapprove Form: <strong>{vehicleForm?.disapproval}</strong></div>
-              <div className="joms-word-count">Cancel Form: <strong>{vehicleForm?.cancel}</strong></div>
-              <div className="joms-word-count">Pending for approval: <strong>{vehicleForm?.pendingApproval}</strong></div>
-              <div className="joms-word-count">Pending for assign vehicle and driver: <strong>{vehicleForm?.pendingAssignment}</strong></div>
-              <Link to={`/joms/vehicle/form`}> <div className="ppa-system-link"> Go to Request Form </div></Link>
+              <div className="joms-word-count">Completed: <strong>{vehicleForm?.complete}</strong></div>
+              <div className="joms-word-count">Pending: <strong>{vehicleForm?.pending}</strong></div>
+              <div className="joms-word-count">Canceled: <strong>{vehicleForm?.cancel}</strong></div>
             </div>
 
           </div>

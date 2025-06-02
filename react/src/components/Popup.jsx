@@ -8,6 +8,7 @@ const Popup = ({
   submitAnimation, 
   handlelSupervisorApproval,
   SubmitSupReason,
+  handlelAdminApproval,
   justClose,
   handleDelete,
   closePopup,
@@ -20,9 +21,12 @@ const Popup = ({
   RemovePersonnel,
   AvailableConfirmation,
   CloseForceRequest,
+  DeleteFormRequest,
   removeVehicleDet,
   vacantVehicle,
   inspectionData,
+  form,
+  facility,
   vehicle,
   user
 }) => {
@@ -315,6 +319,92 @@ const Popup = ({
           </>
           )}
 
+          {/* GSO for Inspection Form Part B */}
+          {popupContent == "gsoi" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              form={form}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
+
+          {/* GSO Delete Form on Facility*/}
+          {popupContent == "gsodelete" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              onClick={() => DeleteFormRequest(facility)}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
+
+          {/* Admin Approval */}
+          {popupContent == "ama" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              onClick={() => handlelAdminApproval(inspectionData)}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
+
           {/* --- Sup Approval --- */}
 
           {/* DM Approval Function */}
@@ -375,6 +465,64 @@ const Popup = ({
           )}
 
           {/* --- Admin Approval --- */}
+
+          {/* Admin Disapproval For Fac */}
+          {popupContent == "amif" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              form={form}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
+
+          {/* Admin Approval For Fac */}
+          {popupContent == "adf" && (
+          <>
+            {/* Submit */}
+            <button 
+              type="submit"
+              onClick={() => handlelAdminApproval(facility)}
+              className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+              disabled={submitLoading}
+            >
+              {submitLoading ? (
+                <div className="flex justify-center">
+                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                  <span className="ml-1">Loading</span>
+                </div>
+              ):(
+                'Confirm'
+              )}
+            </button>
+
+            {/* Cancel */}
+            {!submitLoading && (
+              <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                Close
+              </button>
+            )}
+          </>
+          )}
           
           {/* Admin Approval */}
           {popupContent == "adminApproval" && (

@@ -44,24 +44,18 @@ export default function AddVehicleType(){
   useEffect(() => {
     // Define the class to be added/removed
     const popupClass = 'popup-show';
-    const loadingClass = 'loading-show';
 
     // Function to add the class to the body
     const addPopupClass = () => document.body.classList.add(popupClass);
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
 
     // Function to remove the class from the body
     const removePopupClass = () => document.body.classList.remove(popupClass);
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
 
     // Add or remove the class based on showPopup state
     if (showPopup) {
       addPopupClass();
-    } else if (loading) {
-      addLoadingClass();
     } else {
       removePopupClass();
-      removeLoadingClass();
     }
 
     // Cleanup function to remove the class when the component is unmounted or showPopup changes
@@ -297,18 +291,11 @@ export default function AddVehicleType(){
   const codes = ucode.split(',').map(code => code.trim());
   const GSO = codes.includes("GSO");
   const SuperAdmin = codes.includes("HACK");
-  const access = GSO || SuperAdmin;
+  const PersonnelAuthority = codes.includes("AU");
+  const access = GSO || SuperAdmin || PersonnelAuthority ;
 
   return(
     <PageComponent title="Vehicle Information">
-      {/* Loading */}
-      {loading && (
-        <div className="pre-loading-screen z-50 relative flex justify-center items-center">
-          <img className="mx-auto h-32 w-auto absolute" src={loadingAnimation} alt="Your Company" />
-          <img className="mx-auto h-16 w-auto absolute ppg-logo-img" src={ppalogo} alt="Your Company" />
-        </div>
-      )}
-
       {access ? (
       <>
         {addVehicle && (

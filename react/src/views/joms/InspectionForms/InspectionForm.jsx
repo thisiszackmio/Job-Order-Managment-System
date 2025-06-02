@@ -65,11 +65,13 @@ export default function InspectionForm(){
   const [updateComplain, setUpdateComplain] = useState('');
 
   // --- Part B --- //
+  const [partBdate, setPartBdate] = useState(today);
   const [lastfilledDate, setLastFilledDate] = useState('');
   const [natureRepair, setNatureRepair] = useState('');
   const [pointPersonnel, setPointPersonnel] = useState({ pid: '', pname: '' });
 
   // --- Update Part B --- //
+  const [updatePartBdate, setUpdatePartBdate] = useState(today);
   const [updatelastfilledDate, setUpdateLastFilledDate] = useState(inspectionData?.form?.date_of_last_repair ?? "");
   const [updatenatureRepair, setUpdateNatureRepair] = useState(inspectionData?.form?.nature_of_last_repair ?? "");
   const [updatepointPersonnel, setUpdatePointPersonnel] = useState({ pid: '', pname: '' });
@@ -222,29 +224,29 @@ export default function InspectionForm(){
   }
 
   // Idle for the personnel
-  const setIdle = () => {
-    if(GSO){
-      axiosClient
-      .get(`/idleinspectionrequest/${id}`)
-      .then(response => {
-        console.log(response.data.message); // Show success message
-      })
-      .catch(error => {
-        setPopupContent("error");
-        setPopupMessage(DevErrorText);
-        setShowPopup(true); 
-      }).finally(() => {
-        setSubmitLoading(false);
-      });
-    }
-  }
+  // const setIdle = () => {
+  //   if(GSO){
+  //     axiosClient
+  //     .get(`/idleinspectionrequest/${id}`)
+  //     .then(response => {
+  //       console.log(response.data.message); // Show success message
+  //     })
+  //     .catch(error => {
+  //       setPopupContent("error");
+  //       setPopupMessage(DevErrorText);
+  //       setShowPopup(true); 
+  //     }).finally(() => {
+  //       setSubmitLoading(false);
+  //     });
+  //   }
+  // }
 
   useEffect(() => { 
     if(currentUserId){
       fecthInspection();
       fetchDisplayPersonnel();
       setFormClosed();
-      setIdle();
+      // setIdle();
     }
   }, [id, currentUserId]);
 
@@ -457,7 +459,7 @@ export default function InspectionForm(){
 
     const data = {
       gsoId: currentUserId,
-      date_of_filling: today,
+      date_of_filling: partBdate,
       date_of_last_repair: lastfilledDate,
       nature_of_last_repair: natureRepair,
       personnel_id: pointPersonnel.pid,
@@ -849,13 +851,13 @@ export default function InspectionForm(){
 
               {/* Notification for auto close and for the GSO */}
               <div className="text-sm flex justify-end items-center w-full">
-                {inspectionData?.form?.form_status == 4 && GSO && "Parts C and D will appear if the assigned personnel do not complete them within 24 hours."}
+                {/* {inspectionData?.form?.form_status == 4 && GSO && "Parts C and D will appear if the assigned personnel do not complete them within 24 hours."} */}
                 {accessOnly && inspectionData?.form?.form_status == 2 && "The form becomes non-editable after 24 hours."}
               </div>
   
               {/* Header */}
               <div className="ppa-form-header text-base flex justify-between items-center">
-                <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
+                <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span> {inspectionData?.form?.form_status} </span>
                 <div className="flex space-x-3"> 
                   {/* Cancel Request */}
                   {GSO && [5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
@@ -939,7 +941,7 @@ export default function InspectionForm(){
                     </div>
     
                     {/* Part A */}
-                    <div className={`${[1, 2, 3, 4, 5, 12, 13].includes(inspectionData?.form?.form_status) || (GSO && [6, 8, 9, 10].includes(inspectionData?.form?.form_status)) ? "pb-6 border-b border-gray-300" : ""}`}>
+                    <div className={`${([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
 
                       {/* Caption */}
                       <div className="flex">
@@ -953,331 +955,330 @@ export default function InspectionForm(){
                       </div>
 
                       {/* Form */}
-                      <div>
-                        <form id="EditPartA" onSubmit={event => UpdatePartA(event, inspectionData?.form?.id)}>
-                          {/* ---- Part A Fields ---- */}
-                          <div className="grid grid-cols-2">
-                            {/* Part A left side */}
-                            <div className="col-span-1">
+                      <form id="EditPartA" onSubmit={event => UpdatePartA(event, inspectionData?.form?.id)}>
+                        {/* ---- Part A Fields ---- */}
+                        <div className="grid grid-cols-2">
+                          {/* Part A left side */}
+                          <div className="col-span-1">
 
-                              {/* Date */}
-                              <div className="flex items-center mt-6">
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900">
-                                  Date:
-                                  </label> 
-                                </div>
-                                <div className="w-1/2 ppa-form-view h-6">
-                                  {!loading &&(formatDate(inspectionData?.form?.date_request))}
-                                </div>
+                            {/* Date */}
+                            <div className="flex items-center mt-6">
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900">
+                                Date:
+                                </label> 
                               </div>
-
-                              {/* Property No */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-2'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Property No: </label> 
-                                </div>
-                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                {!loading && (
-                                  enablePartA ? (
-                                    inspectionData?.form?.property_number ? inspectionData?.form?.property_number : 'N/A'
-                                  ):(
-                                    <input
-                                      type="text"
-                                      name="rep_property_no"
-                                      id="rep_property_no"
-                                      autoComplete="rep_property_no"
-                                      value={updatepropertyNo}
-                                      onChange={ev => setUpdatePropertyNo(ev.target.value)}
-                                      placeholder="Input Property Number" 
-                                      className="block w-full ppa-form-edit"
-                                    />
-                                  )
-                                )}
-                                </div>
+                              <div className="w-1/2 ppa-form-view h-6">
+                                {!loading &&(formatDate(inspectionData?.form?.date_request))}
                               </div>
-
-                              {/* Acquisition Date */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Date: </label> 
-                                </div>
-                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                  {!loading && (
-                                    enablePartA ? (
-                                      inspectionData?.form?.acquisition_date ? formatDate(inspectionData?.form?.acquisition_date) : 'N/A'
-                                    ):(
-                                      <input
-                                        type="date"
-                                        name="rep_acquisition_date"
-                                        id="rep_acquisition_date"
-                                        value={updateacquisitionDate}
-                                        onChange={ev => setUpdateAcquisitionDate(ev.target.value)}
-                                        max={currentDate}
-                                        className="block w-full ppa-form-edit"
-                                      />
-                                    )
-                                  )} 
-                                </div>
-                              </div>
-
-                              {/* Acquisition Cost */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Cost: </label> 
-                                </div>
-                                  <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                  {!loading && (
-                                    enablePartA ? (
-                                      inspectionData?.form?.acquisition_cost 
-                                      ? new Intl.NumberFormat('en-PH', {
-                                          style: 'currency',
-                                          currency: 'PHP'
-                                        }).format(inspectionData?.form?.acquisition_cost) 
-                                      : 'N/A'
-                                    ):(
-                                    <>
-                                      <input
-                                        type="text"
-                                        name="rep_acquisition_cost"
-                                        id="rep_acquisition_cost"
-                                        autoComplete="rep_acquisition_cost"
-                                        value={updateacquisitionCost}
-                                        onChange={ev => {
-                                          const inputVal = ev.target.value;
-                                          // Allow only numeric input
-                                          if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
-                                            setUpdateAcquisitionCost(inputVal.replace(/,/g, ''));
-                                          }
-                                        }}
-                                        placeholder="Input Acquisition Cost"
-                                        className="block w-full ppa-form-edit"
-                                      />
-                                    </>
-                                    )
-                                  )}
-                                  </div>
-                              </div>
-
-                              {/* Brand/Model */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Brand/Model: </label> 
-                                </div>
-                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                  {!loading && (
-                                    enablePartA ? (
-                                      inspectionData?.form?.brand_model ? inspectionData?.form?.brand_model : 'N/A'
-                                    ):(
-                                      <input
-                                        type="text"
-                                        name="brand_mrep_brand_model"
-                                        id="rep_brand_model"
-                                        autoComplete="rep_brand_model"
-                                        value={updateBrandModel}
-                                        onChange={ev => setUpdateBrandModel(ev.target.value)}
-                                        placeholder="Input Brand/Model"
-                                        className="block w-full ppa-form-edit"
-                                      />
-                                    )
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Serial/Engine No */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4 mb-3'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Serial/Engine No: </label> 
-                                </div>
-                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                  {!loading && (
-                                    enablePartA ? (
-                                      inspectionData?.form?.serial_engine_no ? inspectionData?.form?.serial_engine_no : 'N/A'
-                                    ):(
-                                      <input
-                                        type="text"
-                                        name="rep_serial_engine_no"
-                                        id="rep_serial_engine_no"
-                                        autoComplete="rep_serial_engine_no"
-                                        defaultValue={inspectionData?.form?.serial_engine_no}
-                                        onChange={ev => setUpdateSerialEngineNo(ev.target.value)}
-                                        placeholder="Input Serial/Engine No"
-                                        className="block w-full ppa-form-edit"
-                                      />
-                                    )
-                                  )}
-                                </div>
-                              </div>
-
                             </div>
-                            {/* Part A right side */}
-                            <div className="col-span-1">
 
-                              {/* Type of Property */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-6' : 'mt-6'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Type of Property: </label> 
-                                </div>
-                                <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                  {!loading && (
-                                    enablePartA ? (
-                                      inspectionData?.form?.type_of_property
-                                    ):(
-                                      <select 
-                                        name="rep_type_of_property" 
-                                        id="rep_type_of_property" 
-                                        autoComplete="rep_type_of_property"
-                                        value={updateTypeofProperty}
-                                        onChange={ev => setUpdateTypeofProperty(ev.target.value)}
-                                        className="block w-full ppa-form-edit"
-                                      >
-                                        <option value="" disabled>{inspectionData?.form?.type_of_property}</option>
-                                        {["Vehicle Supplies & Materials", "IT Equipment & Related Materials", "Others"]
-                                          .filter(option => option !== inspectionData?.form?.type_of_property) // Remove existing option
-                                          .map(option => (
-                                            <option key={option} value={option}>{option}</option>
-                                          ))}
-                                      </select>
-                                    )
-                                  )}
-                                </div>
+                            {/* Property No */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-2'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Property No: </label> 
                               </div>
-
-                              {/* Description */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Description: </label> 
-                                </div>
-                                <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                {!loading && (
-                                  enablePartA ? (
-                                    inspectionData?.form?.property_description
-                                  ):(
-                                    <input
-                                      type="text"
-                                      name="rep_description"
-                                      id="rep_description"
-                                      defaultValue={inspectionData?.form?.property_description}
-                                      onChange={ev => setUpdateDescription(ev.target.value)}
-                                      placeholder="Enter Description"
-                                      className="block w-full ppa-form-edit"
-                                    />
-                                  )
-                                )}
-                                </div>
-                              </div>
-
-                              {/* Location */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Location: </label> 
-                                </div>
-                                <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                                {!loading && (
-                                  enablePartA ? (
-                                    inspectionData?.form?.location
-                                  ):(
-                                    <input
-                                      type="text"
-                                      name="rep_location"
-                                      id="rep_location"
-                                      defaultValue={inspectionData?.form?.location}
-                                      onChange={ev => setUpdateLocation(ev.target.value)}
-                                      placeholder="Enter Location"
-                                      className="block w-full ppa-form-edit"
-                                    />
-                                  )
-                                )}
-                                </div>
-                              </div>
-
-                              {/* Requestor */}
-                              <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Requested By: </label> 
-                                </div>
-                                <div className="w-1/2 h-6 font-bold italic ppa-form-view">
-                                  {!loading && inspectionData?.form?.user_name}
-                                </div>
-                              </div>
-
-                              {/* Noted By */}
-                              <div className="flex items-center mt-2">
-                                <div className="w-40">
-                                  <label className="block text-base font-bold leading-6 text-gray-900"> Noted By: </label> 
-                                </div>
-                                <div className="w-1/2 h-6 font-bold italic ppa-form-view">
-                                  {!loading && inspectionData?.form?.supervisor_name}
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-                          {/* Complain */}
-                          <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-2'}`}>
-                            <div className="w-40">
-                              <label className="block text-base font-bold leading-6 text-gray-900"> Complain/Defect: </label> 
-                            </div>
-                            <div className={`w-3/4 ${enablePartA ? 'ppa-form-view' : ''}`}>
-                            {!loading && (
-                              enablePartA ? (
-                                inspectionData?.form?.complain
-                              ):(
-                                <input
-                                  type="text"
-                                  name="rep_property_no"
-                                  id="rep_property_no"
-                                  autoComplete="rep_property_no"
-                                  defaultValue={inspectionData?.form?.complain}
-                                  onChange={ev => setUpdateComplain(ev.target.value)}
-                                  placeholder="Input Property Number" 
-                                  className="block w-full ppa-form-edit"
-                                />
-                              )
-                            )}
-                            </div>
-                          </div>
-                        </form>
-                        {/* For the Edit Button */}
-                        {!enablePartA && (
-                          !buttonHide && (
-                            <div className="mt-8">
-                              {/* Submit */}
-                              <button 
-                                type="submit"
-                                form="EditPartA"
-                                className={`py-2 px-4 mr-2 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
+                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              {!loading && (
+                                enablePartA ? (
+                                  inspectionData?.form?.property_number ? inspectionData?.form?.property_number : 'N/A'
                                 ):(
-                                  'Submit'
-                                )}
-                              </button>
-      
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartA(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
+                                  <input
+                                    type="text"
+                                    name="rep_property_no"
+                                    id="rep_property_no"
+                                    autoComplete="rep_property_no"
+                                    value={updatepropertyNo}
+                                    onChange={ev => setUpdatePropertyNo(ev.target.value)}
+                                    placeholder="Input Property Number" 
+                                    className="block w-full ppa-form-edit"
+                                  />
+                                )
                               )}
+                              </div>
                             </div>
-                          )
-                        )}
-                      </div>
+
+                            {/* Acquisition Date */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Date: </label> 
+                              </div>
+                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                {!loading && (
+                                  enablePartA ? (
+                                    inspectionData?.form?.acquisition_date ? formatDate(inspectionData?.form?.acquisition_date) : 'N/A'
+                                  ):(
+                                    <input
+                                      type="date"
+                                      name="rep_acquisition_date"
+                                      id="rep_acquisition_date"
+                                      value={updateacquisitionDate}
+                                      onChange={ev => setUpdateAcquisitionDate(ev.target.value)}
+                                      max={currentDate}
+                                      className="block w-full ppa-form-edit"
+                                    />
+                                  )
+                                )} 
+                              </div>
+                            </div>
+
+                            {/* Acquisition Cost */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Cost: </label> 
+                              </div>
+                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                {!loading && (
+                                  enablePartA ? (
+                                    inspectionData?.form?.acquisition_cost 
+                                    ? new Intl.NumberFormat('en-PH', {
+                                        style: 'currency',
+                                        currency: 'PHP'
+                                      }).format(inspectionData?.form?.acquisition_cost) 
+                                    : 'N/A'
+                                  ):(
+                                  <>
+                                    <input
+                                      type="text"
+                                      name="rep_acquisition_cost"
+                                      id="rep_acquisition_cost"
+                                      autoComplete="rep_acquisition_cost"
+                                      value={updateacquisitionCost}
+                                      onChange={ev => {
+                                        const inputVal = ev.target.value;
+                                        // Allow only numeric input
+                                        if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
+                                          setUpdateAcquisitionCost(inputVal.replace(/,/g, ''));
+                                        }
+                                      }}
+                                      placeholder="Input Acquisition Cost"
+                                      className="block w-full ppa-form-edit"
+                                    />
+                                  </>
+                                  )
+                                )}
+                                </div>
+                            </div>
+
+                            {/* Brand/Model */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Brand/Model: </label> 
+                              </div>
+                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                {!loading && (
+                                  enablePartA ? (
+                                    inspectionData?.form?.brand_model ? inspectionData?.form?.brand_model : 'N/A'
+                                  ):(
+                                    <input
+                                      type="text"
+                                      name="brand_mrep_brand_model"
+                                      id="rep_brand_model"
+                                      autoComplete="rep_brand_model"
+                                      value={updateBrandModel}
+                                      onChange={ev => setUpdateBrandModel(ev.target.value)}
+                                      placeholder="Input Brand/Model"
+                                      className="block w-full ppa-form-edit"
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Serial/Engine No */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4 mb-3'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Serial/Engine No: </label> 
+                              </div>
+                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                {!loading && (
+                                  enablePartA ? (
+                                    inspectionData?.form?.serial_engine_no ? inspectionData?.form?.serial_engine_no : 'N/A'
+                                  ):(
+                                    <input
+                                      type="text"
+                                      name="rep_serial_engine_no"
+                                      id="rep_serial_engine_no"
+                                      autoComplete="rep_serial_engine_no"
+                                      defaultValue={inspectionData?.form?.serial_engine_no}
+                                      onChange={ev => setUpdateSerialEngineNo(ev.target.value)}
+                                      placeholder="Input Serial/Engine No"
+                                      className="block w-full ppa-form-edit"
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+
+                          </div>
+                          {/* Part A right side */}
+                          <div className="col-span-1">
+
+                            {/* Type of Property */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-6' : 'mt-6'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Type of Property: </label> 
+                              </div>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                {!loading && (
+                                  enablePartA ? (
+                                    inspectionData?.form?.type_of_property
+                                  ):(
+                                    <select 
+                                      name="rep_type_of_property" 
+                                      id="rep_type_of_property" 
+                                      autoComplete="rep_type_of_property"
+                                      value={updateTypeofProperty}
+                                      onChange={ev => setUpdateTypeofProperty(ev.target.value)}
+                                      className="block w-full ppa-form-edit"
+                                    >
+                                      <option value="" disabled>{inspectionData?.form?.type_of_property}</option>
+                                      {["Vehicle Supplies & Materials", "IT Equipment & Related Materials", "Others"]
+                                        .filter(option => option !== inspectionData?.form?.type_of_property) // Remove existing option
+                                        .map(option => (
+                                          <option key={option} value={option}>{option}</option>
+                                        ))}
+                                    </select>
+                                  )
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Description */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Description: </label> 
+                              </div>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              {!loading && (
+                                enablePartA ? (
+                                  inspectionData?.form?.property_description
+                                ):(
+                                  <input
+                                    type="text"
+                                    name="rep_description"
+                                    id="rep_description"
+                                    defaultValue={inspectionData?.form?.property_description}
+                                    onChange={ev => setUpdateDescription(ev.target.value)}
+                                    placeholder="Enter Description"
+                                    className="block w-full ppa-form-edit"
+                                  />
+                                )
+                              )}
+                              </div>
+                            </div>
+
+                            {/* Location */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Location: </label> 
+                              </div>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              {!loading && (
+                                enablePartA ? (
+                                  inspectionData?.form?.location
+                                ):(
+                                  <input
+                                    type="text"
+                                    name="rep_location"
+                                    id="rep_location"
+                                    defaultValue={inspectionData?.form?.location}
+                                    onChange={ev => setUpdateLocation(ev.target.value)}
+                                    placeholder="Enter Location"
+                                    className="block w-full ppa-form-edit"
+                                  />
+                                )
+                              )}
+                              </div>
+                            </div>
+
+                            {/* Requestor */}
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Requested By: </label> 
+                              </div>
+                              <div className="w-1/2 h-6 font-bold italic ppa-form-view">
+                                {!loading && inspectionData?.form?.user_name}
+                              </div>
+                            </div>
+
+                            {/* Noted By */}
+                            <div className="flex items-center mt-2">
+                              <div className="w-40">
+                                <label className="block text-base font-bold leading-6 text-gray-900"> Noted By: </label> 
+                              </div>
+                              <div className="w-1/2 h-6 font-bold italic ppa-form-view">
+                                {!loading && inspectionData?.form?.supervisor_name}
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                        {/* Complain */}
+                        <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-2'}`}>
+                          <div className="w-40">
+                            <label className="block text-base font-bold leading-6 text-gray-900"> Complain/Defect: </label> 
+                          </div>
+                          <div className={`w-3/4 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                          {!loading && (
+                            enablePartA ? (
+                              inspectionData?.form?.complain
+                            ):(
+                              <input
+                                type="text"
+                                name="rep_property_no"
+                                id="rep_property_no"
+                                autoComplete="rep_property_no"
+                                defaultValue={inspectionData?.form?.complain}
+                                onChange={ev => setUpdateComplain(ev.target.value)}
+                                placeholder="Input Property Number" 
+                                className="block w-full ppa-form-edit"
+                              />
+                            )
+                          )}
+                          </div>
+                        </div>
+                      </form>
+
+                      {/* For the Edit Button */}
+                      {!enablePartA && (
+                        !buttonHide && (
+                          <div className="mt-8">
+                            {/* Submit */}
+                            <button 
+                              type="submit"
+                              form="EditPartA"
+                              className={`py-2 px-4 mr-2 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Submit'
+                              )}
+                            </button>
+    
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setEnablePartA(true);
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        )
+                      )}
 
                     </div>
 
                     {/* Part B */}
-                    <div className={`mt-4 ${[1, 2, 3, 12].includes(inspectionData?.form?.form_status) || (inspectionData?.form?.personnel_id == currentUserId && [4, 13].includes(inspectionData?.form?.form_status)) || (GSO && inspectionData?.form?.form_status == 13) ? 'pb-6 border-b border-gray-300' : ''}`}>
-                      {([1, 2, 3, 4, 5, 12, 13].includes(inspectionData?.form?.form_status) || (GSO && [6, 8, 9, 10].includes(inspectionData?.form?.form_status))) && (
-                      <>
+                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    <>
+                      <div className={`mt-4 ${([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
 
                         {/* Caption */}
                         <div className="flex">
@@ -1288,8 +1289,10 @@ export default function InspectionForm(){
                           )}
                         </div>
 
-                        {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) && enablePartA ? (
+                        {/* Form */}                        
+                        {(GSO && !inspectionData?.form?.date_of_filling) && enablePartA ? (
                         <>
+                          {/* Form */}
                           <form id="partBForm" onSubmit={event => SubmitPartB(event, inspectionData?.form?.id)}>
 
                             {/* Date */}
@@ -1303,10 +1306,9 @@ export default function InspectionForm(){
                                 <input 
                                   type="date" 
                                   name="rep_date" 
-                                  id="rep_date" 
-                                  defaultValue={today} 
+                                  value={partBdate}
+                                  onChange={ev => setPartBdate(ev.target.value)}
                                   className="block w-full ppa-form"
-                                  readOnly
                                 />
                               </div>
                             </div>
@@ -1380,10 +1382,9 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             </div>
-
                           </form>
 
-                          {/* Submit Form */}
+                          {/* Submit */}
                           <div className="mt-6">
                             {pointPersonnel.pid ? (
                               // Check if the Date and Nature of Repair has a data
@@ -1446,9 +1447,21 @@ export default function InspectionForm(){
                                     Date:
                                     </label> 
                                   </div>
-                                  <div className={`w-1/2 h-6 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                                    {inspectionData?.form?.date_of_filling ? formatDate(inspectionData?.form?.date_of_filling) 
-                                    : null}
+                                  <div className={`w-1/2 h-6 ${enablePartB ? 'ppa-form-view' : 'mb-2'} ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                                  {/* <div className={`w-1/2 h-6 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}> */}
+                                    {enablePartB ? (
+                                      inspectionData?.form?.date_of_filling ? formatDate(inspectionData?.form?.date_of_filling) 
+                                      : null 
+                                    ):(
+                                      <input
+                                        type="date"
+                                        name="last_date_filled"
+                                        id="last_date_filled"    
+                                        value={updatePartBdate}
+                                        onChange={ev => setUpdatePartBdate(ev.target.value)}
+                                        className="block w-full ppa-form-edit"
+                                      />
+                                    )}
                                   </div>
                                 </div>
 
@@ -1556,6 +1569,7 @@ export default function InspectionForm(){
                               </div>
 
                             </div>
+                            
                             {/* Nature of Repair */}
                             <div className={`flex items-center ${enablePartB ? 'mt-2' : 'mt-5'}`}>
                               <div className="w-40">
@@ -1615,36 +1629,36 @@ export default function InspectionForm(){
                           )}
                         </>
                         )}
-                      </>
-                      )}
-                    </div>
+
+                      </div>
+                    </>
+                    )}
 
                     {/* Part C */}
-                    <div className={`mt-4 ${[1, 2, 3].includes(inspectionData?.form?.form_status) || (inspectionData?.form?.personnel_id == currentUserId && [3, 12].includes(inspectionData?.form?.form_status)) || (GSO && inspectionData?.form?.form_status == 12) ? 'pb-6 border-b border-gray-300' : ''}`}>
-                      {([1, 2, 3, 12].includes(inspectionData?.form?.form_status) || inspectionData?.form?.personnel_id == currentUserId || (GSO && inspectionData?.form?.form_status == 13)) && (
-                      <>
+                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    <>
+                      <div className={`mt-4 ${([2, 3, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
 
                         {/* Caption */}
-                        {[13, 12, 4, 3, 2, 1].includes(inspectionData?.form?.form_status) && (
-                          <div className="flex">
-                            <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
-                            {(inspectionData?.form?.form_status != 1 && inspectionData?.form?.form_status != 0) && (
-                              <>
-                              {/* For the GSO */}
-                              {GSO && [2, 12].includes(inspectionData?.form?.form_status) && enablePartA && enablePartB && enablePartC && enablePartD && (
-                                <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                              )}
-                              {/* For the AssignPersonnel */}
-                              {inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.before_repair_date && enablePartA && enablePartB && enablePartC && enablePartD && (
-                                <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                              )}
-                              </>
+                        <div className="flex">
+                          <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job. </h2>
+                          {(inspectionData?.form?.form_status != 1 && inspectionData?.form?.form_status != 0) && (
+                            <>
+                            {/* For the GSO */}
+                            {GSO && enablePartA && enablePartB && enablePartC && enablePartD && inspectionData?.form?.before_repair_date && (
+                              <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
                             )}
-                          </div>
-                        )}
-                        
-                        {([4, 13].includes(inspectionData?.form?.form_status) && inspectionData?.form?.personnel_id == currentUserId) || (inspectionData?.form?.form_status == 13 && GSO)
-                        && !inspectionData?.form?.before_repair_date && enablePartA && enablePartB && enablePartD ? (
+                            {/* For the AssignPersonnel */}
+                            {inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.before_repair_date && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                            )}
+                            </>
+                          )}
+                        </div>
+
+                        {/* Form */}
+                        {!inspectionData?.form?.before_repair_date && (inspectionData?.form?.personnel_id == currentUserId || (GSO && inspectionData?.form?.date_of_filling)) ? (
+                        <>
                           <form id="partCForm" onSubmit={event => SubmitPartC(event, inspectionData?.form?.id)}>
                             {/* Date */}
                             <div className="flex items-center mt-6">
@@ -1748,7 +1762,8 @@ export default function InspectionForm(){
                               )}
                             </div> 
                           </form>
-                        ):[12, 4, 3, 2, 1].includes(inspectionData?.form?.form_status) ? (
+                        </>
+                        ):(
                         <>
                           <form id="editPartC" onSubmit={event => UpdatePartC(event, inspectionData?.form?.id)}>
                             {/* Date */}
@@ -1852,15 +1867,18 @@ export default function InspectionForm(){
                             )
                           )}
                         </>
-                        ):null}
-                      </>
-                      )}
-                    </div>
+                        )}
+
+                      </div>
+                    </>
+                    )}
 
                     {/* Part D */}
-                    <div className={`mt-4`}>
-                      {([1, 2, 3].includes(inspectionData?.form?.form_status) || (inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 12) || (GSO && inspectionData?.form?.form_status == 12)) && (
-                      <>
+                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    <>
+
+                      <div className="mt-4">
+
                         {/* Caption */}
                         <div className="flex">
                           <h2 className="text-lg font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job.  </h2>
@@ -1881,8 +1899,8 @@ export default function InspectionForm(){
                           )}
                         </div>
 
-                        {(([3, 12].includes(inspectionData?.form?.form_status) && inspectionData?.form?.personnel_id == currentUserId) || (inspectionData?.form?.form_status == 12 && GSO))
-                        && inspectionData?.form?.before_repair_date && enablePartA && enablePartC && enablePartD ? (
+                        {/* Form */}
+                        {!inspectionData?.form?.after_reapir_date && (inspectionData?.form?.personnel_id == currentUserId || (GSO && inspectionData?.form?.before_repair_date)) ? (
                         <>
                           <form id="partDForm" onSubmit={event => SubmitPartD(event, inspectionData?.form?.id)}>
 
@@ -1944,8 +1962,9 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             </div>
+
                           </form>
-        
+
                           {/* Button */}
                           {!buttonHide && (
                             <div className="mt-5">
@@ -2048,9 +2067,11 @@ export default function InspectionForm(){
                           )}
                         </>
                         )}
-                      </>
-                      )}
-                    </div>
+
+                      </div>
+
+                    </>
+                    )}
 
                   </>
                   )

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useUserStateContext  } from "../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import ppabg from '/default/ppa_bg.png';
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { setCurrentUserId, setCurrentUserName, setCurrentUserAvatar, setCurrentUserToken, setCurrentUserCode } = useUserStateContext();
@@ -22,6 +23,15 @@ export default function Login() {
 
   const [inputErrors, setInputErrors] = useState('');
   const [logoutMessage, setLogoutMessage] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+  const token = localStorage.getItem('TOKEN');
+  if (token) {
+    navigate('/joms/dashboard', { replace: true });
+  }
+}, []);
 
   // Disable RightClick
   useEffect(() => {
@@ -79,7 +89,7 @@ export default function Login() {
         localStorage.removeItem("logoutReason");
 
         // Redirect to home page or dashboard
-        window.location.href = '/joms';
+        window.location.href = '/joms/dashboard';
     } catch (error) {
       const responseData = error.response?.data?.error;
 

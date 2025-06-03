@@ -653,6 +653,7 @@ class InspectionController extends Controller
             return response()->json(['message' => 'Cannot Update'], 408);
         } else {
             $uPartB = $InspectionRequest->update([
+                'date_of_filling' => $request->input('date_of_filling'),
                 'date_of_last_repair' => $request->input('date_of_last_repair'),
                 'nature_of_last_repair' => $request->input('nature_of_last_repair'),
                 'personnel_id' => $request->input('personnel_id'),

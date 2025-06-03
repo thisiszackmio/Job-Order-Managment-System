@@ -501,6 +501,7 @@ export default function InspectionForm(){
 
     const dataB = {
       user_name: currentUserName.name,
+      date_of_filling: updatePartBdate,
       date_of_last_repair : updatelastfilledDate,
       nature_of_last_repair: updatenatureRepair,
       personnel_id: updatepointPersonnel.pid ? updatepointPersonnel.pid : inspectionData?.form?.personnel_id,

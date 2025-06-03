@@ -903,6 +903,7 @@ class InspectionController extends Controller
         } else {
 
             $uPartC = $InspectionRequest->update([
+                'before_repair_date' => $request->input('before_repair_date'),
                 'findings' => $request->input('findings'),
                 'recommendations' => $request->input('recommendations')
             ]);
@@ -1064,6 +1065,7 @@ class InspectionController extends Controller
         } else {
 
             $uPartC = $InspectionRequest->update([
+                'after_reapir_date' =>  $request->input('after_reapir_date'),
                 'remarks' => $request->input('remarks')
             ]);
     

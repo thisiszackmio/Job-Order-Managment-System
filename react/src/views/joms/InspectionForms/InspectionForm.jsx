@@ -81,12 +81,12 @@ export default function InspectionForm(){
   const [recommendations, setRecommendations] = useState('');
 
   // --- Update Part C --- //
-  const [partCDate, setPartCDate] = useState('');
+  const [partCDate, setPartCDate] = useState(today);
   const [updatefindings, setUpdateFindings] = useState('');
   const [updaterecommendations, setUpdateRecommendations] = useState('');
 
   // --- Part D --- //
-  const [partDDate, setPartDDate] = useState('');
+  const [partDDate, setPartDDate] = useState(today);
   const [remarks, setRemarks] = useState('');
 
   // --- Update Part D --- //
@@ -561,7 +561,7 @@ export default function InspectionForm(){
 
     const data = {
       user_name: currentUserName.name,
-      before_repair_date: inspectionData?.form?.form_status == 13 ? partCDate : today,
+      before_repair_date: partCDate,
       findings: findings,
       recommendations: recommendations
     }
@@ -601,6 +601,7 @@ export default function InspectionForm(){
 
     const dataC = {
       user_name: currentUserName.name,
+      before_repair_date: partCDate ? partCDate : inspectionData?.form?.before_repair_date,
       findings : updatefindings ? updatefindings : inspectionData?.form?.findings,
       recommendations: updaterecommendations ? updaterecommendations : inspectionData?.form?.recommendations
     }
@@ -647,7 +648,7 @@ export default function InspectionForm(){
 
     const data = {
       user_name: currentUserName.name,
-      after_reapir_date:  inspectionData?.form?.form_status == 12 ? partDDate : today,
+      after_reapir_date: partDDate,
       remarks: remarks,
     }
 
@@ -685,6 +686,7 @@ export default function InspectionForm(){
     setSubmitLoading(true);
 
     const dataD = {
+      after_reapir_date : partDDate,
       user_name: currentUserName.name,
       remarks : updateremarks ? updateremarks : inspectionData?.form?.remarks,
     }
@@ -858,7 +860,7 @@ export default function InspectionForm(){
   
               {/* Header */}
               <div className="ppa-form-header text-base flex justify-between items-center">
-                <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span> {inspectionData?.form?.form_status} </span>
+                <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
                 <div className="flex space-x-3"> 
                   {/* Cancel Request */}
                   {GSO && [5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
@@ -1310,6 +1312,7 @@ export default function InspectionForm(){
                                   value={partBdate}
                                   onChange={ev => setPartBdate(ev.target.value)}
                                   className="block w-full ppa-form"
+                                  max={today}
                                 />
                               </div>
                             </div>
@@ -1461,6 +1464,7 @@ export default function InspectionForm(){
                                         value={updatePartBdate}
                                         onChange={ev => setUpdatePartBdate(ev.target.value)}
                                         className="block w-full ppa-form-edit"
+                                        max={today}
                                       />
                                     )}
                                   </div>
@@ -1768,14 +1772,31 @@ export default function InspectionForm(){
                         <>
                           <form id="editPartC" onSubmit={event => UpdatePartC(event, inspectionData?.form?.id)}>
                             {/* Date */}
-                            <div className="flex items-center mt-6">
+                            <div className={`flex items-center ${enablePartC ? 'mt-6' : 'mt-6 mb-6'}`}>
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900">
                                 Date:
                                 </label> 
                               </div>
-                              <div className={`w-1/4 h-6 ppa-form-view`}>
-                                {inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) : null}
+                              <div className={`w-1/4 h-6 ${enablePartC ? 'ppa-form-view' : ''}`}>
+                                {enablePartC ? (
+                                  inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) : null
+                                ):(
+                                  <>
+                                    <input
+                                      type="date"
+                                      name="date_filled"
+                                      id="date_filled"
+                                      className={`block w-full ${(!partCDate && inputErrors.before_repair_date) ? "ppa-form-error":"ppa-form"}`}
+                                      value= {partCDate}
+                                      onChange={ev => setPartCDate(ev.target.value)}
+                                      max={today}
+                                    />
+                                    {!partCDate && inputErrors.before_repair_date && (
+                                      <p className="form-validation">This form is required</p>
+                                    )}
+                                  </>
+                                )}
                               </div>
                             </div>
     
@@ -1996,8 +2017,25 @@ export default function InspectionForm(){
                                 Date:
                                 </label> 
                               </div>
-                              <div className={`w-1/4 h-6 ppa-form-view`}>
-                                {inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) : null}
+                              <div className={`w-1/4 h-6 ${enablePartD ? 'ppa-form-view' : 'mb-4'}`}>
+                                {enablePartD ? (
+                                  inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) : null
+                                ):(
+                                  <>
+                                  <input
+                                    type="date"
+                                    name="date_filled"
+                                    id="date_filled"
+                                    className={`block w-full ${(!partDDate && inputErrors.after_reapir_date) ? "ppa-form-error":"ppa-form"}`}
+                                    value= {partDDate}
+                                    onChange={ev => setPartDDate(ev.target.value)}
+                                    max={today}
+                                  />
+                                  {!partDDate && inputErrors.after_reapir_date && (
+                                    <p className="form-validation">This form is required</p>
+                                  )}
+                                </>
+                                )}
                               </div>
                             </div>
     

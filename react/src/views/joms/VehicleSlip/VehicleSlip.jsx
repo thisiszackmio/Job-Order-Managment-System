@@ -749,7 +749,7 @@ export default function VehicleSlip(){
                         Purpose:
                       </label> 
                     </div>
-                    <div className={`w-1/2 ${editDetail ? 'h-6 ppa-form-view text-left pl-2' : '' }`}>
+                    <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2' : '' }`}>
                       {editDetail ? (
                         !loading && vehicleData?.purpose
                       ):(
@@ -772,7 +772,7 @@ export default function VehicleSlip(){
                         Place/s to be Visited:
                       </label> 
                     </div>
-                    <div className={`w-1/2 ${editDetail ? 'h-6 ppa-form-view text-left pl-2' : '' }`}>
+                    <div className={`w-1/2 ${editDetail ? 'ppa-form-view text-left pl-2' : '' }`}>
                       {editDetail ? (
                         !loading && vehicleData?.place_visited
                       ):(

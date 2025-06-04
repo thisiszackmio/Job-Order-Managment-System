@@ -981,7 +981,7 @@ export default function InspectionForm(){
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Property No: </label> 
                               </div>
-                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
                               {!loading && (
                                 enablePartA ? (
                                   inspectionData?.form?.property_number ? inspectionData?.form?.property_number : 'N/A'
@@ -1002,11 +1002,11 @@ export default function InspectionForm(){
                             </div>
 
                             {/* Acquisition Date */}
-                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Date: </label> 
                               </div>
-                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
                                 {!loading && (
                                   enablePartA ? (
                                     inspectionData?.form?.acquisition_date ? formatDate(inspectionData?.form?.acquisition_date) : 'N/A'
@@ -1026,11 +1026,11 @@ export default function InspectionForm(){
                             </div>
 
                             {/* Acquisition Cost */}
-                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Cost: </label> 
                               </div>
-                                <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                                <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
                                 {!loading && (
                                   enablePartA ? (
                                     inspectionData?.form?.acquisition_cost 
@@ -1064,11 +1064,11 @@ export default function InspectionForm(){
                             </div>
 
                             {/* Brand/Model */}
-                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4'}`}>
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Brand/Model: </label> 
                               </div>
-                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
                                 {!loading && (
                                   enablePartA ? (
                                     inspectionData?.form?.brand_model ? inspectionData?.form?.brand_model : 'N/A'
@@ -1089,11 +1089,11 @@ export default function InspectionForm(){
                             </div>
 
                             {/* Serial/Engine No */}
-                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-4 mb-3'}`}>
+                            <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Serial/Engine No: </label> 
                               </div>
-                              <div className={`w-1/2 h-6 ${enablePartA ? 'ppa-form-view' : ''}`}>
+                              <div className={`w-1/2 ${enablePartA ? 'ppa-form-view' : ''}`}>
                                 {!loading && (
                                   enablePartA ? (
                                     inspectionData?.form?.serial_engine_no ? inspectionData?.form?.serial_engine_no : 'N/A'
@@ -1200,7 +1200,7 @@ export default function InspectionForm(){
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Requested By: </label> 
                               </div>
-                              <div className="w-1/2 h-6 font-bold italic ppa-form-view">
+                              <div className="w-1/2 font-bold italic ppa-form-view">
                                 {!loading && inspectionData?.form?.user_name}
                               </div>
                             </div>
@@ -1210,7 +1210,7 @@ export default function InspectionForm(){
                               <div className="w-40">
                                 <label className="block text-base font-bold leading-6 text-gray-900"> Noted By: </label> 
                               </div>
-                              <div className="w-1/2 h-6 font-bold italic ppa-form-view">
+                              <div className="w-1/2 font-bold italic ppa-form-view">
                                 {!loading && inspectionData?.form?.supervisor_name}
                               </div>
                             </div>
@@ -1218,7 +1218,7 @@ export default function InspectionForm(){
                           </div>
                         </div>
                         {/* Complain */}
-                        <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-2'}`}>
+                        <div className={`flex items-center ${enablePartA ? 'mt-2' : 'mt-1'}`}>
                           <div className="w-40">
                             <label className="block text-base font-bold leading-6 text-gray-900"> Complain/Defect: </label> 
                           </div>
@@ -1286,7 +1286,7 @@ export default function InspectionForm(){
                         {/* Caption */}
                         <div className="flex">
                           <h2 className="text-lg font-bold leading-7 text-gray-900"> Part B: To be filled-up by Administrative Division </h2>
-                          {(inspectionData?.form?.form_status != 0 && inspectionData?.form?.form_status != 1 && GSO) && (
+                          {(inspectionData?.form?.form_status != 0 && inspectionData?.form?.form_status != 1 && (GSO || SuperAdmin)) && (
                             (inspectionData?.form?.date_of_filling && enablePartA && enablePartB && enablePartC && enablePartD) &&
                               (<FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />)
                           )}
@@ -1348,6 +1348,7 @@ export default function InspectionForm(){
                                   value={natureRepair}
                                   onChange={ev => setNatureRepair(ev.target.value)}
                                   style={{ resize: "none" }}  
+                                  maxLength={255}
                                   className="block w-full ppa-form"
                                 />
                               </div>
@@ -1582,7 +1583,7 @@ export default function InspectionForm(){
                                 Nature of Repair:
                                 </label> 
                               </div>
-                              <div className={`w-3/4 h-6 ${enablePartB ? 'ppa-form-view' : ''} ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                              <div className={`w-3/4 ${enablePartB ? 'ppa-form-view' : ''} ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
                                 {enablePartB ? (
                                   inspectionData?.form?.date_of_filling ? (
                                     inspectionData?.form?.nature_of_last_repair ? inspectionData?.form?.nature_of_last_repair : 'N/A'
@@ -1717,6 +1718,7 @@ export default function InspectionForm(){
                                   value= {findings}
                                   onChange={ev => setFindings(ev.target.value)}
                                   className={`block w-full ${(!findings && inputErrors.findings) ? "ppa-form-error":"ppa-form"}`}
+                                  maxLength={500}
                                 />
                                 {!findings && inputErrors.findings && (
                                   <p className="form-validation">This form is required</p>
@@ -1738,6 +1740,7 @@ export default function InspectionForm(){
                                   rows={3}
                                   style={{ resize: "none" }}
                                   value= {recommendations}
+                                  maxLength={500}
                                   onChange={ev => setRecommendations(ev.target.value)}
                                   className={`block w-full ${(!recommendations && inputErrors.recommendations) ? "ppa-form-error":"ppa-form"}`}
                                 />
@@ -1829,6 +1832,7 @@ export default function InspectionForm(){
                                     defaultValue={inspectionData?.form?.findings}
                                     onChange={ev => setUpdateFindings(ev.target.value)}
                                     className="block w-full ppa-form-edit"
+                                    maxLength={500}
                                   />
                                 )}
                               </div>
@@ -1851,6 +1855,7 @@ export default function InspectionForm(){
                                     defaultValue= {inspectionData?.form?.recommendations}
                                     onChange={ev => setUpdateRecommendations(ev.target.value)}
                                     className="block w-full ppa-form-edit"
+                                    maxLength={500}
                                   />
                                 )}
                               </div>
@@ -1976,6 +1981,7 @@ export default function InspectionForm(){
                                   rows={3}
                                   style={{ resize: "none" }}
                                   value= {remarks}
+                                  maxLength={500}
                                   onChange={ev => setRemarks(ev.target.value)}
                                   className={`block w-full ${(!remarks && inputErrors.remarks) ? "ppa-form-error":"ppa-form"}`}
                                 />
@@ -2068,6 +2074,7 @@ export default function InspectionForm(){
                                     defaultValue= {inspectionData?.form?.remarks}
                                     onChange={ev => setUpdateRemarks(ev.target.value)}
                                     className="block w-full ppa-form-edit"
+                                    maxLength={500}
                                   />
                                 )}
                               </div>

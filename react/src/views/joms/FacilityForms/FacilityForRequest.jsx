@@ -909,6 +909,7 @@ export default function FacilityVenueForm(){
                   value={reqOffice}
                   onChange={ev => setRegOffice(ev.target.value)}
                   className={`block w-full ${(!reqOffice && fieldMissing.request_office) ? "ppa-form-error":"ppa-form"}`}
+                  maxLength={255}
                 />
                 {!reqOffice && fieldMissing.request_office && (
                   <p className="form-validation">This form is required</p>
@@ -932,6 +933,7 @@ export default function FacilityVenueForm(){
                   value={titleReq}
                   onChange={ev => setTitleReq(ev.target.value)}
                   className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form"}`}
+                  maxLength={255}
                 />
                 {!titleReq && fieldMissing.title_of_activity && (
                   <p className="form-validation">This form is required</p>
@@ -1624,6 +1626,7 @@ export default function FacilityVenueForm(){
                     onChange={ev => setOprInstruct(ev.target.value)}
                     className="block w-full ppa-form"
                     placeholder="Input here"
+                    maxLength={255}
                   />
                 </div>
               </div>

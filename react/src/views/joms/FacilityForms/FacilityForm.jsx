@@ -2595,7 +2595,7 @@ export default function FacilityForm(){
               </tr>
             </table>
 
-            <span className="system-generated">Joint Local Management System - This is system-generated.</span>
+            <span className="system-generated">Job Order Management System - This is system-generated.</span>
 
           </div>
         </div>

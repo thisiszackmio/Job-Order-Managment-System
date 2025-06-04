@@ -1373,7 +1373,7 @@ export default function VehicleSlip(){
                           </div>
                         </div>
 
-                        <span className="system-generated">Joint Local Management System - This is system-generated.</span>
+                        <span className="system-generated">Job Order Management System - This is system-generated.</span>
 
                       </td>
                     </tr>
@@ -1587,7 +1587,7 @@ export default function VehicleSlip(){
                           </div>
                         </div>
 
-                        <span className="system-generated">Joint Local Management System - This is system-generated.</span>
+                        <span className="system-generated">Job Order Management System - This is system-generated.</span>
 
                       </td>
                     </tr>

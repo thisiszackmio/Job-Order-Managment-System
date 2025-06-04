@@ -241,7 +241,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Property No: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                     {propertyNo ? propertyNo : "N/A"}
                     </div>
                   </div>
@@ -251,7 +251,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Date: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                     {acquisitionDate ? formatDate(acquisitionDate) : "N/A"}
                     </div>
                   </div>
@@ -261,7 +261,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Acquisition Cost: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {acquisitionCost ? new Intl.NumberFormat('en-PH', {
                         style: 'currency',
                         currency: 'PHP'
@@ -274,7 +274,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Brand/Model: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {BrandModel ? BrandModel : "N/A"}
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export default function RepairRequestForm(){
                     <div className="w-40">
                       <label className="block text-base font-bold leading-6 text-gray-900"> Serial/Engine No: </label> 
                     </div>
-                    <div className="w-1/2 h-6 ppa-form-view">
+                    <div className="w-1/2 ppa-form-view">
                       {SerialEngineNo ? SerialEngineNo : "N/A"}
                     </div>
                   </div>

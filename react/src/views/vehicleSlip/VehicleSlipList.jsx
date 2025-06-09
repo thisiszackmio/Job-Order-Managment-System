@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import PageComponent from "../../../components/PageComponent";
-import axiosClient from "../../../axios";
+import PageComponent from "../../components/PageComponent";
+import axiosClient from "../../axios";
 import loading_table from "/default/ring-loading.gif";
-import { useUserStateContext } from "../../../context/ContextProvider";
+import { useUserStateContext } from "../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEye, faGear } from '@fortawesome/free-solid-svg-icons';
-import Restrict from "../../../components/Restrict";
+import Restrict from "../../components/Restrict";
 
 export default function VehicleSlipList(){
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import PageComponent from "../../components/PageComponent";
-import axiosClient from "../../axios";
+import PageComponent from "../components/PageComponent";
+import axiosClient from "../axios";
 import loading_table from "/default/ring-loading.gif";
-import { useUserStateContext } from "../../context/ContextProvider";
+import { useUserStateContext } from "../context/ContextProvider";
 
 export default function UserDetails(){
 

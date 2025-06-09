@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import PageComponent from "../../../components/PageComponent";
-import axiosClient from "../../../axios";
+import PageComponent from "../../components/PageComponent";
+import axiosClient from "../../axios";
 import submitAnimation from '/default/ring-loading.gif';
 import loadingAnimation from '/default/loading-new.gif';
 import ppalogo from '/default/ppa_logo-st.png';
-import { useUserStateContext } from "../../../context/ContextProvider";
+import { useUserStateContext } from "../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCheckToSlot, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
-import Popup from "../../../components/Popup";
-import Restrict from "../../../components/Restrict";
+import Popup from "../../components/Popup";
+import Restrict from "../../components/Restrict";
 
 export default function AddPersonnel(){
   const { currentUserName, currentUserCode } = useUserStateContext();

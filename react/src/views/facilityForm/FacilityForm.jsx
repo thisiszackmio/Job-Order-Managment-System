@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import PageComponent from "../../../components/PageComponent";
+import PageComponent from "../../components/PageComponent";
 import { useParams } from "react-router-dom";
-import { useUserStateContext } from "../../../context/ContextProvider";
+import { useUserStateContext } from "../../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import ppa_logo from '/default/ppa_logo.png'
 import loading_table from "/default/ring-loading.gif";
-import axiosClient from "../../../axios";
+import axiosClient from "../../axios";
 import { useReactToPrint } from "react-to-print";
-import Popup from "../../../components/Popup";
-import Restrict from "../../../components/Restrict";
+import Popup from "../../components/Popup";
+import Restrict from "../../components/Restrict";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faCircleXmark, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 

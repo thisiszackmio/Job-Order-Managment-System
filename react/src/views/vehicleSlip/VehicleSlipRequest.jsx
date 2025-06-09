@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import submitAnimation from '/default/ring-loading.gif';
-import PageComponent from "../../../components/PageComponent";
-import axiosClient from "../../../axios";
-import { useUserStateContext } from "../../../context/ContextProvider";
+import PageComponent from "../../components/PageComponent";
+import axiosClient from "../../axios";
+import { useUserStateContext } from "../../context/ContextProvider";
 import moment from 'moment-timezone';
-import Popup from "../../../components/Popup";
+import Popup from "../../components/Popup";
 
 export default function FacilityVenueForm(){
   const { currentUserId, currentUserName, currentUserCode } = useUserStateContext();

@@ -1,42 +1,35 @@
-import { useEffect, useState } from "react";
-import axiosClient from "../../axios";
-import loading_table from "/default/ring-loading.gif";
-import loadingAnimation from '/default/loading-new.gif';
 import ppalogo from '/default/ppa_logo-st.png';
-import { useUserStateContext } from "../../context/ContextProvider";
 import { Link } from "react-router-dom";
-import Footer from "../../components/Footer";
 
-export default function DashboardJLMS(){
+export default function JLMS(){
   return(
     <div className="font-roboto">
 
-    <header className="flex justify-between items-center px-4 py-6 sm:px-4 lg:px-4">
-      {/* Logo and Title container */}
-      <div className="flex items-center space-x-4">
-        <img
-          src={ppalogo}
-          alt="PPA PMO/LNI"
-          className="transition-width duration-300 w-[300px] h-[300px] object-contain"
-        />
-        <div className="flex flex-col">
-          <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-none">
-            JLMS
+      <header className="flex justify-between items-center px-4 py-6 sm:px-4 lg:px-4">
+        {/* Logo and Title container */}
+        <div className="flex items-center space-x-4">
+          <img
+            src={ppalogo}
+            alt="PPA PMO/LNI"
+            className="transition-width duration-300 w-[300px] h-[300px] object-contain"
+          />
+          <div className="flex flex-col">
+            <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-none">
+              JLMS
+            </div>
+            <h1 className="text-2xl font-regular tracking-tight text-gray-900 font-roboto">
+              Joint Local Management System
+            </h1>
           </div>
-          <h1 className="text-2xl font-regular tracking-tight text-gray-900 font-roboto">
-            Joint Local Management System
-          </h1>
         </div>
-      </div>
-    </header>
-
+      </header>
 
       {/* System Link Section */}
 
       {/* First Row: AMS, JOMS, PPS */}
       <div className="grid grid-cols-3 gap-4">
         {/* AMS */}
-        <Link to={`/ams`}> 
+        <Link to={`/ams/`}> 
         <div className="relative text-center">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/asset.gif" alt="Your Company" />
@@ -46,11 +39,7 @@ export default function DashboardJLMS(){
           <div className="ppa-system-text text-lg text-gray-700">
             Asset Management System
           </div>
-
-          {/* Coming Soon Badge */}
-          <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full border border-yellow-300 animate-pulse shadow-sm">
-            🚧 Coming Soon
-          </div>
+          
         </div>
         </Link>
 

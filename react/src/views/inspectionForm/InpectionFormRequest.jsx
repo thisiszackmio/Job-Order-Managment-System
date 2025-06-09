@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import submitAnimation from '/default/ring-loading.gif';
-import PageComponent from "../../../components/PageComponent";
-import axiosClient from "../../../axios";
-import { useUserStateContext } from "../../../context/ContextProvider";
-import Popup from "../../../components/Popup";
+import PageComponent from "../../components/PageComponent";
+import axiosClient from "../../axios";
+import { useUserStateContext } from "../../context/ContextProvider";
+import Popup from "../../components/Popup";
 
 export default function RepairRequestForm(){
   const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();

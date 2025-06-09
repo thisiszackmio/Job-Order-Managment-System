@@ -9,6 +9,7 @@ use App\Http\Controllers\FacilityVenueController;
 use App\Http\Controllers\VehicleSlipController;
 use App\Http\Controllers\JOMSDashboardController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\ServerStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -147,3 +148,4 @@ Route::post('/showlogs', [LogsController::class, 'showLogs']);
 
 // --- Test --- //
 Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
+Route::get('/server/disk-usage', [ServerStatusController::class, 'diskUsage']);

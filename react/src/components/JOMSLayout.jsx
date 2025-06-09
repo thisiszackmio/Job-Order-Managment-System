@@ -292,6 +292,9 @@ export default function JOMSLayout() {
                   <section>
                     <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                        <Link to="/joms/systemstat">System Status</Link>
+                      </li>
+                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/joms/settings">General Settings</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
@@ -303,7 +306,6 @@ export default function JOMSLayout() {
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/joms/addemployee">Add Employee Data</Link>
                       </li>
-
                     </ul>
                   </section>
                 )}

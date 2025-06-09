@@ -16,6 +16,7 @@ import UserRegistrationJLMS from './views/jlms/UserRegistration';
 import UserListJLMS from './views/jlms/UserList';
 import UserDetailsJLMS from './views/jlms/UserDetails';
 import Logs from './views/jlms/Logs';
+import SystemStats from './views/joms/SystemStatus'; 
 
 // -- JOMS -- //
 import JOMSLayout from './components/JOMSLayout';
@@ -63,6 +64,7 @@ const routes = [
       { path: '/joms/vehicletype', element: <AddVehicleType /> },
       { path: '/joms/settings', element: <Maintenance /> },
       { path: '/joms/user', element: <ViewUser /> },
+      { path: '/joms/systemstat', element: <SystemStats /> },
       // Inspection
       { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },

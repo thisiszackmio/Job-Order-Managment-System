@@ -944,7 +944,7 @@ export default function InspectionForm(){
                     </div>
     
                     {/* Part A */}
-                    <div className={`${([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
+                    <div className={`${([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || ((inspectionData?.form?.form_status !== 0 && inspectionData?.form?.form_status !== 7) && GSO) ? "pb-6 border-b border-gray-300" : ""}`}>
 
                       {/* Caption */}
                       <div className="flex">
@@ -1279,7 +1279,7 @@ export default function InspectionForm(){
                     </div>
 
                     {/* Part B */}
-                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || ((inspectionData?.form?.form_status !== 0 && inspectionData?.form?.form_status !== 7) && GSO)) && (
                     <>
                       <div className={`mt-4 ${([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
 
@@ -1641,7 +1641,7 @@ export default function InspectionForm(){
                     )}
 
                     {/* Part C */}
-                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || ((inspectionData?.form?.form_status !== 0 && inspectionData?.form?.form_status !== 7) && GSO)) && (
                     <>
                       <div className={`mt-4 ${([2, 3, 5, 6, 12, 13].includes(inspectionData?.form?.form_status)) || GSO ? "pb-6 border-b border-gray-300" : ""}`}>
 
@@ -1901,7 +1901,7 @@ export default function InspectionForm(){
                     )}
 
                     {/* Part D */}
-                    {([2, 3, 4, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || GSO) && (
+                    {([2, 3, 5, 6, 12, 13].includes(inspectionData?.form?.form_status) || ((inspectionData?.form?.form_status !== 0 && inspectionData?.form?.form_status !== 7) && GSO)) && (
                     <>
 
                       <div className="mt-4">

@@ -44,6 +44,8 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
+  Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
+  Route::get('/pendingrequestcount/{id}', [JOMSDashboardController::class, 'PendingRequestCount']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -134,6 +136,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
   Route::put('/availvehicledriver/{id}', [VehicleSlipController::class, 'availableVehicleDriver']);
   Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
+  Route::put('/ontravelset', [VehicleSlipController::class, 'OnTravel']);
 });
 
 // --- Login --- //

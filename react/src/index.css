@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Form */
+.form-title-text {
+    color: #000;
+    font-size: 16px;
+    font-weight: 900;
+}
+
 /* Animation Loading */
 span.loading {
   font-size: 25px;
@@ -589,6 +596,8 @@ span.ass {
 .icon-form {
   color: #808080;
   transition: 200ms;
+  top: 0;
+  left: 21.5rem;
 }
 .icon-form:hover {
   color: #272727;

@@ -439,7 +439,7 @@ export default function AddVehicleType(){
                     </td>
                     <td className="px-3 py-2 text-center text-base">{veh.vehicle_usage}</td>
                     <td className="px-3 py-2 text-center text-base">
-                      <strong>{veh.vehicle_status == 0 ? ("Available"):("On Travel")}</strong>
+                      <strong>{veh.vehicle_status == 1 ? ("On Travel"):("Available")}</strong>
                     </td>
                     <td className="px-3 py-2">
                     <div className="flex justify-center items-center space-x-4">
@@ -461,7 +461,7 @@ export default function AddVehicleType(){
                             />
                         </>
                       ):(
-                        veh.vehicle_status === 0 ? (
+                        (veh.vehicle_status === 0 || veh.vehicle_status === 2) ? (
                           <>
                             {/* Delete */}
                             <FontAwesomeIcon

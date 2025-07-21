@@ -339,17 +339,10 @@ export default function VehicleSlip(){
     event.preventDefault();
     setSubmitLoading(true);
 
-    const VehName = vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[0];
-    const VehPlate = vehicleData?.vehicle_type.split(/ \(([^)]+)\)/)?.[1];
-
-    const data = {
-      approver: currentUserId,
-      vehicleName: VehName,
-      vehiclePlate: VehPlate,
-    }
-
     axiosClient
-    .put(`/vehreqapprove/${id}`, data)
+    .put(`/vehreqapprove/${id}`, {
+      approver: currentUserId
+    })
     .then(() => {
       setButtonHide(true);
       setShowPopup(true);

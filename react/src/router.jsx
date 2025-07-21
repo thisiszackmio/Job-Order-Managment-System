@@ -29,14 +29,24 @@ import UserRegistrationJLMS from './views/settings/UserRegistration';
 import UserListJLMS from './views/settings/UserList';
 import UserDetailsJLMS from './views/settings/UserDetails';
 import ViewUser from './views/ViewUser';
+import PendingRequest from './views/sidebar/Pending';
 
-import JLMS from './views/JLMS';
+import JLMS from './views/jlms';
 import Login from './views/Login';
 import Maintenance from './views/settings/Maintenance';
 import SystemStats from './views/settings/SystemStatus'; 
 import FileNotFound from './components/404';
 
 const routes = [
+
+  // ---- Joint Local Management System (Open No need for the access) ---- //
+  {
+    path: '/',
+    element: <JLMSLayout />,
+    children: [
+      { path: '/', element:  <JLMS /> }
+    ]
+  },
 
   // ---- Login ---- //
   {
@@ -45,15 +55,6 @@ const routes = [
     children: [
       { path: "/joms/login", element: <Login /> },
       { path: '/login', element: <Navigate to="/joms/login" replace /> },
-    ]
-  },
-
-  // ---- Joint Local Management System (Open No need for the access) ---- //
-  {
-    path: '/',
-    element: <JLMSLayout />,
-    children: [
-      { path: '/', element:  <JLMS /> }
     ]
   },
 
@@ -78,6 +79,7 @@ const routes = [
       { path: '/joms/userlist', element: <UserListJLMS /> },
       { path: '/joms/userdetails/:id', element: <UserDetailsJLMS /> },
       { path: '/joms/user', element: <ViewUser /> },
+      { path: '/joms/pending', element: <PendingRequest /> },
       // Inspection
       { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },

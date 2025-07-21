@@ -142,7 +142,6 @@ class UserController extends Controller
             'lastname' => 'required|string',
             'position' => 'required|string',
             'division' => 'required|string',
-            'username' => 'required|string',
         ]);
 
         $getUser = PPAEmployee::find($id);
@@ -158,7 +157,6 @@ class UserController extends Controller
             'lastname' => $validateData['lastname'],
             'position' => $validateData['position'],
             'division' => $validateData['division'],
-            'username' => $validateData['username'],
         ]);
 
         if($updateDetails){
@@ -333,11 +331,12 @@ class UserController extends Controller
     }
 
     /**
-     * Update User's Esignature
+     * Update User's Account
      */
     public function updatePassword(Request $request, $id){
         // Validate
-        $validatePWD = $request->validate([
+        $validateAcc = $request->validate([
+            'username' => 'required|string',
             'password' => [
                 'required',
                 Password::min(8)->mixedCase()->numbers()->symbols()
@@ -353,7 +352,8 @@ class UserController extends Controller
 
         // Update Data
         $updatePWD = $getUser->update([
-            'password' =>  $validatePWD['password'],
+            'username' => $validateAcc['username'],
+            'password' =>  $validateAcc['password'],
             'status' =>  2,
         ]);
 
@@ -672,8 +672,7 @@ class UserController extends Controller
         }
 
         // Update the status
-        $data->status = 0;
-        $data->form_id = 0;
+        $data->status = 2;
 
         if($data->save()){
             // Creating logs only if both operations are successful
@@ -699,7 +698,7 @@ class UserController extends Controller
             $security = [
                 'id' => $data->id,
                 'user_id' => $data->user_id,
-                'hostingname' => $data->hostingname,
+                'datetime' => $data->created_at,
                 'browser' => $data->browser,
             ];
         }

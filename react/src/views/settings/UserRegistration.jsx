@@ -170,7 +170,7 @@ export default function UserRegistrationJLMS(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.href = '/userlist';
+    window.location.href = '/joms/userlist';
   }
 
   // Restrictions Condition
@@ -183,26 +183,25 @@ export default function UserRegistrationJLMS(){
 
       {/* Main Content */}
       {Authorize ? (
-        <div className="font-roboto ppa-form-box">
+      <>
+        <div className="font-roboto ppa-form-box bg-white">
+          <div className="ppa-form-header"> Input Employee Details  </div>
 
-          <div className="ppa-form-header"> Input Employee Details </div>
-          <div style={{ padding: '6px 10px 50px 10px' }}>
-
+          <div className="p-4">
             {/* Form */}
             <form onSubmit={onSubmit} action="#" method="POST" encType="multipart/form-data">
 
-              <div className="grid grid-cols-2 gap-12">
+              <div className="grid grid-cols-2">
 
                 {/* 1st Column */}
                 <div className="col-span-1">
 
-                  {/* Name */}
-                  <div className="flex items-center mt-4 ">
+                  {/* Name Surname */}
+                  <div className="flex items-center mt-4">
                     <div className="w-40">
-                      <label htmlFor="ppd_name" className="block text-base font-medium leading-6 text-black"> Name: </label> 
+                      <label htmlFor="ppd_name" className="form-title-text"> Name: </label> 
                     </div>
 
-                    {/* Surname */}
                     <div className="w-full flex">
                       <div className="w-full">
                         <input
@@ -212,17 +211,14 @@ export default function UserRegistrationJLMS(){
                           value={lastName}
                           onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
                           placeholder="Surname"
-                          className="block w-full ppa-form"
+                          className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form"}`}
                         />
-                        {!lastName && inputErrors && inputErrors.lastname && (
-                          <p className="form-validation">This form is required</p>
-                        )}
                       </div>
                     </div>
                   </div>  
 
-                  {/* First Name */}
-                  <div className="flex items-center mt-4 ">
+                  {/* Name First Name */}
+                  <div className="flex items-center mt-2">
                     <div className="w-40"></div>
                     <div className="w-full flex">
                       <div className="w-full">
@@ -233,17 +229,14 @@ export default function UserRegistrationJLMS(){
                           value={firstName}
                           onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
                           placeholder="First Name"
-                          className="block w-full ppa-form"
+                          className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form"}`}
                         />
-                        {!firstName && inputErrors && inputErrors.firstname && (
-                          <p className="form-validation">This form is required</p>
-                        )}
                       </div>
                     </div>
-                  </div>  
+                  </div> 
 
-                  {/* Middle Initial */}
-                  <div className="flex items-center mt-4 ">
+                  {/* Name Middle Initial */}
+                  <div className="flex items-center mt-2">
                     <div className="w-40"></div>
                     <div className="w-full flex">
                       <div className="w-full">
@@ -255,19 +248,26 @@ export default function UserRegistrationJLMS(){
                           onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
                           maxLength={2}
                           placeholder="Middle Initial (e.g. A , Ll)"
-                          className="block w-full ppa-form"
+                          className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form"}`}
                         />
-                        {!middleName && inputErrors && inputErrors.middlename && (
-                          <p className="form-validation">This form is required</p>
-                        )}
+                        {!lastName && !firstName && !middleName && inputErrors.lastname && inputErrors.firstname && inputErrors.middlename ? (
+                          <p className="form-validation">Please Input the given name</p>
+                        ):!lastName && inputErrors && inputErrors.lastname ? (
+                          <p className="form-validation">Last name is empty</p>
+                        ):!firstName && inputErrors && inputErrors.firstname ? (
+                          <p className="form-validation">First name is empty</p>
+                        ):!middleName && inputErrors && inputErrors.middlename ? (
+                          <p className="form-validation">Middle initial is required</p>
+                        ):null}
+
                       </div>
                     </div>
-                  </div> 
+                  </div>
 
                   {/* Gender */}
-                  <div className="flex items-center mt-4">
+                  <div className="flex items-center mt-2">
                     <div className="w-40">
-                      <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
+                      <label htmlFor="rep_property_no" className="form-title-text">
                         Gender:
                       </label> 
                     </div>
@@ -277,7 +277,7 @@ export default function UserRegistrationJLMS(){
                         id="gender"
                         value={gender}
                         onChange={ev => setGender(ev.target.value)}
-                        className="block w-full ppa-form"
+                        className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form"}`}
                       >
                         <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Gender</option>
                         <option value="Male">Male</option>
@@ -290,9 +290,9 @@ export default function UserRegistrationJLMS(){
                   </div> 
 
                   {/* Position */}
-                  <div className="flex items-center mt-4">
+                  <div className="flex items-center mt-2">
                     <div className="w-40">
-                      <label htmlFor="ppa-position" className="block text-base font-medium leading-6 text-black">
+                      <label htmlFor="ppa-position" className="form-title-text">
                         Position:
                       </label> 
                     </div>
@@ -304,7 +304,7 @@ export default function UserRegistrationJLMS(){
                         value={position}
                         onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
                         placeholder="Division Manager A"
-                        className="block w-full ppa-form"
+                        className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form"}`}
                       />
                       {!position && inputErrors && inputErrors.position && (
                         <p className="form-validation">This form is required</p>
@@ -312,50 +312,10 @@ export default function UserRegistrationJLMS(){
                     </div>
                   </div>
 
-                  {/* Avatar */}
-                  <div className="flex items-center mt-5">
-                    <div className="w-36">
-                    <label htmlFor="ppa-avatar" className="block text-base font-medium leading-6 text-black">
-                        Upload Avatar:
-                      </label> 
-                    </div>
-
-                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                      <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                        </svg>
-                        <div className="mt-3 text-sm leading-6 text-gray-600">
-                          <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload your new avatar here</span>
-                            <input 
-                              id="ppa-avatar" 
-                              name="ppa-avatar" 
-                              type="file" 
-                              accept=".png, .jpg, .jpeg"
-                              className="sr-only" 
-                              onChange={handleAvatarChange}  
-                            />
-                          </label>
-                        </div>
-                        <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
-                        {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
-                        {!uploadedAvatarName && inputErrors && inputErrors.avatar && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* 2nd Column */}
-                <div className="col-span-1">
-
                   {/* Division */}
-                  <div className="flex items-center mt-4">
-                    <div className="w-36">
-                      <label htmlFor="ppa-division" className="block text-base font-medium leading-6 text-black">
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label htmlFor="ppa-division" className="form-title-text">
                         Division:
                       </label> 
                     </div>
@@ -365,7 +325,7 @@ export default function UserRegistrationJLMS(){
                         id="ppa-division"
                         value={division}
                         onChange={ev => setDivision(ev.target.value)}
-                        className="block w-full ppa-form"
+                        className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form"}`}
                       >
                         <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
                         <option value="Administrative Division">Administrative Division</option>
@@ -383,9 +343,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Username */}
-                  <div className="flex items-center mt-4">
-                    <div className="w-36">
-                      <label htmlFor="ppa-username" className="block text-base font-medium leading-6 text-black">
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label htmlFor="ppa-username" className="form-title-text">
                         Username:
                       </label> 
                     </div>
@@ -396,7 +356,7 @@ export default function UserRegistrationJLMS(){
                         type="text"
                         value={getusername}
                         onChange={ev => setUsername(ev.target.value)}
-                        className="block w-full ppa-form input-placeholder"
+                        className={`block w-full ${(!getusername && inputErrors.username) ? "ppa-form-error":"ppa-form"}`}
                         autoComplete="new-username"
                       />
                       {!getusername && inputErrors && inputErrors.username && (
@@ -406,9 +366,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Password */}
-                  <div className="flex items-center mt-4">
-                    <div className="w-36">
-                      <label htmlFor="password" className="block text-base font-medium leading-6 text-black">
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label htmlFor="password" className="form-title-text">
                         Password:
                       </label> 
                     </div>
@@ -419,7 +379,7 @@ export default function UserRegistrationJLMS(){
                         type={showPassword ? 'text' : 'password'}
                         value={getpassword}
                         onChange={ev => setPassword(ev.target.value)}
-                        className="block w-full ppa-form input-placeholder"
+                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form"}`}
                         autoComplete="new-password"
                       />
                       <button
@@ -429,16 +389,16 @@ export default function UserRegistrationJLMS(){
                       >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                       </button>
-                      {inputErrors && inputErrors && inputErrors.password && (
+                      {!getpassword && inputErrors && inputErrors.password && (
                         <p className="form-validation">This form is required</p>
                       )}
                     </div>
                   </div>
 
                   {/* Password Confirmation*/}
-                  <div className="flex items-center mt-4">
-                    <div className="w-36">
-                      <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black">
+                  <div className="flex items-center mt-2">
+                    <div className="w-40">
+                      <label htmlFor="rep_property_no" className="form-title-text">
                         Repeat Password:
                       </label> 
                     </div>
@@ -465,15 +425,55 @@ export default function UserRegistrationJLMS(){
                     </div>
                   </div>
 
-                  {/* Esig */}
-                  <div className="flex items-center mt-5">
+                </div>
+
+                {/* 2nd Column */}
+                <div className="col-span-1 pl-10">
+
+                  {/* Avatar */}
+                  <div className="items-center mt-4">
                     <div className="w-36">
-                    <label htmlFor="ppa-esignature" className="block text-base font-medium leading-6 text-black">
+                    <label htmlFor="ppa-avatar" className="form-title-text">
+                        Upload Avatar:
+                      </label> 
+                    </div>
+
+                    <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                      <div className="text-center">
+                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                        </svg>
+                        <div className="mt-3 text-sm leading-6 text-gray-600">
+                          <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                            <span>Upload your new avatar here</span>
+                            <input 
+                              id="ppa-avatar" 
+                              name="ppa-avatar" 
+                              type="file" 
+                              accept=".png, .jpg, .jpeg"
+                              className="sr-only" 
+                              onChange={handleAvatarChange}  
+                            />
+                          </label>
+                        </div>
+                        <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
+                        {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
+                        {!uploadedAvatarName && inputErrors && inputErrors.avatar && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Esig */}
+                  <div className="items-center mt-2">
+                    <div className="w-36">
+                    <label htmlFor="ppa-esignature" className="form-title-text">
                         Upload Esig:
                       </label> 
                     </div>
 
-                    <div className="mt-2 w-80 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                    <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
                       <div className="text-center">
                         <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
@@ -500,156 +500,144 @@ export default function UserRegistrationJLMS(){
                     </div>
                   </div>
 
-                </div>
+                  {/* Code Clearance */}
+                  <div className="items-center mt-2">
 
-              </div>
-
-              {/* Code Clearance */}
-              <div>
-
-                <div className="mt-6 font-roboto">
-                  <label htmlFor="rf_request" className="block text-base leading-6 text-black">
-                    Code Clearance:
-                  </label> 
-                </div>
-
-                <div className="flex space-x-6 mt-6">
-
-                  {/* For PM - Port Manager */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="pm-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('PM')}
-                        onChange={(e) => handleCheckboxChange(e, 'PM')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        Port Manager (PM)
+                    <div className="font-roboto">
+                      <label htmlFor="rf_request" className="form-title-text">
+                        Code Clearance:
                       </label> 
                     </div>
-                  </div>
 
-                  {/* For AM - Admin Manager */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="am-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('AM')}
-                        onChange={(e) => handleCheckboxChange(e, 'AM')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="am-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        Admin Manager (AM)
-                      </label> 
-                    </div>
-                  </div>
+                    <div className="grid grid-cols-2">
 
-                  {/* For DM - Division Manager */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="dm-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('DM')}
-                        onChange={(e) => handleCheckboxChange(e, 'DM')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="dm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        Division Manager (DM)
-                      </label> 
-                    </div>
-                  </div>
+                      {/* 1st Column */}
+                      <div className="col-span-1">
 
-                  {/* For GSO - General Service Officer */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="gso-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('GSO')}
-                        onChange={(e) => handleCheckboxChange(e, 'GSO')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        General Service Officer (GSO)
-                      </label> 
-                    </div>
-                  </div>
+                        {/* For PM - Port Manager */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="pm-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('PM')}
+                              onChange={(e) => handleCheckboxChange(e, 'PM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Port Manager (PM)
+                            </label> 
+                          </div>
+                        </div>
 
-                </div>
+                        {/* For AM - Admin Manager */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="am-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('AM')}
+                              onChange={(e) => handleCheckboxChange(e, 'AM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="am-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Admin Manager (AM)
+                            </label> 
+                          </div>
+                        </div>
 
-                <div className="flex space-x-6 mt-6">
+                        {/* For DM - Division Manager */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="dm-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('DM')}
+                              onChange={(e) => handleCheckboxChange(e, 'DM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="dm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Division Manager (DM)
+                            </label> 
+                          </div>
+                        </div>
 
-                  {/* For PT - Procurement Team */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="pt-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('PT')}
-                        onChange={(e) => handleCheckboxChange(e, 'PT')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="pt-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        Procurement Team (PT)
-                      </label> 
-                    </div>
-                  </div>
+                        {/* For GSO - General Service Officer */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="gso-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('GSO')}
+                              onChange={(e) => handleCheckboxChange(e, 'GSO')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              General Service Officer (GSO)
+                            </label> 
+                          </div>
+                        </div>
 
-                  {/* For HACK - IT Superadmin */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="hack-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('HACK')}
-                        onChange={(e) => handleCheckboxChange(e, 'HACK')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="hack-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        IT People (HACK)
-                      </label> 
-                    </div>
-                  </div>
+                      </div>
 
-                  {/* For MEM - Members (COS and Regular) */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="mem-checkbox"
-                        type="checkbox"
-                        checked={selectedRoles.includes('MEM')}
-                        onChange={(e) => handleCheckboxChange(e, 'MEM')}
-                        className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                      />
+                      {/* 2nd Column */}
+                      <div className="col-span-1">
+
+                        {/* For HACK - IT Superadmin */}
+                        <div className="relative flex items-center font-roboto">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="hack-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('HACK')}
+                              onChange={(e) => handleCheckboxChange(e, 'HACK')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="hack-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              IT People (HACK)
+                            </label> 
+                          </div>
+                        </div>
+
+                        {/* For MEM - Members (COS and Regular) */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="mem-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('MEM')}
+                              onChange={(e) => handleCheckboxChange(e, 'MEM')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Members (MEM)
+                            </label> 
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {inputErrors && inputErrors.code_clearance && (
+                        <p className="form-validation">This form is required</p>
+                      )}
+
                     </div>
-                    <div className="ml-3">
-                      <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                        Members (MEM)
-                      </label> 
-                    </div>
+
                   </div>
 
                 </div>
-
-                {inputErrors && inputErrors.code_clearance && (
-                  <p className="form-validation mt-2">Code Clearance is required</p>
-                )}
 
               </div>
 
@@ -658,7 +646,7 @@ export default function UserRegistrationJLMS(){
                 {/* Submit */}
                 <button 
                   type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn' : 'btn-default' }`}
+                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
@@ -671,12 +659,12 @@ export default function UserRegistrationJLMS(){
                   )}
                 </button>
               </div>
-              
+
             </form>
 
           </div>
-
         </div>
+      </>
       ):(
       <Restrict />
       )}

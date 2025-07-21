@@ -263,15 +263,15 @@ class VehicleSlipController extends Controller
         : null;
 
         // Get The Vehicle and Driver availability
-        $DriverDet = AssignPersonnelModel::where('personnel_id', $VehicleSlipForm->driver_id)->where('form_id', $VehicleSlipForm->id)->first();
-        $DriverStat = $DriverDet 
-        ? ($DriverDet->status == 1 ? 1 : null) 
-        : null;
+        // $DriverDet = AssignPersonnelModel::where('personnel_id', $VehicleSlipForm->driver_id)->where('form_id', $VehicleSlipForm->id)->first();
+        // $DriverStat = $DriverDet 
+        // ? ($DriverDet->status == 1 ? 1 : null) 
+        // : null;
 
-        $VehicleDet = VehicleTypeModel::where('form_id', $VehicleSlipForm->id)->where('availability', 1)->first();
-        $VehicleStat = $VehicleDet
-        ? ($VehicleDet->availability == 1 ? 1 : null)
-        : null;
+        // $VehicleDet = VehicleTypeModel::where('form_id', $VehicleSlipForm->id)->where('availability', 1)->first();
+        // $VehicleStat = $VehicleDet
+        // ? ($VehicleDet->availability == 1 ? 1 : null)
+        // : null;
 
 
         $respondData = [
@@ -284,8 +284,8 @@ class VehicleSlipController extends Controller
             'requestorPosition' => $RequestorPosition, 
             'requestorEsig' => $RequestorEsig,     
             'driverEsig' => $DriverEsig,
-            'driverAvail' => $DriverStat,
-            'vehicleDet' => $VehicleStat
+            // 'driverAvail' => $DriverStat,
+            // 'vehicleDet' => $VehicleStat
         ];
 
         return response()->json($respondData);
@@ -493,7 +493,6 @@ class VehicleSlipController extends Controller
         $ReqId = $VehicleDataRequest->user_id;
         $ReqName = $VehicleDataRequest->user_name;
 
-        
         // For Remarks
         $typeOfSlip = $VehicleDataRequest->type_of_slip;
 
@@ -549,59 +548,117 @@ class VehicleSlipController extends Controller
         $VehicleDataRequest->admin_approval = $approver;
         $VehicleDataRequest->remarks = $remark;
 
+        // Vehicle
+        if (preg_match('/^(.*?)\s*\((.*?)\)$/', $VehicleDataRequest->vehicle_type, $matches)) {
+            $vehicleName = trim($matches[1]);
+            $plateNumber = trim($matches[2]);
+        } else {
+            $vehicleName = $slip->vehicle_type;
+            $plateNumber = null;
+        }
+
+        VehicleTypeModel::where('vehicle_name', $vehicleName)
+                    ->where('vehicle_plate', $plateNumber)
+                    ->update(['status' => 0]);
+
+        AssignPersonnelModel::where('personnel_id', $VehicleDataRequest->driver_id)
+                    ->update(['status' => 0]);
+
         if($VehicleDataRequest->save()){
-            // For the Vechicle
-            $VehTypeDet = VehicleTypeModel::where('vehicle_name', $request->input('vehicleName'))
-                        ->where('vehicle_plate', $request->input('vehiclePlate'))
-                        ->first();
-            $VehTypeDet->availability = 1;
-            $VehTypeDet->form_id = $VehicleDataRequest->id;
+            // Send Notification to the requestor
+            // Loop through receivers to create separate notifications
+            foreach ($receivers as $receiver) {
+                $notifications[] = [
+                    'type_of_jlms'    => "JOMS",
+                    'sender_avatar'    => $approverAvatar,
+                    'sender_id'        => $approverDet->id,
+                    'sender_name'      => $approverName,
+                    'message'          => $receiver['noti'],
+                    'receiver_id'      => $receiver['id'],
+                    'receiver_name'    => $receiver['name'],
+                    'joms_type'        => 'JOMS_Vehicle',
+                    'status'           => 2,
+                    'form_location'    => $form,
+                    'joms_id'          => $VehicleDataRequest->id,
+                    'created_at'       => $now,
+                    'updated_at'       => $now
+                ];
+            }  
 
-            //For the Personnel
-            $AssignDet = AssignPersonnelModel::where('personnel_id', $VehicleDataRequest->driver_id)->first();
-            $AssignDet->status = 1;
-            $AssignDet->form_id = $VehicleDataRequest->id;
+            // Insert notifications in bulk for efficiency
+            NotificationModel::insert($notifications);
 
+            // Update Notification (Para ma wala sa notifacion list)
+            NotificationModel::where('joms_type', 'JOMS_Vehicle')
+            ->where('joms_id', $VehicleDataRequest->id)
+            ->where('form_location', 2)
+            ->update(['status' => 0]);
 
-            if($VehTypeDet->save() && $AssignDet->save()){
-                // Send Notification to the requestor
-                // Loop through receivers to create separate notifications
-                foreach ($receivers as $receiver) {
-                    $notifications[] = [
-                        'type_of_jlms'    => "JOMS",
-                        'sender_avatar'    => $approverAvatar,
-                        'sender_id'        => $approverDet->id,
-                        'sender_name'      => $approverName,
-                        'message'          => $receiver['noti'],
-                        'receiver_id'      => $receiver['id'],
-                        'receiver_name'    => $receiver['name'],
-                        'joms_type'        => 'JOMS_Vehicle',
-                        'status'           => 2,
-                        'form_location'    => $form,
-                        'joms_id'          => $VehicleDataRequest->id,
-                        'created_at'       => $now,
-                        'updated_at'       => $now
-                    ];
-                }  
+            // For LOGS
+            $logs = new LogsModel();
+            $logs->category = 'VSLIP';
+            $logs->message = $approverName." has approved ".$VehicleDataRequest->user_name."'s request on Vehicle Slip No.".$VehicleDataRequest->id.".";
+            $logs->save();
 
-                // Insert notifications in bulk for efficiency
-                NotificationModel::insert($notifications);
+            return response()->json(['message' => 'The Form has been approved'], 200);
+            
+        }
+    }
 
-                // Update Notification (Para ma wala sa notifacion list)
-                NotificationModel::where('joms_type', 'JOMS_Vehicle')
-                ->where('joms_id', $VehicleDataRequest->id)
-                ->where('form_location', 2)
-                ->update(['status' => 0]);
+    /**
+     *  Activate On-Travel on assigned Driver and Vehicle
+     */
+    public function OnTravel(){
+        
+        $now = Carbon::now()->toDateString(); // Now
+        $yesterday = Carbon::yesterday()->toDateString(); // Yesterday
 
-                // For LOGS
-                $logs = new LogsModel();
-                $logs->category = 'VSLIP';
-                $logs->message = $approverName." has approved ".$VehicleDataRequest->user_name."'s request on Vehicle Slip No.".$VehicleDataRequest->id.".";
-                $logs->save();
+        $VehicleDataRequest = VehicleSlipModel::whereIn('date_arrival', [$now, $yesterday])->where('admin_approval', 1)->get();
 
-                return response()->json(['message' => 'The Form has been approved'], 200);
+        // If data is not exist
+        if($VehicleDataRequest->isEmpty()){
+            return response()->json(['error' => 'No data found'], 404);
+        }
+
+        // Initialize counters
+        $todayCount = 0;
+        $yesterdayCount = 0;
+
+        foreach ($VehicleDataRequest as $slip) {
+            // Vehicle
+            if (preg_match('/^(.*?)\s*\((.*?)\)$/', $slip->vehicle_type, $matches)) {
+                $vehicleName = trim($matches[1]);
+                $plateNumber = trim($matches[2]);
+            } else {
+                $vehicleName = $slip->vehicle_type;
+                $plateNumber = null;
+            }
+
+            // Update the Data
+            if ($slip->date_arrival === $now) {
+
+                VehicleTypeModel::where('vehicle_name', $vehicleName)
+                    ->where('vehicle_plate', $plateNumber)
+                    ->where('status', 0)
+                    ->update(['status' => 1]);
+
+                AssignPersonnelModel::where('personnel_id', $slip->driver_id)
+                    ->where('status', 0)
+                    ->update(['status' => 1]);
+
+            } elseif ($slip->date_arrival === $yesterday) {
+                
+                VehicleTypeModel::where('vehicle_name', $vehicleName)
+                    ->where('vehicle_plate', $plateNumber)
+                    ->update(['status' => 0]);
+
+                AssignPersonnelModel::where('personnel_id', $slip->driver_id)
+                    ->update(['status' => 0]);
+
             }
         }
+        
+        return response()->json(['message' => 'Vehicle and Driver status updates applied.'], 200);
     }
 
     /**
@@ -773,7 +830,7 @@ class VehicleSlipController extends Controller
                 'vehicle_id' => $vehicle->id,
                 'vehicle_name' => $vehicle->vehicle_name,
                 'vehicle_plate' => $vehicle->vehicle_plate,
-                'availability' => $vehicle->availability
+                'availability' => $vehicle->status
             ];
         });
 
@@ -823,7 +880,7 @@ class VehicleSlipController extends Controller
                 'vehicle_id' => $vehicle->id,
                 'vehicle_name' => $vehicle->vehicle_name,
                 'vehicle_plate' => $vehicle->vehicle_plate,
-                'vehicle_status' => $vehicle->availability,
+                'vehicle_status' => $vehicle->status,
                 'vehicle_usage' => $slipCount
             ];
         });
@@ -897,10 +954,8 @@ class VehicleSlipController extends Controller
         }
 
         // Update the status
-        $DriverDet->form_id = 0;
         $DriverDet->status = 0;
-        $VehicleDetailRequest->form_id = 0;
-        $VehicleDetailRequest->availability = 0;
+        $VehicleDetailRequest->status = 0;
 
         if($VehicleDetailRequest->save() && $DriverDet->save()){
             // Creating logs only if both operations are successful
@@ -949,8 +1004,7 @@ class VehicleSlipController extends Controller
         }
 
         // Update the status
-        $VehicleDetailRequest->form_id = 0;
-        $VehicleDetailRequest->availability = 0;
+        $VehicleDetailRequest->status = 2;
 
         if($VehicleDetailRequest->save()){
             // Creating logs only if both operations are successful
@@ -962,4 +1016,5 @@ class VehicleSlipController extends Controller
 
         return response()->json(['message' => 'Vehicle Available.'], 200);
     }
+
 }

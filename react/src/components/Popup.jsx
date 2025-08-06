@@ -47,9 +47,40 @@ const Popup = ({
       {/* Popup content */}
       <div className={`absolute p-6 rounded-lg shadow-md bg-white ${closing ? "animate-fade-out" : "animate-fade-down"}`} style={{ width: "430px" }}>
         {/* Popup Message */}
-        <p className="text-lg text-center"> {popupMessage} </p>
+        <p className="text-lg text-center"> 
+          {popupContent == 'error' ? (
+            popupMessage == '404' ? (
+              <>
+                <p className="popup-title">Data not Exist</p>
+                <p className="popup-message"><span>Data not found. (Error 404)</span></p>
+              </>
+            ):popupMessage == '406' ? (
+              <>
+                <p className="popup-title">Failed to save</p>
+                <p className="popup-message"><span>There was a problem on saving the data, please contact to the developer <strong>IP Phone 4084</strong>. (Error code 406) </span></p>
+              </>
+            ):(
+              <>
+                <p className="popup-title">There was the Problem</p>
+                <p className="popup-message">There was a problem, please contact the developer <strong>IP Phone 4084</strong>. (Error code {popupMessage})</p>
+              </>
+            )
+          ):(
+            popupMessage
+          )} 
+        </p>
+
         {/* Buttons */}
         <div className="flex justify-end mt-4">
+
+          {/* Error Button */}
+          {popupContent == 'error' && (
+            <button onClick={justClose} className="w-full py-2 btn-cancel"> Close </button>
+          )}
+
+          {popupContent == 'check-error' && (
+            <button onClick={justClose} className="w-full py-2 btn-cancel"> Close </button>
+          )}
 
           {/* Delete Confirmation on Announcements */}
           {popupContent == 'warning' && (
@@ -132,11 +163,6 @@ const Popup = ({
               </button>
             )}
           </>
-          )}
-
-          {/* Error Button */}
-          {popupContent == 'error' && (
-            <button onClick={justClose} className="w-full py-2 btn-cancel"> Close </button>
           )}
 
           {/* Success */}

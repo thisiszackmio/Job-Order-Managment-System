@@ -78,17 +78,17 @@ class FacilityVenueController extends Controller
     
         // Check if at least one facility is selected
         if (!$request->input('mph') && !$request->input('conference') && !$request->input('dorm') && !$request->input('other')) {
-            return response()->json(['error' => 'facility'], 422);
+            return response()->json(['message' => 'facility'], 201);
         }
     
         // Check if the start date is in the past
         if ($startDateTime < $currentDateTime) {
-            return response()->json(['error' => 'invalidDate'], 422);
+            return response()->json(['message' => 'invalidDate'], 201);
         }
     
         // Check if the end date is before the start date
         if ($endDateTime < $startDateTime) {
-            return response()->json(['error' => 'checkDate'], 422);
+            return response()->json(['message' => 'checkDate'], 201);
         }
     
         // Query to check facility availability
@@ -109,21 +109,21 @@ class FacilityVenueController extends Controller
             if($facility->admin_approval === 5 || $facility->admin_approval === 6 || $facility->admin_approval === 7){
                 if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
                 ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
-                    return response()->json(['message' => 'Pending']);
+                    return response()->json(['message' => 'Pending'], 201);
                 }
             }
 
             if($facility->admin_approval === 2 || $facility->admin_approval === 1 || $facility->admin_approval === 0){
                 if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
                 ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
-                    return response()->json(['message' => 'Not Vacant']);
+                    return response()->json(['message' => 'Not Vacant'], 201);
                 }
             }
     
         }
     
         // If no conflicts, return 'Vacant'
-        return response()->json(['message' => 'Vacant']);
+        return response()->json(['message' => 'Vacant'], 200);
     }
 
     /**
@@ -137,7 +137,7 @@ class FacilityVenueController extends Controller
 
         // Create and save the deployment data
         $deploymentData = FacilityVenueModel::create($data);
-        if (!$deploymentData) { return response()->json(['error' => 'Data Error'], 500); }
+        if (!$deploymentData) { return response()->json(['error' => 'Data Error'], 404); }
 
         // Get Your Avatar
         $dataReq = PPAEmployee::where('id', $data['user_id'])->first(); 
@@ -228,18 +228,18 @@ class FacilityVenueController extends Controller
         $facilityData = FacilityVenueModel::find($id);
 
         // If the Admin Manager approves the form
-        if($facilityData->admin_approval == 2){
-            return response()->json(['message' => 'Approve'], 204);
+        if($facilityData->admin_approval == 0){
+            return response()->json(['message' => 'Closed'], 200);
         }
 
         // If the Admin Manager disapproves the form
         if($facilityData->admin_approval == 3){
-            return response()->json(['error' => 'Disapprove'], 408);
+            return response()->json(['message' => 'Disapprove'], 200);
         } 
         
         // If the Admin Manager disapproves the form
         if($facilityData->admin_approval == 5){
-            return response()->json(['error' => 'Deleted'], 408);
+            return response()->json(['massage' => 'Deleted'], 200);
         } 
 
         // Update the Data
@@ -273,7 +273,7 @@ class FacilityVenueController extends Controller
 
             return response()->json(['message' => 'Form update successfully'], 200);
         } else {
-            return response()->json(['message' => 'Failed to update the form'], 400);
+            return response()->json(['message' => 'Failed to update the form'], 406);
         }
 
     }
@@ -331,18 +331,18 @@ class FacilityVenueController extends Controller
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
         if (!$facilityRequest) { 
-            return response()->json(['message' => 'Facility request not found.'], 404); 
+            return response()->json(['error' => 'Facility request not found.'], 404); 
         }
 
         // check if the request form was already deleted
         if($facilityRequest->admin_approval == 4 || $facilityRequest->admin_approval == 0){
-            return response()->json(['error' => 'Deleted'], 408);
+            return response()->json(['message' => 'Deleted'], 201);
         }
 
         // Check if the Approver is the Admin (For Security)
         $checkAM = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%AM%")->first();
         if (!$checkAM) {
-            return response()->json(['message' => 'Not Admin'], 408);
+            return response()->json(['message' => 'Not Admin'], 201);
         }
 
         // GSO Details 
@@ -424,7 +424,7 @@ class FacilityVenueController extends Controller
 
            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
         } else {
-            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
+            return response()->json(['error' => 'Failed to update OPR instruction.'], 406);
         }
     }   
 
@@ -439,7 +439,7 @@ class FacilityVenueController extends Controller
         // Check if the Approver is the Admin (For Security)
         $checkAM = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%AM%")->first();
         if (!$checkAM) {
-            return response()->json(['message' => 'Not Admin.'], 408);
+            return response()->json(['error' => 'Not Admin.'], 500);
         }
 
         // Find the facility request by ID
@@ -457,7 +457,7 @@ class FacilityVenueController extends Controller
             $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has updated the OPR Instruction on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         } else {
-            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
+            return response()->json(['error' => 'Failed to update OPR instruction.'], 406);
         }
 
     }
@@ -476,7 +476,7 @@ class FacilityVenueController extends Controller
         // Get the sender's data (If GSO)
         $sender = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%GSO%")->first();
         if (!$sender) { 
-            return response()->json(['message' => 'Not Admin.'], 408);
+            return response()->json(['error' => 'Not Admin.'], 500);
         }else{
             $senderId = $sender->id;
             $senderAvatar = $sender->avatar;
@@ -485,7 +485,7 @@ class FacilityVenueController extends Controller
 
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
-        if (!$facilityRequest) { return response()->json(['message' => 'Facility request not found.'], 404); }
+        if (!$facilityRequest) { return response()->json(['error' => 'Facility request not found.'], 404); }
 
         // Update the OPR comment
         $facilityRequest->obr_comment = $CheckOPR['oprAction'];
@@ -534,7 +534,7 @@ class FacilityVenueController extends Controller
             $logs->save();
 
         }else{
-            return response()->json(['message' => 'Failed to update OPR instruction.'], 400);
+            return response()->json(['error' => 'Failed to update OPR instruction.'], 406);
         }
 
     }
@@ -704,8 +704,8 @@ class FacilityVenueController extends Controller
         $facilityRequest = FacilityVenueModel::find($id);
 
         // Check if the Request is already approve
-        if($facilityRequest->admin_approval == 0){
-            return response()->json(['message' => 'Already'], 408);
+        if($facilityRequest->admin_approval == 0 || $facilityRequest->admin_approval == 1){
+            return response()->json(['message' => 'Already'], 201);
         }
 
         // Update Approve

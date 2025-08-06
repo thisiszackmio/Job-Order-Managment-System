@@ -144,10 +144,14 @@ export default function FacilityForm(){
     setGetMale(facData?.form?.name_male ?? "");
     setGetFemale(facData?.form?.name_female ?? "");
     setOtherDetails(facData?.form?.other_details ?? "");
+    setRegOffice(facData?.form?.request_office ?? "");
+    setTitleReq(facData?.form?.title_of_activity ?? "");
   }, [
     facData?.form?.name_male,
     facData?.form?.name_female,
-    facData?.form?.other_details
+    facData?.form?.other_details,
+    facData?.form?.request_office,
+    facData?.form?.title_of_activity
   ]);
 
   const handleInputTableChange = (event) => {
@@ -285,7 +289,7 @@ export default function FacilityForm(){
 
     const data = {
       user_name: currentUserName.name,
-      request_office: reqOffice ? reqOffice : facData?.form?.request_office,
+      request_office: reqOffice,
       title_of_activity: titleReq ? titleReq : facData?.form?.title_of_activity,
       table: checkTable,
       no_table: checkTable ? NoOfTable ? NoOfTable : facData?.form?.no_table : null,
@@ -330,7 +334,6 @@ export default function FacilityForm(){
           </div>
         );
         setShowPopup(true);
-        return;
       }else if(error.response.data.error === "Approve"){
         setPopupContent("success");
         setPopupMessage(
@@ -340,7 +343,6 @@ export default function FacilityForm(){
           </div>
         );
         setShowPopup(true);
-        return;
       }else if(error.response.data.error === "Deleted"){
         setPopupContent("success");
         setPopupMessage(
@@ -350,12 +352,10 @@ export default function FacilityForm(){
           </div>
         );
         setShowPopup(true);
-        return;
       }else{
-        setPopupContent("error");
-        setPopupMessage(DevErrorText);
-        setShowPopup(true);  
-        return; 
+        setShowPopup(true); 
+        setPopupContent('error');
+        setPopupMessage(error.response.status);  
       }
     })
     .finally(() => {
@@ -579,7 +579,7 @@ export default function FacilityForm(){
     }
   }
 
-  // Delete Confirmation
+  // Cancel Confirmation
   function handleDeleteFormContirmation(){
     setShowPopup(true);
     setPopupContent('gsodelete');
@@ -591,7 +591,7 @@ export default function FacilityForm(){
     );
   }
 
-  // Delete Form
+  // Cancel Form
   function DeleteFormRequest(id){
     setSubmitLoading(true);
 
@@ -599,32 +599,34 @@ export default function FacilityForm(){
     .put(`/closefacilityforce/${id}`, {
       user_name: currentUserName.name,
     })
-    .then(() => {
-      setButtonHide(true);
-      setPopupContent("success");
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Success</p>
-          <p className="popup-message">The form has been canceled.</p>
-        </div>
-      );
-      setShowPopup(true);
-    })
-    .catch((error) => {
-      if (error.response.status === 408) {
-        setPopupContent("error");
+    .then((response) => {
+      const responseData = response.data.message;
+
+      if(responseData === 'Already'){
+        setShowPopup(true);
+        setPopupContent("check-error");
         setPopupMessage(
           <div>
             <p className="popup-title">Already Approved!</p>
-            <p className="popup-message">You cannot delete the form once the admin approves it.</p>
+            <p className="popup-message">You cannot cancel the form once the admin approves it.</p>
+          </div>
+        );
+      }else{
+        setButtonHide(true);
+        setPopupContent("success");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Success</p>
+            <p className="popup-message">The form has been canceled.</p>
           </div>
         );
         setShowPopup(true);
-      } else {
-        setPopupContent("error");
-        setPopupMessage(DevErrorText);
-        setShowPopup(true);
-      }   
+      }
+    })
+    .catch((error) => {
+      setShowPopup(true); 
+      setPopupContent('error');
+      setPopupMessage(error.response.status);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -1006,7 +1008,7 @@ export default function FacilityForm(){
                           name="rf_request"
                           id="rf_request"
                           autoComplete="rf_request"
-                          defaultValue={facData?.form?.request_office}
+                          value={reqOffice}
                           onChange={ev => setRegOffice(ev.target.value)}
                           className={`block w-full ppa-form-edit`}
                         />
@@ -1026,7 +1028,7 @@ export default function FacilityForm(){
                           name="rep_title"
                           id="rep_title"
                           autoComplete="rep_title"
-                          defaultValue={facData?.form?.title_of_activity}
+                          defaultValue={titleReq}
                           onChange={ev => setTitleReq(ev.target.value)}
                           className={`block w-full ppa-form-edit`}
                         />
@@ -1905,7 +1907,7 @@ export default function FacilityForm(){
                             <label className="block text-base font-bold leading-6 text-gray-900 mr-2">
                               Instruction for the OPR for Action:
                             </label> 
-                            {Admin && (facData?.form?.admin_approval == 3) && !enableAmOPR && (
+                            {Admin && (facData?.form?.admin_approval == 3 || facData?.form?.admin_approval == 2) && !enableAmOPR && (
                               <FontAwesomeIcon onClick={() => { setEnableAmOPR(true); }} className="icon-form" title="Edit" icon={faPenToSquare} />
                             )}
                           </div>

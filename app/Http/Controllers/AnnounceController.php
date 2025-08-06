@@ -30,11 +30,11 @@ class AnnounceController extends Controller
             'details' => 'required|string|max:1000',
         ]);
 
-        // Create the announcement data
+        //Create the announcement data
         try {
             $announcement = Announce::create($data);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Data Error', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Data Error', 'message'], 500);
         }
 
         return response()->json(['message' => 'Announcement created successfully', 'data' => $announcement], 200);
@@ -51,7 +51,7 @@ class AnnounceController extends Controller
         $checkAnn = Announce::where('id', $id)->first();
 
         if(!$checkAnn){
-            return response()->json(['message' => 'Facility not found'], 404);
+            return response()->json(['error' => 'Facility not found'], 404);
         }
 
         $checkAnn->update([
@@ -70,7 +70,7 @@ class AnnounceController extends Controller
 
         // Check if the announcement exists
         if(!$announcement){
-            return response()->json(['message' => 'Announcement not found'], 404);
+            return response()->json(['error' => 'Announcement not found'], 404);
         }
 
         // Delete the announcement

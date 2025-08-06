@@ -81,7 +81,12 @@ class JOMSDashboardController extends Controller
                 'vehicle_name' => $item->vehicle_name ?? null,
                 'vehicle_plate' => $item->vehicle_plate ?? null,
             ];
-        });    
+        });
+        
+        // ❗ Check if empty after map()
+        if ($onTravel->isEmpty()) {
+            return response()->json(['message' => 'No data found'], 404);
+        }
 
         return response()->json(['on_travel' => $onTravel]);
     }

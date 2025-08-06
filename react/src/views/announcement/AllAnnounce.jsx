@@ -3,16 +3,12 @@ import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
 import Popup from "../../components/Popup";
 import submitAnimation from '/default/ring-loading.gif';
-import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
 import Restrict from "../../components/Restrict";
 
 export default function AllAnnouncements(){
 
   const { currentUserCode } = useUserStateContext();
-
-  // Loading
-  const [loadingArea, setLoadingArea] = useState(true);
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -67,19 +63,8 @@ export default function AllAnnouncements(){
       });
 
       setAnnounceList({mappedData});
-    })
-    .finally(() => {
-      setLoadingArea(false);
     });
   },[]);
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
 
   // Update Announcement
   const handleSaveClick = (event, id) => {
@@ -101,10 +86,13 @@ export default function AllAnnouncements(){
       ); 
     })
     .catch((error) => {
-      //console.error(error);
-      setPopupContent("error");
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);   
+      if (error.response) {
+        const code = error.response.status;
+
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(<ErrorPopup code={code} />);
+      }   
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -142,10 +130,14 @@ export default function AllAnnouncements(){
         </div>
       );
     })
-    .catch(() => {
-      setPopupContent('error');
-      setPopupMessage(DevErrorText);
-      setShowPopup(true);
+    .catch((error) => {
+      if (error.response) {
+        const code = error.response.status;
+
+        setShowPopup(true);
+        setPopupContent('error');
+        setPopupMessage(<ErrorPopup code={code} />);
+      } 
     })
     .finally(() => {
       setSubmitLoading(false);

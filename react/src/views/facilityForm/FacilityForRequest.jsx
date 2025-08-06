@@ -45,7 +45,6 @@ export default function FacilityVenueForm(){
   const [disableForm, setDisableForm] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [fieldMissing, setFieldMissing] = useState({});
-  const [loading, setLoading] = useState(true);
   const [confirmation, setConfirmation] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -97,14 +96,6 @@ export default function FacilityVenueForm(){
   const [otherDetails, setOtherDetails] = useState('');
 
   const [oprInstruct, setOprInstruct] = useState('');
-
-  // Set Delay for Loading
-  useEffect(() => {
-    // Simulate an authentication check
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -198,14 +189,6 @@ export default function FacilityVenueForm(){
     setNoOfMicrophone(inputValue);
   };
 
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Error</p>
-      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
-    </div>
-  );
-
   // For checkbox
   const handleCheckboxChange = (setStateFunction, isChecked, ...otherStateFunctions) => {
     setStateFunction(isChecked);
@@ -247,73 +230,55 @@ export default function FacilityVenueForm(){
     axiosClient
     .post('checkavailability', checkRequest)
     .then((response) => {
-
       const responseData = response.data.message;
 
-      // If the result us vacant
-      if(responseData === "Vacant"){
-        if(mphCheck || confCheck || otherCheck){
-          setEnableFacility(true);
-          setDisableForm(true);
-        } else {
-          setEnableDormitory(true);
-          setDisableForm(true);
-        }
-      }
-      else if(responseData === "Pending"){
+      if(responseData === 'checkDate'){
         setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Not Available</p>
-            <p className="popup-message">Sorry, that schedule is pending approval from another requestor.</p>
-          </div>
-        );
-      }
-      else{
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">
-              {mphCheck ? ("Multi-Purpose Hall (MPH) is not available!"):null}
-              {confCheck ? ("Conference Hall is not available!"):null}
-              {dormCheck ? ("Dormitory is not available!"):null}
-            </p>
-            <p className="popup-message">Sorry, this schedule is not available. Please try another day.</p>
-          </div>
-        );
-      }
-      
-    })
-    .catch((error)=>{
-      // alert(error.response.data.error);
-      if(error.response.data.error == "facility"){
-        setCheckFacility(true);
-      } 
-      else if(error.response.data.error == "invalidDate"){
-        setPopupContent("error");
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid!</p>
-            <p className="popup-message">The date you entered is invalid.</p>
+            <p className="popup-message">Oops! It looks like the end time is earlier than the start time. Please double-check your inputs.</p>
           </div>
         );
+      }else if(responseData === 'invalidDate'){
         setShowPopup(true);
-      }
-      else if(error.response.data.error == "checkDate"){
-        setPopupContent("error");
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
-            <p className="popup-title">Invalid</p>
-            <p className="popup-message">The date you entered is invalid. Please check the End Date and End Time of the activity.</p>
+            <p className="popup-title">Invalid!</p>
+            <p className="popup-message">Please select a start date and time that’s not in the past.</p>
+            <p className="popup-message"><i><b>Don’t look back—focus on the present!</b></i></p>
           </div>
         );
-        setShowPopup(true);
-      }
-      else {
-        const responseErrors = error.response.data.errors;
-        setFieldMissing(responseErrors);
+      }else{
+        if(responseData === "Vacant"){
+          if(mphCheck || confCheck || otherCheck){
+            setEnableFacility(true);
+            setDisableForm(true);
+          } else {
+            setEnableDormitory(true);
+            setDisableForm(true);
+          }
+        }else if(responseData === "Not Vacant"){
+          setShowPopup(true);
+          setPopupContent('check-error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Not Available</p>
+              <p className="popup-message">Sorry, that facility is not yet available.</p>
+            </div>
+          );
+        }else{
+          setShowPopup(true);
+          setPopupContent('check-error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Pending for Approval</p>
+              <p className="popup-message">Sorry, that schedule is pending approval from another requestor.</p>
+            </div>
+          );
+        }
       }
     })
     .finally(() => {
@@ -328,7 +293,7 @@ export default function FacilityVenueForm(){
 
     if(!oprInstruct && Admin){
       setShowPopup(true);
-      setPopupContent('error');
+      setPopupContent('check-error');
       setPopupMessage(
         <div>
           <p className="popup-title">Error</p>
@@ -339,7 +304,7 @@ export default function FacilityVenueForm(){
       if(enableFacility){
         if(checkedCount <= 0){
           setShowPopup(true);
-          setPopupContent('error');
+          setPopupContent('check-error');
           setPopupMessage(
             <div>
               <p className="popup-title">Invalid</p>
@@ -358,7 +323,7 @@ export default function FacilityVenueForm(){
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }else{
           setShowPopup(true);
-          setPopupContent('error');
+          setPopupContent('check-error');
           setPopupMessage(
             <div>
               <p className="popup-title">Invalid</p>
@@ -434,7 +399,7 @@ export default function FacilityVenueForm(){
     .catch(()=>{
       setShowPopup(true);
       setPopupContent('error');
-      setPopupMessage(DevErrorText);
+      setPopupMessage(error.response.status);
     })
     .finally(() => {
       setSubmitLoading(false);

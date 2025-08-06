@@ -17,6 +17,8 @@ export default function AddAnnouncements(){
   const [details, setDetails] = useState('');
   const maxCharacters = 1000;
 
+  const [requiredField, setRequiredField] = useState({});
+
   const handleChange = (ev) => {
     setDetails(ev.target.value);
   };
@@ -25,14 +27,6 @@ export default function AddAnnouncements(){
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
 
   // Submit the Form
   function onSubmit(e){
@@ -44,41 +38,32 @@ export default function AddAnnouncements(){
       details: details
     }
 
-    if(!details){
+    axiosClient
+    .post('/addannouncements', FormData)
+    .then(() => { 
       setShowPopup(true);
-      setPopupContent('error');
+      setPopupContent('success');
       setPopupMessage(
         <div>
-          <p className="popup-title">Invalid</p>
-          <p className="popup-message">Please input the Details</p>
+          <p className="popup-title">Success</p>
+          <p className="popup-message">Your announcement is being posted</p>
         </div>
       );
-      setSubmitLoading(false);
-    } else {
-      axiosClient
-      .post('/addannouncements', FormData)
-      .then(() => { 
+      fetchNotification();    
+    })
+    .catch((error) => {
+      if (error.response.status === 422) {
+        const responseErrors = error.response.data.errors;
+        setRequiredField(responseErrors);
+      }else{
         setShowPopup(true);
-        setPopupContent('success');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">Success</p>
-            <p className="popup-message">Your announcement is being posted</p>
-          </div>
-        );
-        fetchNotification();    
-      })
-      .catch((error) => {
-        if (error.response.status === 500) {
-          setShowPopup(true);
-          setPopupContent('error');
-          setPopupMessage(DevErrorText);
-        }  
-      })
-      .finally(() => {
-        setSubmitLoading(false);
-      });
-    }
+        setPopupContent('error');
+        setPopupMessage(error.response.status);
+      }  
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
 
   }
 
@@ -148,6 +133,9 @@ export default function AddAnnouncements(){
                       className="block w-full ppa-form"
                     />
                     <p className="text-sm text-gray-500"> {maxCharacters - details.length} characters remaining </p>
+                    {!details && requiredField.details && (
+                      <p className="form-validation">This form is required</p>
+                    )}
                   </div>
                 </div>
               </div>  

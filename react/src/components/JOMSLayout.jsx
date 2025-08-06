@@ -98,11 +98,23 @@ export default function JOMSLayout() {
   }
 
   const OnTravelSet = () => {
-    axiosClient
-    .put(`/ontravelset`)
-    .then((response) => {
-      console.log(response.data.message);
-    });
+    if(Authority || GSO){
+      axiosClient
+      .put(`/ontravelset`)
+      .then((response) => {
+        console.log(response.data.message);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 404) {
+          // Custom handling for 404
+          console.warn("No data found (Error 404)");
+          // Optional: Show a popup or notification here
+        } else {
+          // Handle other errors
+          console.error("Unexpected error occurred:", error);
+        }
+      });
+    }
   }
 
   // Get the useEffect

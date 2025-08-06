@@ -173,7 +173,7 @@ class InspectionController extends Controller
             $deploymentData = InspectionModel::create($data);
         
             if (!$deploymentData) {
-                return response()->json(['error' => 'Data Error'], 500);
+                return response()->json(['error' => 'Data Error'], 404);
             }
 
             // Condition Area
@@ -214,7 +214,7 @@ class InspectionController extends Controller
                 $logs->message = $data['user_name'] . ' has submitted the request for Pre/Post Repair Inspection.';
                 $logs->save();
             } else {
-                return response()->json(['error' => 'Failed to save notification'], 500);
+                return response()->json(['error' => 'Failed to save notification'], 406);
             }
 
             
@@ -230,7 +230,7 @@ class InspectionController extends Controller
         $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         if ($InspectionRequest->supervisor_status === 1 && !in_array("GSO", $codeClearance)) {
@@ -261,7 +261,7 @@ class InspectionController extends Controller
 
                 return response()->json(['message' => 'User details updated successfully.'], 200);
             } else {
-                return response()->json(['message' => 'There area some missing.'], 204);
+                return response()->json(['error' => 'There area some missing.'], 406);
             }
         }
 
@@ -281,7 +281,7 @@ class InspectionController extends Controller
         $GSOData = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
 
         if (!$ApproveRequest) {
-            return response()->json(['message' => 'Inspection request not found'], 404);
+            return response()->json(['error' => 'Inspection request not found'], 404);
         }
 
         // Update a form for supervisor's approval
@@ -362,7 +362,7 @@ class InspectionController extends Controller
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
         } else {
-            return response()->json(['message' => 'Failed to update the request'], 500);
+            return response()->json(['error' => 'Failed to update the request'], 406);
         }
 
         $logs = new LogsModel();
@@ -388,7 +388,7 @@ class InspectionController extends Controller
         $DisapproveRequest = InspectionModel::find($id);
 
         if (!$DisapproveRequest) {
-            return response()->json(['message' => 'Inspection request not found'], 404);
+            return response()->json(['error' => 'Inspection request not found'], 404);
         }
 
         // Send back to the GSO
@@ -476,7 +476,7 @@ class InspectionController extends Controller
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
         } else {
-            return response()->json(['message' => 'Failed to update the request'], 500);
+            return response()->json(['error' => 'Failed to update the request'], 406);
         }
         
         // Logs
@@ -507,7 +507,7 @@ class InspectionController extends Controller
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         // Get Admin Manager
@@ -795,7 +795,7 @@ class InspectionController extends Controller
             $logs->message = trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname). ' has approved the request on the Pre/Post Repair Inspection Form (Control No. '. $ApproveRequest->id.').';
             $logs->save();
         } else {
-            return response()->json(['message' => 'Failed to update the request'], 500);
+            return response()->json(['error' => 'Failed to update the request'], 406);
         }
     }
 
@@ -816,7 +816,7 @@ class InspectionController extends Controller
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         if($InspectionRequest->form_status == 13){
@@ -884,7 +884,7 @@ class InspectionController extends Controller
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
-            return response()->json(['message' => 'There area some missing.'], 204);
+            return response()->json(['error' => 'There area some missing.'], 406);
         }
     }
 
@@ -895,7 +895,7 @@ class InspectionController extends Controller
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         if ($InspectionRequest->form_status === 1) { 
@@ -917,7 +917,7 @@ class InspectionController extends Controller
     
                 return response()->json(['message' => 'User details updated successfully.'], 200);
             } else {
-                return response()->json(['message' => 'There area some missing.'], 204);
+                return response()->json(['error' => 'There area some missing.'], 406);
             }
         }
 
@@ -939,7 +939,7 @@ class InspectionController extends Controller
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         if($InspectionRequest->form_status == 12){
@@ -1046,7 +1046,7 @@ class InspectionController extends Controller
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
-            return response()->json(['message' => 'There area some missing.'], 204);
+            return response()->json(['error' => 'There area some missing.'], 406);
         }
     }
 
@@ -1057,7 +1057,7 @@ class InspectionController extends Controller
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         if ($InspectionRequest->form_status === 1) { 
@@ -1078,7 +1078,7 @@ class InspectionController extends Controller
     
                 return response()->json(['message' => 'User details updated successfully.'], 200);
             } else {
-                return response()->json(['message' => 'There area some missing.'], 204);
+                return response()->json(['error' => 'There area some missing.'], 406);
             }
         }
 
@@ -1172,7 +1172,7 @@ class InspectionController extends Controller
             $logs->save();
 
         } else {
-            return response()->json(['message' => 'Failed to update the request'], 500);
+            return response()->json(['error' => 'Failed to update the request'], 406);
         }
     }
 

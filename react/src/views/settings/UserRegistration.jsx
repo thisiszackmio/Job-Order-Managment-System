@@ -10,7 +10,7 @@ import Restrict from "../../components/Restrict";
 
 export default function UserRegistrationJLMS(){
 
-  const { currentUserCode } = useUserStateContext();
+  const { currentUserCode, currentUserName } = useUserStateContext();
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -124,6 +124,7 @@ export default function UserRegistrationJLMS(){
     formData.append("password", getpassword);
     formData.append("consfirmPassword", passwordCorfirmation);
     formData.append("status", 2);
+    formData.append("registrant", currentUserName.name);
 
     // Axios Client
     axiosClient.post("/register", formData, {

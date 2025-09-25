@@ -94,6 +94,10 @@ export default function VehicleSlipList(){
   const pageCountUser = Math.ceil(filteredList.length / itemsPerPage);
   const displayPaginationUser = pageCountUser > 1;
 
+  // Calculate range for display
+  const startIndex = currentPage * itemsPerPage + 1;
+  const endIndex = Math.min((currentPage + 1) * itemsPerPage, filteredList.length);
+
   const currentList = filteredList.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
@@ -140,11 +144,40 @@ export default function VehicleSlipList(){
                   {/* Count */}
                   <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
                     <div className="text-right text-sm/[17px]">
-                      Total of <b>{currentList.length}</b> Request list
+                      Total of{" "}
+                      {pageCountUser > 1 ? (
+                        <b>{startIndex} - {endIndex}</b>
+                      ) : (
+                        <b>{filteredList.length}</b>
+                      )}{" "}
+                      out of <b>{filteredList.length}</b> Request list
                     </div>
                   </div>
                 </div>
-
+                
+                {displayPaginationUser && (
+                  <ReactPaginate
+                    previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                    nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                    breakLabel="..."
+                    pageCount={pageCountUser}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={handlePageChange}
+                    forcePage={currentPage}
+                    containerClassName="pagination-top"
+                    subContainerClassName="pages pagination"
+                    activeClassName="active"
+                    pageClassName="page-item"
+                    pageLinkClassName="page-link"
+                    breakClassName="page-item"
+                    breakLinkClassName="page-link"
+                    previousClassName="page-item"
+                    previousLinkClassName="page-link"
+                    nextClassName="page-item"
+                    nextLinkClassName="page-link"
+                  />
+                )}
                 <table className="ppa-table w-full mb-10 mt-2">
                   <thead className="bg-gray-100">
                     <tr className="bg-gray-100">
@@ -209,6 +242,7 @@ export default function VehicleSlipList(){
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={5}
                     onPageChange={handlePageChange}
+                    forcePage={currentPage}
                     containerClassName="pagination"
                     subContainerClassName="pages pagination"
                     activeClassName="active"

@@ -238,15 +238,14 @@ export default function UserDetailsJLMS(){
   // Update Details
   function submitUpdateDetail(){
     setSubmitLoading(true);
-    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user detail information.`;
     
     const UpdateData = {
-      logs: logs,
       firstname: fname,
       lastname: lname,
       middlename: mname,
       position: position,
-      division: division ? division : userDet.division
+      division: division ? division : userDet.division,
+      authority: currentUserName.name
     };
 
     axiosClient
@@ -298,12 +297,12 @@ export default function UserDetailsJLMS(){
   // Update Account
   function submitUpdateAccount(){
     setSubmitLoading(true);
-    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user account.`;
 
     const UpdateAcc = {
-      logs: logs,
+      name: `${userDet.firstname} ${userDet.middlename}. ${userDet.lastname}`,
       username,
-      password: getpassword 
+      password: getpassword,
+      authority: currentUserName.name
     };
 
     axiosClient
@@ -365,12 +364,11 @@ export default function UserDetailsJLMS(){
   function submitUpdateCodeClearance(){
     setSubmitLoading(true);
 
-    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user code clearance.`;
-
     axiosClient
     .put(`updatecc/${id}`, {
       code_clearance: selectedRoles.join(', '),
-      logs: logs
+      name: `${userDet.firstname} ${userDet.middlename}. ${userDet.lastname}`,
+      authority: currentUserName.name
     })
     .then(() => {
       setShowPopup(true);
@@ -428,15 +426,13 @@ export default function UserDetailsJLMS(){
   // Update Avatar
   function SubmitAvatar(e){
     e.preventDefault();
-
     setSubmitLoading(true);
-
-    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user avatar.`;
 
     const formData = new FormData();
     formData.append('_method', 'PUT');
     formData.append('avatar', uploadAvatar);
-    formData.append('logs', logs);
+    formData.append('name', `${userDet.firstname} ${userDet.middlename}. ${userDet.lastname}`);
+    formData.append('authority', currentUserName.name);
 
     axiosClient
     .post(`updateaavatar/${id}`, formData, {
@@ -500,15 +496,13 @@ export default function UserDetailsJLMS(){
   // Update Esig
   function SubmitEsig(e){
     e.preventDefault();
-
     setSubmitLoading(true);
-
-    const logs = `${currentUserName.firstname} has updated ${userDet.firstname} ${userDet.lastname}'s user e-signature.`;
 
     const formData = new FormData();
     formData.append('_method', 'PUT');
     formData.append('esig', uploadEsig);
-    formData.append('logs', logs);
+    formData.append('name', `${userDet.firstname} ${userDet.middlename}. ${userDet.lastname}`);
+    formData.append('authority', currentUserName.name);
 
     axiosClient
     .post(`updateesig/${id}`, formData, {
@@ -621,11 +615,12 @@ export default function UserDetailsJLMS(){
   function handleDeleteClick(id){
     setSubmitLoading(true);
 
-    const logs = `${currentUserName.firstname} has removed ${userDet.firstname} ${userDet.lastname} from the database.`;
-
     axiosClient
     .delete(`/deleteuser/${id}`, {
-      params: { logs: logs }
+      params: { 
+        name: `${userDet.firstname} ${userDet.middlename}. ${userDet.lastname}`,
+        authority: currentUserName.name
+    }
     })
     .then(() => {
       setShowPopup(true);

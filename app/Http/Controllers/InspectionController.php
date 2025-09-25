@@ -7,6 +7,7 @@ use App\Models\InspectionModel;
 use App\Models\LogsModel;
 use App\Models\PPAEmployee;
 use App\Models\NotificationModel;
+use App\Models\FormTracker;
 use App\Http\Requests\InspectionFormRequest;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
@@ -30,8 +31,6 @@ class InspectionController extends Controller
      * 9 - Admin Manager Requestor
      * 10 - Supervisor Requestor
      * 11 - Regaular Requestor
-     * 12 - GSO Access the Part D
-     * 13 - GSO Access the Part C
      * 
      */
 
@@ -208,9 +207,16 @@ class InspectionController extends Controller
 
             // Save the notification and create logs if successful
             if ($noti->save()) {
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $deploymentData->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = $request->input('user_name').' submitted a request.';
+                $track->save();
+
                 // Create logs
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = $data['user_name'] . ' has submitted the request for Pre/Post Repair Inspection.';
                 $logs->save();
             } else {
@@ -233,13 +239,15 @@ class InspectionController extends Controller
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->supervisor_status === 1 && !in_array("GSO", $codeClearance)) {
-            return response()->json(['message' => 'Closed'], 408);
+        if ($InspectionRequest->form_status === 1 && 
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) {
+                return response()->json(['message' => 'Closed'], 201);
+        } 
+        else if ($InspectionRequest->form_status === 6 && $request->input('user_id') == $InspectionRequest->user_id){
+            return response()->json(['message' => 'Not Editable'], 201);
         }
-
-        if ($InspectionRequest->form_status === 1) {
-            return response()->json(['message' => 'Request is already close'], 409);
-        } else {
+        else {
             $uPartA = $InspectionRequest->update([
                 'property_number' => $request->input('property_number'),
                 'acquisition_date' => $request->input('acquisition_date'),
@@ -253,9 +261,16 @@ class InspectionController extends Controller
             ]);
 
             if($uPartA){
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $InspectionRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = $request->input('user_name').' updated the part A form.';
+                $track->save();
+
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = $request->input('user_name').' has updated Part A of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
 
@@ -284,8 +299,20 @@ class InspectionController extends Controller
             return response()->json(['error' => 'Inspection request not found'], 404);
         }
 
+        // Check if the requestor is already canceled
+        if($ApproveRequest->form_status === 0){
+            return response()->json(['message' => 'Canceled Already'], 201);
+        }
+
         // Update a form for supervisor's approval
-        $ApproveRequest->form_status = 6; 
+        // Condition for the approval
+        if($ApproveRequest->date_of_filling && $ApproveRequest->before_repair_date && $ApproveRequest->after_reapir_date){
+            $supApproval = 5;
+        }else{
+            $supApproval = 6;
+        }
+
+        $ApproveRequest->form_status = $supApproval; 
         $ApproveRequest->form_remarks = "The form has been approved by the supervisor.";
         $ApproveRequest->save();
 
@@ -365,8 +392,15 @@ class InspectionController extends Controller
             return response()->json(['error' => 'Failed to update the request'], 406);
         }
 
+        // Add to the Trackers
+        $track = new FormTracker();
+        $track->form_id = $ApproveRequest->id;
+        $track->type_of_request = 'Repair';
+        $track->remarks = $ApproveRequest->supervisor_name.' approved the request.';
+        $track->save();
+
         $logs = new LogsModel();
-        $logs->category = 'INSP';
+        $logs->category = 'FORM';
         $logs->message = $ApproveRequest->supervisor_name. ' has approved the request on the Pre/Post Repair Inspection Form (Control No. '. $ApproveRequest->id.').';
         $logs->save();
         
@@ -468,6 +502,13 @@ class InspectionController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
+
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $DisapproveRequest->id;
+            $track->type_of_request = 'Repair';
+            $track->remarks = $DisapproveRequest->supervisor_name.' disapproved the request.';
+            $track->save();
 
             // Update Notification (Para ma wala sa notifacion list)
             NotificationModel::where('joms_type', 'JOMS_Inspection')
@@ -630,9 +671,16 @@ class InspectionController extends Controller
             return response()->json(['message' => 'There area some missing.'], 204);
         }
 
+        // Add to the Trackers
+        $track = new FormTracker();
+        $track->form_id = $InspectionRequest->id;
+        $track->type_of_request = 'Repair';
+        $track->remarks = $nameGSO.' filled out Part B form.';
+        $track->save();
+
         // Logs
         $logs = new LogsModel();
-        $logs->category = 'INSP';
+        $logs->category = 'FORM';
         $logs->message = $nameGSO.' has filled out Part B of the Pre/Post Repair Inspection Form (Control No. '. $InspectionRequest->id.')';
         $logs->save();
     }
@@ -661,9 +709,16 @@ class InspectionController extends Controller
             ]);
 
             if($uPartB){
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $InspectionRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = $request->input('user_name').' updated the part B form.';
+                $track->save();
+
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = $request->input('user_name').' has updated Part B of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
@@ -789,9 +844,16 @@ class InspectionController extends Controller
             ->where('form_location', 5)
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $ApproveRequest->id;
+            $track->type_of_request = 'Repair';
+            $track->remarks = trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname).' approved the request.';
+            $track->save();
+
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'INSP';
+            $logs->category = 'FORM';
             $logs->message = trim($AMData->firstname . ' ' . $AMData->middlename . '. ' . $AMData->lastname). ' has approved the request on the Pre/Post Repair Inspection Form (Control No. '. $ApproveRequest->id.').';
             $logs->save();
         } else {
@@ -876,9 +938,16 @@ class InspectionController extends Controller
             ->where('form_location', 4)
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $InspectionRequest->id;
+            $track->type_of_request = 'Repair';
+            $track->remarks = $request->input('user_name').' filled out Part C form.';
+            $track->save();
+
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'INSP';
+            $logs->category = 'FORM';
             $logs->message = $request->input('user_name').' has filled out Part C of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
             $logs->save();
 
@@ -892,6 +961,13 @@ class InspectionController extends Controller
      * Update Part C Form 
      */
     public function updatePartC(Request $request, $id){
+        // Validate the Part C Form
+        $validatePartC = $request->validate([
+            'before_repair_date' => 'required|date',
+            'findings' => 'required|string',
+            'recommendations' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
@@ -903,15 +979,22 @@ class InspectionController extends Controller
         } else {
 
             $uPartC = $InspectionRequest->update([
-                'before_repair_date' => $request->input('before_repair_date'),
-                'findings' => $request->input('findings'),
-                'recommendations' => $request->input('recommendations')
+                'before_repair_date' => $validatePartC['before_repair_date'],
+                'findings' => $validatePartC['findings'],
+                'recommendations' => $validatePartC['recommendations']
             ]);
     
             if($uPartC){
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $InspectionRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = $request->input('user_name').' updated the part C form.';
+                $track->save();
+
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = $request->input('user_name').' has updated Part C of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
@@ -1038,9 +1121,16 @@ class InspectionController extends Controller
             ->where('form_location', 3)
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $InspectionRequest->id;
+            $track->type_of_request = 'Repair';
+            $track->remarks = $request->input('user_name').' filled out Part D form.';
+            $track->save();
+
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'INSP';
+            $logs->category = 'FORM';
             $logs->message = $request->input('user_name').' has filled out Part D of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
             $logs->save();
 
@@ -1054,6 +1144,12 @@ class InspectionController extends Controller
      * Update Part D Form 
      */
     public function updatePartD(Request $request, $id){
+        // Validate the Part B Form
+        $validatePartD = $request->validate([
+            'after_reapir_date' => 'required|date',
+            'remarks' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
 
         if (!$InspectionRequest) {
@@ -1065,14 +1161,21 @@ class InspectionController extends Controller
         } else {
 
             $uPartC = $InspectionRequest->update([
-                'after_reapir_date' =>  $request->input('after_reapir_date'),
-                'remarks' => $request->input('remarks')
+                'after_reapir_date' =>  $validatePartD['after_reapir_date'],
+                'remarks' => $validatePartD['remarks']
             ]);
     
             if($uPartC){
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $InspectionRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = $request->input('user_name').' updated the part D form.';
+                $track->save();
+
                 // Logs
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = $request->input('user_name').' has updated Part D of the Pre/Post Repair Inspection Form (Control No. '.$InspectionRequest->id.').';
                 $logs->save();
     
@@ -1086,7 +1189,7 @@ class InspectionController extends Controller
     }
 
     /**
-     * Idle for 24 hours on Assign Personnel 
+     * Idle for 24 hours on Assign Personnel (Not Used!)
      */
     public function personnelIdle(Request $request, $id){
         $twentyFourHoursAgo = Carbon::now()->subHours(24);
@@ -1134,9 +1237,16 @@ class InspectionController extends Controller
                 ->where('form_location', 2)
                 ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $ApproveRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = 'The form was closed by the system.';
+                $track->save();
+
                 // Log the action
                 $logs = new LogsModel();
-                $logs->category = 'INSP';
+                $logs->category = 'FORM';
                 $logs->message = 'The system has closed the Pre/Post Repair Inspection Form (Control No. ' . $ApproveRequest->id . ').';
                 $logs->save();
             }
@@ -1153,6 +1263,10 @@ class InspectionController extends Controller
 
         $ApproveRequest = InspectionModel::find($id);
 
+        if (!$ApproveRequest) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
         // Update Approve
         $ApproveRequest->form_status = 0;
         $ApproveRequest->form_remarks = $request->input('user_name'). ' canceled the form request.';
@@ -1165,9 +1279,16 @@ class InspectionController extends Controller
             ->where('joms_id', $ApproveRequest->id)
             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $ApproveRequest->id;
+            $track->type_of_request = 'Repair';
+            $track->remarks = $request->input('user_name').' cancel the request.';
+            $track->save();
+
             // Log only if saving the notification is successful
             $logs = new LogsModel();
-            $logs->category = 'INSP';
+            $logs->category = 'FORM';
             $logs->message = $request->input('user_name').' has canceled the request for the Pre/Post Repair Inspection Form (Control No. '.$ApproveRequest->id.').';
             $logs->save();
 

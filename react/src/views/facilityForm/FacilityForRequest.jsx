@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import submitAnimation from '/default/ring-loading.gif';
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
@@ -238,7 +238,7 @@ export default function FacilityVenueForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid!</p>
-            <p className="popup-message">Oops! It looks like the end time is earlier than the start time. Please double-check your inputs.</p>
+            <p className="popup-message">You've entered the wrong date and time.</p>
           </div>
         );
       }else if(responseData === 'invalidDate'){
@@ -247,8 +247,7 @@ export default function FacilityVenueForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid!</p>
-            <p className="popup-message">Please select a start date and time that’s not in the past.</p>
-            <p className="popup-message"><i><b>Don’t look back—focus on the present!</b></i></p>
+            <p className="popup-message">Start date/time must be today or later.</p>
           </div>
         );
       }else{
@@ -265,8 +264,8 @@ export default function FacilityVenueForm(){
           setPopupContent('check-error');
           setPopupMessage(
             <div>
-              <p className="popup-title">Not Available</p>
-              <p className="popup-message">Sorry, that facility is not yet available.</p>
+              <p className="popup-title">Sorry</p>
+              <p className="popup-message">Facility unavailable on this day.</p>
             </div>
           );
         }else{
@@ -275,11 +274,14 @@ export default function FacilityVenueForm(){
           setPopupMessage(
             <div>
               <p className="popup-title">Pending for Approval</p>
-              <p className="popup-message">Sorry, that schedule is pending approval from another requestor.</p>
+              <p className="popup-message">Sorry, that schedule is pending approval by another requestor.</p>
             </div>
           );
         }
       }
+    })
+    .catch((error) => {
+      setFieldMissing(error.response.data.errors);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -296,7 +298,7 @@ export default function FacilityVenueForm(){
       setPopupContent('check-error');
       setPopupMessage(
         <div>
-          <p className="popup-title">Error</p>
+          <p className="popup-title">Invalid</p>
           <p className="popup-message">Please fill up the OPR Intruction.</p>
         </div>
       );
@@ -308,7 +310,7 @@ export default function FacilityVenueForm(){
           setPopupMessage(
             <div>
               <p className="popup-title">Invalid</p>
-              <p className="popup-message">You haven’t selected any checkboxes.</p>
+              <p className="popup-message">No checkbox selected. Please choose one.</p>
             </div>
           );
           setSubmitLoading(false);
@@ -327,7 +329,7 @@ export default function FacilityVenueForm(){
           setPopupMessage(
             <div>
               <p className="popup-title">Invalid</p>
-              <p className="popup-message">Please enter the details of the guest.</p>
+              <p className="popup-message">Please enter the guest’s details.</p>
             </div>
           );
         }
@@ -389,14 +391,14 @@ export default function FacilityVenueForm(){
         <div>
           <p className="popup-title">Success</p>
           {Admin ? (
-            <p className="popup-message">Form submitted successfully.</p>
+            <p className="popup-message">Your form has been submitted.</p>
           ):(
-            <p className="popup-message">Form submitted successfully. Please wait for the admin manager's approval.</p>
+            <p className="popup-message">Your form has been submitted. Please wait for the admin manager’s approval.</p>
           )}
         </div>
       );
     })
-    .catch(()=>{
+    .catch((error)=>{
       setShowPopup(true);
       setPopupContent('error');
       setPopupMessage(error.response.status);
@@ -462,8 +464,7 @@ export default function FacilityVenueForm(){
 
             {/* Title */}
             <div>
-              <h2 className="text-base font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
-              <p className="text-xs font-bold text-red-500">This will not be editable once submitted.</p>
+              <h2 className="text-base font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE!</h2>
             </div>
 
             {/* Form */}

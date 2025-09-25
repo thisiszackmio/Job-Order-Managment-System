@@ -38,7 +38,6 @@ class UserController extends Controller
         return response()->json($codeClearance);
     }
 
-
     /**
      * Show all User Employee's Data
      */
@@ -163,8 +162,8 @@ class UserController extends Controller
 
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('logs');
+            $logs->category = 'USER';
+            $logs->message = $request->input('authority').' updated the details of '.$validateData['firstname'].' '.$validateData['middlename'].'. '.$validateData['lastname'].'.';
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -209,8 +208,8 @@ class UserController extends Controller
         if($updateCC){
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('logs');
+            $logs->category = 'USER';
+            $logs->message = $request->input('authority').' updated the code clearance of '.$request->input('name').'.';
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -267,8 +266,8 @@ class UserController extends Controller
 
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('logs');
+            $logs->category = 'USER';
+            $logs->message = $request->input('authority').' updated the avatar of '.$request->input('name').'.';
             $logs->save();
 
             return response()->json(['message' => 'Avatar updated successfully'], 200);
@@ -320,8 +319,8 @@ class UserController extends Controller
 
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('logs');
+            $logs->category = 'USER';
+            $logs->message = $request->input('authority').' updated the esignature of '.$request->input('name').'.';
             $logs->save();
     
             return response()->json(['message' => 'Avatar updated successfully'], 200);
@@ -361,8 +360,8 @@ class UserController extends Controller
 
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'User';
-            $logs->message = $request->input('logs');
+            $logs->category = 'USER';
+            $logs->message = $request->input('authority').' updated the account of '.$request->input('name');
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -388,8 +387,8 @@ class UserController extends Controller
 
         // Logs
         $logs = new LogsModel();
-        $logs->category = 'User';
-        $logs->message = $request->input('logs');
+        $logs->category = 'USER';
+        $logs->message = $request->input('authority').' removed '.$request->input('name').' from the system.';
         $logs->save();
 
         return response()->json(['message' => 'Remove successfully'], 200);
@@ -594,7 +593,7 @@ class UserController extends Controller
                 if($findPersonnel->save()) {
                     // Creating logs
                     $logs = new LogsModel();
-                    $logs->category = 'Personnel';
+                    $logs->category = 'PERSONNEL';
                     $logs->message = $personnelData['personnel_name'].' has been assigned to the '.$personnelData['assignment'].' list.';
                     $logs->save();
                 }
@@ -602,6 +601,33 @@ class UserController extends Controller
             }
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
+    }
+
+    /**
+     * Set Personnel to Not Available
+     */
+    public function notavailPersonnel(Request $request, $id){
+        // Find the personnel assignment
+        $data = AssignPersonnelModel::find($id);
+
+        // Data not found
+        if (!$data){
+            return response()->json(['message' => 'Personnel not found'], 404);
+        }
+
+        // Update the status
+        $data->status = 3;
+        $data->date_assigned = null;
+
+        if($data->save()){
+            // Creating logs only if both operations are successful
+            $logs = new LogsModel();
+            $logs->category = 'PERSONNEL';
+            $logs->message = $request->input('authority').' has set '.$data->personnel_name.' to not available.';
+            $logs->save();
+        }
+
+        return response()->json(['message' => 'Personnel Available.'], 200);
     }
 
     /**
@@ -673,11 +699,12 @@ class UserController extends Controller
 
         // Update the status
         $data->status = 2;
+        $data->date_assigned = null;
 
         if($data->save()){
             // Creating logs only if both operations are successful
             $logs = new LogsModel();
-            $logs->category = 'Personnel';
+            $logs->category = 'PERSONNEL';
             $logs->message = $request->input('authority').' has set '.$data->personnel_name.' to available.';
             $logs->save();
         }

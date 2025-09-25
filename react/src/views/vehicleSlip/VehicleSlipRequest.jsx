@@ -60,24 +60,21 @@ export default function FacilityVenueForm(){
   const [VRPassenger, setVRPassenger] = useState('');
   const [vehicalName, setVehicleName] = useState('');
   const [pointDriver, setPointDriver] = useState({ did: '', dname: '' });
+  const [VRNote, setVRNote] = useState('');
 
   const [inputErrors, setInputErrors] = useState({});
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
-    </div>
-  );
 
   // Get Vehicle Details
   const fetchVehicle = () => {
     axiosClient
-    .get(`/getvehdet`)
+    .get(`/getvehdet`, {
+      params: {
+        date: VRDateArrival,
+        time: VRTimeArrival,
+      },
+    })
     .then((response) => {
       const responseData = response.data;
-
       setVehicleDet(responseData)    
     });
   }
@@ -85,18 +82,22 @@ export default function FacilityVenueForm(){
   // Get Driver Details
   const fetchDriver = () => {
     axiosClient
-    .get(`/getdriverdet`)
+    .get(`/getdriverdet`, {
+      params: {
+        date: VRDateArrival,
+        time: VRTimeArrival,
+      },
+    })
     .then((response) => {
       const responseData = response.data;
-
       setDriver(responseData)
     });
-  }
+  } 
 
   useEffect(() => { 
     fetchVehicle();
     fetchDriver();
-  }, []);
+  }, [VRDateArrival, VRTimeArrival]);
 
   // Confirm Function
   function handleConfirm(event){
@@ -118,13 +119,13 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO || PersonAuthority ? 7 : Admin ? 5 : PortManager ? 6 : 8,
+      admin_approval : GSO || PersonAuthority ? 8 : Admin ? 6 : PortManager ? 7 : 9,
       remarks : "Check",
     }
 
     if (selectedDateTime.isBefore(currentDateTime)) {
       setShowPopup(true);
-      setPopupContent('error');
+      setPopupContent('check-error');
       setPopupMessage(
         <div>
           <p className="popup-title">Error</p>
@@ -141,13 +142,13 @@ export default function FacilityVenueForm(){
         }
       })
       .catch((error)=>{
-        if(error.response.status === 500) {
-          setShowPopup(true);
-          setPopupContent('error');
-          setPopupMessage(DevErrorText);
-        }else{
+        if(error.response.status === 422) {
           const responseErrors = error.response.data.errors;
           setInputErrors(responseErrors);
+        }else{
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(error.response.status);
         }
       });
     }
@@ -178,8 +179,9 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO || PersonAuthority ? 7 : Admin ? 5 : PortManager ? 6 : 8,
+      admin_approval : GSO || PersonAuthority ? 8 : Admin ? 6 : PortManager ? 7 : 9,
       remarks : remarks,
+      notes: VRNote
     }
 
     axiosClient
@@ -195,11 +197,11 @@ export default function FacilityVenueForm(){
         </div>
       );
     })
-    .catch(()=>{
+    .catch((error)=>{
       setButtonHide(true)
       setShowPopup(true);
       setPopupContent('error');
-      setPopupMessage(DevErrorText);
+      setPopupMessage(error.response.status);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -241,7 +243,6 @@ export default function FacilityVenueForm(){
             {/* Title */}
             <div>
               <h2 className="text-lg font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
-              <p className="text-sm font-bold text-red-500">NOTE: This will not be editable once submitted.</p>
             </div>
 
             {/* Date */}
@@ -357,6 +358,18 @@ export default function FacilityVenueForm(){
                 ))}
               </div>
             </div>
+            ):null}
+
+            {/* Note */}
+            {VRNote ? (
+              <div className="flex items-center mt-2">
+                <div className="w-40">
+                  <label className="block text-base font-bold leading-6 text-gray-900"> Note: </label> 
+                </div>
+                <div className="w-1/2 ppa-form-view">
+                {VRNote}
+                </div>
+              </div>
             ):null}
 
             {/* Button */}
@@ -539,9 +552,9 @@ export default function FacilityVenueForm(){
                 min={today}
                 className={`block w-full ${(!VRDateArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
               />
-              {!VRDateArrival && inputErrors.date_arrival && (
+              {!VRDateArrival && inputErrors.date_arrival ? (
                 <p className="form-validation">This form is required</p>
-              )}
+              ):(<p className="text-gray-500 text-xs">Please enter the date of arrival at your destination.</p>)}
             </div>
           </div>
 
@@ -561,9 +574,9 @@ export default function FacilityVenueForm(){
                 onChange={ev => setVRTimeArrival(ev.target.value)}
                 className={`block w-full ${(!VRTimeArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
               />
-              {!VRTimeArrival && inputErrors.time_arrival && (
+              {!VRTimeArrival && inputErrors.time_arrival ? (
                 <p className="form-validation">This form is required</p>
-              )}
+              ):(<p className="text-gray-500 text-xs">Please enter the time of arrival at your destination.</p>)}
             </div>
           </div>
 
@@ -590,15 +603,15 @@ export default function FacilityVenueForm(){
                     <option 
                       key={vehDet.vehicle_id} 
                       value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
-                      disabled={vehDet.availability == 1}
-                      className={`${vehDet.availability == 1 ? "disable-form":''}`}
+                      disabled={vehDet.availability == 3 || vehDet.availability == 2 || vehDet.availability == 1}
+                      className={`${vehDet.availability == 3 || vehDet.availability == 2 || vehDet.availability == 1 ? "disable-form":''}`}
                     >
-                      {vehDet.vehicle_name} - {vehDet.vehicle_plate} {vehDet.availability == 1 ? "(On Travel)":null}
+                      {vehDet.vehicle_name} - {vehDet.vehicle_plate} {vehDet.availability == 3 ? "(Not Available)": vehDet.availability == 2 ? "(Reserve)": vehDet.availability == 1 ? "(On Travel)" :null}
                     </option>
                   ))}
                 </select>
-                {!vehicalName && inputErrors.vehicle_type && (
-                  <p className="form-validation">This form is required</p>
+                {(!VRDateArrival || !VRTimeArrival) && (
+                  <p className="text-gray-500 text-xs" >Please enter the Date and Time of Arrival first to enable the selection options.</p>
                 )}
               </div>
             </div>
@@ -612,32 +625,36 @@ export default function FacilityVenueForm(){
               </div>
               <div className="w-1/2">
                 <select 
-                name="rep_type_of_property" 
-                id="rep_type_of_property" 
-                autoComplete="rep_type_of_property"
-                value={pointDriver.did}
-                onChange={ev => {
-                  const personnelId = parseInt(ev.target.value);
-                  const selectedPersonnel = driver.find(staff => staff.driver_id === personnelId);
+                  name="rep_type_of_property" 
+                  id="rep_type_of_property" 
+                  autoComplete="rep_type_of_property"
+                  value={pointDriver.did}
+                  onChange={ev => {
+                    const personnelId = parseInt(ev.target.value);
+                    const selectedPersonnel = driver.find(staff => staff.driver_id === personnelId);
 
-                  setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
-                }}
-                className={`block w-full ${(!pointDriver.did && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
+                    setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                  }}
+                  className={`block w-full ${(!pointDriver.did && inputErrors.purpose) ? "ppa-form-error":"ppa-form"}`}
                 >
                   <option value="" disabled>Driver Select</option>
                   {driver?.map((driverDet) => (
                     <option 
                       key={driverDet.driver_id} 
                       value={driverDet.driver_id}
-                      disabled={driverDet.driver_status == 1}
-                      className={`${driverDet.driver_status == 1 ? "disable-form":''}`}
+                      disabled={driverDet.availability == 3 || driverDet.availability == 2 || driverDet.availability == 1}
+                      className={`${driverDet.availability == 3 || driverDet.availability == 2 || driverDet.availability == 1 ? "disable-form":''}`}
                     >
-                      {driverDet.driver_name} {driverDet.driver_status == 1 ? "(On Travel)":null}
+                      {driverDet.driver_name} {driverDet.availability == 3 ? "(Not Available)": driverDet.availability == 2 ? "(Reserve)": driverDet.availability == 1 ? "(On Travel)" :null}
                     </option>
                   ))}
                 </select>
                 {!pointDriver.did && inputErrors.driver && (
                   <p className="form-validation">This form is required</p>
+                )}
+
+                {(!VRDateArrival || !VRTimeArrival) && (
+                  <p className="text-gray-500 text-xs" >Please enter the Date and Time of Arrival first to enable the selection options.</p>
                 )}
               </div>
             </div>
@@ -678,6 +695,36 @@ export default function FacilityVenueForm(){
               <p className="text-gray-500 text-xs">List each name on a separate line without numbering. If there are no passengers, leave it blank.</p>
             </div>
           </div>
+
+          {/* Note */}
+          {selectedTravelType == 'outside' && (
+            <div className="flex mt-2 font-roboto">
+              <div className="w-48">
+                <label htmlFor="vr_passengers" className="block text-base font-bold leading-6 text-black">
+                  Note:
+                </label>
+              </div>
+              <div className="w-1/2">
+                <textarea
+                  id="vr_notes"
+                  name="vr_notes"
+                  rows={4}
+                  value={VRNote}
+                  onChange={(ev) => {
+                    const input = ev.target.value;
+                    const formatted =
+                    input.charAt(0).toUpperCase() + input.slice(1);
+                      setVRNote(formatted);
+                  }}
+                  style={{ resize: 'none' }}
+                  maxLength={1000}
+                  className="block w-full ppa-form"
+                  placeholder="Enter here (leave blank if none)"
+                />
+                <p className="text-gray-500 text-xs">Please enter your suggestions here.</p>
+              </div>
+            </div>
+          )}
 
           {/* Button */}
           <button 

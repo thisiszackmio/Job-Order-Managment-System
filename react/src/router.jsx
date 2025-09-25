@@ -30,6 +30,7 @@ import UserListJLMS from './views/settings/UserList';
 import UserDetailsJLMS from './views/settings/UserDetails';
 import ViewUser from './views/ViewUser';
 import PendingRequest from './views/sidebar/Pending';
+import VehicleAvailability from './views/sidebar/VehicleAvailability';
 
 import JLMS from './views/jlms';
 import Login from './views/Login';
@@ -80,6 +81,7 @@ const routes = [
       { path: '/joms/userdetails/:id', element: <UserDetailsJLMS /> },
       { path: '/joms/user', element: <ViewUser /> },
       { path: '/joms/pending', element: <PendingRequest /> },
+      { path: '/joms/vehicleavail', element: <VehicleAvailability /> },
       // Inspection
       { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },

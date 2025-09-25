@@ -70,9 +70,9 @@ class AuthController extends Controller
                 // Logs
                 $logs = new LogsModel();
                 $logs->category = 'USER';
-                $logs->message = $request->input('firstname') . ' ' . $request->input('middlename') . '. ' . $request->input('lastname') . ' has been added to the system database.';
+                $logs->message = $request->input('registrant').' has registered '.$request->input('firstname').' '.$request->input('middlename').'. '.$request->input('lastname').' in the system.';
                 $logs->save();
-                
+
                 return response()->json([
                     'message' => "Product successfully created."
                 ], 200);
@@ -151,15 +151,13 @@ class AuthController extends Controller
                 $security->user_id = $user->id;
             }
 
-            $security->hostingname = $pcName;
             $security->browser = $agent->browser();
 
             if ($security->save()) {
                 // Add to logs
                 $logs = new LogsModel();
                 $logs->category = 'USER';
-                $logs->message = $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname .
-                                 ' has logged into the system on device ' . $pcName . ' using the ' .$agent->browser(). ' browser.';
+                $logs->message = $user->firstname.' '.$user->middlename.'. '. $user->lastname.' has logged into the system ('.$agent->browser().').';
                 $logs->save();
             }
 
@@ -218,12 +216,11 @@ class AuthController extends Controller
 
         // Format the full name
         $fullName = trim($user->firstname . ' ' . ($user->middlename ? $user->middlename[0] . '. ' : '') . $user->lastname);
-        $pcName = gethostname();
 
         // LOGS
         $logs = new LogsModel();
         $logs->category = 'USER';
-        $logs->message = $fullName .' has logged out on the system using '.$pcName.'.';
+        $logs->message = $fullName .' has logged out on the system.';
 
         if($logs->save() === True){
             $user->currentAccessToken()->delete();
@@ -234,29 +231,5 @@ class AuthController extends Controller
             'success' => true
         ]);
     }
-
-    /**
-     * Get the Superadmin Settings
-     */
-    // public function settingsSuperAdmin() {
-    //     // Retrieve all settings from the database
-    //     $getSettings = SuperAdminSettingsModel::all();
-    
-    //     // Check if there are any settings available
-    //     if ($getSettings->isEmpty()) {
-    //         return response()->json([
-    //             'error' => 'Settings not found.'
-    //         ], 404);  // Return 404 if no settings are found
-    //     }
-    
-    //     // Extract the 'enable_main' setting value
-    //     $respondData = [
-    //         'maintainance' => $getSettings->first()->enable_main  // Assuming the first record holds the setting
-    //     ];
-    
-    //     // Return the response
-    //     return response()->json($respondData);
-    // }
-
     
 }

@@ -18,6 +18,9 @@ const Popup = ({
   SubmitAdminReason,
   SubmitAvailability,
   personnelId,
+  vehicleId,
+  NotAvailPersonnel,
+  NotAvailVehicle,
   RemovePersonnel,
   AvailableConfirmation,
   CloseForceRequest,
@@ -170,6 +173,64 @@ const Popup = ({
             <button onClick={closePopup} className="w-full py-2 btn-default"> Close </button>
           )}
 
+          {/* --- Set Personnel to Not Available --- */}
+          {popupContent == 'NotavailPersonnel' && (
+            <>
+              {/* Submit */}
+              <button 
+                type="submit"
+                onClick={() => NotAvailPersonnel(personnelId)}
+                className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Loading</span>
+                  </div>
+                ):(
+                  'Confirm'
+                )}
+              </button>
+
+              {/* Cancel */}
+              {!submitLoading && (
+                <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                  Close
+                </button>
+              )}
+            </>
+          )}
+
+          {/* --- Set Vehicle to Not Available --- */}
+          {popupContent == 'NotavailVehicle' && (
+            <>
+              {/* Submit */}
+              <button 
+                type="submit"
+                onClick={() => NotAvailVehicle(vehicleId)}
+                className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-2">Loading</span>
+                  </div>
+                ):(
+                  'Confirm'
+                )}
+              </button>
+
+              {/* Cancel */}
+              {!submitLoading && (
+                <button onClick={justClose} className="w-1/2 py-2 btn-cancel ml-2">
+                  Close
+                </button>
+              )}
+            </>
+          )}
+
           {/* Set Available for Driver and Vehicle */}
           {popupContent == "subAvailability" && (
           <>
@@ -263,7 +324,7 @@ const Popup = ({
             {/* Submit */}
             <button 
               type="submit"
-              onClick={removeVehicleDet}
+              onClick={() => removeVehicleDet(vehicleId)}
               className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
               disabled={submitLoading}
             >
@@ -292,7 +353,7 @@ const Popup = ({
             {/* Submit */}
             <button 
               type="submit"
-              onClick={vacantVehicle}
+              onClick={() => vacantVehicle(vehicleId)}
               className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
               disabled={submitLoading}
             >
@@ -351,7 +412,7 @@ const Popup = ({
             {/* Submit */}
             <button 
               type="submit"
-              form={form}
+              onClick={() => form()}
               className={`py-2 px-4 ${ submitLoading ? 'process-btn w-full' : 'btn-default w-1/2' }`}
               disabled={submitLoading}
             >

@@ -5,18 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AssignPersonnelModel extends Model
+class FormTracker extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'personnel_id',
-        'personnel_name',
-        'assignment',
         'form_id',
-        'status',
-        'date_assigned'
+        'type_of_request',
+        'remarks'
     ];
 
-    protected $table = 'assign_personnel';
+    protected $table = 'form_request_tracker';
 }

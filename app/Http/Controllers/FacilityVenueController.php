@@ -7,6 +7,7 @@ use App\Models\FacilityVenueModel;
 use App\Models\NotificationModel;
 use App\Models\PPAEmployee;
 use App\Models\LogsModel;
+use App\Models\FormTracker;
 use App\Http\Requests\FacilityFormRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
@@ -28,13 +29,18 @@ class FacilityVenueController extends Controller
      */
 
      /**
-     *  Form List 
+     *  Form List (Shows on the Request List)
      */
     public function index(){
         // For Facility Form
-        $getFacilityFormData = FacilityVenueModel::orderBy('created_at', 'desc')->get();
+        $FacilityFormData = FacilityVenueModel::orderBy('created_at', 'desc')->get();
 
-        $facDet = $getFacilityFormData->map(function ($facilityForm) {
+        // Check if the facility request exists
+        if (!$FacilityFormData) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
+        $facDet = $FacilityFormData->map(function ($facilityForm) {
             return[
                 'id' => $facilityForm->id,
                 'date_request' => $facilityForm->created_at,
@@ -113,7 +119,7 @@ class FacilityVenueController extends Controller
                 }
             }
 
-            if($facility->admin_approval === 2 || $facility->admin_approval === 1 || $facility->admin_approval === 0){
+            if($facility->admin_approval === 2 || $facility->admin_approval === 1){
                 if(($startDateTime >= $facilityStartDateTime && $startDateTime <= $facilityEndDateTime) ||
                 ($endDateTime >= $facilityStartDateTime && $endDateTime <= $facilityEndDateTime)){
                     return response()->json(['message' => 'Not Vacant'], 201);
@@ -137,7 +143,7 @@ class FacilityVenueController extends Controller
 
         // Create and save the deployment data
         $deploymentData = FacilityVenueModel::create($data);
-        if (!$deploymentData) { return response()->json(['error' => 'Data Error'], 404); }
+        if (!$deploymentData) { return response()->json(['error' => 'Something wrong'], 406); }
 
         // Get Your Avatar
         $dataReq = PPAEmployee::where('id', $data['user_id'])->first(); 
@@ -189,10 +195,17 @@ class FacilityVenueController extends Controller
         // Insert notifications in bulk for efficiency
         NotificationModel::insert($notifications);
 
+        // Add to the Trackers
+        $track = new FormTracker();
+        $track->form_id = $deploymentData->id;
+        $track->type_of_request = 'Facility/Venue';
+        $track->remarks = $request->input('user_name').' submitted a request.';
+        $track->save();
+
         // Create logs
         $logs = new LogsModel();
-        $logs->category = 'FVF';
-        $logs->message = $nameReq. ' has submitted the request.';
+        $logs->category = 'FORM';
+        $logs->message = $nameReq. ' has submitted a request.';
         $logs->save();
 
         return response()->json(['message' => 'Deployment data created successfully'], 200);
@@ -205,6 +218,10 @@ class FacilityVenueController extends Controller
         $CheckForm = $request->validate([
             'request_office' => 'required|string',
             'title_of_activity' => 'required|string',
+            'date_start' => 'required|date',
+            'time_start' => 'required|date_format:H:i:s',
+            'date_end' => 'required|date',
+            'time_end' => 'required|date_format:H:i:s',
             'table' => 'required|boolean',
             'no_table' => 'nullable|numeric',
             'chair' => 'required|boolean',
@@ -227,24 +244,38 @@ class FacilityVenueController extends Controller
 
         $facilityData = FacilityVenueModel::find($id);
 
-        // If the Admin Manager approves the form
+        // If the Admin Manager Cancel the Form
         if($facilityData->admin_approval == 0){
-            return response()->json(['message' => 'Closed'], 200);
+            return response()->json(['message' => 'Cancel'], 201);
         }
 
-        // If the Admin Manager disapproves the form
-        if($facilityData->admin_approval == 3){
-            return response()->json(['message' => 'Disapprove'], 200);
+        // If the Admin Manager Closed the form
+        if($facilityData->admin_approval == 1){
+            return response()->json(['message' => 'Closed'], 201);
         } 
         
         // If the Admin Manager disapproves the form
-        if($facilityData->admin_approval == 5){
-            return response()->json(['massage' => 'Deleted'], 200);
+        if($facilityData->admin_approval == 4){
+            return response()->json(['message' => 'Disapproved'], 201);
         } 
+
+        // Check if the end datetime is before start datetime
+        if (
+            Carbon::parse($CheckForm['date_start'] . ' ' . $CheckForm['time_start'])
+                ->greaterThan(
+                    Carbon::parse($CheckForm['date_end'] . ' ' . $CheckForm['time_end'])
+                )
+        ) {
+            return response()->json(['message' => 'Invalid Date'], 201);
+        }
 
         // Update the Data
         $facilityData->request_office = $CheckForm['request_office'];
         $facilityData->title_of_activity = $CheckForm['title_of_activity'];
+        $facilityData->date_start = $CheckForm['date_start'];
+        $facilityData->time_start = $CheckForm['time_start'];
+        $facilityData->date_end = $CheckForm['date_end'];
+        $facilityData->time_end = $CheckForm['time_end'];
         $facilityData->table = $CheckForm['table'];
         $facilityData->no_table = $CheckForm['no_table'];
         $facilityData->chair = $CheckForm['chair'];
@@ -265,9 +296,16 @@ class FacilityVenueController extends Controller
         $facilityData->other_details = $CheckForm['other_details'];
 
         if($facilityData->save()){
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityData->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $request->input('user_name').' updated the form.';
+            $track->save();
+
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'FVF';
+            $logs->category = 'FORM';
             $logs->message = $request->input('user_name'). ' has update the form on Facility/Venue Form (Control No. '.$facilityData->id.').';
             $logs->save();
 
@@ -290,7 +328,7 @@ class FacilityVenueController extends Controller
 
         // Check if the facility request exists
         if (!$FacilityRequest) {
-            return response()->json(['error' => 'No-Form'], 404);
+            return response()->json(['error' => 'Data Not Found'], 404);
         }
 
         // Get Requestor Detail
@@ -331,7 +369,7 @@ class FacilityVenueController extends Controller
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
         if (!$facilityRequest) { 
-            return response()->json(['error' => 'Facility request not found.'], 404); 
+            return response()->json(['error' => 'Data not found'], 404); 
         }
 
         // check if the request form was already deleted
@@ -342,6 +380,13 @@ class FacilityVenueController extends Controller
         // Check if the Approver is the Admin (For Security)
         $checkAM = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%AM%")->first();
         if (!$checkAM) {
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = 'Unauthorized approval attempt by ' .$checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname;
+            $track->save();
+
             return response()->json(['message' => 'Not Admin'], 201);
         }
 
@@ -416,11 +461,18 @@ class FacilityVenueController extends Controller
                         ->whereIn('form_location', [5, 6, 7])
                         ->update(['status' => 0]); // Change to 0 for delete the Notification
 
-           // Create logs
-           $logs = new LogsModel();
-           $logs->category = 'FVF';
-           $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has approved the request on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
-           $logs->save();
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname .' input the OPR instruction and approved the request.';
+            $track->save();
+            
+            // Create logs
+            $logs = new LogsModel();
+            $logs->category = 'FORM';
+            $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has approved the request on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
+            $logs->save();
 
            return response()->json(['message' => 'OPR instruction updated successfully.'], 200);
         } else {
@@ -436,24 +488,40 @@ class FacilityVenueController extends Controller
             'oprInstruct' => 'required|string'
         ]);
 
-        // Check if the Approver is the Admin (For Security)
-        $checkAM = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%AM%")->first();
-        if (!$checkAM) {
-            return response()->json(['error' => 'Not Admin.'], 500);
-        }
-
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
-        if (!$facilityRequest) { return response()->json(['message' => 'Facility request not found.'], 404); }
+        if (!$facilityRequest) { return response()->json(['message' => 'Data not found'], 404); }
 
+        // Check if the Approver is the Admin (For Security)
+        $checkAM = PPAEmployee::where('id', $request->input('user_id'))
+        ->whereRaw("code_clearance LIKE '%AM%' OR code_clearance LIKE '%HACK%'")
+        ->first();
+        if (!$checkAM) {
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = 'Unauthorized OPR update attempt by ' .$checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname;
+            $track->save();
+
+            return response()->json(['message' => 'Not Admin'], 201);
+        }
+        
         // Update the OPR instruction
         $facilityRequest->obr_instruct = $CheckOPR['oprInstruct'];
 
         // Save the updated facility request
         if ($facilityRequest->save()) {
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname .' updated the OPR instruction.';
+            $track->save();
+
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'FVF';
+            $logs->category = 'FORM';
             $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has updated the OPR Instruction on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         } else {
@@ -475,17 +543,13 @@ class FacilityVenueController extends Controller
 
         // Get the sender's data (If GSO)
         $sender = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%GSO%")->first();
-        if (!$sender) { 
-            return response()->json(['error' => 'Not Admin.'], 500);
-        }else{
-            $senderId = $sender->id;
-            $senderAvatar = $sender->avatar;
-            $senderName = trim($sender->firstname . ' ' . $sender->middlename . '. ' . $sender->lastname);
-        }
+        $senderId = $sender->id;
+        $senderAvatar = $sender->avatar;
+        $senderName = trim($sender->firstname . ' ' . $sender->middlename . '. ' . $sender->lastname);
 
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
-        if (!$facilityRequest) { return response()->json(['error' => 'Facility request not found.'], 404); }
+        if (!$facilityRequest) { return response()->json(['error' => 'Data not found'], 404); }
 
         // Update the OPR comment
         $facilityRequest->obr_comment = $CheckOPR['oprAction'];
@@ -527,9 +591,16 @@ class FacilityVenueController extends Controller
                         ->where('form_location', 3)
                         ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $senderName .' submitted the OPR action.';
+            $track->save();
+
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'FVF';
+            $logs->category = 'FORM';
             $logs->message = $senderName.' has entered the OPR Action on the Facility/Venue Request Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
 
@@ -548,22 +619,26 @@ class FacilityVenueController extends Controller
         ]); 
 
         // Check if this is GSO (For Security)
-        $checkGSO = PPAEmployee::where('id', $request->input('user_id'))->where('code_clearance', 'LIKE', "%GSO%")->first();
-        if (!$checkGSO) {
-            return response()->json(['message' => 'Not GSO'], 408);
-        }
+        $checkGSO = PPAEmployee::where('id', $request->input('user_id'))->whereRaw("code_clearance LIKE '%AM%' OR code_clearance LIKE '%HACK%'")->first();
 
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
-        if (!$facilityRequest) { return response()->json(['message' => 'Facility request not found.'], 404); }
+        if (!$facilityRequest) { return response()->json(['error' => 'Data not found'], 404); }
 
         // Update the OPR comment
         $facilityRequest->obr_comment = $CheckOPR['oprAction'];
 
         if($facilityRequest->save()){
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $checkGSO->firstname. ' ' .$checkGSO->middlename. '. ' .$checkGSO->lastname .' updated the OPR action.';
+            $track->save();
+
             // Create logs
             $logs = new LogsModel();
-            $logs->category = 'FVF';
+            $logs->category = 'FORM';
             $logs->message = $checkGSO->firstname. ' ' .$checkGSO->middlename. '. ' .$checkGSO->lastname . ' has updated the OPR Action on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         }
@@ -577,6 +652,10 @@ class FacilityVenueController extends Controller
         $now = Carbon::now();
 
         $facilityRequest = FacilityVenueModel::find($id);
+
+        // Find the facility request by ID
+        $facilityRequest = FacilityVenueModel::find($id);
+        if (!$facilityRequest) { return response()->json(['error' => 'Data not found'], 404); }
 
         $facilityRequest->admin_approval = 4;
         $facilityRequest->date_approve = today();
@@ -657,9 +736,16 @@ class FacilityVenueController extends Controller
                             ->whereIn('form_location', [5, 6, 7])
                             ->update(['status' => 0]); // Change to 0 for delete the Notification
 
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $nameAM.'  disapproved the request.';
+            $track->save();
+
             // Logs
             $logs = new LogsModel();
-            $logs->category = 'FVF';
+            $logs->category = 'FORM';
             $logs->message = $nameAM.' has disapproved the request on the Facility / Venue Request Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         
@@ -680,15 +766,24 @@ class FacilityVenueController extends Controller
                                         ->where('updated_at', '<', $twentyFourHoursAgo)
                                         ->first();
 
+        if (!$FacilityRequest) { return response()->json(['message' => 'No changes has made'], 201); }
+
         if ($FacilityRequest) {
             // Update the record
             $FacilityRequest->admin_approval = 1;
             $FacilityRequest->remarks = 'Form is closed';
 
             if($FacilityRequest->save()){
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $FacilityRequest->id;
+                $track->type_of_request = 'Facility/Venue';
+                $track->remarks = 'The form was closed by the system.';
+                $track->save();
+
                 // Log the action
                 $logs = new LogsModel();
-                $logs->category = 'FVF';
+                $logs->category = 'FORM';
                 $logs->message = 'The system has closed the Facility / Venue Request Form (Control No. ' . $FacilityRequest->id . ').';
                 $logs->save();
             }
@@ -702,10 +797,15 @@ class FacilityVenueController extends Controller
     public function cancelRequest(Request $request, $id){
 
         $facilityRequest = FacilityVenueModel::find($id);
+        if (!$facilityRequest) { return response()->json(['error' => 'Data not found'], 404); }
 
         // Check if the Request is already approve
-        if($facilityRequest->admin_approval == 0 || $facilityRequest->admin_approval == 1){
-            return response()->json(['message' => 'Already'], 201);
+        if($facilityRequest->admin_approval == 0){
+            return response()->json(['message' => 'Cancel'], 201);
+        }else if($facilityRequest->admin_approval == 1){
+            return response()->json(['message' => 'Approve'], 201);
+        }else if($facilityRequest->admin_approval == 4){
+            return response()->json(['message' => 'Disapproved'], 201);
         }
 
         // Update Approve
@@ -722,9 +822,16 @@ class FacilityVenueController extends Controller
                 $notification->status = 0;
 
                 if ($notification->save()) {
+                    // Add to the Trackers
+                    $track = new FormTracker();
+                    $track->form_id = $facilityRequest->id;
+                    $track->type_of_request = 'Facility/Venue';
+                    $track->remarks = $request->input('user_name').' canceled the form.';
+                    $track->save();
+
                     // Log only if saving the notification is successful
                     $logs = new LogsModel();
-                    $logs->category = 'FVF';
+                    $logs->category = 'FORM';
                     $logs->message = $request->input('user_name').' has canceled the form on Facility / Venue Request Form (Control Number:'.$facilityRequest->id.').';
                     $logs->save();
                 }

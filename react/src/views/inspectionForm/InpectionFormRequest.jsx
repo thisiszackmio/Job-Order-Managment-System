@@ -217,7 +217,6 @@ export default function RepairRequestForm(){
               {/* Title */}
               <div>
                 <h2 className="text-lg font-bold leading-7 text-gray-900">KINDLY double check your form PLEASE! </h2>
-                <p className="text-sm font-bold text-red-500">NOTE: This will not be editable once submitted.</p>
               </div>
 
               <div className="grid grid-cols-2">

@@ -2,28 +2,30 @@ import React, { useEffect, useState } from "react";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
 import submitAnimation from '/default/ring-loading.gif';
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faCheckToSlot, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faUserPlus, faXmark, faUserAltSlash, faUser, faHouse } from '@fortawesome/free-solid-svg-icons';
 import Popup from "../../components/Popup";
 import Restrict from "../../components/Restrict";
 
 export default function AddPersonnel(){
   const { currentUserName, currentUserCode } = useUserStateContext();
 
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
-    </div>
-  );
-
   // Function
   const [loading, setLoading] = useState(true);
+
   const [addPersonnel, SetAddPersonnel] = useState(false);
+
+  const [personnelList, setPersonnelList] = useState([]);
+
+  const [selectedId, setSelectedId] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  const [personnel, setPersonnel] = useState([]);
+
+  // Variable
+  const [selectPersonnel, setSelectPersonnel] = useState({ id: '', name: '' });
+  const [personnelCategory, setPersonnelCategory] = useState("");
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -53,16 +55,6 @@ export default function AddPersonnel(){
       removePopupClass();
     };
   }, [showPopup]);
-
-  const [personnelList, setPersonnelList] = useState([]);
-  const [personnel, setPersonnel] = useState([]);
-
-  // Variable
-  const [selectPersonnel, setSelectPersonnel] = useState({ id: '', name: '' });
-  const [personnelCategory, setPersonnelCategory] = useState("");
-
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
 
   // Get Personnel List
   const fetchPersonnelList = () => {
@@ -101,7 +93,7 @@ export default function AddPersonnel(){
   function submitPersonnel(event){
     event.preventDefault();
     setSubmitLoading(true);
-
+    
     const data = {
       personnel_id: selectPersonnel.id,
       personnel_name: selectPersonnel.name,
@@ -123,11 +115,93 @@ export default function AddPersonnel(){
       );
     })
     .catch((error)=>{
-      if (error.response.status === 500) {
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(error.response.status);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
+  // Set Personnel to Not Available
+  function handleNotAvailableConfirmation(id){
+    setSelectedId(id);
+    setShowPopup(true);
+    setPopupContent('NotavailPersonnel');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">Do you want to set this personnel as not available?</p>
+      </div>
+    );
+  }
+
+  // Set to Not Available Function
+  function NotAvailPersonnel(id){
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`/notvailpersonnel/${id}`, {
+      data: {
+        authority: currentUserName.name
       }
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Successful</p>
+          <p className="popup-message">Personnel marked as not available.</p>
+        </div>
+      );
+    })
+    .catch((error)=>{
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(error.response.status);
+    })
+    .finally(() => {
+      setSubmitLoading(false);
+    });
+  }
+
+  // Set Personnel to Available
+  function handleAvailableConfirmation(id, status){
+    setSelectedId(id);
+    setShowPopup(true);
+    setPopupContent('availablePersonnel');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Are you sure?</p>
+        <p className="popup-message">This personnel is {status === 1 ? "arrived?" : "available?"}</p>
+      </div>
+    );
+  }
+
+  // Set Available Function
+  function AvailableConfirmation(id){
+    setSubmitLoading(true);
+
+    axiosClient
+    .put(`/availpersonnel/${id}`, {
+      authority: currentUserName.name
+    })
+    .then(() => {
+      setShowPopup(true);
+      setPopupContent('success');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Successful</p>
+          <p className="popup-message">The personnel is available</p>
+        </div>
+      );
+    })
+    .catch((error)=>{
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(error.response.status);
     })
     .finally(() => {
       setSubmitLoading(false);
@@ -142,7 +216,7 @@ export default function AddPersonnel(){
     setPopupMessage(
       <div>
         <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">Do you want remove? It cannot be undone.</p>
+        <p className="popup-message">You want to remove this personnel from the list?</p>
       </div>
     );
   }
@@ -168,54 +242,12 @@ export default function AddPersonnel(){
       );
     })
     .catch((error)=>{
-      if (error.response.status === 500) {
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }
+      setShowPopup(true);
+      setPopupContent('error');
+      setPopupMessage(error.response.status);
     })
     .finally(() => {
       setSubmitLoading(false);
-    });
-  }
-
-  // Set Available Popup
-  function handleAvailableConfirmation(id){
-    setSelectedId(id);
-    setShowPopup(true);
-    setPopupContent('availablePersonnel');
-    setPopupMessage(
-      <div>
-        <p className="popup-title">Are you sure?</p>
-        <p className="popup-message">This personnel is available?</p>
-      </div>
-    );
-  }
-
-  // Set Available Function
-  function AvailableConfirmation(id){
-    setSubmitLoading(true);
-
-    axiosClient
-    .put(`/availpersonnel/${id}`, {
-      authority: currentUserName.name
-    })
-    .then(() => {
-      setShowPopup(true);
-      setPopupContent('success');
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Successful</p>
-          <p className="popup-message">The personnel is available</p>
-        </div>
-      );
-    })
-    .catch((error)=>{
-      if (error.response.status === 500) {
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }
     });
   }
 
@@ -246,13 +278,85 @@ export default function AddPersonnel(){
 
   return(
     <PageComponent title="Personnel">
-
       {Access ? (
       <>
+      
+        {/* For the Personnel List */}
+        <div className="ppa-form-header text-base flex justify-between items-center">
+          <div>Personnel List</div>
+          <div className="flex space-x-4"> 
+            {!addPersonnel && (
+              <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
+            )}
+          </div>
+        </div>
+
+        {/* For the Personnel List */}
+        <div className="p-2 ppa-form-box">
+          {/* Table */}
+          <table className="ppa-table w-full mb-10 mt-2">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-3 py-2 text-left text-sm font-medium text-gray-600 uppercase">Name</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
+                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody style={{ backgroundColor: '#fff' }}>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
+                    <div className="flex justify-center items-center">
+                      <span className="loading-table">Fetching Data</span>
+                    </div>
+                  </td>
+                </tr>
+              ):(
+                personnelList.map.length > 0 ? (
+                  personnelList.map(staffList => (
+                    <tr key={staffList.personnel_id}>
+                      <td className="px-3 py-2 w-1/4 text-left table-font">{staffList.personnel_name}</td>
+                      <td className="px-3 py-2 text-center table-font">{staffList.assignment}</td>
+                      <td className="px-3 py-2 text-center table-font">
+                        <strong>{staffList.status == 3 ? (
+                          <p className="text-red-700">Not Available</p>
+                          ):staffList.status == 1 ? (
+                            <p className="text-red-700">On Travel</p>
+                          ):(
+                            <p className="text-black">Available</p>
+                          )}</strong>
+                      </td>
+                      <td className="px-3 py-2 text-center table-font">
+                        {staffList.status == 3 ? (
+                          <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Set Personnel to Available" icon={faUser} />
+                        ):staffList.status == 1 ? (
+                          <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Personnel Arrrived" icon={faHouse} />
+                        ):(
+                        <>
+                          <FontAwesomeIcon onClick={() => handleNotAvailableConfirmation(staffList.personnel_id)} className="icon-avail mr-4" title="Set Personnel to Not Available" icon={faUserAltSlash} />
+                          <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" title="Removel Personnel" icon={faTrash} />
+                        </>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ):(
+                  <tr>
+                    <td colSpan={4} className="px-2 py-2 text-center text-sm text-gray-600">
+                      No records found.
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+
         {/* For Adding Personnel */}
         {addPersonnel && (
         <>
-          <div className="ppa-form-header text-base flex justify-between items-center">
+          <div className="ppa-form-header text-base flex justify-between items-center mt-4">
             <div>Assign Personnel</div>
             <div className="flex space-x-4">
               <FontAwesomeIcon onClick={() => {
@@ -327,82 +431,27 @@ export default function AddPersonnel(){
         </>
         )}
 
-        {/* For the Personnel List */}
-        <div className="ppa-form-header text-base flex justify-between items-center">
-          <div>Personnel List</div>
-          <div className="flex space-x-4"> 
-            {!addPersonnel && (
-              <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
-            )}
-          </div>
-        </div>
-        <div className="p-2 ppa-form-box">
-          {/* Table */}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-              {loading ? (
-              <tr>
-                <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
-                  <div className="flex justify-center items-center">
-                    <span className="loading-table">Fetching Data</span>
-                  </div>
-                </td>
-              </tr>
-              ):(
-                personnelList.map.length > 0 ? (
-                  personnelList.map(staffList => (
-                      <tr key={staffList.personnel_id}>
-                        <td className="px-3 py-2 text-center table-font">{staffList.personnel_name}</td>
-                        <td className="px-3 py-2 text-center table-font">{staffList.assignment}</td>
-                        <td className="px-3 py-2 text-center table-font">
-                          <strong>{staffList.status == 1 ? ("On Travel"):("Available")}</strong>
-                        </td>
-                        <td className="px-3 py-2 text-center table-font">
-                          {staffList.status == 1 ? (
-                            <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id)} className="icon-avail" title="Available" icon={faCheckToSlot} />
-                          ):(
-                            <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" icon={faTrash} />
-                          )}
-                        </td>
-                      </tr>
-                  ))
-                ):(
-                  <tr>
-                    <td colSpan={3} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
       </>
-      ):(<Restrict />)}
+      ):(
+        <Restrict />
+      )}
 
       {/* Popup */}
       {showPopup && (
         <Popup 
           popupContent={popupContent}
           popupMessage={popupMessage}
-          submitLoading={submitLoading}
-          submitAnimation={submitAnimation}
           justClose={justclose}
           closePopup={closePopup}
           personnelId={selectedId}
-          RemovePersonnel={RemovePersonnel}
+          NotAvailPersonnel={NotAvailPersonnel}
           AvailableConfirmation={AvailableConfirmation}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          RemovePersonnel={RemovePersonnel}
         />
       )}
 
     </PageComponent>
-  );
+  )
 }

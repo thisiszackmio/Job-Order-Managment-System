@@ -385,21 +385,22 @@ img.under-main {
   border-radius: 5px;
 }
 .pagination { display: flex; list-style: none; padding: 0; margin: 0; user-select: none; margin-top: 10px; }
-.pagination li {
+.pagination-top { display: flex; list-style: none; padding: 0; margin: 0; user-select: none; margin-bottom: 10px; }
+.pagination li, .pagination-top li {
   margin: 0 5px;
   cursor: pointer;
   background-color: #D3D3D3;
   padding: 0px 7px;
   border-radius: 5px;
 }
-.pagination li.active {
+.pagination li.active, .pagination-top li.active {
   background-color: #4A6589 !important;
   color: #FFF;
   font-weight: 500;
   padding: 1px 7px;
   border-radius: 5px;
 }
-.pagination a.page-link {
+.pagination a.page-link, .pagination-top a.page-link {
   font-size: 12px;
 }
 
@@ -556,6 +557,19 @@ img.img-minimize { width: auto; height: 40px; }
 .ppa-accordion > li > section p { margin: 15px 0; padding: 0 20px; font-size: 12px; line-height: 1.5; }
 
 /* Forms */
+/* Target all disabled inputs */
+input:disabled,
+input[disabled],
+textarea:disabled,
+textarea[disabled],
+select:disabled,
+select[disabled] {
+  background-color: #f3f4f6;   /* light gray background */
+  color: #6b7280;              /* muted text color */
+  border: 1px solid #d1d5db;   /* subtle border */
+  cursor: not-allowed;         /* show "not allowed" cursor */
+  opacity: 1;                  /* keep text visible (default reduces opacity) */
+}
 .status-sec {
   background-color: #d9edf7;
   padding: 10px;
@@ -622,7 +636,6 @@ span.ass {
   cursor: pointer;
 }
 .icon-avail {
-  height: 20px;
   width: auto;
   transition: 200ms;
 }

@@ -10,6 +10,7 @@ use App\Models\VehicleSlipModel;
 use App\Models\NotificationModel;
 use App\Models\VehicleTypeModel;
 use App\Models\AssignPersonnelModel;
+use App\Models\FormTracker;
 
 class JOMSDashboardController extends Controller
 {
@@ -33,8 +34,8 @@ class JOMSDashboardController extends Controller
 
         // For Facility Check
         $facTotal = FacilityVenueModel::count();
-        $facComplete = FacilityVenueModel::where('admin_approval', 1)->count();
-        $facPending = FacilityVenueModel::whereIn('admin_approval', [2, 3, 5, 6, 7])->count();
+        $facComplete = FacilityVenueModel::whereIn('admin_approval', [1, 2])->count();
+        $facPending = FacilityVenueModel::whereIn('admin_approval', [3, 5, 6, 7])->count();
         $facCancel = FacilityVenueModel::whereIn('admin_approval', [0, 4])->count();
 
         $data = [
@@ -199,7 +200,7 @@ class JOMSDashboardController extends Controller
                 $pendingApproval = $pendingApproval->merge($facilityDataGSO);
 
                 // Vehicle
-                $vehicleDataGSO = VehicleSlipModel::whereIn('admin_approval', [5, 6, 8])
+                $vehicleDataGSO = VehicleSlipModel::whereIn('admin_approval', [6, 7, 9])
                     ->get()
                     ->map(function ($vehicleDataGSO) {
                         return [
@@ -237,7 +238,7 @@ class JOMSDashboardController extends Controller
                 $pendingApproval = $pendingApproval->merge($inspectionDataAM);
 
                 // Facility
-                $facilityDataAdmin = FacilityVenueModel::whereIn('admin_approval', [6, 7])
+                $facilityDataAdmin = FacilityVenueModel::whereIn('admin_approval', [5, 7])
                     ->get()
                     ->map(function ($facilityDataAdmin) {
                         return [
@@ -252,7 +253,7 @@ class JOMSDashboardController extends Controller
                 $pendingApproval = $pendingApproval->merge($facilityDataAdmin);
 
                 // Vehicle
-                $vehicleDataAdmin = VehicleSlipModel::whereIn('admin_approval', [3, 7])
+                $vehicleDataAdmin = VehicleSlipModel::whereIn('admin_approval', [4, 8])
                     ->get()
                     ->map(function ($vehicleDataAdmin) {
                         return [
@@ -291,7 +292,7 @@ class JOMSDashboardController extends Controller
             if($AURequest) {
 
                 // Vehicle
-                $vehicleDataAU = VehicleSlipModel::whereIn('admin_approval', [5, 6, 8])
+                $vehicleDataAU = VehicleSlipModel::whereIn('admin_approval', [6, 7, 9])
                     ->get()
                     ->map(function ($vehicleDataAU) {
                         return [
@@ -314,7 +315,7 @@ class JOMSDashboardController extends Controller
 
             if($PortManagerRequest) {
                 // Vehicle
-                $vehicleDataPM = VehicleSlipModel::whereIn('admin_approval', [4, 7])
+                $vehicleDataPM = VehicleSlipModel::whereIn('admin_approval', [5, 8])
                     ->get()
                     ->map(function ($vehicleDataPM) {
                         return [
@@ -359,7 +360,7 @@ class JOMSDashboardController extends Controller
         if ($isGSO) {
             $gsoCount += InspectionModel::whereIn('form_status', [6, 8, 9, 10])->count();
             $gsoCount += FacilityVenueModel::whereIn('admin_approval', [3, 6])->count();
-            $gsoCount += VehicleSlipModel::whereIn('admin_approval', [5, 6, 8])->count();
+            $gsoCount += VehicleSlipModel::whereIn('admin_approval', [6, 7, 9])->count();
         }
 
         // ---- Admin Area ---- //
@@ -371,8 +372,8 @@ class JOMSDashboardController extends Controller
 
         if ($isAM) {
             $amCount += InspectionModel::where('form_status', 5)->count();
-            $amCount += FacilityVenueModel::whereIn('admin_approval', [6, 7])->count();
-            $amCount += VehicleSlipModel::whereIn('admin_approval', [3, 7])->count();
+            $amCount += FacilityVenueModel::whereIn('admin_approval', [5, 7])->count();
+            $amCount += VehicleSlipModel::whereIn('admin_approval', [4, 8])->count();
         }
 
         // ---- Authorize Person Area ---- //
@@ -383,7 +384,7 @@ class JOMSDashboardController extends Controller
         $auCount = 0;
 
         if($isAU) {
-            $auCount += VehicleSlipModel::whereIn('admin_approval', [5, 6, 8])->count();
+            $auCount += VehicleSlipModel::whereIn('admin_approval', [6, 7, 9])->count();
         }
 
         // ---- Authorize Port Manager ---- //
@@ -394,7 +395,7 @@ class JOMSDashboardController extends Controller
         $pmCount = 0;
 
         if($isPortManager) {
-            $pmCount += VehicleSlipModel::whereIn('admin_approval', [4, 7])->count();
+            $pmCount += VehicleSlipModel::whereIn('admin_approval', [5, 8])->count();
         }
 
         // Merge/Sum the counts
@@ -404,6 +405,32 @@ class JOMSDashboardController extends Controller
         return response()->json([
             'pending_count' => $totalCount === 0 ? null : $totalCount
         ]);
+    }
+
+    /**
+     *  Form Tracking
+     */
+    public function FormTracking(Request $request, $id){
+        $type = $request->query('type'); 
+        $track = FormTracker::where('form_id', $id)->where('type_of_request', $type)->orderBy('created_at', 'desc')->get();
+
+        if(!$track){
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        $trackDetails = $track->map(function ($trackForm) {
+            return[
+                'id' => $trackForm->id,
+                'form_id' => $trackForm->form_id,
+                'type_of_request' => $trackForm->type_of_request,
+                'remarks' => $trackForm->remarks,
+                'date' => $trackForm->created_at->toDateString(),
+                'time' => $trackForm->created_at->format('h:i a'),
+            ];
+        });
+
+        // Return response
+        return response()->json($trackDetails);
     }
         
 }

@@ -23,6 +23,7 @@ class VehicleSlipModel extends Model
         'driver',
         'admin_approval',
         'remarks',
+        'notes',
     ];
 
     protected $table = 'joms_vehicle_slip_form';

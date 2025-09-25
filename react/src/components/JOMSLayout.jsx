@@ -8,7 +8,6 @@ import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../axios";
 import Footer from "./Footer";
 import Popup from "./Popup";
-import moment from 'moment-timezone';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -32,8 +31,8 @@ export default function JOMSLayout() {
 
   useEffect(() => {
     const now = new Date();
-    const startDate = new Date("2025-05-30");
-    const endDate = new Date("2025-06-14");
+    const startDate = new Date("2025-09-25");
+    const endDate = new Date("2025-10-02");
 
     if (now >= startDate && now <= endDate) {
       setShowLink(true);
@@ -98,23 +97,21 @@ export default function JOMSLayout() {
   }
 
   const OnTravelSet = () => {
-    if(Authority || GSO){
-      axiosClient
-      .put(`/ontravelset`)
-      .then((response) => {
-        console.log(response.data.message);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 404) {
-          // Custom handling for 404
-          console.warn("No data found (Error 404)");
-          // Optional: Show a popup or notification here
-        } else {
-          // Handle other errors
-          console.error("Unexpected error occurred:", error);
-        }
-      });
-    }
+    axiosClient
+    .put(`/ontravelset/${currentUserId}`)
+    .then((response) => {
+      console.log(response.data.message);
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        // Custom handling for 404
+        console.warn("No Driver and Vehicle to be available");
+        // Optional: Show a popup or notification here
+      } else {
+        // Handle other errors
+        console.error("Unexpected error occurred:", error);
+      }
+    });
   }
 
   // Get the useEffect
@@ -171,7 +168,7 @@ export default function JOMSLayout() {
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/systemupdate" className="flex items-center">
                     <FontAwesomeIcon icon={faUserGear} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Upate Note</p>}
+                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Update <span className="ml-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">Hi</span></p>}
                   </Link>
                 </div>
               </li>
@@ -287,6 +284,18 @@ export default function JOMSLayout() {
                 )}
               </li>
             )}
+
+            {/* Vehicle */}
+            {/* {(SuperAdmin || GSO || AssignPersonnel) && (
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
+                  <Link to="/joms/vehicleavail" onClick={() => { PendingCount(); }} className="flex items-center">
+                    <FontAwesomeIcon icon={faList} />
+                    {!isSidebarMinimized && <p className="ml-4 text-lg">Vehicle Slip</p>}
+                  </Link>
+                </div>
+              </li>
+            )} */}
 
             {/* Personnel */}
             {(SuperAdmin || GSO || AssignPersonnel) && (

@@ -12,6 +12,7 @@ use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ServerStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\LogsModel;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,13 @@ Route::middleware('auth:sanctum')->group(function(){
       ['key_name' => 'maintenance_mode'],
       ['key_value' => $mode]
     );
+
+    // Logs
+    $logs = new LogsModel();
+    $logs->category = 'SYSTEM';
+    $logs->message = 'Maintenance mode ' . ($mode === 'on' ? 'activated.' : 'deactivated.');
+    $logs->save();
+
     return response()->json(['success' => true, 'mode' => $mode]);
   });
 
@@ -46,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
   Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
   Route::get('/pendingrequestcount/{id}', [JOMSDashboardController::class, 'PendingRequestCount']);
+  Route::get('/formtracking/{id}', [JOMSDashboardController::class, 'FormTracking']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -81,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- Assign Personnel --- //
   Route::post('/assignpersonnel', [UserController::class, 'storePersonnel']); // Assign Personnel
   Route::delete('/removepersonnel/{id}', [UserController::class, 'removePersonnel']); // Remove personnel on list
+  Route::put('/notvailpersonnel/{id}', [UserController::class, 'notavailPersonnel']); // Remove personnel on list
   Route::get('/showpersonnel', [UserController::class, 'showPersonnel']); // Show personnel Detail on Personnel Page
   Route::put('/availpersonnel/{id}', [UserController::class, 'availablePersonnel']);
   Route::get('/getpersonnel', [UserController::class, 'getPersonnel']); // Select personnel during assignment
@@ -124,6 +134,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- JOMS Vehicle Slip Request --- //
   Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
+  Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
   Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
   Route::get('/allvehicleslip', [VehicleSlipController::class, 'index']);
   Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
@@ -136,7 +147,10 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
   Route::put('/availvehicledriver/{id}', [VehicleSlipController::class, 'availableVehicleDriver']);
   Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
-  Route::put('/ontravelset', [VehicleSlipController::class, 'OnTravel']);
+  Route::put('/notavailvehicle/{id}', [VehicleSlipController::class, 'notavailableVehicle']);
+  Route::put('/ontravelset/{id}', [VehicleSlipController::class, 'OnTravel']);
+  Route::put('/editvehicle/{id}', [VehicleSlipController::class, 'editVehicle']);
+  Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
 });
 
 // --- Login --- //

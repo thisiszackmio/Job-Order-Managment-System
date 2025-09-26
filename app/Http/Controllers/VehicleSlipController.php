@@ -658,52 +658,48 @@ class VehicleSlipController extends Controller
                         $plateNumber = null;
                     }
 
-                    // --- VEHICLE + DRIVER ---
-                    $vehicle = VehicleTypeModel::where('vehicle_name', $vehicleName)
-                        ->where('vehicle_plate', $plateNumber)
-                        ->first();
-
-                    $driver = AssignPersonnelModel::where('personnel_id', $slip->driver_id)->first();
-
-                    // Check yesterday → today transitions
-                    // $hasTodaySchedule = $vehicleDateTime->isSameDay($today);
-
                     // === VEHICLE ===
                     if ($vehicle) {
-                        if ($vehicle->date_used && Carbon::parse($vehicle->date_used)->lt($today)) {
-                            // Past date → reset
-                            $vehicle->update([
-                                'status' => 0,
-                                'date_used' => null,
-                            ]);
-                        }
+                        if ($vehicle->status == 0) {
+                            // Reset if past date
+                            if ($vehicle->date_used && Carbon::parse($vehicle->date_used)->lt($today)) {
+                                $vehicle->update([
+                                    'status' => 0,
+                                    'date_used' => null,
+                                ]);
+                            }
 
-                        if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
-                            // Scheduled today → set to active
-                            $vehicle->update([
-                                'status' => 1,
-                                'date_used' => $today->toDateString(),
-                            ]);
+                            // Activate if scheduled today
+                            if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
+                                $vehicle->update([
+                                    'status' => 1,
+                                    'date_used' => $today->toDateString(),
+                                ]);
+                            }
                         }
+                        // if status == 2 → do nothing (keep as is)
                     }
 
-                    // === Driver ===
+                    // === DRIVER ===
                     if ($driver) {
-                        if ($driver->date_assigned && Carbon::parse($driver->date_assigned)->lt($today)) {
-                            // Past date → reset
-                            $driver->update([
-                                'status' => 0,
-                                'date_assigned' => null,
-                            ]);
-                        }
+                        if ($driver->status == 0) {
+                            // Reset if past date
+                            if ($driver->date_assigned && Carbon::parse($driver->date_assigned)->lt($today)) {
+                                $driver->update([
+                                    'status' => 0,
+                                    'date_assigned' => null,
+                                ]);
+                            }
 
-                        if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
-                            // Scheduled today → set to active
-                            $driver->update([
-                                'status' => 1,
-                                'date_assigned' => $today->toDateString(),
-                            ]);
+                            // Activate if scheduled today
+                            if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
+                                $driver->update([
+                                    'status' => 1,
+                                    'date_assigned' => $today->toDateString(),
+                                ]);
+                            }
                         }
+                        // if status == 2 → do nothing (keep as is)
                     }
 
                 }

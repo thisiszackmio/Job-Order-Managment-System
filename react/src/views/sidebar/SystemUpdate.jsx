@@ -5,7 +5,7 @@ export default function SystemUpdate(){
   return(
     <PageComponent title="System Update Release Note">
 
-      <h2 className="text-xl font-bold leading-7 text-gray-900"> <b>Release:</b> Job Order Management System v1.2.0 </h2>
+      <h2 className="text-xl font-bold leading-7 text-gray-900"> <b>Release:</b> Job Order Management System v1.2.1 </h2>
       <p className="mt-2">We’re excited to announce the release of version 1.2.1 of the Job Order Management System.</p>
 
       <h2 className="text-lg font-bold leading-7 text-gray-900 mt-6"> What's New: </h2>

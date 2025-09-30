@@ -2566,7 +2566,7 @@ export default function InspectionForm(){
           <div className="hidden md:none">
           {/* <div className="visible md:block"> */}
             <div ref={componentRef}>
-              <div className="relative" style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '1px solid' }}>
+              <div className="relative" style={{ width: '210mm', height: '297mm', paddingLeft: '25px', paddingRight: '25px', paddingTop: '10px', border: '0px solid' }}>
 
                 {/* Control Number */}
                 <div className="title-area font-arial pr-6 text-right pb-2 pt-2">

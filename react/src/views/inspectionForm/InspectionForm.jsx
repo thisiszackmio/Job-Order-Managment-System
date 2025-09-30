@@ -2965,7 +2965,7 @@ export default function InspectionForm(){
 
                             {/* For Property Inspector Signature */}
                             <div className="col-span-1">
-                              <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
+                              <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> ACCOMPLISHED BY: </label>
                               <div className="mt-3">
                                 <div className="w-64 mx-auto border-b text-center border-black pl-1 h-5" style={{ position: 'relative' }}>
                                   {[1, 2, 3, 4].includes(inspectionData?.form?.form_status) && (
@@ -3031,7 +3031,7 @@ export default function InspectionForm(){
 
                             {/* For Supervisor Signature */}
                             <div className="col-span-1">
-                              <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> NOTED: </label>
+                              <label htmlFor="type_of_property" className="block text-sm font-normal leading-6"> ACCOMPLISHED BY: </label>
                               <div className="mt-3">
                                 <div className="w-64 mx-auto border-b text-center border-black pl-1 h-5" style={{ position: 'relative' }}>
                                   {[1, 2, 4].includes(inspectionData?.form?.form_status) && (

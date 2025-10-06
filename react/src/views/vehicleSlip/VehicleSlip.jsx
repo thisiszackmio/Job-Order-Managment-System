@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import PageComponent from "../../components/PageComponent";
 import Restrict from "../../components/Restrict";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useUserStateContext } from "../../context/ContextProvider";
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../components/Popup";
 import ppa_logo from '/default/ppa_logo.png'
+import loading_table from "/default/ring-loading.gif";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faFilePdf, faHouse, faGear, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import moment from "moment-timezone";
@@ -52,6 +53,7 @@ export default function VehicleSlip(){
  
   // Get the ID
   const {id} = useParams();
+  const navigate = useNavigate();
 
   //Date Format 
   function formatDate(dateString) {
@@ -89,6 +91,7 @@ export default function VehicleSlip(){
   const [passenger, setPassenger] = useState([]);
   const [requestor, setRequestor] = useState([]);
   const [admin, setAdmin] = useState([]);
+  const [btnPB, setBtnPB] = useState([]);
 
   const [vehicleDet, setVehicleDet] = useState([]);
   const [driverName, setDriverName] = useState([]);
@@ -111,8 +114,11 @@ export default function VehicleSlip(){
       const driverEsig = responseData.driverEsig;
       const driverAvail = responseData.driverAvail;
       const vehicleDet = responseData.vehicleDet;
+      const prev = responseData.prev_id;
+      const next = responseData.next_id;
 
       setVehicleData(FormData);
+      setBtnPB({prev, next})
       setVacant({driverAvail, vehicleDet})
       setPassenger(passengerData);
       setRequestor({requestorPosData, requestorEsig, driverEsig});
@@ -213,6 +219,20 @@ export default function VehicleSlip(){
       fetchTracking();
     }
   }, [id, currentUserId, vehicleData?.date_arrival, vehicleData?.time_arrival]);
+
+  // Previous Page
+  const handlePrev = () => {
+    if (!btnPB?.prev) return; // stop if no previous
+    setLoading(true);
+    navigate(`/joms/vehicle/form/${btnPB?.prev}`);
+  };
+
+  // Next Page
+  const handleNext = () => {
+    if (!btnPB?.next) return; // stop if no next
+    setLoading(true);
+    navigate(`/joms/vehicle/form/${btnPB?.next}`);
+  };
 
   // Variable
   const [vehicalName, setVehicleName] = useState('');
@@ -610,26 +630,40 @@ export default function VehicleSlip(){
 
   return (
     <PageComponent title="Vehicle Slip">
-      {loading ? (
-        <div className="flex items-left h-20 space-x-4">
-          {/* Loading Animation */}
-          <FontAwesomeIcon
-            icon={faGear}
-            className="text-4xl text-blue-700 gear"
-          />
-          <span className="loading">Loading...</span>
-        </div>
-      ):(
-      dataAccess != 'Not-Found' ? (
+      {dataAccess != 'Not-Found' ? (
         Access == "Denied" ? (
           <Restrict />
         ):(
           <>
 
-            {/* Notification for auto close and for the GSO */}
-            <div className="text-sm flex justify-end items-center w-full">
-            {GSO && vehicleData?.admin_approval == 2 && ("The form becomes non-editable after 24 hours.")}
-            </div>
+            {/* Buttons */}
+            {(GSO || Admin || SuperAdmin) && (
+              <div className="text-sm flex justify-between items-center w-full mt-2 mb-2">
+                <button
+                  onClick={handlePrev}
+                  disabled={!btnPB?.prev}
+                  className={`px-4 py-2 rounded ${
+                    btnPB?.prev
+                      ? "bg-gray-700 text-white hover:bg-gray-600"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  ← Previous
+                </button>
+
+                <button
+                  onClick={handleNext}
+                  disabled={!btnPB?.next}
+                  className={`px-4 py-2 rounded ${
+                    btnPB?.next
+                      ? "bg-blue-700 text-white hover:bg-blue-600"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
 
             {/* Header */}
             <div className="ppa-form-header text-base flex justify-between items-center">
@@ -769,6 +803,11 @@ export default function VehicleSlip(){
               {loadingForm ? (
                 <div className="flex justify-center text-lg font-bold items-center space-x-4">
                   Generating PDF
+                </div>
+              ):loading ? (
+                <div className="flex justify-center items-center py-4">
+                  <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                  <span className="loading-table">Loading Facility / Venue Form</span>
                 </div>
               ):(
                 adminDisapproval ? (
@@ -1252,7 +1291,7 @@ export default function VehicleSlip(){
 
             </div>
             
-            {editDetail && !loadingForm && !adminDisapproval && (
+            {editDetail && !loadingForm && !adminDisapproval && !loading && (
             <>
               {/* Activities */}
               <div className="ppa-form-header text-base flex justify-between items-center">
@@ -1286,7 +1325,6 @@ export default function VehicleSlip(){
         )
       ):(
         null
-      )
       )}
 
       {/* Popup */}

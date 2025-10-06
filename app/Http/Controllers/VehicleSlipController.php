@@ -281,7 +281,18 @@ class VehicleSlipController extends Controller
         ? $rootUrl . '/storage/displayesig/' . $DriverAssign->esign 
         : null;
 
+        // ✅ Prev & Next IDs
+        $prevId = VehicleSlipModel::where('id', '<', $id)
+            ->orderBy('id', 'desc')
+            ->value('id');
+
+        $nextId = VehicleSlipModel::where('id', '>', $id)
+            ->orderBy('id', 'asc')
+            ->value('id');
+
         $respondData = [
+            'prev_id' => $prevId,
+            'next_id' => $nextId,
             'form' => $VehicleSlipForm,
             'pmId' => $PMId,
             'pmName' => $PMName,

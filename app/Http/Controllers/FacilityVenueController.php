@@ -342,7 +342,18 @@ class FacilityVenueController extends Controller
         $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
         $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
+        // ✅ Prev & Next IDs
+        $prevId = FacilityVenueModel::where('id', '<', $id)
+            ->orderBy('id', 'desc')
+            ->value('id');
+
+        $nextId = FacilityVenueModel::where('id', '>', $id)
+            ->orderBy('id', 'asc')
+            ->value('id');
+
         $respondData = [
+            'prev_id' => $prevId,
+            'next_id' => $nextId,
             'form' => $FacilityRequest,
             'admin_name' => $AdminName,
             'admin_esig' => $AdminEsig,

@@ -143,7 +143,7 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="p-2 ppa-div-table" style={{ maxHeight: '400px', overflowY: 'auto'}}>
+          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
             <table className="ppa-table w-full mb-10 mt-2"> 
               <thead>
                 <tr className="bg-gray-100">
@@ -209,7 +209,7 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ) : (
-          <div className="p-2 ppa-div-table" style={{ maxHeight: '400px', overflowY: 'auto'}}>
+          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
             <table className="ppa-table w-full mb-10 mt-2">
               <thead>
                 <tr className="bg-gray-100">
@@ -277,7 +277,7 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="p-2 ppa-div-table" style={{ maxHeight: '400px', overflowY: 'auto'}}>
+          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
             <table className="ppa-table w-full mb-10 mt-2">
               <thead>
                 <tr className="bg-gray-100">

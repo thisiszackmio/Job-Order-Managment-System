@@ -95,36 +95,39 @@ export default function InspectionFormList(){
       {Access ? (
         <div className="font-roboto ppa-form-box bg-white">
           <div className="ppa-form-header"> Pre/Post Repair Inspection Form List </div>
-          <div className="p-2 ppa-div-table relative overflow-x-auto shadow-md sm:rounded-lg">
+
+          <div className="p-2 ppa-div-table relative ppa-widget overflow-x-auto shadow-md">
+
             {/* Search Filter */}
             <div className="mt-2 mb-4 flex">
 
-            {/* Search */}
-            <div className="flex-grow">
-              <input
-                type="text"
-                placeholder="Search Here"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-96 p-2 border border-gray-300 rounded text-sm"
-              />
-            </div>
-
-            {/* Count */}
-            <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
-              <div className="text-right text-sm/[17px]">
-                Total of{" "}
-                {pageCountUser > 1 ? (
-                  <b>{startIndex} - {endIndex}</b>
-                ) : (
-                  <b>{filteredList.length}</b>
-                )}{" "}
-                out of <b>{filteredList.length}</b> Request list
+              {/* Search */}
+              <div className="flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search Here"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-96 p-2 border border-gray-300 rounded text-sm"
+                />
               </div>
-            </div>
+
+              {/* Count */}
+              <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
+                <div className="text-right text-sm/[17px]">
+                  Total of{" "}
+                  {pageCountUser > 1 ? (
+                    <b>{startIndex} - {endIndex}</b>
+                  ) : (
+                    <b>{filteredList.length}</b>
+                  )}{" "}
+                  out of <b>{filteredList.length}</b> Request list
+                </div>
+              </div>
 
             </div>
 
+            {/* Top Pagination */}
             {displayPaginationUser && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
@@ -148,6 +151,8 @@ export default function InspectionFormList(){
                 nextLinkClassName="page-link"
               />
             )}
+
+            {/* Table */}
             <table className="ppa-table w-full mb-10 mt-2">
               <thead className="bg-gray-100">
                 <tr className="bg-gray-100">
@@ -224,7 +229,9 @@ export default function InspectionFormList(){
                 )
               )}
               </tbody>
-            </table> 
+            </table>
+
+            {/* Bottom Pagination */}
             {displayPaginationUser && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
@@ -248,6 +255,7 @@ export default function InspectionFormList(){
                 nextLinkClassName="page-link"
               />
             )}
+
           </div>
         </div>
       ):(

@@ -3,7 +3,7 @@ import { Menu, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline'
 import axiosClient from '../axios';
 import loading_table from "/default/ring-loading.gif";
-import VehicleSlip from "/default/Vehicle_Slip.png";
+import VehicleSlip from "/default/van.png";
 import repair from "/default/mechanic.png"
 import facilityicon from "/default/schedule.png"
 

@@ -11,6 +11,7 @@ use App\Models\NotificationModel;
 use App\Models\VehicleTypeModel;
 use App\Models\AssignPersonnelModel;
 use App\Models\FormTracker;
+use Carbon\Carbon;
 
 class JOMSDashboardController extends Controller
 {
@@ -18,44 +19,32 @@ class JOMSDashboardController extends Controller
      *  Count Everyone
      */
     public function FormCount(){
-        // $facForm = FacilityVenueModel::count();
+        $today = Carbon::today();
 
         // For the Inspection
-        $inspTotal = InspectionModel::count();
-        $inspComplete = InspectionModel::where('form_status', 1)->count();
-        $inspPending = InspectionModel::whereIn('form_status', [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13])->count();
-        $inspCancel = InspectionModel::whereIn('form_status', [0, 7])->count();
+        $inspToday = InspectionModel::whereDate('created_at', $today)->count();
+        $inspcount = InspectionModel::count();
 
         // For vehicle Check
-        $vehTotal = VehicleSlipModel::count();
-        $vehComplete = VehicleSlipModel::where('admin_approval', 1)->count();
-        $vehPending = VehicleSlipModel::whereIn('admin_approval', [3, 4, 5, 6, 7, 8])->count();
-        $vehCancel = VehicleSlipModel::whereIn('admin_approval', [0, 2])->count();
+        $vehToday = VehicleSlipModel::whereDate('created_at', $today)->count();
+        $vehcount = VehicleSlipModel::count();
 
         // For Facility Check
-        $facTotal = FacilityVenueModel::count();
-        $facComplete = FacilityVenueModel::whereIn('admin_approval', [1, 2])->count();
-        $facPending = FacilityVenueModel::whereIn('admin_approval', [3, 5, 6, 7])->count();
-        $facCancel = FacilityVenueModel::whereIn('admin_approval', [0, 4])->count();
+        $facToday = FacilityVenueModel::whereDate('created_at', $today)->count();
+        $faccount = FacilityVenueModel::count();
 
         $data = [
             'inspection' => [
-                'count' => $inspTotal,
-                'complete' => $inspComplete,
-                'pending' => $inspPending,
-                'cancel' => $inspCancel,
+                'today' => $inspToday,
+                'count' => $inspcount
             ],
             'vehicle' => [
-                'count' => $vehTotal,
-                'complete' =>$vehComplete,
-                'pending' => $vehPending,
-                'cancel' => $vehCancel
+                'today' => $vehToday,
+                'count' => $vehcount
             ],
             'facility' => [
-                'count' => $facTotal,
-                'complete' =>$facComplete,
-                'pending' => $facPending,
-                'cancel' => $facCancel
+                'today' => $facToday,
+                'count' => $faccount
             ]
         ];
 

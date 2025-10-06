@@ -2,9 +2,10 @@ import PageComponent from "../../components/PageComponent";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios";
-import VehicleSlip from "/default/Vehicle_Slip.png";
+import vehicleSlip from "/default/van.png";
 import repair from "/default/mechanic.png"
-import facilityicon from "/default/schedule.png"
+import facilityicon from "/default/booking.png"
+import locator from "/default/form.png"
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from '@fortawesome/free-solid-svg-icons';
@@ -168,8 +169,49 @@ export default function DashboardJOMS(){
       ):(
         <div className="font-roboto">
 
+          {/* Request Form */}
+          <div className="grid grid-cols-4 gap-2 mt-6">
+
+            {/* For Repair */}
+            <div className="col-span-1 ppa-widget relative">
+              <div className="joms-dashboard-title text-right"> Inspection Repair </div>
+              <img className="joms-icons" src={repair} alt="Your Company"/>
+              <div className="joms-count text-right pr-4">{inspectionForm?.count}</div>
+              <div className="border-b border-gray-300 mx-4"></div>
+              <div className="joms-word-count">No of Request Today: <strong>{inspectionForm?.today}</strong></div>
+            </div>
+
+            {/* For Facility */}
+            <div className="col-span-1 ppa-widget relative">
+              <div className="joms-dashboard-title text-right"> Facility/Venue </div>
+              <img className="mx-auto joms-icons" src={facilityicon} alt="Your Company"/>
+              <div className="joms-count text-right pr-4">{facilityForm?.count}</div>
+              <div className="border-b border-gray-300 mx-4"></div>
+              <div className="joms-word-count">No of Request Today: <strong>{facilityForm?.today}</strong></div>
+            </div>
+
+            {/* For Vehicle Slip  */}
+            <div className="col-span-1 ppa-widget relative">
+              <div className="joms-dashboard-title text-right"> Vehicle Slip </div>
+              <img className="mx-auto joms-icons" src={vehicleSlip} alt="Your Company"/>
+              <div className="joms-count text-right pr-4">{vehicleForm?.count}</div>
+              <div className="border-b border-gray-300 mx-4"></div>
+              <div className="joms-word-count">No of Request Today: <strong>{vehicleForm?.today}</strong></div>
+            </div>
+
+            {/* For Locator Slip  */}
+            <div className="col-span-1 ppa-widget relative">
+              <div className="joms-dashboard-title text-right"> Locator Slip </div>
+              <img className="mx-auto joms-icons" src={locator} alt="Your Company"/>
+              <div className="joms-count text-right pr-4">{vehicleForm?.count}</div>
+              <div className="border-b border-gray-300 mx-4"></div>
+              <div className="joms-word-count">No of Request Today: <strong>{vehicleForm?.today}</strong></div>
+            </div>
+
+          </div>
+
           {/* Announcements */}
-          <div className="ppa-widget mb-6">
+          <div className="ppa-widget mt-10">
             <div className="ppa-widget-title">Announcement Board</div>
             <div className="p-3" style={{ minHeight: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
               <table className="ppa-table w-full">
@@ -195,41 +237,6 @@ export default function DashboardJOMS(){
                 </tbody>
               </table>
             </div>
-          </div>
-
-          {/* Request Form */}
-          <div className="grid grid-cols-3 gap-2">
-
-            {/* For Repair */}
-            <div className="col-span-1 ppa-widget relative">
-              <div className="joms-dashboard-title"> Pre/Post Repair Inspection Form </div>
-              <img className="joms-icons h-[80px] mt-3" src={repair} alt="Your Company"/>
-              <div className="joms-count">{inspectionForm?.count}</div>
-              <div className="joms-word-count">Completed: <strong>{inspectionForm?.complete}</strong></div>
-              <div className="joms-word-count">Pending: <strong>{inspectionForm?.pending}</strong></div>
-              <div className="joms-word-count">Canceled: <strong>{inspectionForm?.cancel}</strong></div>
-            </div>
-
-            {/* For Facility */}
-            <div className="col-span-1 ppa-widget relative">
-              <div className="joms-dashboard-title"> Facility / Venue Form </div>
-              <img className="mx-auto joms-icons h-[80px] mt-3" src={facilityicon} alt="Your Company"/>
-              <div className="joms-count">{facilityForm?.count}</div>
-              <div className="joms-word-count">Completed: <strong>{facilityForm?.complete}</strong></div>
-              <div className="joms-word-count">Pending: <strong>{facilityForm?.pending}</strong></div>
-              <div className="joms-word-count">Canceled: <strong>{facilityForm?.cancel}</strong></div>
-            </div>
-
-            {/* For Vehicle Slip  */}
-            <div className="col-span-1 ppa-widget relative">
-              <div className="joms-dashboard-title"> Vehicle Slip </div>
-              <img className="mx-auto joms-icons h-[100px]" src={VehicleSlip} alt="Your Company"/>
-              <div className="joms-count">{vehicleForm?.count}</div>
-              <div className="joms-word-count">Completed: <strong>{vehicleForm?.complete}</strong></div>
-              <div className="joms-word-count">Pending: <strong>{vehicleForm?.pending}</strong></div>
-              <div className="joms-word-count">Canceled: <strong>{vehicleForm?.cancel}</strong></div>
-            </div>
-
           </div>
 
           {/* For the Logs and Team Members */}

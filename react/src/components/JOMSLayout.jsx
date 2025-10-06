@@ -20,8 +20,6 @@ export default function JOMSLayout() {
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
-
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
@@ -198,7 +196,7 @@ export default function JOMSLayout() {
             {(SuperAdmin || GSO || AdminManager || DivisionManager || AssignPersonnel || PortManager ) && (
             <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4">
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full' : ''}`}>
-                <Link to={`/joms/pending`} onClick={() => { PendingCount(); OnTravelSet(); }} className="flex items-center justify-between w-full">
+                <Link to={`/joms/pending`} onClick={() => { PendingCount(); OnTravelSet(); }} className="flex items-center">
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faTableList} />
                     {!isSidebarMinimized && (
@@ -207,7 +205,7 @@ export default function JOMSLayout() {
                   </div>
                   {!isSidebarMinimized && (
                     pendingCount && (
-                      <span className="ml-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      <span className="absolute right-9 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                         {pendingCount}
                       </span>
                     )
@@ -408,6 +406,7 @@ export default function JOMSLayout() {
               {!isSidebarMinimized ? 
                 <p className="text-base leading-4 text-sm">
                   <Link to="/joms/user">{currentUserName?.name}</Link>
+                  <p className="mt-1 font-bold">ID: {currentUserId}</p>
                 </p> 
               : null }  
               </div>

@@ -48,24 +48,76 @@ const Popup = ({
       <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
 
       {/* Popup content */}
-      <div className={`absolute p-6 rounded-lg shadow-md bg-white ${closing ? "animate-fade-out" : "animate-fade-down"}`} style={{ width: "430px" }}>
+      <div className={`absolute p-6 rounded-lg shadow-md bg-white ${closing ? "animate-fade-out" : "animate-fade-down"}`} style={{ width: "350px" }}>
+
+        {/* Notification Icons */}
+        <div className="f-modal-alert">
+
+          {/* Success */}
+          {popupContent == 'success' && (
+            <div class="f-modal-icon f-modal-success animate">
+              <span class="f-modal-line f-modal-tip animateSuccessTip"></span>
+              <span class="f-modal-line f-modal-long animateSuccessLong"></span>
+            </div>
+          )}
+
+          {/* Error */}
+          {(popupContent == 'error' ||
+          popupContent == 'check-error') && (
+            <div className="f-modal-icon f-modal-error animate">
+              <span className="f-modal-x-mark">
+                <span className="f-modal-line f-modal-left animateXLeft"></span>
+                <span className="f-modal-line f-modal-right animateXRight"></span>
+              </span>
+            </div>
+          )}
+
+          {/* Warning */}
+          {(popupContent == 'warning' ||
+          popupContent == "cancelForm" ||
+          popupContent == "gsofc" ||
+          popupContent == 'delete_user' ||
+          popupContent == 'NotavailPersonnel' ||
+          popupContent == 'NotavailVehicle' ||
+          popupContent == "subAvailability" ||
+          popupContent == 'removePersonnel' ||
+          popupContent == 'removeVehicle' ||
+          popupContent == 'availableVehicle' ||
+          popupContent == "gsoi" ||
+          popupContent == "gsodelete" ||
+          popupContent == "ama" ||
+          popupContent == "dma" ||
+          popupContent == "dmd" ||
+          popupContent == "amif" ||
+          popupContent == "adf" ||
+          popupContent == "adminApproval" ||
+          popupContent == "adminDisapproval" ||
+          popupContent == 'Logout') && (
+            <div class="f-modal-icon f-modal-warning animate">
+              <span class="f-modal-body scaleWarning"></span>
+              <span class="f-modal-dot pulseWarningIns"></span>
+            </div>
+          )}
+
+        </div>
+
         {/* Popup Message */}
         <p className="text-lg text-center"> 
           {popupContent == 'error' ? (
             popupMessage == '404' ? (
               <>
-                <p className="popup-title">Data not Exist</p>
-                <p className="popup-message"><span>Data not found. (Error 404)</span></p>
+                <p className="popup-title">Error {popupMessage}</p>
+                <p className="popup-message"><span>Data not found.</span></p>
               </>
             ):popupMessage == '406' ? (
               <>
-                <p className="popup-title">Failed to save</p>
-                <p className="popup-message"><span>There was a problem on saving the data, please contact to the developer <strong>IP Phone 4084</strong>. (Error code 406) </span></p>
+                <p className="popup-title">Error {popupMessage}</p>
+                <p className="popup-message"><span>There was a problem on saving the data, please contact to the developer <strong>IP Phone 4084</strong>.</span></p>
               </>
             ):(
               <>
-                <p className="popup-title">There was the Problem</p>
-                <p className="popup-message">There was a problem, please contact the developer <strong>IP Phone 4084</strong>. (Error code {popupMessage})</p>
+                <p className="popup-title">Error {popupMessage}</p>
+                <p className="popup-message">There was a problem, please contact the developer <strong>IP Phone 4084</strong>.</p>
               </>
             )
           ):(
@@ -106,7 +158,7 @@ const Popup = ({
             </button>
             {/* Cancel */}
             {!submitLoading && (
-              <button onClick={justClose} className="btn-cancel ml-2">
+              <button onClick={justClose} className=" w-1/2 btn-cancel ml-2">
                 Close
               </button>
             )}
@@ -161,7 +213,7 @@ const Popup = ({
 
             {/* Cancel */}
             {!submitLoading && (
-              <button onClick={handleClose} className="btn-cancel ml-2">
+              <button onClick={handleClose} className="btn-cancel ml-2 w-1/2">
                 Close
               </button>
             )}

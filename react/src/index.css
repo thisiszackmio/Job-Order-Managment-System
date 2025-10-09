@@ -125,6 +125,7 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 
 /* Table Style #2 */
 .ppa-form-header { background-color: #132E51; color: #fff; padding: 10px; font-size: 20px; }
+.loading-table { font-weight: bold; }
 
 /* Team members */
 .members-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }

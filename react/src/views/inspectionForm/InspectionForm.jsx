@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageComponent from "../../components/PageComponent";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useUserStateContext } from "../../context/ContextProvider";
 import loading_table from "/default/ring-loading.gif";
 import submitAnimation from '/default/ring-loading.gif';
@@ -26,6 +26,7 @@ export default function InspectionForm(){
 
   // Get the ID
   const {id} = useParams();
+  const navigate = useNavigate();
 
   // Functions
   const [loading, setLoading] = useState(true);
@@ -220,7 +221,7 @@ export default function InspectionForm(){
   // Auto close request
   const setFormClosed = () => {
 
-    if(GSO){
+    if(GSO || inspectionData?.form?.user_id == currentUserId || SuperAdmin){
       axiosClient
       .get(`/closeinspectionrequest/${id}`)
       .then(response => {
@@ -260,33 +261,32 @@ export default function InspectionForm(){
     });
   }
 
-  // Idle for the personnel
-  // const setIdle = () => {
-  //   if(GSO){
-  //     axiosClient
-  //     .get(`/idleinspectionrequest/${id}`)
-  //     .then(response => {
-  //       console.log(response.data.message); // Show success message
-  //     })
-  //     .catch(error => {
-  //       setPopupContent("error");
-  //       setPopupMessage(DevErrorText);
-  //       setShowPopup(true); 
-  //     }).finally(() => {
-  //       setSubmitLoading(false);
-  //     });
-  //   }
-  // }
-
   useEffect(() => { 
     if(currentUserId){
       fecthInspection();
       fetchDisplayPersonnel();
       setFormClosed();
       fetchTracking();
-      // setIdle();
     }
   }, [id, currentUserId]);
+
+  // Previous Page
+  const handlePrev = () => {
+    if (!inspectionData?.form?.prev_id) return; // stop if no previous
+    setFormClosed();
+    fetchTracking();
+    setLoading(true);
+    navigate(`/joms/inspection/form/${inspectionData.form.prev_id}`);
+  };
+
+  // Next Page
+  const handleNext = () => {
+    if (!inspectionData?.form?.next_id) return; // stop if no next
+    setFormClosed();
+    fetchTracking();
+    setLoading(true);
+    navigate(`/joms/inspection/form/${inspectionData.form.next_id}`);
+  };
 
   // Supervisor Approvel Popup 
   const handleSupApprovalConfirmation = () => {
@@ -894,656 +894,632 @@ export default function InspectionForm(){
   return (
     <PageComponent title="Pre/Post Repair Inspection Form">
       {dataAccess != 'Not-Found' ? (
-        loading ? (
-          <div className="flex justify-center items-center py-4">
-            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-            <span className="loading-table">Loading Pre/Post Repair Inspection Form</span>
+        clearance ? (
+        <>
+          {/* Buttons */}
+          {(GSO || DivisionManager || Admin || SuperAdmin) && (
+            <div className="text-sm flex justify-between items-center w-full mt-2 mb-2">
+              <button
+                onClick={handlePrev}
+                disabled={!inspectionData?.form?.prev_id || loading}
+                className={`px-4 py-2 rounded ${
+                  inspectionData?.form?.prev_id
+                    ? "bg-gray-700 text-white hover:bg-gray-600"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                ← Previous
+              </button>
+
+              <button
+                onClick={handleNext}
+                disabled={!inspectionData?.form?.next_id || loading}
+                className={`px-4 py-2 rounded ${
+                  inspectionData?.form?.next_id
+                    ? "bg-blue-700 text-white hover:bg-blue-600"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+
+          {/* Header */}
+          <div className="ppa-form-header text-base flex justify-between items-center">
+            <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
+            <div className="flex space-x-4">
+              {/* Supervisor Button */}
+              {DivisionManager && currentUserId == inspectionData?.form?.supervisor_id && inspectionData?.form?.form_status == 11 && (
+                enableSupDecline ? (
+                <>
+                  {/* Enable Reason */}
+                  <button onClick={() => handleSupDeclineConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Submit </button>
+                  <button onClick={() => { setEnableSupDecline(false); setReason(''); setReasonError(false); }} className="py-2 px-4 text-sm btn-cancel-form"> Cancel </button>
+                </>
+                ):(
+                <>
+                  {/* Approve */}
+                  <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Approve </button>
+                  {/* Decline */}
+                  {!inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
+                    <button onClick={() => setEnableSupDecline(true)} className="py-2 px-4 text-sm btn-cancel-form"> Decline </button>
+                  )}
+                </>
+                )
+              )}
+
+              {/* Admin Manager's Approval */}
+              {Admin && inspectionData?.form?.form_status == 5 && (
+                <button
+                  onClick={() => handleAdminApprovalConfirmation()} 
+                  className="py-2 px-4 text-sm btn-default-form"
+                >
+                  Approve
+                </button>
+              )}
+
+              {/* Cancel Button */}
+              {!partBForm && enablePartA && enablePartB && enablePartC && enablePartD && !inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
+                currentUserId == inspectionData?.form?.user_id && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !SuperAdmin) ? (
+                  <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
+                ):(GSO || currentUserId == 1) && [5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
+                  <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
+                ):null
+              )}
+
+              {/* Generate PDF Button */}
+              {!partDForm && !partCForm && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                currentUserId == inspectionData?.form?.user_id && [1, 2].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) ? (
+                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                ):(GSO || SuperAdmin || (Admin && inspectionData?.form?.form_status === 1)) ? (
+                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                ):null
+              )}
+            </div>
           </div>
-        ):(
-          clearance ? (
-          <>
-            {/* Notification for auto close and for the GSO */}
-            <div className="text-sm flex justify-end items-center w-full">
-              {/* {accessOnly && inspectionData?.form?.form_status == 2 && "The form becomes non-editable after 24 hours."} */}
-            </div>
 
-            {/* Header */}
-            <div className="ppa-form-header text-base flex justify-between items-center">
-              <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
-              <div className="flex space-x-4">
-                {/* Supervisor Button */}
-                {DivisionManager && currentUserId == inspectionData?.form?.supervisor_id && inspectionData?.form?.form_status == 11 && (
-                  enableSupDecline ? (
-                  <>
-                    {/* Enable Reason */}
-                    <button onClick={() => handleSupDeclineConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Submit </button>
-                    <button onClick={() => { setEnableSupDecline(false); setReason(''); setReasonError(false); }} className="py-2 px-4 text-sm btn-cancel-form"> Cancel </button>
-                  </>
-                  ):(
-                  <>
-                    {/* Approve */}
-                    <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Approve </button>
-                    {/* Decline */}
-                    {!inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
-                      <button onClick={() => setEnableSupDecline(true)} className="py-2 px-4 text-sm btn-cancel-form"> Decline </button>
-                    )}
-                  </>
-                  )
-                )}
-
-                {/* Admin Manager's Approval */}
-                {Admin && inspectionData?.form?.form_status == 5 && (
-                  <button
-                    onClick={() => handleAdminApprovalConfirmation()} 
-                    className="py-2 px-4 text-sm btn-default-form"
-                  >
-                    Approve
-                  </button>
-                )}
-
-                {/* Cancel Button */}
-                {!partBForm && enablePartA && enablePartB && enablePartC && enablePartD && !inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
-                  currentUserId == inspectionData?.form?.user_id && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !SuperAdmin) ? (
-                    <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                  ):(GSO || currentUserId == 1) && [5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
-                    <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                  ):null
-                )}
-
-                {/* Generate PDF Button */}
-                {!partDForm && !partCForm && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                  currentUserId == inspectionData?.form?.user_id && [1, 2].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) ? (
-                    <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-                  ):(GSO || SuperAdmin || (Admin && inspectionData?.form?.form_status === 1)) ? (
-                    <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-                  ):null
-                )}
+          {/* Form */}
+          <div className="py-6 ppa-widget bg-white mb-6">
+            {loadingPDF ? (
+              <div className="flex justify-center text-lg font-bold items-center space-x-4">
+                Generating PDF
               </div>
-            </div>
-
-            {/* Form */}
-            <div className="py-6 ppa-widget bg-white mb-6">
-              {loadingPDF ? (
-                <div className="flex justify-center text-lg font-bold items-center space-x-4">
-                  Generating PDF
+            ):loading ? (
+              <div className="flex justify-center items-center py-4">
+                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                <span className="loading-table">Loading Pre/Post Repair Inspection Form</span>
+              </div>
+            ):(
+              enableSupDecline ? (
+                <div className="px-4">
+                  {/* Form Reason */}
+                  <form id="submitSupReason" onSubmit={SubmitSupReason}>
+                    <label className="form-title">
+                      Reason for disapproval:
+                    </label>
+                    <div className="w-full mt-2">
+                      <input
+                        type="text"
+                        name="reason"
+                        id="reason"
+                        value={reason}
+                        onChange={ev => setReason(ev.target.value)}
+                        placeholder="Input your reasons"
+                        className={`block w-full ${reasonError && !reason ? "ppa-form-error":"ppa-form-edit"}`}
+                      />
+                      {reasonError && !reason && (<p className="form-validation">This form is required</p>)}
+                    </div>
+                  </form>
                 </div>
               ):(
-                enableSupDecline ? (
-                  <div className="px-4">
-                    {/* Form Reason */}
-                    <form id="submitSupReason" onSubmit={SubmitSupReason}>
-                      <label className="form-title">
-                        Reason for disapproval:
-                      </label>
-                      <div className="w-full mt-2">
-                        <input
-                          type="text"
-                          name="reason"
-                          id="reason"
-                          value={reason}
-                          onChange={ev => setReason(ev.target.value)}
-                          placeholder="Input your reasons"
-                          className={`block w-full ${reasonError && !reason ? "ppa-form-error":"ppa-form-edit"}`}
-                        />
-                        {reasonError && !reason && (<p className="form-validation">This form is required</p>)}
-                      </div>
-                    </form>
-                  </div>
-                ):(
-                <div>
+              <div>
 
-                  {/* Status */}
-                  <div className="status-sec mb-4 mx-4">
-                    {([5, 11].includes(inspectionData?.form?.form_status) && 
-                    inspectionData?.form?.date_of_filling && 
-                    inspectionData?.form?.before_repair_date &&
-                    inspectionData?.form?.after_reapir_date) ? (
-                    <>
-                      <p> <strong>Status: </strong> Form was completed, but no approval from {[11].includes(inspectionData?.form?.form_status) && "Immediate Supervisor "} {[11].includes(inspectionData?.form?.form_status) ? "and" : null} {[5, 11].includes(inspectionData?.form?.form_status) && "Admin Manager"}. </p>
-                    </>
-                    ):(
-                      <p> <strong>Status: </strong> {inspectionData?.form?.form_remarks} </p>
-                    )}
-                  </div>
+                {/* Status */}
+                <div className="status-sec mb-4 mx-4">
+                  {loading && ([5, 11].includes(inspectionData?.form?.form_status) && 
+                  inspectionData?.form?.date_of_filling && 
+                  inspectionData?.form?.before_repair_date &&
+                  inspectionData?.form?.after_reapir_date) ? (
+                  <>
+                    <p> <strong>Status: </strong> Form was completed, but no approval from {[11].includes(inspectionData?.form?.form_status) && "Immediate Supervisor "} {[11].includes(inspectionData?.form?.form_status) ? "and" : null} {[5, 11].includes(inspectionData?.form?.form_status) && "Admin Manager"}. </p>
+                  </>
+                  ):(
+                    <p> <strong>Status: </strong> {inspectionData?.form?.form_remarks} </p>
+                  )}
+                </div>
 
-                  {/* Part A */}
-                  <div className="pb-6 border-b border-gray-300">
+                {/* Part A */}
+                <div className="pb-6 border-b border-gray-300">
 
-                    {/* Caption */}
-                    <div className="flex justify-between items-center px-4">
-                      <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
-                      <div>
-                        {/* Edit Button*/}
-                        {SuperAdmin && currentUserId == 1 && (!partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                        )}
-                        
-                        {GSO && inspectionData?.form?.form_status != 0 && inspectionData?.form?.form_status != 1 ? (
-                          !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                        ):(!SuperAdmin || !GSO || !DivisionManager || !Admin) && (inspectionData?.form?.user_id == currentUserId && !SuperAdmin) && [8, 9, 10, 11, 12].includes(inspectionData?.form?.form_status) ? (
-                          enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                        ):null}
-
-                        {/* Edit Part A Button */}
-                        {!enablePartA && (
-                        <>
-                          {/* SuperAdmin */}
-                          {SuperAdmin && currentUserId == 1 && (
-                            !buttonHide && (
-                              <>
-                                {/* Submit */}
-                                <button 
-                                  type="submit"
-                                  onClick={() => UpdatePartA()}
-                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-1">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Save'
-                                  )}
-                                </button>
-
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button onClick={() => { 
-                                      setEnablePartA(true);
-                                    }} className="py-2 px-4 text-sm btn-cancel-form">
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
-                            )
-                          )}
-
-                          {/* For the Requestor */}
-                          {(currentUserId == inspectionData?.form?.user_id && !SuperAdmin) && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) && (
-                            !buttonHide && (
-                              <>
-                                {/* Submit */}
-                                <button 
-                                  type="submit"
-                                  onClick={() => UpdatePartA()}
-                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-1">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Save'
-                                  )}
-                                </button>
-
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button onClick={() => { 
-                                      setEnablePartA(true);
-                                    }} className="py-2 px-4 text-sm btn-cancel-form">
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
-                            )
-                          )}
-
-                          {/* For the GSO */}
-                          {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
-                            !buttonHide && (
-                              <>
-                                {/* Submit */}
-                                <button 
-                                  type="submit"
-                                  onClick={() => UpdatePartA()}
-                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-1">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Save'
-                                  )}
-                                </button>
-
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button onClick={() => { 
-                                      setEnablePartA(true);
-                                    }} className="py-2 px-4 text-sm btn-cancel-form">
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
-                            )
-                          )}
-                        </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="px-4">
+                  {/* Caption */}
+                  <div className="flex justify-between items-center px-4">
+                    <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
+                    <div>
+                      {/* Edit Button*/}
+                      {SuperAdmin && currentUserId == 1 && (!partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
+                        <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                      )}
                       
-                      {/* ---- Part A Fields ---- */}
-                      <div className="grid grid-cols-2">
+                      {GSO && inspectionData?.form?.form_status != 0 && inspectionData?.form?.form_status != 1 ? (
+                        !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                      ):(!SuperAdmin || !GSO || !DivisionManager || !Admin) && (inspectionData?.form?.user_id == currentUserId && !SuperAdmin) && [8, 9, 10, 11, 12].includes(inspectionData?.form?.form_status) ? (
+                        enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                      ):null}
 
-                        {/* Part A left side */}
-                        <div className="col-span-1">
-
-                          {/* Date */}
-                          <div className="flex items-center mt-4">
-                            <div className="w-40">
-                              <label className="form-title">
-                              Date:
-                              </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  value={formatDate(inspectionData?.form?.date_request)}
-                                  className="block w-full ppa-form-edit"
-                                  disabled
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading &&(formatDate(inspectionData?.form?.date_request))}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Property No */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Property No: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  name="rep_property_no"
-                                  id="rep_property_no"
-                                  autoComplete="rep_property_no"
-                                  value={updatepropertyNo}
-                                  onChange={ev => setUpdatePropertyNo(ev.target.value)}
-                                  placeholder="Input Property Number" 
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>                            
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.property_number ? inspectionData?.form?.property_number : "N/A")}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Acquisition Date */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Acquisition Date: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="date"
-                                  name="rep_acquisition_date"
-                                  id="rep_acquisition_date"
-                                  value={updateacquisitionDate}
-                                  onChange={ev => setUpdateAcquisitionDate(ev.target.value)}
-                                  max={currentDate}
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.acquisition_date ? formatDate(inspectionData?.form?.acquisition_date) : "N/A")}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Acquisition Cost */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Acquisition Cost: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                  <input
-                                    type="text"
-                                    name="rep_acquisition_cost"
-                                    id="rep_acquisition_cost"
-                                    autoComplete="rep_acquisition_cost"
-                                    value={updateacquisitionCost}
-                                    onChange={ev => {
-                                      const inputVal = ev.target.value;
-                                      // Allow only numeric input
-                                      if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
-                                        setUpdateAcquisitionCost(inputVal.replace(/,/g, ''));
-                                      }
-                                    }}
-                                    placeholder="Input Acquisition Cost"
-                                    className="block w-full ppa-form-edit"
-                                  />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.acquisition_cost 
-                                  ? new Intl.NumberFormat('en-PH', {
-                                      style: 'currency',
-                                      currency: 'PHP'
-                                    }).format(inspectionData?.form?.acquisition_cost) 
-                                  : 'N/A')}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Brand/Model */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Brand/Model: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  name="brand_mrep_brand_model"
-                                  id="rep_brand_model"
-                                  autoComplete="rep_brand_model"
-                                  value={updateBrandModel}
-                                  onChange={ev => setUpdateBrandModel(ev.target.value)}
-                                  placeholder="Input Brand/Model"
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.brand_model ? inspectionData?.form?.brand_model : "N/A")}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Serial/Engine No */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Serial/Engine No: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  name="rep_serial_engine_no"
-                                  id="rep_serial_engine_no"
-                                  autoComplete="rep_serial_engine_no"
-                                  value={updateSerialEngineNo}
-                                  onChange={ev => setUpdateSerialEngineNo(ev.target.value)}
-                                  placeholder="Input Serial/Engine No"
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.serial_engine_no ? inspectionData?.form?.serial_engine_no : "N/A")}
-                              </div>
-                            )}
-                          </div>
-
-                        </div>
-
-                        {/* Part A right side */}
-                        <div className="col-span-1">
-
-                          {/* Type of Property */}
-                          <div className="flex items-center mt-6">
-                            <div className="w-40">
-                              <label className="form-title"> Type of Property: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <select 
-                                  name="rep_type_of_property" 
-                                  id="rep_type_of_property" 
-                                  value={updateTypeofProperty}
-                                  onChange={ev => setUpdateTypeofProperty(ev.target.value)}
-                                  className="block w-full ppa-form-edit"
-                                >
-                                  <option value="" disabled>(Current) {inspectionData?.form?.type_of_property}</option>
-                                  {["Vehicle Supplies & Materials", "IT Equipment & Related Materials", "Others"]
-                                    .filter(option => option !== inspectionData?.form?.type_of_property)
-                                    .map(option => (
-                                      <option key={option} value={option}>{option}</option>
-                                    ))}
-                                </select>
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.type_of_property)}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Description */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Description: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  name="rep_description"
-                                  id="rep_description"
-                                  value={updateDescription}
-                                  onChange={ev => setUpdateDescription(ev.target.value)}
-                                  placeholder="Enter Description"
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.property_description)}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Location */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title"> Location: </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  name="rep_location"
-                                  id="rep_location"
-                                  value={updateLocation}
-                                  onChange={ev => setUpdateLocation(ev.target.value)}
-                                  placeholder="Enter Location"
-                                  className="block w-full ppa-form-edit"
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.location)}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Requestor */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title">
-                              Requestor:
-                              </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  value={inspectionData?.form?.user_name}
-                                  className="block w-full ppa-form-edit"
-                                  disabled
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.user_name)}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Noted By */}
-                          <div className="flex items-center mt-2">
-                            <div className="w-40">
-                              <label className="form-title">
-                              Noted By:
-                              </label> 
-                            </div>
-                            {!enablePartA ? (
-                              <div className="w-1/2">
-                                <input
-                                  type="text"
-                                  value={inspectionData?.form?.supervisor_name}
-                                  className="block w-full ppa-form-edit"
-                                  disabled
-                                />
-                              </div>
-                            ):(
-                              <div className="w-1/2 ppa-form-view">
-                                {!loading && (inspectionData?.form?.supervisor_name)}
-                              </div>
-                            )}
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                      {/* Complain */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-40">
-                          <label className="form-title">
-                          Complain:
-                          </label> 
-                        </div>
-                        {!enablePartA ? (
-                          <div className="w-3/4">
-                            <textarea
-                              type="text"
-                              name="rep_property_no"
-                              id="rep_property_no"
-                              rows={4}
-                              value={updateComplain}
-                              onChange={ev => setUpdateComplain(ev.target.value)}
-                              placeholder="Input Complain" 
-                              className="block w-full ppa-form-edit"
-                              style={{ resize: 'none' }}
-                            />
-                          </div>
-                        ):(
-                          <div className="w-3/4 ppa-form-view">
-                            {!loading && (inspectionData?.form?.complain)}
-                          </div>
-                        )}
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  {/* Part B */}
-                  <div className="pb-6 border-b border-gray-300">
-                    
-                    {/* Caption */}
-                    <div className="flex justify-between items-center mt-4 px-4">
-                      <h2 className="req-title"> Part B: To be filled-up by Administrative Division </h2>
-                      <div>
-                        {/* Edit button */}
+                      {/* Edit Part A Button */}
+                      {!enablePartA && (
+                      <>
+                        {/* SuperAdmin */}
                         {SuperAdmin && currentUserId == 1 && (
-                          (inspectionData?.form?.date_of_filling && [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
-                          )
-                        )}
-
-                        {/* GSO */}
-                        {GSO && (
-                        <>
-                          {/* Enable Part B Form */}
-                          {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
-                            !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                            )
-                          ): [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
-                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
-                            )
-                          ):null}
-                        </>
-                        )}
-
-                        {/* Submit Part B Button */}
-                        {partBForm && (
                           !buttonHide && (
-                            !pointPersonnel.pid ? (
                             <>
                               {/* Submit */}
-                              <button type="submit"
-                                  onClick={() => SubmitPartB()}
-                                  className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
+                              <button 
+                                type="submit"
+                                onClick={() => UpdatePartA()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
                                 {submitLoading ? (
                                   <div className="flex">
                                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                                     <span className="ml-1">Loading</span>
                                   </div>
                                 ):(
-                                'Submit'
+                                  'Save'
                                 )}
                               </button>
 
                               {/* Cancel */}
                               {!submitLoading && (
                                 <button onClick={() => { 
-                                    setPartBForm(false); 
+                                    setEnablePartA(true);
                                   }} className="py-2 px-4 text-sm btn-cancel-form">
                                   Cancel
                                 </button>
                               )}
                             </>
-                            ):(
-                            (!lastfilledDate || !natureRepair) ? (
+                          )
+                        )}
+
+                        {/* For the Requestor */}
+                        {(currentUserId == inspectionData?.form?.user_id && !SuperAdmin) && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) && (
+                          !buttonHide && (
                             <>
                               {/* Submit */}
-                              <button type="submit"
-                                onClick={() => handleGSOSubmitConfirmation()} 
-                                className="py-2 px-3 text-sm mr-2 btn-default-form"
+                              <button 
+                                type="submit"
+                                onClick={() => UpdatePartA()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
                               >
-                                Submit
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Save'
+                                )}
                               </button>
 
                               {/* Cancel */}
                               {!submitLoading && (
                                 <button onClick={() => { 
-                                    setPartBForm(false); 
+                                    setEnablePartA(true);
                                   }} className="py-2 px-4 text-sm btn-cancel-form">
                                   Cancel
                                 </button>
                               )}
                             </>
-                            ):(
+                          )
+                        )}
+
+                        {/* For the GSO */}
+                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
+                          !buttonHide && (
                             <>
                               {/* Submit */}
-                              <button type="submit"
+                              <button 
+                                type="submit"
+                                onClick={() => UpdatePartA()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Save'
+                                )}
+                              </button>
+
+                              {/* Cancel */}
+                              {!submitLoading && (
+                                <button onClick={() => { 
+                                    setEnablePartA(true);
+                                  }} className="py-2 px-4 text-sm btn-cancel-form">
+                                  Cancel
+                                </button>
+                              )}
+                            </>
+                          )
+                        )}
+                      </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="px-4">
+                    
+                    {/* ---- Part A Fields ---- */}
+                    <div className="grid grid-cols-2">
+
+                      {/* Part A left side */}
+                      <div className="col-span-1">
+
+                        {/* Date */}
+                        <div className="flex items-center mt-4">
+                          <div className="w-40">
+                            <label className="form-title">
+                            Date:
+                            </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                value={formatDate(inspectionData?.form?.date_request)}
+                                className="block w-full ppa-form-edit"
+                                disabled
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {formatDate(inspectionData?.form?.date_request)}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Property No */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Property No: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                name="rep_property_no"
+                                id="rep_property_no"
+                                autoComplete="rep_property_no"
+                                value={updatepropertyNo}
+                                onChange={ev => setUpdatePropertyNo(ev.target.value)}
+                                placeholder="Input Property Number" 
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>                            
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.property_number ? inspectionData?.form?.property_number : "N/A"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Acquisition Date */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Acquisition Date: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="date"
+                                name="rep_acquisition_date"
+                                id="rep_acquisition_date"
+                                value={updateacquisitionDate}
+                                onChange={ev => setUpdateAcquisitionDate(ev.target.value)}
+                                max={currentDate}
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.acquisition_date ? formatDate(inspectionData?.form?.acquisition_date) : "N/A"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Acquisition Cost */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Acquisition Cost: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                                <input
+                                  type="text"
+                                  name="rep_acquisition_cost"
+                                  id="rep_acquisition_cost"
+                                  autoComplete="rep_acquisition_cost"
+                                  value={updateacquisitionCost}
+                                  onChange={ev => {
+                                    const inputVal = ev.target.value;
+                                    // Allow only numeric input
+                                    if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
+                                      setUpdateAcquisitionCost(inputVal.replace(/,/g, ''));
+                                    }
+                                  }}
+                                  placeholder="Input Acquisition Cost"
+                                  className="block w-full ppa-form-edit"
+                                />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.acquisition_cost 
+                                ? new Intl.NumberFormat('en-PH', {
+                                    style: 'currency',
+                                    currency: 'PHP'
+                                  }).format(inspectionData?.form?.acquisition_cost) 
+                                : 'N/A'}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Brand/Model */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Brand/Model: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                name="brand_mrep_brand_model"
+                                id="rep_brand_model"
+                                autoComplete="rep_brand_model"
+                                value={updateBrandModel}
+                                onChange={ev => setUpdateBrandModel(ev.target.value)}
+                                placeholder="Input Brand/Model"
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.brand_model ? inspectionData?.form?.brand_model : "N/A"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Serial/Engine No */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Serial/Engine No: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                name="rep_serial_engine_no"
+                                id="rep_serial_engine_no"
+                                autoComplete="rep_serial_engine_no"
+                                value={updateSerialEngineNo}
+                                onChange={ev => setUpdateSerialEngineNo(ev.target.value)}
+                                placeholder="Input Serial/Engine No"
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.serial_engine_no ? inspectionData?.form?.serial_engine_no : "N/A"}
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+
+                      {/* Part A right side */}
+                      <div className="col-span-1">
+
+                        {/* Type of Property */}
+                        <div className="flex items-center mt-6">
+                          <div className="w-40">
+                            <label className="form-title"> Type of Property: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <select 
+                                name="rep_type_of_property" 
+                                id="rep_type_of_property" 
+                                value={updateTypeofProperty}
+                                onChange={ev => setUpdateTypeofProperty(ev.target.value)}
+                                className="block w-full ppa-form-edit"
+                              >
+                                <option value="" disabled>(Current) {inspectionData?.form?.type_of_property}</option>
+                                {["Vehicle Supplies & Materials", "IT Equipment & Related Materials", "Others"]
+                                  .filter(option => option !== inspectionData?.form?.type_of_property)
+                                  .map(option => (
+                                    <option key={option} value={option}>{option}</option>
+                                  ))}
+                              </select>
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.type_of_property}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Description: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                name="rep_description"
+                                id="rep_description"
+                                value={updateDescription}
+                                onChange={ev => setUpdateDescription(ev.target.value)}
+                                placeholder="Enter Description"
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.property_description}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Location */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title"> Location: </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                name="rep_location"
+                                id="rep_location"
+                                value={updateLocation}
+                                onChange={ev => setUpdateLocation(ev.target.value)}
+                                placeholder="Enter Location"
+                                className="block w-full ppa-form-edit"
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.location}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Requestor */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title">
+                            Requestor:
+                            </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                value={inspectionData?.form?.user_name}
+                                className="block w-full ppa-form-edit"
+                                disabled
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.user_name}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Noted By */}
+                        <div className="flex items-center mt-2">
+                          <div className="w-40">
+                            <label className="form-title">
+                            Noted By:
+                            </label> 
+                          </div>
+                          {!enablePartA ? (
+                            <div className="w-1/2">
+                              <input
+                                type="text"
+                                value={inspectionData?.form?.supervisor_name}
+                                className="block w-full ppa-form-edit"
+                                disabled
+                              />
+                            </div>
+                          ):(
+                            <div className="w-1/2 ppa-form-view">
+                              {inspectionData?.form?.supervisor_name}
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    {/* Complain */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-40">
+                        <label className="form-title">
+                        Complain:
+                        </label> 
+                      </div>
+                      {!enablePartA ? (
+                        <div className="w-3/4">
+                          <textarea
+                            type="text"
+                            name="rep_property_no"
+                            id="rep_property_no"
+                            rows={4}
+                            value={updateComplain}
+                            onChange={ev => setUpdateComplain(ev.target.value)}
+                            placeholder="Input Complain" 
+                            className="block w-full ppa-form-edit"
+                            style={{ resize: 'none' }}
+                          />
+                        </div>
+                      ):(
+                        <div className="w-3/4 ppa-form-view">
+                          {inspectionData?.form?.complain}
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* Part B */}
+                <div className="pb-6 border-b border-gray-300">
+                  
+                  {/* Caption */}
+                  <div className="flex justify-between items-center mt-4 px-4">
+                    <h2 className="req-title"> Part B: To be filled-up by Administrative Division </h2>
+                    <div>
+                      {/* Edit button */}
+                      {SuperAdmin && currentUserId == 1 && (
+                        (inspectionData?.form?.date_of_filling && [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
+                          <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
+                        )
+                      )}
+
+                      {/* GSO */}
+                      {GSO && (
+                      <>
+                        {/* Enable Part B Form */}
+                        {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
+                          !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          )
+                        ): [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
+                          )
+                        ):null}
+                      </>
+                      )}
+
+                      {/* Submit Part B Button */}
+                      {partBForm && (
+                        !buttonHide && (
+                          !pointPersonnel.pid ? (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
                                 onClick={() => SubmitPartB()}
                                 className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                                 disabled={submitLoading}
@@ -1551,308 +1527,365 @@ export default function InspectionForm(){
                               {submitLoading ? (
                                 <div className="flex">
                                   <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                  <span className="ml-2">Loading</span>
+                                  <span className="ml-1">Loading</span>
                                 </div>
                               ):(
                               'Submit'
                               )}
+                            </button>
+
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setPartBForm(false); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          ):(
+                          (!lastfilledDate || !natureRepair) ? (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => handleGSOSubmitConfirmation()} 
+                              className="py-2 px-3 text-sm mr-2 btn-default-form"
+                            >
+                              Submit
+                            </button>
+
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setPartBForm(false); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          ):(
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => SubmitPartB()}
+                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                            {submitLoading ? (
+                              <div className="flex">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-2">Loading</span>
+                              </div>
+                            ):(
+                            'Submit'
+                            )}
+                            </button>
+
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setPartBForm(false); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          )
+                          )
+                        )
+                      )}
+
+                      {/* Edit Part B Button */}
+                      {!enablePartB && (
+                      <>
+                        {/* SuperAdmin */}
+                        {SuperAdmin && currentUserId == 1 && (
+                          !buttonHide && (
+                            <>
+                              {/* Submit */}
+                              <button type="submit"
+                                onClick={() => UpdatePartB()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Update Part B'
+                                )}
                               </button>
 
                               {/* Cancel */}
                               {!submitLoading && (
                                 <button onClick={() => { 
-                                    setPartBForm(false); 
+                                    setEnablePartB(true); 
+                                  }} className="py-2 px-4 text-sm mr-2 btn-cancel-form">
+                                  Cancel
+                                </button>
+                              )}
+                            </>
+                          )
+                        )}
+
+                        {/* GSO */}
+                        {GSO && (
+                          !buttonHide && (
+                            <>
+                              {/* Submit */}
+                              <button type="submit"
+                                onClick={() => UpdatePartB()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Update Part B'
+                                )}
+                              </button>
+
+                              {/* Cancel */}
+                              {!submitLoading && (
+                                <button onClick={() => { 
+                                    setEnablePartB(true); 
                                   }} className="py-2 px-4 text-sm btn-cancel-form">
                                   Cancel
                                 </button>
                               )}
                             </>
-                            )
-                            )
                           )
                         )}
-
-                        {/* Edit Part B Button */}
-                        {!enablePartB && (
-                        <>
-                          {/* SuperAdmin */}
-                          {SuperAdmin && currentUserId == 1 && (
-                            !buttonHide && (
-                              <>
-                                {/* Submit */}
-                                <button type="submit"
-                                  onClick={() => UpdatePartB()}
-                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-1">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Update Part B'
-                                  )}
-                                </button>
-
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button onClick={() => { 
-                                      setEnablePartB(true); 
-                                    }} className="py-2 px-4 text-sm mr-2 btn-cancel-form">
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
-                            )
-                          )}
-
-                          {/* GSO */}
-                          {GSO && (
-                            !buttonHide && (
-                              <>
-                                {/* Submit */}
-                                <button type="submit"
-                                  onClick={() => UpdatePartB()}
-                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-1">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Update Part B'
-                                  )}
-                                </button>
-
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button onClick={() => { 
-                                      setEnablePartB(true); 
-                                    }} className="py-2 px-4 text-sm btn-cancel-form">
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
-                            )
-                          )}
-                        </>
-                        )}
-                      </div>
+                      </>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="px-4">
-                    
-                      {/* Date */}
-                      <div className="flex items-center mt-6">
-                        <div className="w-44">
-                          <label className="form-title">
-                          Date:
-                          </label> 
-                        </div>
-                        {partBForm ? (
-                          <div className="w-1/2">
-                            <input 
-                              type="date" 
-                              name="rep_date" 
-                              value={partBdate}
-                              onChange={ev => setPartBdate(ev.target.value)}
-                              className="block w-full ppa-form-edit"
-                              max={today}
-                            />
-                          </div>
-                        ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="date"
-                                name="last_date_filled"
-                                id="last_date_filled"    
-                                value={updatePartBdate}
-                                onChange={ev => setUpdatePartBdate(ev.target.value)}
-                                className="block w-full ppa-form-edit"
-                                max={today}
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.date_of_filling ? formatDate(inspectionData?.form?.date_of_filling) : null }
-                            </div>
-                          )
-                        )}
+                  <div className="px-4">
+                  
+                    {/* Date */}
+                    <div className="flex items-center mt-6">
+                      <div className="w-44">
+                        <label className="form-title">
+                        Date:
+                        </label> 
                       </div>
-
-                      {/* Date of Last Repair */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Date of Last Repair:
-                          </label> 
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <input 
+                            type="date" 
+                            name="rep_date" 
+                            value={partBdate}
+                            onChange={ev => setPartBdate(ev.target.value)}
+                            className="block w-full ppa-form-edit"
+                            max={today}
+                          />
                         </div>
-                        {partBForm ? (
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
                           <div className="w-1/2">
                             <input
                               type="date"
                               name="last_date_filled"
                               id="last_date_filled"    
-                              value={lastfilledDate}
-                              onChange={ev => setLastFilledDate(ev.target.value)}
+                              value={updatePartBdate}
+                              onChange={ev => setUpdatePartBdate(ev.target.value)}
+                              className="block w-full ppa-form-edit"
+                              max={today}
+                            />
+                          </div>
+                        ):(
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.date_of_filling ? formatDate(inspectionData?.form?.date_of_filling) : null }
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    {/* Date of Last Repair */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Date of Last Repair:
+                        </label> 
+                      </div>
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="date"
+                            name="last_date_filled"
+                            id="last_date_filled"    
+                            value={lastfilledDate}
+                            onChange={ev => setLastFilledDate(ev.target.value)}
+                            max={currentDate}
+                            className="block w-full ppa-form-edit"
+                          />
+                        </div>
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
+                          <div className="w-1/2">
+                            <input
+                              type="date"
+                              name="last_date_filled"
+                              id="last_date_filled"    
+                              value={updatelastfilledDate}
+                              onChange={ev => setUpdateLastFilledDate(ev.target.value)}
                               max={currentDate}
                               className="block w-full ppa-form-edit"
                             />
                           </div>
                         ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="date"
-                                name="last_date_filled"
-                                id="last_date_filled"    
-                                value={updatelastfilledDate}
-                                onChange={ev => setUpdateLastFilledDate(ev.target.value)}
-                                max={currentDate}
-                                className="block w-full ppa-form-edit"
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.date_of_filling ? (
-                                inspectionData?.form?.date_of_last_repair ? formatDate(inspectionData?.form?.date_of_last_repair) : 'N/A'
-                              ) : null  }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.date_of_filling ? (
+                              inspectionData?.form?.date_of_last_repair ? formatDate(inspectionData?.form?.date_of_last_repair) : 'N/A'
+                            ) : null  }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Nature of Last Repair */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Nature of Last Repair:
-                          </label> 
+                    {/* Nature of Last Repair */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Nature of Last Repair:
+                        </label> 
+                      </div>
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <textarea
+                            id="nature_repair"
+                            name="nature_repair"
+                            rows={3}
+                            value={natureRepair}
+                            onChange={ev => setNatureRepair(ev.target.value)}
+                            style={{ resize: "none" }}  
+                            maxLength={255}
+                            className="block w-full ppa-form-edit"
+                          />
                         </div>
-                        {partBForm ? (
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
                           <div className="w-1/2">
-                            <textarea
+                            <input
                               id="nature_repair"
                               name="nature_repair"
-                              rows={3}
-                              value={natureRepair}
-                              onChange={ev => setNatureRepair(ev.target.value)}
+                              value={updatenatureRepair}
+                              onChange={ev => setUpdateNatureRepair(ev.target.value)}
                               style={{ resize: "none" }}  
-                              maxLength={255}
+                              placeholder={inspectionData?.form?.nature_of_last_repair}
                               className="block w-full ppa-form-edit"
                             />
                           </div>
                         ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <input
-                                id="nature_repair"
-                                name="nature_repair"
-                                value={updatenatureRepair}
-                                onChange={ev => setUpdateNatureRepair(ev.target.value)}
-                                style={{ resize: "none" }}  
-                                placeholder={inspectionData?.form?.nature_of_last_repair}
-                                className="block w-full ppa-form-edit"
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.date_of_filling ? (
-                                inspectionData?.form?.nature_of_last_repair ? inspectionData?.form?.nature_of_last_repair : 'N/A'
-                              ) : null}
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.date_of_filling ? (
+                              inspectionData?.form?.nature_of_last_repair ? inspectionData?.form?.nature_of_last_repair : 'N/A'
+                            ) : null}
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Assign Personnel */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Assign Personnel:
-                          </label> 
+                    {/* Assign Personnel */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Assign Personnel:
+                        </label> 
+                      </div>
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <select 
+                            name="rep_type_of_property" 
+                            id="rep_type_of_property" 
+                            autoComplete="rep_type_of_property"
+                            value={pointPersonnel.pid}
+                            onChange={ev => {
+                              const selectedPid = parseInt(ev.target.value);
+                              const selectedPersonnel = getPersonnel.find(staff => staff.personnel_id === selectedPid);
+
+                              setPointPersonnel(selectedPersonnel ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } : { pid: '', pname: '' });
+                            }}
+                            className={`block w-full ${(!pointPersonnel.pid && inputErrors.personnel_id) ? "ppa-form-error":"ppa-form-edit"}`}
+                            >
+                              <option value="" disabled>Select an option</option>
+                              {getPersonnel.map((data)=>(
+                                <option key={data.personnel_id} value={data.personnel_id}>
+                                  {data.personnel_name}
+                                </option>
+                              ))}
+                          </select>
+                          {!pointPersonnel.pid && inputErrors.personnel_id && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partBForm ? (
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
                           <div className="w-1/2">
                             <select 
                               name="rep_type_of_property" 
                               id="rep_type_of_property" 
                               autoComplete="rep_type_of_property"
-                              value={pointPersonnel.pid}
+                              value={updatepointPersonnel.pid}
                               onChange={ev => {
                                 const selectedPid = parseInt(ev.target.value);
                                 const selectedPersonnel = getPersonnel.find(staff => staff.personnel_id === selectedPid);
 
-                                setPointPersonnel(selectedPersonnel ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } : { pid: '', pname: '' });
+                                setUpdatePointPersonnel(
+                                  selectedPersonnel 
+                                    ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } 
+                                    : { pid: '', pname: '' }
+                                );
                               }}
-                              className={`block w-full ${(!pointPersonnel.pid && inputErrors.personnel_id) ? "ppa-form-error":"ppa-form-edit"}`}
-                              >
-                                <option value="" disabled>Select an option</option>
-                                {getPersonnel.map((data)=>(
+                              className="block w-full ppa-form-edit"
+                            >
+                              {/* Disabled option for current personnel */}
+                              <option value="" disabled>
+                                {inspectionData?.form?.personnel_name ? `${inspectionData.form.personnel_name} (current)`  : "Select Personnel"} 
+                              </option>
+
+                              {/* Filter out current personnel */}
+                              {getPersonnel
+                                .filter(data => data.personnel_id !== inspectionData?.form?.personnel_id) // Remove current personnel
+                                .map(data => (
                                   <option key={data.personnel_id} value={data.personnel_id}>
                                     {data.personnel_name}
                                   </option>
                                 ))}
                             </select>
-                            {!pointPersonnel.pid && inputErrors.personnel_id && (
-                              <p className="form-validation">This form is required</p>
-                            )}
                           </div>
                         ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <select 
-                                name="rep_type_of_property" 
-                                id="rep_type_of_property" 
-                                autoComplete="rep_type_of_property"
-                                value={updatepointPersonnel.pid}
-                                onChange={ev => {
-                                  const selectedPid = parseInt(ev.target.value);
-                                  const selectedPersonnel = getPersonnel.find(staff => staff.personnel_id === selectedPid);
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.personnel_name}
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                                  setUpdatePointPersonnel(
-                                    selectedPersonnel 
-                                      ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } 
-                                      : { pid: '', pname: '' }
-                                  );
-                                }}
-                                className="block w-full ppa-form-edit"
-                              >
-                                {/* Disabled option for current personnel */}
-                                <option value="" disabled>
-                                  {inspectionData?.form?.personnel_name ? `${inspectionData.form.personnel_name} (current)`  : "Select Personnel"} 
-                                </option>
-
-                                {/* Filter out current personnel */}
-                                {getPersonnel
-                                  .filter(data => data.personnel_id !== inspectionData?.form?.personnel_id) // Remove current personnel
-                                  .map(data => (
-                                    <option key={data.personnel_id} value={data.personnel_id}>
-                                      {data.personnel_name}
-                                    </option>
-                                  ))}
-                              </select>
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.personnel_name}
-                            </div>
-                          )
-                        )}
+                    {/* Requested By */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Requested By:
+                        </label> 
                       </div>
-
-                      {/* Requested By */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Requested By:
-                          </label> 
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="text"
+                            value={inspectionData?.gso_name}
+                            className="block w-full ppa-form-edit"
+                            disabled
+                          />
                         </div>
-                        {partBForm ? (
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
                           <div className="w-1/2">
                             <input
                               type="text"
@@ -1862,31 +1895,31 @@ export default function InspectionForm(){
                             />
                           </div>
                         ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="text"
-                                value={inspectionData?.gso_name}
-                                className="block w-full ppa-form-edit"
-                                disabled
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.date_of_filling ? inspectionData?.gso_name : null}
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.date_of_filling ? inspectionData?.gso_name : null}
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Noted By */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Noted By:
-                          </label> 
+                    {/* Noted By */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Noted By:
+                        </label> 
+                      </div>
+                      {partBForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="text"
+                            value={inspectionData?.admin_name}
+                            className="block w-full ppa-form-edit"
+                            disabled
+                          />
                         </div>
-                        {partBForm ? (
+                      ):(
+                        !enablePartB && (GSO || SuperAdmin) ? (
                           <div className="w-1/2">
                             <input
                               type="text"
@@ -1896,87 +1929,113 @@ export default function InspectionForm(){
                             />
                           </div>
                         ):(
-                          !enablePartB && (GSO || SuperAdmin) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="text"
-                                value={inspectionData?.admin_name}
-                                className="block w-full ppa-form-edit"
-                                disabled
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.date_of_filling ? inspectionData?.admin_name : null}
-                            </div>
-                          )
-                        )}
-                      </div>
-
+                          <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.date_of_filling ? null : 'h-6' }`}>
+                            {inspectionData?.form?.date_of_filling ? inspectionData?.admin_name : null}
+                          </div>
+                        )
+                      )}
                     </div>
 
                   </div>
 
-                  {/* Part C */}
-                  <div className="pb-6 border-b border-gray-300">
+                </div>
 
-                    {/* Caption */}
-                    <div className="flex justify-between items-center mt-4 px-4">
-                      <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job </h2>
-                      <div>
-                        {/* For the SuperAdmin and assign */}
-                        {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 4 ? (
-                            !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                {/* Part C */}
+                <div className="pb-6 border-b border-gray-300">
+
+                  {/* Caption */}
+                  <div className="flex justify-between items-center mt-4 px-4">
+                    <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job </h2>
+                    <div>
+                      {/* For the SuperAdmin and assign */}
+                      {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 4 ? (
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                        )
+                      ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
+                        !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                        )
+                      ):null}
+
+                      {/* For the GSO */}
+                      {GSO && (
+                        [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                        )
+                      )}
+
+                      {/* For the Assign Personnel */}
+                      {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
+                        inspectionData?.form?.form_status == 4 ? (
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
                           )
-                        ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
-                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                          )
-                        ):null}
+                        ):[2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
+                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                        ):null
+                      )}
 
-                        {/* For the GSO */}
-                        {GSO && (
-                          [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                          )
-                        )}
+                      {/* Submit Part C Button */}
+                      {partCForm && (
+                        !buttonHide && (
+                        <>
+                          {/* Submit */}
+                          <button type="submit"
+                            onClick={() => SubmitPartC()}
+                            className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                            disabled={submitLoading}
+                          >
+                          {submitLoading ? (
+                            <div className="flex">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-1">Loading</span>
+                            </div>
+                          ):(
+                          'Submit'
+                          )}
+                          </button>
 
-                        {/* For the Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                          inspectionData?.form?.form_status == 4 ? (
-                            !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                            )
-                          ):[2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
-                            <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                          ):null
-                        )}
+                          {/* Cancel */}
+                          {!submitLoading && (
+                            <button onClick={() => { 
+                                setPartCForm(false); 
+                              }} className="py-2 px-4 text-sm btn-cancel-form">
+                              Cancel
+                            </button>
+                          )}
+                        </>
+                        )
+                      )}
 
-                        {/* Submit Part C Button */}
-                        {partCForm && (
+                      {/* Edit Part C Button */}
+                      {!enablePartC && (
+                      <>
+                        {/* Assign Personnel */}
+                        {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
                           !buttonHide && (
                           <>
                             {/* Submit */}
                             <button type="submit"
-                              onClick={() => SubmitPartC()}
-                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              onClick={() => UpdatePartC()}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                               disabled={submitLoading}
                             >
-                            {submitLoading ? (
-                              <div className="flex">
-                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-1">Loading</span>
-                              </div>
-                            ):(
-                            'Submit'
-                            )}
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update Part C'
+                              )}
                             </button>
 
                             {/* Cancel */}
                             {!submitLoading && (
                               <button onClick={() => { 
-                                  setPartCForm(false); 
+                                  setEnablePartC(true);
+                                  setPartCDate(''); 
                                 }} className="py-2 px-4 text-sm btn-cancel-form">
                                 Cancel
                               </button>
@@ -1985,95 +2044,75 @@ export default function InspectionForm(){
                           )
                         )}
 
-                        {/* Edit Part C Button */}
-                        {!enablePartC && (
-                        <>
-                          {/* Assign Personnel */}
-                          {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
-                            !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button type="submit"
-                                onClick={() => UpdatePartC()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Update Part C'
-                                )}
-                              </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartC(true);
-                                    setPartCDate(''); 
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
+                        {/* For the GSO */}
+                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => UpdatePartC()}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update Part C'
                               )}
-                            </>
-                            )
-                          )}
+                            </button>
 
-                          {/* For the GSO */}
-                          {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
-                            !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button type="submit"
-                                onClick={() => UpdatePartC()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Update Part C'
-                                )}
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setEnablePartC(true);
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
                               </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartC(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
-                              )}
-                            </>
-                            )
-                          )}
-                        </>
+                            )}
+                          </>
+                          )
                         )}
-                      </div>
+                      </>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="px-4">
+                  <div className="px-4">
 
-                      {/* Date Inspected */}
-                      <div className="flex items-center mt-6">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Date:
-                          </label> 
+                    {/* Date Inspected */}
+                    <div className="flex items-center mt-6">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Date:
+                        </label> 
+                      </div>
+                      {partCForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="date"
+                            name="date_filled"
+                            id="date_filled"
+                            className={`block w-full ${(!partCDate && inputErrors.before_repair_date) ? "ppa-form-error":"ppa-form-edit"}`}
+                            value={partCDate}
+                            onChange={ev => setPartCDate(ev.target.value)}
+                            max={today}
+                          />
+                          {!partCDate && inputErrors.before_repair_date && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partCForm ? (
+                      ):(
+                        !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
                             <input
                               type="date"
                               name="date_filled"
                               id="date_filled"
                               className={`block w-full ${(!partCDate && inputErrors.before_repair_date) ? "ppa-form-error":"ppa-form-edit"}`}
-                              value={partCDate}
+                              value= {partCDate}
                               onChange={ev => setPartCDate(ev.target.value)}
                               max={today}
                             />
@@ -2082,37 +2121,31 @@ export default function InspectionForm(){
                             )}
                           </div>
                         ):(
-                          !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="date"
-                                name="date_filled"
-                                id="date_filled"
-                                className={`block w-full ${(!partCDate && inputErrors.before_repair_date) ? "ppa-form-error":"ppa-form-edit"}`}
-                                value= {partCDate}
-                                onChange={ev => setPartCDate(ev.target.value)}
-                                max={today}
-                              />
-                              {!partCDate && inputErrors.before_repair_date && (
-                                <p className="form-validation">This form is required</p>
-                              )}
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) : null }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.before_repair_date ? formatDate(inspectionData?.form?.before_repair_date) : null }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Assigned Personnel */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Assigned Personnel:
-                          </label> 
+                    {/* Assigned Personnel */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Assigned Personnel:
+                        </label> 
+                      </div>
+                      {partCForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="text"
+                            value={inspectionData?.form?.personnel_name}
+                            className="block w-full ppa-form-edit"
+                            disabled
+                          />
                         </div>
-                        {partCForm ? (
+                      ):(
+                        !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
                             <input
                               type="text"
@@ -2122,179 +2155,204 @@ export default function InspectionForm(){
                             />
                           </div>
                         ):(
-                          !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="text"
-                                value={inspectionData?.form?.personnel_name}
-                                className="block w-full ppa-form-edit"
-                                disabled
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.before_repair_date ? inspectionData?.form?.personnel_name : null }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.before_repair_date ? inspectionData?.form?.personnel_name : null }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Findings */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Findings:
-                          </label> 
+                    {/* Findings */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Findings:
+                        </label> 
+                      </div>
+                      {partCForm ? (
+                        <div className="w-1/2">
+                          <textarea
+                            id="findings"
+                            name="findings"
+                            rows={2}
+                            style={{ resize: "none" }}
+                            value= {findings}
+                            onChange={ev => setFindings(ev.target.value)}
+                            className={`block w-full ${(!findings && inputErrors.findings) ? "ppa-form-error":"ppa-form-edit"}`}
+                            maxLength={500}
+                          />
+                          {!findings && inputErrors.findings && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partCForm ? (
+                      ):(
+                        !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
-                            <textarea
+                            <input
                               id="findings"
                               name="findings"
-                              rows={2}
-                              style={{ resize: "none" }}
-                              value= {findings}
-                              onChange={ev => setFindings(ev.target.value)}
-                              className={`block w-full ${(!findings && inputErrors.findings) ? "ppa-form-error":"ppa-form-edit"}`}
+                              value= {updatefindings}
+                              onChange={ev => setUpdateFindings(ev.target.value)}
+                              className="block w-full ppa-form-edit"
                               maxLength={500}
                             />
-                            {!findings && inputErrors.findings && (
+                            {!updatefindings && inputErrors.findings && (
                               <p className="form-validation">This form is required</p>
                             )}
                           </div>
                         ):(
-                          !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                id="findings"
-                                name="findings"
-                                value= {updatefindings}
-                                onChange={ev => setUpdateFindings(ev.target.value)}
-                                className="block w-full ppa-form-edit"
-                                maxLength={500}
-                              />
-                              {!updatefindings && inputErrors.findings && (
-                                <p className="form-validation">This form is required</p>
-                              )}
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.findings ? inspectionData?.form?.findings : null }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.findings ? inspectionData?.form?.findings : null }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Recomendations */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Recomendations:
-                          </label> 
+                    {/* Recomendations */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Recomendations:
+                        </label> 
+                      </div>
+                      {partCForm ? (
+                        <div className="w-1/2">
+                          <textarea
+                            id="recomendations"
+                            name="recomendations"
+                            rows={2}
+                            style={{ resize: "none" }}
+                            value={recommendations}
+                            maxLength={500}
+                            onChange={ev => setRecommendations(ev.target.value)}
+                            className={`block w-full ${(!recommendations && inputErrors.recommendations) ? "ppa-form-error":"ppa-form-edit"}`}
+                          />
+                          {!recommendations && inputErrors.recommendations && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partCForm ? (
+                      ):(
+                        !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
-                            <textarea
+                            <input
                               id="recomendations"
                               name="recomendations"
-                              rows={2}
-                              style={{ resize: "none" }}
-                              value={recommendations}
+                              value= {updaterecommendations}
+                              onChange={ev => setUpdateRecommendations(ev.target.value)}
+                              className="block w-full ppa-form-edit"
                               maxLength={500}
-                              onChange={ev => setRecommendations(ev.target.value)}
-                              className={`block w-full ${(!recommendations && inputErrors.recommendations) ? "ppa-form-error":"ppa-form-edit"}`}
                             />
-                            {!recommendations && inputErrors.recommendations && (
+                            {!updaterecommendations && inputErrors.recommendations && (
                               <p className="form-validation">This form is required</p>
                             )}
                           </div>
                         ):(
-                          !enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                id="recomendations"
-                                name="recomendations"
-                                value= {updaterecommendations}
-                                onChange={ev => setUpdateRecommendations(ev.target.value)}
-                                className="block w-full ppa-form-edit"
-                                maxLength={500}
-                              />
-                              {!updaterecommendations && inputErrors.recommendations && (
-                                <p className="form-validation">This form is required</p>
-                              )}
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.recommendations ? inspectionData?.form?.recommendations : null }
-                            </div>
-                          )
-                        )}
-                      </div>
-
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.before_repair_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.recommendations ? inspectionData?.form?.recommendations : null }
+                          </div>
+                        )
+                      )}
                     </div>
 
                   </div>
 
-                  {/* Part D */}
-                  <div className="pb-6">
+                </div>
 
-                    {/* Caption */}
-                    <div className="flex justify-between items-center mt-4 px-4">
-                      <h2 className="text-lg font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
-                      <div>
-                        {/* For the SuperAdmin */}
-                        {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 3 ? (
-                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                          )
-                        ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
-                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                          )
-                        ):null}
+                {/* Part D */}
+                <div className="pb-6">
 
+                  {/* Caption */}
+                  <div className="flex justify-between items-center mt-4 px-4">
+                    <h2 className="text-lg font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
+                    <div>
+                      {/* For the SuperAdmin */}
+                      {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 3 ? (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                        )
+                      ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
+                        !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                        )
+                      ):null}
+
+                      {/* Assign Personnel */}
+                      {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
+                        inspectionData?.form?.form_status == 3 ? (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          )
+                        ):inspectionData?.form?.form_status == 2 && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
+                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                        ):null
+                      )}
+
+                      {/* For the GSO */}
+                      {GSO && (
+                        [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                        )
+                      )}
+
+                      {/* Submit Part D Form */}
+                      {partDForm && (
+                        !buttonHide && (
+                        <>
+                          {/* Submit */}
+                          <button type="submit"
+                            onClick={() => SubmitPartD()}
+                            className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                            disabled={submitLoading}
+                          >
+                          {submitLoading ? (
+                            <div className="flex">
+                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                              <span className="ml-1">Loading</span>
+                            </div>
+                          ):(
+                          'Submit'
+                          )}
+                          </button>
+
+                          {/* Cancel */}
+                          {!submitLoading && (
+                            <button onClick={() => { 
+                                setPartDForm(false); 
+                              }} className="py-2 px-4 text-sm btn-cancel-form">
+                              Cancel
+                            </button>
+                          )}
+                        </>
+                        )
+                      )}
+
+                      {/* Edit Part D Button */}
+                      {!enablePartD && (
+                      <>
                         {/* Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                          inspectionData?.form?.form_status == 3 ? (
-                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                            )
-                          ):inspectionData?.form?.form_status == 2 && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
-                            <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                          ):null
-                        )}
-
-                        {/* For the GSO */}
-                        {GSO && (
-                          [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                          )
-                        )}
-
-                        {/* Submit Part D Form */}
-                        {partDForm && (
+                        {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
                           !buttonHide && (
                           <>
                             {/* Submit */}
                             <button type="submit"
-                              onClick={() => SubmitPartD()}
-                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              onClick={() => UpdatePartD()}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                               disabled={submitLoading}
                             >
-                            {submitLoading ? (
-                              <div className="flex">
-                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-1">Loading</span>
-                              </div>
-                            ):(
-                            'Submit'
-                            )}
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update Part D'
+                              )}
                             </button>
 
                             {/* Cancel */}
                             {!submitLoading && (
                               <button onClick={() => { 
-                                  setPartDForm(false); 
+                                  setEnablePartD(true);
                                 }} className="py-2 px-4 text-sm btn-cancel-form">
                                 Cancel
                               </button>
@@ -2303,93 +2361,74 @@ export default function InspectionForm(){
                           )
                         )}
 
-                        {/* Edit Part D Button */}
-                        {!enablePartD && (
-                        <>
-                          {/* Assign Personnel */}
-                          {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
-                            !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button type="submit"
-                                onClick={() => UpdatePartD()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Update Part D'
-                                )}
-                              </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartD(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
+                        {/* For the GSO */}
+                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => UpdatePartD()}
+                              className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update Part D'
                               )}
-                            </>
-                            )
-                          )}
+                            </button>
 
-                          {/* For the GSO */}
-                          {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
-                            !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button type="submit"
-                                onClick={() => UpdatePartD()}
-                                className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Update Part D'
-                                )}
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setEnablePartD(true);
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
                               </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartD(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
-                              )}
-                            </>
-                            )
-                          )}
-                        </>
+                            )}
+                          </>
+                          )
                         )}
-                      </div>
+                      </>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="px-4">
+                  <div className="px-4">
 
-                      {/* Date Inspected */}
-                      <div className="flex items-center mt-6">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Date:
-                          </label> 
+                    {/* Date Inspected */}
+                    <div className="flex items-center mt-6">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Date:
+                        </label> 
+                      </div>
+                      {partDForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="date"
+                            name="date_filled"
+                            id="date_filled"
+                            className={`block w-full ${(!partDDate && inputErrors.after_reapir_date) ? "ppa-form-error":"ppa-form-edit"}`}
+                            value= {partDDate}
+                            onChange={ev => setPartDDate(ev.target.value)}
+                            max={today}
+                          />
+                          {!partDDate && inputErrors.after_reapir_date && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partDForm ? (
+                      ):(
+                        !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
                             <input
                               type="date"
                               name="date_filled"
                               id="date_filled"
-                              className={`block w-full ${(!partDDate && inputErrors.after_reapir_date) ? "ppa-form-error":"ppa-form-edit"}`}
+                              className={`block w-full ${(!partDDate && inputErrors.after_reapir_date) ? "ppa-form-error":"ppa-form"}`}
                               value= {partDDate}
                               onChange={ev => setPartDDate(ev.target.value)}
                               max={today}
@@ -2399,37 +2438,31 @@ export default function InspectionForm(){
                             )}
                           </div>
                         ):(
-                          !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="date"
-                                name="date_filled"
-                                id="date_filled"
-                                className={`block w-full ${(!partDDate && inputErrors.after_reapir_date) ? "ppa-form-error":"ppa-form"}`}
-                                value= {partDDate}
-                                onChange={ev => setPartDDate(ev.target.value)}
-                                max={today}
-                              />
-                              {!partDDate && inputErrors.after_reapir_date && (
-                                <p className="form-validation">This form is required</p>
-                              )}
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) : null }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.after_reapir_date ? formatDate(inspectionData?.form?.after_reapir_date) : null }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Assigned Personnel */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Assigned Personnel:
-                          </label> 
+                    {/* Assigned Personnel */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Assigned Personnel:
+                        </label> 
+                      </div>
+                      {partDForm ? (
+                        <div className="w-1/2">
+                          <input
+                            type="text"
+                            value={inspectionData?.form?.personnel_name}
+                            className="block w-full ppa-form-edit"
+                            disabled
+                          />
                         </div>
-                        {partDForm ? (
+                      ):(
+                        !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
                             <input
                               type="text"
@@ -2439,144 +2472,133 @@ export default function InspectionForm(){
                             />
                           </div>
                         ):(
-                          !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                type="text"
-                                value={inspectionData?.form?.personnel_name}
-                                className="block w-full ppa-form-edit"
-                                disabled
-                              />
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.after_reapir_date ? inspectionData?.form?.personnel_name : null }
-                            </div>
-                          )
-                        )}
-                      </div>
+                          <div className={`w-1/2 ppa-form-view font-bold ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.after_reapir_date ? inspectionData?.form?.personnel_name : null }
+                          </div>
+                        )
+                      )}
+                    </div>
 
-                      {/* Remarks */}
-                      <div className="flex items-center mt-2">
-                        <div className="w-44">
-                          <label className="form-title">
-                            Remarks:
-                          </label> 
+                    {/* Remarks */}
+                    <div className="flex items-center mt-2">
+                      <div className="w-44">
+                        <label className="form-title">
+                          Remarks:
+                        </label> 
+                      </div>
+                      {partDForm ? (
+                        <div className="w-1/2">
+                          <textarea
+                            id="remarks"
+                            name="remarks"
+                            rows={3}
+                            style={{ resize: "none" }}
+                            value= {remarks}
+                            maxLength={500}
+                            onChange={ev => setRemarks(ev.target.value)}
+                            className={`block w-full ${(!remarks && inputErrors.remarks) ? "ppa-form-error":"ppa-form-edit"}`}
+                          />
+                          {!remarks && inputErrors.remarks && (
+                            <p className="form-validation">This form is required</p>
+                          )}
                         </div>
-                        {partDForm ? (
+                      ):(
+                        !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
                           <div className="w-1/2">
-                            <textarea
+                            <input
                               id="remarks"
                               name="remarks"
-                              rows={3}
-                              style={{ resize: "none" }}
-                              value= {remarks}
+                              value={updateremarks}
+                              onChange={ev => setUpdateRemarks(ev.target.value)}
+                              className={`block w-full ${(!partDDate && inspectionData?.form?.remarks) ? "ppa-form-error":"ppa-form-edit"}`}
                               maxLength={500}
-                              onChange={ev => setRemarks(ev.target.value)}
-                              className={`block w-full ${(!remarks && inputErrors.remarks) ? "ppa-form-error":"ppa-form-edit"}`}
                             />
-                            {!remarks && inputErrors.remarks && (
+                            {!updateremarks && inputErrors.remarks && (
                               <p className="form-validation">This form is required</p>
                             )}
                           </div>
                         ):(
-                          !enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
-                            <div className="w-1/2">
-                              <input
-                                id="remarks"
-                                name="remarks"
-                                value={updateremarks}
-                                onChange={ev => setUpdateRemarks(ev.target.value)}
-                                className={`block w-full ${(!partDDate && inspectionData?.form?.remarks) ? "ppa-form-error":"ppa-form-edit"}`}
-                                maxLength={500}
-                              />
-                              {!updateremarks && inputErrors.remarks && (
-                                <p className="form-validation">This form is required</p>
-                              )}
-                            </div>
-                          ):(
-                            <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
-                              {!loading && inspectionData?.form?.remarks ? inspectionData?.form?.remarks : null }
-                            </div>
-                          )
-                        )}
-                      </div>
-
+                          <div className={`w-1/2 ppa-form-view ${inspectionData?.form?.after_reapir_date ? null : 'h-6' }`}>
+                            {inspectionData?.form?.remarks ? inspectionData?.form?.remarks : null }
+                          </div>
+                        )
+                      )}
                     </div>
 
                   </div>
 
                 </div>
-                )
-              )}
+
+              </div>
+              )
+            )}
+          </div>
+
+          {/* Activities */}
+          {enablePartA && enablePartB && enablePartC && enablePartD && !enableSupDecline && !loadingPDF && !loading && (
+          <>
+            <div className="ppa-form-header text-base flex justify-between items-center">
+              <span className="text-md">Activities</span>
             </div>
 
-            {/* Activities */}
-            {enablePartA && enablePartB && enablePartC && enablePartD && !enableSupDecline && !loadingPDF && (
-            <>
-              <div className="ppa-form-header text-base flex justify-between items-center">
-                <span className="text-md">Activities</span>
-              </div>
-
-              <div
-                className="pl-4 pt-6 pb-6 pr-4 ppa-widget bg-white mb-6"
-                style={{
-                  minHeight: "auto",
-                  maxHeight: "300px",
-                  overflowY: "auto",
-                }}
-              >
-                {/* Add padding INSIDE a wrapper to separate data from the border */}
-                <table className="w-full border-collapse">
-                  <tbody className="relative border-l-2 border-gray-300 ml-4">
-                    {trackingForm.length > 0 ? (
-                      trackingForm.map((list) => (
-                        <tr key={list.id} className="flex items-start relative">
-                          {/* Dot */}
-                          <td className="w-4 flex justify-center items-start pt-3 relative -left-2">
-                            <span className="w-3 h-3 bg-gray-300 rounded-full z-10"></span>
-                          </td>
-
-                          {/* Timeline content */}
-                          <td className="py-2 text-sm font-bold pl-2">{list.date}</td>
-                          <td className="py-2 text-sm font-bold pl-2">{list.time}</td>
-                          <td className="py-2 pl-3 text-sm">{list.remarks}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td>
-                          <span className="py-2 text-sm">No Activities Yet</span>
+            <div
+              className="pl-4 pt-6 pb-6 pr-4 ppa-widget bg-white mb-6"
+              style={{
+                minHeight: "auto",
+                maxHeight: "300px",
+                overflowY: "auto",
+              }}
+            >
+              {/* Add padding INSIDE a wrapper to separate data from the border */}
+              <table className="w-full border-collapse">
+                <tbody className="relative border-l-2 border-gray-300 ml-4">
+                  {trackingForm.length > 0 ? (
+                    trackingForm.map((list) => (
+                      <tr key={list.id} className="flex items-start relative">
+                        {/* Dot */}
+                        <td className="w-4 flex justify-center items-start pt-3 relative -left-2">
+                          <span className="w-3 h-3 bg-gray-300 rounded-full z-10"></span>
                         </td>
+
+                        {/* Timeline content */}
+                        <td className="py-2 text-sm font-bold pl-2">{list.date}</td>
+                        <td className="py-2 text-sm font-bold pl-2">{list.time}</td>
+                        <td className="py-2 pl-3 text-sm">{list.remarks}</td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </>
-            )}
-
-            {/* Popup */}
-            {showPopup && (
-              <Popup 
-                popupContent={popupContent}
-                popupMessage={popupMessage}
-                SubmitSupReason={SubmitSupReason}
-                handlelSupervisorApproval={handlelSupervisorApproval}
-                handlelAdminApproval={handlelAdminApproval}
-                CloseForceRequest={CloseForceRequest}
-                inspectionData={inspectionData?.form?.id}
-                justClose={justClose}
-                closePopup={closePopup}
-                submitLoading={submitLoading}
-                submitAnimation={submitAnimation}
-                form={SubmitPartB}
-              />
-            )}
-
+                    ))
+                  ) : (
+                    <tr>
+                      <td>
+                        <span className="py-2 text-sm">No Activities Yet</span>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </>
-          ):<Restrict />
-        )
+          )}
+
+          {/* Popup */}
+          {showPopup && (
+            <Popup 
+              popupContent={popupContent}
+              popupMessage={popupMessage}
+              SubmitSupReason={SubmitSupReason}
+              handlelSupervisorApproval={handlelSupervisorApproval}
+              handlelAdminApproval={handlelAdminApproval}
+              CloseForceRequest={CloseForceRequest}
+              inspectionData={inspectionData?.form?.id}
+              justClose={justClose}
+              closePopup={closePopup}
+              submitLoading={submitLoading}
+              submitAnimation={submitAnimation}
+              form={SubmitPartB}
+            />
+          )}
+
+        </>
+        ):<Restrict />
       ):null}
 
       {/* PDF Area */}

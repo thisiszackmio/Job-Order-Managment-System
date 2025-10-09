@@ -99,8 +99,14 @@ class InspectionController extends Controller
         $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
         $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
+        // Prev & Next IDs
+        $prevId = InspectionModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
+        $nextId = InspectionModel::where('id', '>', $id)->orderBy('id', 'asc')->value('id');
+
         // Custom form data with limited fields
         $form = [
+            'prev_id' => $prevId,
+            'next_id' => $nextId,
             'id' => $InspectionRequest->id,
             'date_request' => $InspectionRequest->created_at, 
             'user_id' => $InspectionRequest->user_id,

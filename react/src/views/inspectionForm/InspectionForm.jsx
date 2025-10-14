@@ -2138,8 +2138,8 @@ export default function InspectionForm(){
                       <div>
                         {/* For the SuperAdmin and assign */}
                         {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 4 ? (
-                            !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
                           )
                         ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
                           !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
@@ -2155,15 +2155,15 @@ export default function InspectionForm(){
                         )}
 
                         {/* For the Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                          inspectionData?.form?.form_status == 4 ? (
-                            !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                            )
-                          ):[2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
+                        {(inspectionData?.form?.personnel_id == currentUserId) && currentUserId != 1 && !GSO && inspectionData?.form?.form_status == 4 ? (
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          )
+                        ):(inspectionData?.form?.personnel_id == currentUserId) && currentUserId != 1 && !GSO ? (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
                             <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                          ):null
-                        )}
+                          )
+                        ):null}
                       </div>
                     </div>
 
@@ -2350,25 +2350,25 @@ export default function InspectionForm(){
                       <div>
                         {/* For the SuperAdmin */}
                         {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 3 ? (
-                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
                           )
                         ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
-                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
                             <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
                           )
                         ):null}
 
                         {/* Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                          inspectionData?.form?.form_status == 3 ? (
-                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                              <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                            )
-                          ):inspectionData?.form?.form_status == 2 && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
+                        {(inspectionData?.form?.personnel_id == currentUserId) && currentUserId != 1 && !GSO && inspectionData?.form?.form_status == 3 ? (
+                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                          )
+                        ):(inspectionData?.form?.personnel_id == currentUserId) && currentUserId != 1 && !GSO ? (
+                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
                             <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                          ):null
-                        )}
+                          )
+                        ):null}
 
                         {/* For the GSO */}
                         {GSO && (

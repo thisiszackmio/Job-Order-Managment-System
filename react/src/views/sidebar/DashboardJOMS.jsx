@@ -6,7 +6,7 @@ import vehicleSlip from "/default/van.png";
 import repair from "/default/mechanic.png"
 import facilityicon from "/default/booking.png"
 import locator from "/default/form.png"
-import { Link } from "react-router-dom";
+import comingsoon from "/default/coming-soon.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 
@@ -203,9 +203,10 @@ export default function DashboardJOMS(){
             <div className="col-span-1 ppa-widget relative">
               <div className="joms-dashboard-title text-right"> Locator Slip </div>
               <img className="mx-auto joms-icons" src={locator} alt="Your Company"/>
-              <div className="joms-count text-right pr-4">{vehicleForm?.count}</div>
+              <img className="mx-auto joms-comsing-soon" src={comingsoon} alt="Your Company"/>
+              {/* <div className="joms-count text-right pr-4">{vehicleForm?.count}</div>
               <div className="border-b border-gray-300 mx-4"></div>
-              <div className="joms-word-count">No of Request Today: <strong>{vehicleForm?.today}</strong></div>
+              <div className="joms-word-count">No of Request Today: <strong>{vehicleForm?.today}</strong></div> */}
             </div>
 
           </div>

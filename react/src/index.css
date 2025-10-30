@@ -30,6 +30,9 @@ span.noti-requestor { font-weight: 700; }
 .notification-container { align-items: start; }
 .notification-container:hover { background: #E5E4E2; cursor: pointer; transition: 40ms; }
 
+/* Other */
+.joms-comsing-soon { width: 100px; position: absolute; left: 50%; top: 25%; }
+
 /* Login Notification */
 .login-error { background-color: #ff0000; text-align: center; color: #fff; padding: 5px 0px; border-radius: 5px; }
 
@@ -134,6 +137,9 @@ body:hover::-webkit-scrollbar-thumb { background-color: #4A6589; transition: wid
 .team-position { color: #748290; font-size: calc(12px + (15 - 12) * ((100vw - 1366px) / (1920 - 1366))); text-align: center; }
 
 /* Form */
+.note-form span { color: #FF0000; font-weight: bold; }
+p.note-form { font-size: 14px; margin-top: 15px; }
+.ppa-form-confimation { border: 1px solid #A9A9A9; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
 input:focus, textarea:focus {
   outline: 2px solid transparent !important;
   outline-offset: 2px !important;
@@ -152,12 +158,16 @@ input:focus, textarea:focus {
 input:disabled, input[disabled], textarea:disabled, textarea[disabled], select:disabled,
 select[disabled] { background-color: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; cursor: not-allowed; opacity: 1; }
 .form-title { color: #334054; font-weight: bold; }
-.form-validation { color: #ff0000; font-size: 12px; padding-top: 5px; }
+.form-validation { color: #ff0000; font-size: 12px; margin-top: 4px; margin-left: 10px; }
 .cost { padding-left: 20px !important; }
 .ppa-form-field { margin-top: 10px; border: 1px solid #808080; border-radius: 5px; font-size: 15px; }
 .ppa-form-error { margin-top: 10px; border: 1px solid #C41E3A; border-radius: 5px; font-size: 15px; }
 .ppa-form-view { border-bottom: 1px solid; padding-left: 5px; }
 h2.req-title { font-size: 18px; font-weight: 900; }
+.ppa-checklist { border: 1px solid #272727; padding: 3px 8px; margin-right: 15px; border-radius: 5px; height: 30px; width: 28px;}
+.ppa-form-list { border-bottom: 1px solid #000; }
+.ppa-form-box-view { border: 1px solid #272727; height: 6rem; padding: 10px; border-radius: 5px; }
+.ppa-form-preview { padding: 4px 10px; border: 1px solid; font-weight: bold; border-radius: 5px; }
 
 /* Request Form */
 .icon-form { color: #808080; transition: 200ms; top: 0; left: 21.5rem; }
@@ -166,6 +176,7 @@ h2.req-title { font-size: 18px; font-weight: 900; }
 .icon-delete:hover { color: #cecece; cursor: pointer; }
 .status-sec { background-color: #d9edf7; padding: 10px; border-radius: 5px; color: #31708f; border-color: #bce8f1; border-width: 1px; }
 .ppa-form-edit { border: 1px solid #808080; padding: 8px 10px; border-radius: 5px; }
+.form-title-check { color: #272727; font-weight: bold; }
 
 /* Popup or Modal */
 p.popup-title { margin-top: 70px; font-size: 25px; font-weight: 900; }

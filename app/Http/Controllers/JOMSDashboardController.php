@@ -268,7 +268,7 @@ class JOMSDashboardController extends Controller
                         'type' => 'Pre/Post Repair Inspection Form',
                         'date_request' => $inspectionForm->created_at,
                         'requestor' => $inspectionForm->user_name,
-                        'remarks' => $inspectionForm->inspector_status == 3 ? "You are assigned to this request." : "You still need to fill out Part D.",
+                        'remarks' => $inspectionForm->form_status == 4 ? "You are assigned to this request." : "You still need to fill out Part D.",
                     ];
                 });
             $pendingApproval = $pendingApproval->merge($assignPersonnel);

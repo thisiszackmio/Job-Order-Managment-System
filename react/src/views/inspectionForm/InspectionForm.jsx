@@ -221,7 +221,7 @@ export default function InspectionForm(){
   // Auto close request
   const setFormClosed = () => {
 
-    if(GSO || inspectionData?.form?.user_id == currentUserId || SuperAdmin){
+    if(GSO || inspectionData?.form?.user_id == currentUserId || SuperHacker){
       axiosClient
       .get(`/closeinspectionrequest/${id}`)
       .then(response => {
@@ -229,7 +229,7 @@ export default function InspectionForm(){
       })
       .catch(error => {
         setPopupContent("error");
-        setPopupMessage(DevErrorText);
+        setPopupMessage(error.response.status);
         setShowPopup(true); 
       });
     }
@@ -290,6 +290,7 @@ export default function InspectionForm(){
 
   // Supervisor Approvel Popup 
   const handleSupApprovalConfirmation = () => {
+    setButtonHide(true);
     setShowPopup(true);
     setPopupContent('dma');
     setPopupMessage(
@@ -464,7 +465,6 @@ export default function InspectionForm(){
 
   // Submit Part B Form
   function SubmitPartB(){
-    // alert("hi")
     setSubmitLoading(true);
 
     const data = {
@@ -534,7 +534,7 @@ export default function InspectionForm(){
     })
     .catch((error) => {
       if (error.response.status === 409) {
-        setPopupContent("error");
+        setPopupContent("check-error");
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid</p>
@@ -543,7 +543,7 @@ export default function InspectionForm(){
         );
         setShowPopup(true);
       } else if (error.response.status === 408) {
-        setPopupContent("error");
+        setPopupContent("check-error");
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid</p>
@@ -565,6 +565,7 @@ export default function InspectionForm(){
 
   // Admin Approval Popup 
   const handleAdminApprovalConfirmation = () => {
+    setButtonHide(true);
     setShowPopup(true);
     setPopupContent('ama');
     setPopupMessage(
@@ -634,7 +635,7 @@ export default function InspectionForm(){
       if (error.response.status === 500) {
         setShowPopup(true);
         setPopupContent('error');
-        setPopupMessage(DevErrorText);
+        setPopupMessage(error.response.status);
       }else{
         const responseErrors = error.response.data.errors;
         setInputErrors(responseErrors);
@@ -671,7 +672,7 @@ export default function InspectionForm(){
     })
     .catch((error) => {
       if (error.response.status === 409) {
-        setPopupContent("error");
+        setPopupContent("check-error");
         setPopupMessage(
           <div>
             <p className="popup-title">Oops!</p>
@@ -684,7 +685,7 @@ export default function InspectionForm(){
         setInputErrors(responseErrors);
       } else {
         setPopupContent("error");
-        setPopupMessage(DevErrorText);
+        setPopupMessage(error.response.status);
         setShowPopup(true); 
       }
     })
@@ -756,7 +757,7 @@ export default function InspectionForm(){
     })
     .catch((error) => {
       if (error.response.status === 409) {
-        setPopupContent("error");
+        setPopupContent("check-error");
         setPopupMessage(
           <div>
             <p className="popup-title">Oops!</p>
@@ -824,6 +825,7 @@ export default function InspectionForm(){
     setShowPopup(false);
     fecthInspection();
     setEnablePartA(true);
+    setButtonHide(false);
   }
 
   //Close Popup on Success
@@ -887,7 +889,8 @@ export default function InspectionForm(){
   const GSO = codes.includes("GSO");
   const DivisionManager = codes.includes("DM");
   const SuperAdmin = codes.includes("HACK");
-  const roles = ["AM", "GSO", "HACK", "PM", "DM", "AU", "AP"];
+  const SuperHacker = codes.includes("NERD");
+  const roles = ["AM", "GSO", "HACK", "PM", "DM", "AU", "AP", "NERD"];
   const accessOnly = roles.some(role => codes.includes(role));
   const clearance = inspectionData?.form?.user_id == currentUserId || accessOnly;
   
@@ -929,7 +932,49 @@ export default function InspectionForm(){
           <div className="ppa-form-header text-base flex justify-between items-center">
             <span>Control No: <span className="px-2 ppa-form-view">{inspectionData?.form?.id}</span></span>
             <div className="flex space-x-4">
-              {/* Supervisor Button */}
+
+              {/* For the Nerd (Developer) */}
+              {SuperHacker && (
+                inspectionData?.form?.form_status == 1 && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                <>
+                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                </>
+                )
+              )}
+              
+              {/* For the Requestor */}
+              {currentUserId == inspectionData?.form?.user_id && (
+                enablePartA && (
+                  <>
+                    {/* Cancel */}
+                    {inspectionData?.form?.form_status == 11 && (
+                      <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
+                    )}
+
+                    {/* Generate PDF */}
+                    {[1, 2].includes(inspectionData?.form?.form_status) && currentUserId != 1 && !GSO && !Admin && (
+                      <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                    )}
+                  </>
+                )
+              )}
+
+              {/* GSO */}
+              {GSO && (
+                !partBForm && enablePartA && enablePartB &&(
+                <>
+                  {/* Cancel */}
+                  {[6, 11].includes(inspectionData?.form?.form_status) && (
+                    <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
+                  )}
+
+                  {/* Generate PDF */}
+                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                </>
+                )
+              )}
+
+              {/* Supervisor */}
               {DivisionManager && currentUserId == inspectionData?.form?.supervisor_id && inspectionData?.form?.form_status == 11 && (
                 enableSupDecline ? (
                 <>
@@ -938,44 +983,37 @@ export default function InspectionForm(){
                   <button onClick={() => { setEnableSupDecline(false); setReason(''); setReasonError(false); }} className="py-2 px-4 text-sm btn-cancel-form"> Cancel </button>
                 </>
                 ):(
-                <>
-                  {/* Approve */}
-                  <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Approve </button>
-                  {/* Decline */}
-                  {!inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
-                    <button onClick={() => setEnableSupDecline(true)} className="py-2 px-4 text-sm btn-cancel-form"> Decline </button>
-                  )}
-                </>
+                  !submitLoading && !buttonHide && (
+                    <>
+                      {/* Approve */}
+                      <button onClick={() => handleSupApprovalConfirmation()} className="py-2 px-4 text-sm btn-default-form"> Approve </button>
+                      {/* Decline */}
+                      {!inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
+                        <button onClick={() => setEnableSupDecline(true)} className="py-2 px-4 text-sm btn-cancel-form"> Decline </button>
+                      )}
+                    </>
+                  )
                 )
               )}
 
               {/* Admin Manager's Approval */}
-              {Admin && inspectionData?.form?.form_status == 5 && (
-                <button
-                  onClick={() => handleAdminApprovalConfirmation()} 
-                  className="py-2 px-4 text-sm btn-default-form"
-                >
-                  Approve
-                </button>
+              {Admin && (
+                inspectionData?.form?.form_status == 5 ? (
+                  !submitLoading && !buttonHide && (
+                    <button
+                      onClick={() => handleAdminApprovalConfirmation()} 
+                      className="py-2 px-4 text-sm btn-default-form"
+                    >
+                      Approve
+                    </button>
+                  )
+                ):(
+                  [1, 2].includes(inspectionData?.form?.form_status) && !GSO && !Admin && (
+                    <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
+                  )
+                )
               )}
 
-              {/* Cancel Button */}
-              {!partBForm && enablePartA && enablePartB && enablePartC && enablePartD && !inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
-                currentUserId == inspectionData?.form?.user_id && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !SuperAdmin) ? (
-                  <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                ):(GSO || currentUserId == 1) && [5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
-                  <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                ):null
-              )}
-
-              {/* Generate PDF Button */}
-              {!partDForm && !partCForm && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                currentUserId == inspectionData?.form?.user_id && [1, 2].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) ? (
-                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-                ):(GSO || SuperAdmin || (Admin && inspectionData?.form?.form_status === 1)) ? (
-                  <FontAwesomeIcon onClick={handleButtonClick} className="icon-delete" title="Get PDF" icon={faFilePdf} />
-                ):null
-              )}
             </div>
           </div>
 
@@ -1017,16 +1055,32 @@ export default function InspectionForm(){
 
                 {/* Status */}
                 <div className="status-sec mb-4 mx-4">
-                  {loading && ([5, 11].includes(inspectionData?.form?.form_status) && 
-                  inspectionData?.form?.date_of_filling && 
-                  inspectionData?.form?.before_repair_date &&
-                  inspectionData?.form?.after_reapir_date) ? (
-                  <>
-                    <p> <strong>Status: </strong> Form was completed, but no approval from {[11].includes(inspectionData?.form?.form_status) && "Immediate Supervisor "} {[11].includes(inspectionData?.form?.form_status) ? "and" : null} {[5, 11].includes(inspectionData?.form?.form_status) && "Admin Manager"}. </p>
-                  </>
-                  ):(
-                    <p> <strong>Status: </strong> {inspectionData?.form?.form_remarks} </p>
-                  )}
+                  <p> <strong> Status: </strong> 
+                    {DivisionManager && inspectionData?.form?.form_status == 11 ? (
+                      "Waiting for your approval."
+                    ):GSO && inspectionData?.form?.form_status == 5 ? (
+                      "You have entered the Part B form, and it is now pending Admin Manager approval."
+                    ):Admin && inspectionData?.form?.form_status == 5 ? (
+                      "Waiting for your approval."
+                    ):currentUserId == inspectionData?.form?.personnel_id && inspectionData?.form?.form_status == 4 ? (
+                      "You are assign on this request."
+                    ):currentUserId == inspectionData?.form?.personnel_id && inspectionData?.form?.form_status == 3 ? (
+                      "You are assign on this request."
+                    ):(currentUserId == inspectionData?.form?.personnel_id || GSO || SuperAdmin || SuperHacker) && inspectionData?.form?.form_status == 2 ? (
+                      "The assigned personnel has completed the form. It will only be editable for 24 hours (if you see this)."
+                    ):(
+                      [5, 11].includes(inspectionData?.form?.form_status) &&
+                      inspectionData?.form?.date_of_filling &&
+                      inspectionData?.form?.before_repair_date &&
+                      inspectionData?.form?.after_reapir_date ? (
+                        <>
+                          Form was completed, but no approval from {[11].includes(inspectionData?.form?.form_status) && "Immediate Supervisor "} {[11].includes(inspectionData?.form?.form_status) ? "and" : null} {[5, 11].includes(inspectionData?.form?.form_status) && "Admin Manager"}.
+                        </>
+                      ):(
+                        inspectionData?.form?.form_remarks
+                      )
+                    )}
+                  </p>
                 </div>
 
                 {/* Part A */}
@@ -1036,22 +1090,88 @@ export default function InspectionForm(){
                   <div className="flex justify-between items-center px-4">
                     <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
                     <div>
-                      {/* Edit Button*/}
-                      {SuperAdmin && currentUserId == 1 && (!partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
-                        <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+
+                      {/* SuperAdmin */}
+                      {SuperHacker && (
+                        !enablePartA ? (
+                          !buttonHide && (
+                            <>
+                              {/* Submit */}
+                              <button 
+                                type="submit"
+                                onClick={() => UpdatePartA()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Save'
+                                )}
+                              </button>
+
+                              {/* Cancel */}
+                              {!submitLoading && (
+                                <button onClick={() => { 
+                                    setEnablePartA(true);
+                                  }} className="py-2 px-4 text-sm btn-cancel-form">
+                                  Cancel
+                                </button>
+                              )}
+                            </>
+                          )
+                        ):(
+                          inspectionData?.form?.form_status == 1 && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                          )
+                        )
                       )}
-                      
-                      {GSO && inspectionData?.form?.form_status != 0 && inspectionData?.form?.form_status != 1 ? (
-                        !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                      ):(!SuperAdmin || !GSO || !DivisionManager || !Admin) && (inspectionData?.form?.user_id == currentUserId && !SuperAdmin) && [8, 9, 10, 11, 12].includes(inspectionData?.form?.form_status) ? (
-                        enablePartA && enablePartB && enablePartC && enablePartD && <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                      ):null}
 
-                      {/* Edit Part A Button */}
-                      {!enablePartA && (
-                      <>
-                        {/* SuperAdmin */}
-                        {SuperAdmin && currentUserId == 1 && (
+                      {/* Requestor */}
+                      {currentUserId == inspectionData?.form?.user_id && !GSO && (
+                        [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
+                          !enablePartA ? (
+                            !buttonHide && (
+                              <>
+                                {/* Submit */}
+                                <button 
+                                  type="submit"
+                                  onClick={() => UpdatePartA()}
+                                  className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                  disabled={submitLoading}
+                                >
+                                  {submitLoading ? (
+                                    <div className="flex">
+                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                      <span className="ml-1">Loading</span>
+                                    </div>
+                                  ):(
+                                    'Save'
+                                  )}
+                                </button>
+
+                                {/* Cancel */}
+                                {!submitLoading && (
+                                  <button onClick={() => { 
+                                      setEnablePartA(true);
+                                    }} className="py-2 px-4 text-sm btn-cancel-form">
+                                    Cancel
+                                  </button>
+                                )}
+                              </>
+                            )
+                          ):(
+                            <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                          )
+                        )
+                      )}
+
+                      {/* GSO */}
+                      {GSO && (
+                        !enablePartA ? (
                           !buttonHide && (
                             <>
                               {/* Submit */}
@@ -1081,74 +1201,11 @@ export default function InspectionForm(){
                               )}
                             </>
                           )
-                        )}
-
-                        {/* For the Requestor */}
-                        {(currentUserId == inspectionData?.form?.user_id && !SuperAdmin) && [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (!GSO || !DivisionManager || !SuperAdmin) && (
-                          !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button 
-                                type="submit"
-                                onClick={() => UpdatePartA()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Save'
-                                )}
-                              </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartA(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
-                              )}
-                            </>
+                        ):(
+                          inspectionData?.form?.form_status != 1 && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartA(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
                           )
-                        )}
-
-                        {/* For the GSO */}
-                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
-                          !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button 
-                                type="submit"
-                                onClick={() => UpdatePartA()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Save'
-                                )}
-                              </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartA(true);
-                                  }} className="py-2 px-4 text-sm btn-cancel-form">
-                                  Cancel
-                                </button>
-                              )}
-                            </>
-                          )
-                        )}
-                      </>
+                        )
                       )}
                     </div>
                   </div>
@@ -1479,6 +1536,15 @@ export default function InspectionForm(){
                       )}
                     </div>
 
+                    {/* Note */}
+                    {currentUserId == inspectionData?.form?.user_id && (
+                      [8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
+                        <p className="note-form"><span> Note: </span> This form can only be edited before {[8, 9, 10].includes(inspectionData?.form?.form_status) ? ("the GSO submits Part B of the form"):("the supervisor approval")}. </p>
+                      ):[3, 4, 5, 6].includes(inspectionData?.form?.form_status) ? (
+                        <p className="note-form"><span> Note: </span> This form cannot be edited. </p>
+                      ):null
+                    )}
+
                   </div>
 
                 </div>
@@ -1490,116 +1556,10 @@ export default function InspectionForm(){
                   <div className="flex justify-between items-center mt-4 px-4">
                     <h2 className="req-title"> Part B: To be filled-up by Administrative Division </h2>
                     <div>
-                      {/* Edit button */}
-                      {SuperAdmin && currentUserId == 1 && (
-                        (inspectionData?.form?.date_of_filling && [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD) && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
-                        )
-                      )}
 
-                      {/* GSO */}
-                      {GSO && (
-                      <>
-                        {/* Enable Part B Form */}
-                        {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
-                          !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                          )
-                        ): [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
-                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
-                          )
-                        ):null}
-                      </>
-                      )}
-
-                      {/* Submit Part B Button */}
-                      {partBForm && (
-                        !buttonHide && (
-                          !pointPersonnel.pid ? (
-                          <>
-                            {/* Submit */}
-                            <button type="submit"
-                                onClick={() => SubmitPartB()}
-                                className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                              {submitLoading ? (
-                                <div className="flex">
-                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                  <span className="ml-1">Loading</span>
-                                </div>
-                              ):(
-                              'Submit'
-                              )}
-                            </button>
-
-                            {/* Cancel */}
-                            {!submitLoading && (
-                              <button onClick={() => { 
-                                  setPartBForm(false); 
-                                }} className="py-2 px-4 text-sm btn-cancel-form">
-                                Cancel
-                              </button>
-                            )}
-                          </>
-                          ):(
-                          (!lastfilledDate || !natureRepair) ? (
-                          <>
-                            {/* Submit */}
-                            <button type="submit"
-                              onClick={() => handleGSOSubmitConfirmation()} 
-                              className="py-2 px-3 text-sm mr-2 btn-default-form"
-                            >
-                              Submit
-                            </button>
-
-                            {/* Cancel */}
-                            {!submitLoading && (
-                              <button onClick={() => { 
-                                  setPartBForm(false); 
-                                }} className="py-2 px-4 text-sm btn-cancel-form">
-                                Cancel
-                              </button>
-                            )}
-                          </>
-                          ):(
-                          <>
-                            {/* Submit */}
-                            <button type="submit"
-                              onClick={() => SubmitPartB()}
-                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                              disabled={submitLoading}
-                            >
-                            {submitLoading ? (
-                              <div className="flex">
-                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                <span className="ml-2">Loading</span>
-                              </div>
-                            ):(
-                            'Submit'
-                            )}
-                            </button>
-
-                            {/* Cancel */}
-                            {!submitLoading && (
-                              <button onClick={() => { 
-                                  setPartBForm(false); 
-                                }} className="py-2 px-4 text-sm btn-cancel-form">
-                                Cancel
-                              </button>
-                            )}
-                          </>
-                          )
-                          )
-                        )
-                      )}
-
-                      {/* Edit Part B Button */}
-                      {!enablePartB && (
-                      <>
-                        {/* SuperAdmin */}
-                        {SuperAdmin && currentUserId == 1 && (
+                      {/* SuperAdmin */}
+                      {SuperHacker && (
+                        !enablePartB ? (
                           !buttonHide && (
                             <>
                               {/* Submit */}
@@ -1614,7 +1574,7 @@ export default function InspectionForm(){
                                     <span className="ml-1">Loading</span>
                                   </div>
                                 ):(
-                                  'Update Part B'
+                                  'Update'
                                 )}
                               </button>
 
@@ -1622,46 +1582,147 @@ export default function InspectionForm(){
                               {!submitLoading && (
                                 <button onClick={() => { 
                                     setEnablePartB(true); 
-                                  }} className="py-2 px-4 text-sm mr-2 btn-cancel-form">
-                                  Cancel
-                                </button>
-                              )}
-                            </>
-                          )
-                        )}
-
-                        {/* GSO */}
-                        {GSO && (
-                          !buttonHide && (
-                            <>
-                              {/* Submit */}
-                              <button type="submit"
-                                onClick={() => UpdatePartB()}
-                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                disabled={submitLoading}
-                              >
-                                {submitLoading ? (
-                                  <div className="flex">
-                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                    <span className="ml-1">Loading</span>
-                                  </div>
-                                ):(
-                                  'Update Part B'
-                                )}
-                              </button>
-
-                              {/* Cancel */}
-                              {!submitLoading && (
-                                <button onClick={() => { 
-                                    setEnablePartB(true); 
+                                    setUpdatePointPersonnel({ pid: '', pname: '' })
                                   }} className="py-2 px-4 text-sm btn-cancel-form">
                                   Cancel
                                 </button>
                               )}
                             </>
                           )
-                        )}
-                      </>
+                        ):(
+                          inspectionData?.form?.form_status == 1 && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                          )
+                        )
+                      )}
+
+                      {/* GSO */}
+                      {GSO && (
+                        partBForm ? (
+                          !submitLoading && (
+                            !buttonHide && (
+                              !pointPersonnel.pid ? (
+                              <>
+                                {/* Submit */}
+                                <button type="submit"
+                                    onClick={() => SubmitPartB()}
+                                    className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                    disabled={submitLoading}
+                                  >
+                                  {submitLoading ? (
+                                    <div className="flex">
+                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                      <span className="ml-1">Loading</span>
+                                    </div>
+                                  ):(
+                                  'Submit'
+                                  )}
+                                </button>
+
+                                {/* Cancel */}
+                                {!submitLoading && (
+                                  <button onClick={() => { 
+                                      setPartBForm(false); 
+                                    }} className="py-2 px-4 text-sm btn-cancel-form">
+                                    Cancel
+                                  </button>
+                                )}
+                              </>
+                              ):(
+                              (!lastfilledDate || !natureRepair) ? (
+                              <>
+                                {/* Submit */}
+                                <button type="submit"
+                                  onClick={() => handleGSOSubmitConfirmation()} 
+                                  className="py-2 px-3 text-sm mr-2 btn-default-form"
+                                >
+                                  Submit
+                                </button>
+
+                                {/* Cancel */}
+                                {!submitLoading && (
+                                  <button onClick={() => { 
+                                      setPartBForm(false); 
+                                    }} className="py-2 px-4 text-sm btn-cancel-form">
+                                    Cancel
+                                  </button>
+                                )}
+                              </>
+                              ):(
+                              <>
+                                {/* Submit */}
+                                <button type="submit"
+                                  onClick={() => SubmitPartB()}
+                                  className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                  disabled={submitLoading}
+                                >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-2">Loading</span>
+                                  </div>
+                                ):(
+                                'Submit'
+                                )}
+                                </button>
+
+                                {/* Cancel */}
+                                {!submitLoading && (
+                                  <button onClick={() => { 
+                                      setPartBForm(false); 
+                                    }} className="py-2 px-4 text-sm btn-cancel-form">
+                                    Cancel
+                                  </button>
+                                )}
+                              </>
+                              )
+                              )
+                            )
+                          )
+                        ):!enablePartB ? (
+                          !buttonHide && (
+                            <>
+                              {/* Submit */}
+                              <button type="submit"
+                                onClick={() => UpdatePartB()}
+                                className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                disabled={submitLoading}
+                              >
+                                {submitLoading ? (
+                                  <div className="flex">
+                                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                    <span className="ml-1">Loading</span>
+                                  </div>
+                                ):(
+                                  'Update'
+                                )}
+                              </button>
+
+                              {/* Cancel */}
+                              {!submitLoading && (
+                                <button onClick={() => { 
+                                    setEnablePartB(true); 
+                                    setUpdatePointPersonnel({ pid: '', pname: '' })
+                                  }} className="py-2 px-4 text-sm btn-cancel-form">
+                                  Cancel
+                                </button>
+                              )}
+                            </>
+                          )
+                        ):(
+                        <>
+                          {/* Enable Part B Form */}
+                          {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
+                            !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                            )
+                          ):[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
+                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setEnablePartB(false); }} className="icon-form ml-3 self-center" title="Edit Part B" icon={faPenToSquare} />
+                            )
+                          ):null}
+                        </>
+                        )
                       )}
                     </div>
                   </div>
@@ -1813,6 +1874,7 @@ export default function InspectionForm(){
                               setPointPersonnel(selectedPersonnel ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } : { pid: '', pname: '' });
                             }}
                             className={`block w-full ${(!pointPersonnel.pid && inputErrors.personnel_id) ? "ppa-form-error":"ppa-form-edit"}`}
+
                             >
                               <option value="" disabled>Select an option</option>
                               {getPersonnel.map((data)=>(
@@ -1844,6 +1906,7 @@ export default function InspectionForm(){
                                 );
                               }}
                               className="block w-full ppa-form-edit"
+                              disabled={SuperAdmin}
                             >
                               {/* Disabled option for current personnel */}
                               <option value="" disabled>
@@ -1947,72 +2010,39 @@ export default function InspectionForm(){
                   <div className="flex justify-between items-center mt-4 px-4">
                     <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job </h2>
                     <div>
-                      {/* For the SuperAdmin and assign */}
-                      {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 4 ? (
-                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                        )
-                      ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
-                        !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                        )
-                      ):null}
 
-                      {/* For the GSO */}
-                      {GSO && (
-                        [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                        )
-                      )}
-
-                      {/* For the Assign Personnel */}
-                      {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                        inspectionData?.form?.form_status == 4 ? (
-                          !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                          )
-                        ):[2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
-                          <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
-                        ):null
-                      )}
-
-                      {/* Submit Part C Button */}
-                      {partCForm && (
-                        !buttonHide && (
-                        <>
-                          {/* Submit */}
-                          <button type="submit"
-                            onClick={() => SubmitPartC()}
-                            className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                            disabled={submitLoading}
-                          >
-                          {submitLoading ? (
-                            <div className="flex">
-                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-1">Loading</span>
-                            </div>
-                          ):(
-                          'Submit'
-                          )}
-                          </button>
-
-                          {/* Cancel */}
-                          {!submitLoading && (
-                            <button onClick={() => { 
-                                setPartCForm(false); 
-                              }} className="py-2 px-4 text-sm btn-cancel-form">
-                              Cancel
+                      {/* Assign Personnel */}
+                      {inspectionData?.form?.personnel_id == currentUserId && !GSO && (
+                        partCForm ? (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => SubmitPartC()}
+                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                            {submitLoading ? (
+                              <div className="flex">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-1">Loading</span>
+                              </div>
+                            ):(
+                            'Submit'
+                            )}
                             </button>
-                          )}
-                        </>
-                        )
-                      )}
 
-                      {/* Edit Part C Button */}
-                      {!enablePartC && (
-                      <>
-                        {/* Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setPartCForm(false); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          )
+                        ):!enablePartC ? (
                           !buttonHide && (
                           <>
                             {/* Submit */}
@@ -2027,7 +2057,7 @@ export default function InspectionForm(){
                                   <span className="ml-1">Loading</span>
                                 </div>
                               ):(
-                                'Update Part C'
+                                'Update'
                               )}
                             </button>
 
@@ -2042,10 +2072,22 @@ export default function InspectionForm(){
                             )}
                           </>
                           )
-                        )}
+                        ):(
+                          inspectionData?.form?.form_status == 4 ? (
+                            !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                            )
+                          ):(
+                            [2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                            )
+                          )
+                        )
+                      )}
 
-                        {/* For the GSO */}
-                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
+                      {/* GSO */}
+                      {GSO && (
+                        !enablePartC ? (
                           !buttonHide && (
                           <>
                             {/* Submit */}
@@ -2060,7 +2102,7 @@ export default function InspectionForm(){
                                   <span className="ml-1">Loading</span>
                                 </div>
                               ):(
-                                'Update Part C'
+                                'Update'
                               )}
                             </button>
 
@@ -2068,15 +2110,59 @@ export default function InspectionForm(){
                             {!submitLoading && (
                               <button onClick={() => { 
                                   setEnablePartC(true);
+                                  setPartCDate(''); 
                                 }} className="py-2 px-4 text-sm btn-cancel-form">
                                 Cancel
                               </button>
                             )}
                           </>
                           )
-                        )}
-                      </>
+                        ):(
+                          inspectionData?.form?.form_status != 1 && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                          )
+                        )
                       )}
+
+                      {/* SuperAdmin */}
+                      {SuperHacker && (
+                        !enablePartC ? (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => UpdatePartC()}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update'
+                              )}
+                            </button>
+
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setEnablePartC(true);
+                                  setPartCDate(''); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          )
+                        ):(
+                          inspectionData?.form?.form_status == 1 && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartC(false); }} className="icon-form ml-3 self-center" title="Edit Part C" icon={faPenToSquare} />
+                          )
+                        )
+                      )}
+                      
                     </div>
                   </div>
 
@@ -2265,72 +2351,39 @@ export default function InspectionForm(){
                   <div className="flex justify-between items-center mt-4 px-4">
                     <h2 className="text-lg font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
                     <div>
-                      {/* For the SuperAdmin */}
-                      {SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status == 3 ? (
-                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                        )
-                      ):SuperAdmin && currentUserId == 1 && inspectionData?.form?.personnel_id == currentUserId ? (
-                        !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                        )
-                      ):null}
-
+                      
                       {/* Assign Personnel */}
-                      {(inspectionData?.form?.personnel_id == currentUserId) && !SuperAdmin && !GSO && (
-                        inspectionData?.form?.form_status == 3 ? (
-                          !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                            <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
-                          )
-                        ):inspectionData?.form?.form_status == 2 && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD ? (
-                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                        ):null
-                      )}
-
-                      {/* For the GSO */}
-                      {GSO && (
-                        [2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && enablePartA && enablePartB && enablePartC && enablePartD && (
-                          <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
-                        )
-                      )}
-
-                      {/* Submit Part D Form */}
-                      {partDForm && (
-                        !buttonHide && (
-                        <>
-                          {/* Submit */}
-                          <button type="submit"
-                            onClick={() => SubmitPartD()}
-                            className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                            disabled={submitLoading}
-                          >
-                          {submitLoading ? (
-                            <div className="flex">
-                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                              <span className="ml-1">Loading</span>
-                            </div>
-                          ):(
-                          'Submit'
-                          )}
-                          </button>
-
-                          {/* Cancel */}
-                          {!submitLoading && (
-                            <button onClick={() => { 
-                                setPartDForm(false); 
-                              }} className="py-2 px-4 text-sm btn-cancel-form">
-                              Cancel
+                      {inspectionData?.form?.personnel_id == currentUserId && !GSO && (
+                        partDForm ? (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => SubmitPartD()}
+                              className={`py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                            {submitLoading ? (
+                              <div className="flex">
+                                <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                <span className="ml-1">Loading</span>
+                              </div>
+                            ):(
+                            'Submit'
+                            )}
                             </button>
-                          )}
-                        </>
-                        )
-                      )}
 
-                      {/* Edit Part D Button */}
-                      {!enablePartD && (
-                      <>
-                        {/* Assign Personnel */}
-                        {(inspectionData?.form?.personnel_id == currentUserId) && (!SuperAdmin || !GSO) && (
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setPartDForm(false); 
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          )
+                        ):!enablePartD ? (
                           !buttonHide && (
                           <>
                             {/* Submit */}
@@ -2345,7 +2398,7 @@ export default function InspectionForm(){
                                   <span className="ml-1">Loading</span>
                                 </div>
                               ):(
-                                'Update Part D'
+                                'Update'
                               )}
                             </button>
 
@@ -2359,16 +2412,28 @@ export default function InspectionForm(){
                             )}
                           </>
                           )
-                        )}
+                        ):(
+                          inspectionData?.form?.form_status == 3 ? (
+                            !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setPartDForm(true); }} className="icon-form ml-3 self-center" title="Enable Form" icon={faPenToSquare} />
+                            )
+                          ):(
+                            inspectionData?.form?.form_status == 2 && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                              <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                            )
+                          )
+                        )
+                      )}
 
-                        {/* For the GSO */}
-                        {[2, 3, 4, 5, 6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && GSO && (
+                      {/* GSO */}
+                      {GSO && (
+                        !enablePartD ? (
                           !buttonHide && (
                           <>
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => UpdatePartD()}
-                              className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                               disabled={submitLoading}
                             >
                               {submitLoading ? (
@@ -2377,7 +2442,7 @@ export default function InspectionForm(){
                                   <span className="ml-1">Loading</span>
                                 </div>
                               ):(
-                                'Update Part D'
+                                'Update'
                               )}
                             </button>
 
@@ -2391,9 +2456,51 @@ export default function InspectionForm(){
                             )}
                           </>
                           )
-                        )}
-                      </>
+                        ):(
+                          inspectionData?.form?.form_status != 1 && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                          )
+                        )
                       )}
+
+                      {/* SuperAdmin */}
+                      {SuperHacker && (
+                        !enablePartD ? (
+                          !buttonHide && (
+                          <>
+                            {/* Submit */}
+                            <button type="submit"
+                              onClick={() => UpdatePartD()}
+                              className={`py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading ? (
+                                <div className="flex">
+                                  <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                  <span className="ml-1">Loading</span>
+                                </div>
+                              ):(
+                                'Update'
+                              )}
+                            </button>
+
+                            {/* Cancel */}
+                            {!submitLoading && (
+                              <button onClick={() => { 
+                                  setEnablePartD(true);
+                                }} className="py-2 px-4 text-sm btn-cancel-form">
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                          )
+                        ):(
+                          inspectionData?.form?.form_status == 1 && !partBForm && !partCForm && !partDForm && enablePartA && enablePartB && enablePartC && enablePartD && (
+                            <FontAwesomeIcon onClick={() => { setEnablePartD(false); }} className="icon-form ml-3 self-center" title="Edit Part D" icon={faPenToSquare} />
+                          )
+                        )
+                      )}
+
                     </div>
                   </div>
 

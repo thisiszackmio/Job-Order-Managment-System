@@ -206,8 +206,8 @@ export default function RepairRequestForm(){
 
       {/* Form Content */}
       <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header text-base flex justify-between items-center"> 
-          Request For Pre/Post Inspection Repair (Part A)
+        <div className="ppa-form-header"> 
+          Request for Pre/Post Inspection Repair
         </div>
 
         <div className="ppa-widget">
@@ -218,7 +218,6 @@ export default function RepairRequestForm(){
                 {/* Title */}
                 <div className="pl-4 mt-6">
                   <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
-                  <h2 className="form-title">Kindly double-check your forms, please.</h2>
                 </div>
 
                 <div className="grid grid-cols-2">
@@ -228,48 +227,48 @@ export default function RepairRequestForm(){
 
                     {/* Date */}
                     <div className="flex items-center mt-6">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Date:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {formatDate(today)}
                       </div>
                     </div>
 
                     {/* Property No */}
                     <div className="flex items-center mt-2">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Property No:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {propertyNo ? propertyNo : "N/A"}
                       </div>
                     </div>
 
                     {/* Acquisition Date */}
                     <div className="flex items-center mt-2">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Acquisition Date:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {acquisitionDate ? formatDate(acquisitionDate) : "N/A"}
                       </div>
                     </div>
 
                     {/* Acquisition Cost */}
                     <div className="flex items-center mt-2">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Acquisition Cost:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {acquisitionCost ? new Intl.NumberFormat('en-PH', {
                           style: 'currency',
                           currency: 'PHP'
@@ -279,24 +278,24 @@ export default function RepairRequestForm(){
 
                     {/* Brand/Model */}
                     <div className="flex items-center mt-2">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Brand/Model:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {BrandModel ? BrandModel : "N/A"}
                       </div>
                     </div>
 
                     {/* Serial/Engine No */}
                     <div className="flex items-center mt-2">
-                      <div className="w-44">
+                      <div className="w-48">
                         <label className="form-title">
                         Serial/Engine No:
                         </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {SerialEngineNo ? SerialEngineNo : "N/A"}
                       </div>
                     </div>
@@ -311,7 +310,7 @@ export default function RepairRequestForm(){
                       <div className="w-52">
                         <label className="form-title"> Type of Property: </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {typeOfProperty}
                       </div>
                     </div>
@@ -321,7 +320,7 @@ export default function RepairRequestForm(){
                       <div className="w-52">
                         <label className="form-title"> Description: </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {propertyDescription}
                       </div>
                     </div>
@@ -331,7 +330,7 @@ export default function RepairRequestForm(){
                       <div className="w-52">
                         <label className="form-title"> Location: </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {propertyLocation}
                       </div>
                     </div>
@@ -341,7 +340,7 @@ export default function RepairRequestForm(){
                       <div className="w-52">
                         <label className="form-title"> Supervisor: </label> 
                       </div>
-                      <div className="w-full ppa-form-view">
+                      <div className="w-full ppa-form-confimation">
                         {Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name}
                       </div>
                     </div>
@@ -352,18 +351,23 @@ export default function RepairRequestForm(){
 
                 {/* Complain */}
                 <div className="flex items-center mt-2 px-4">
-                  <div className="w-36">
+                  <div className="w-40">
                     <label className="form-title">
                     Complain:
                     </label> 
                   </div>
-                  <div className="w-full ppa-form-view">
+                  <div className="w-full ppa-form-confimation">
                     {ComplainDefect}
                   </div>
                 </div>
 
                 {/* Button */}
                 <div className="mt-10 pl-4 mb-6">
+
+                {Admin || DivisionManager || PortManager ? null : (
+                  <p className="note-form mb-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
+                )}
+                
                 {!buttonHide && (
                 <>
                   {/* Submit */}
@@ -564,9 +568,12 @@ export default function RepairRequestForm(){
 
                 {/* Type of Property */}
                 <div className="items-center mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_type_of_property" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
                       Type of Property:
+                      {!typeOfProperty && inputErrors.type_of_property && (
+                        <p className="form-validation">This form is required</p>
+                      )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -585,17 +592,17 @@ export default function RepairRequestForm(){
                       <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
                       <option value="Others">Others</option>
                     </select>
-                    {!typeOfProperty && inputErrors.type_of_property && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Description */}
                 <div className="items-center mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_description" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="rep_description" className="flex form-title">
                       Description:
+                      {!propertyDescription && inputErrors.property_description && (
+                        <p className="form-validation">This form is required</p>
+                      )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -608,17 +615,17 @@ export default function RepairRequestForm(){
                       onChange={ev => setPropertyDescription(ev.target.value)}
                       className={`block w-full ${(inputErrors.property_description) ? "ppa-form-error":"ppa-form-field"}`}
                     />
-                    {!propertyDescription && inputErrors.property_description && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Location */}
                 <div className="items-center mt-4">
-                  <div className="w-60">
-                    <label htmlFor="rep_location" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="rep_location" className="flex form-title">
                       Location (Div/Section/Unit):
+                      {!propertyLocation && inputErrors.location && (
+                        <p className="form-validation">This form is required</p>
+                      )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -631,17 +638,17 @@ export default function RepairRequestForm(){
                       onChange={ev => setPropertyLocation(ev.target.value)}
                       className={`block w-full ${(inputErrors.location) ? "ppa-form-error":"ppa-form-field"}`}
                     />
-                    {!propertyLocation && inputErrors.location && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Complain / Defect */}
                 <div className="items-center mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_complain" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="rep_complain" className="flex form-title">
                       Complain/Defect:
+                      {!ComplainDefect && inputErrors.complain && (
+                        <p className="form-validation">This form is required</p>
+                      )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -654,18 +661,18 @@ export default function RepairRequestForm(){
                     onChange={ev => setComplainDefect(ev.target.value)}
                     className={`block w-full ${(inputErrors.complain) ? "ppa-form-error":"ppa-form-field"}`}
                   />
-                  {!ComplainDefect && inputErrors.complain && (
-                    <p className="form-validation">This form is required</p>
-                  )}
                   </div>
                 </div>
 
                 {/* Supervisor */}
                 {(Admin || DivisionManager|| PortManager) ? null : (
                   <div className="items-center mt-4">
-                    <div className="w-60">
-                      <label htmlFor="rep_type_of_property" className="form-title">
+                    <div className="w-full">
+                      <label htmlFor="rep_type_of_property" className="flex form-title">
                         Immediate Supervisor:
+                        {!selectedSupervisor.id && inputErrors.supervisor_id && (
+                          <p className="form-validation">This form is required</p>
+                        )}
                       </label> 
                     </div>
                     <div className="w-full">
@@ -688,9 +695,6 @@ export default function RepairRequestForm(){
                           </option>
                         ))}
                       </select>
-                      {!selectedSupervisor.id && inputErrors.supervisor_id && (
-                        <p className="form-validation">This form is required</p>
-                      )}
                     </div>
                   </div>
                 )}

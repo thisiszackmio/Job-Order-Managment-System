@@ -628,16 +628,13 @@ class VehicleSlipController extends Controller
      *  Activate On-Travel on assigned Driver and Vehicle
      */
     public function OnTravel($id){
-        $today = Carbon::today();
-        $yesterday = Carbon::yesterday();
+        $today = Carbon::now();
         $dateNow = Carbon::now()->toDateString();
 
         $VehicleDataRequest = VehicleSlipModel::where('date_arrival', '<=', $dateNow)
             ->whereIn('admin_approval', [2, 1])
             ->orderBy('date_arrival', 'desc')
             ->get();
-
-        // return response()->json($VehicleDataRequest);
 
         if ($VehicleDataRequest->isEmpty()) {
             return response()->json(['message' => 'No Vehicle Travel Yet'], 201);
@@ -646,10 +643,7 @@ class VehicleSlipController extends Controller
             $clearances = array_map('trim', explode(',', $employee->code_clearance));
 
             foreach ($VehicleDataRequest as $slip) {
-                // $vehicleDateTime = Carbon::parse($slip->date_arrival . ' ' . $slip->time_arrival);
-
-                if ($slip->user_id == $employee->id || in_array('GSO', $clearances) || in_array('AM', $clearances)) {
-                    // Vehicle
+                if ($slip->user_id == $employee->id || in_array('GSO', $clearances) || in_array('AM', $clearances) || in_array('NERD', $clearances)) {
                     if (preg_match('/^(.*?)\s*\((.*?)\)$/', $slip->vehicle_type, $matches)) {
                         $vehicleName = trim($matches[1]);
                         $plateNumber = trim($matches[2]);
@@ -658,54 +652,52 @@ class VehicleSlipController extends Controller
                         $plateNumber = null;
                     }
 
-                    // === VEHICLE ===
-                    if ($vehicle) {
-                        if ($vehicle->status == 0) {
-                            // Reset if past date
-                            if ($vehicle->date_used && Carbon::parse($vehicle->date_used)->lt($today)) {
-                                $vehicle->update([
-                                    'status' => 0,
-                                    'date_used' => null,
-                                ]);
-                            }
+                    // Combine arrival date & time
+                    $arrivalDateTime = Carbon::createFromFormat('Y-m-d H:i:s', "{$slip->date_arrival} {$slip->time_arrival}");
 
-                            // Activate if scheduled today
-                            if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
-                                $vehicle->update([
-                                    'status' => 1,
-                                    'date_used' => $today->toDateString(),
-                                ]);
-                            }
-                        }
-                        // if status == 2 → do nothing (keep as is)
+                    // -- Vehicle -- //
+                    $vehicleReq = VehicleTypeModel::where('vehicle_name', $vehicleName)->where('vehicle_plate', $plateNumber)->first();
+
+                    // Check if the vehicle is available
+                    if($vehicleReq && $vehicleReq->status == 0){
+                        $vehicleReq->update([
+                            'status' => 1,
+                            'date_used' => $today->toDateString(),
+                        ]);
                     }
 
-                    // === DRIVER ===
-                    if ($driver) {
-                        if ($driver->status == 0) {
-                            // Reset if past date
-                            if ($driver->date_assigned && Carbon::parse($driver->date_assigned)->lt($today)) {
-                                $driver->update([
-                                    'status' => 0,
-                                    'date_assigned' => null,
-                                ]);
-                            }
-
-                            // Activate if scheduled today
-                            if (Carbon::parse($slip->date_arrival)->isSameDay($today)) {
-                                $driver->update([
-                                    'status' => 1,
-                                    'date_assigned' => $today->toDateString(),
-                                ]);
-                            }
+                    if($vehicleReq && $vehicleReq->status == 1 || $vehicleReq->status == 2){
+                        if ($arrivalDateTime->lessThanOrEqualTo($today)) {
+                            $vehicleReq->update([
+                                'status' => 0,
+                                'date_used' => null,
+                            ]);
                         }
-                        // if status == 2 → do nothing (keep as is)
                     }
 
+                    // -- Driver -- //
+                    $driverReq = AssignPersonnelModel::where('personnel_id', $slip->driver_id)->first();
+
+                    // Check if the driver is available
+                    if($driverReq && $driverReq->status == 0){
+                        $driverReq->update([
+                            'status' => 1,
+                            'date_assigned' => $today->toDateString(),
+                        ]);
+                    }
+
+                    if($driverReq && $driverReq->status == 1 || $driverReq->status == 2){
+                        if ($arrivalDateTime->lessThanOrEqualTo($today)) {
+                            $driverReq->update([
+                                'status' => 0,
+                                'date_assigned' => null,
+                            ]);
+                        }
+                    }
                 }
             }
 
-            return response()->json(['message' => 'Assign Vehicle and Driver Updated'], 200);
+            return response()->json(['message' => 'Vehicle and Driver Updated'], 200);
         }
     }
 

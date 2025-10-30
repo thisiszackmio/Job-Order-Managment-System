@@ -1034,7 +1034,7 @@ class InspectionController extends Controller
         if($InspectionRequest->form_status == 12){
             $formRemarks = 'The GSO will fill out the form on Part D.';
         }else{
-            $formRemarks = $request->input('user_name').' has completed Part D.';
+            $formRemarks = 'The assigned personnel has completed the form.';
         }
 
         // Update Data

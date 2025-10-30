@@ -342,7 +342,13 @@ class FacilityVenueController extends Controller
         $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
         $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
+        // Prev & Next IDs
+        $prevId = FacilityVenueModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
+        $nextId = FacilityVenueModel::where('id', '>', $id)->orderBy('id', 'asc')->value('id');
+
         $respondData = [
+            'next' => $nextId,
+            'prev' => $prevId,
             'form' => $FacilityRequest,
             'admin_name' => $AdminName,
             'admin_esig' => $AdminEsig,
@@ -484,13 +490,8 @@ class FacilityVenueController extends Controller
      *  Edit OPR Instruction for the Admin
      */
     public function editOPRInstruction(Request $request, $id){
-        $CheckOPR = $request->validate([
-            'oprInstruct' => 'required|string'
-        ]);
-
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
-        if (!$facilityRequest) { return response()->json(['message' => 'Data not found'], 404); }
 
         // Check if the Approver is the Admin (For Security)
         $checkAM = PPAEmployee::where('id', $request->input('user_id'))
@@ -506,9 +507,11 @@ class FacilityVenueController extends Controller
 
             return response()->json(['message' => 'Not Admin'], 201);
         }
-        
+
         // Update the OPR instruction
-        $facilityRequest->obr_instruct = $CheckOPR['oprInstruct'];
+        $facilityRequest->obr_instruct = $request->input('oprInstruct');
+
+        $editor = PPAEmployee::where('id', $request->input('user_id'))->first();
 
         // Save the updated facility request
         if ($facilityRequest->save()) {
@@ -516,17 +519,19 @@ class FacilityVenueController extends Controller
             $track = new FormTracker();
             $track->form_id = $facilityRequest->id;
             $track->type_of_request = 'Facility/Venue';
-            $track->remarks = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname .' updated the OPR instruction.';
+            $track->remarks = $editor->firstname. ' ' .$editor->middlename. '. ' .$editor->lastname .' updated the OPR instruction.';
             $track->save();
 
             // Create logs
             $logs = new LogsModel();
             $logs->category = 'FORM';
-            $logs->message = $checkAM->firstname. ' ' .$checkAM->middlename. '. ' .$checkAM->lastname . ' has updated the OPR Instruction on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
+            $logs->message = $editor->firstname. ' ' .$editor->middlename. '. ' .$editor->lastname . ' has updated the OPR Instruction on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         } else {
             return response()->json(['error' => 'Failed to update OPR instruction.'], 406);
         }
+
+        // return response()->json($checkAM);
 
     }
 
@@ -619,7 +624,7 @@ class FacilityVenueController extends Controller
         ]); 
 
         // Check if this is GSO (For Security)
-        $checkGSO = PPAEmployee::where('id', $request->input('user_id'))->whereRaw("code_clearance LIKE '%AM%' OR code_clearance LIKE '%HACK%'")->first();
+        $editor = PPAEmployee::where('id', $request->input('user_id'))->first();
 
         // Find the facility request by ID
         $facilityRequest = FacilityVenueModel::find($id);
@@ -633,13 +638,13 @@ class FacilityVenueController extends Controller
             $track = new FormTracker();
             $track->form_id = $facilityRequest->id;
             $track->type_of_request = 'Facility/Venue';
-            $track->remarks = $checkGSO->firstname. ' ' .$checkGSO->middlename. '. ' .$checkGSO->lastname .' updated the OPR action.';
+            $track->remarks = $editor->firstname. ' ' .$editor->middlename. '. ' .$editor->lastname .' updated the OPR action.';
             $track->save();
 
             // Create logs
             $logs = new LogsModel();
             $logs->category = 'FORM';
-            $logs->message = $checkGSO->firstname. ' ' .$checkGSO->middlename. '. ' .$checkGSO->lastname . ' has updated the OPR Action on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
+            $logs->message = $editor->firstname. ' ' .$editor->middlename. '. ' .$editor->lastname . ' has updated the OPR Action on Facility/Venue Form (Control No. '.$facilityRequest->id.').';
             $logs->save();
         }
     }

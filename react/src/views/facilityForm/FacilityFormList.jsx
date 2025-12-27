@@ -96,14 +96,18 @@ export default function FacilityVenueFormList(){
   };
 
   const filteredList = formlist.filter((list) => {
+    const dateRequest = formatDate(list.date_request)?.toLowerCase() || '';
     const request_office = list.request_office?.toLowerCase() || '';
     const title_activity = list.title_activity?.toLowerCase() || '';
     const requestor = list.requestor?.toLowerCase() || '';
+    const facility = list.facility?.toLowerCase() || '';
     const search = searchTerm.toLowerCase();
   
     return (
+      dateRequest.includes(search) ||
       requestor.includes(search) ||
       request_office.includes(search) ||
+      facility.includes(search) ||
       title_activity.includes(search)
     );
   });
@@ -137,13 +141,14 @@ export default function FacilityVenueFormList(){
   return(
     <PageComponent title="Request List">
       {Access ? (
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Facility / Venue Form List </div>
-
-        <div className="p-2 ppa-div-table relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="ppa-widget mt-8">
+        <div className="joms-user-info-header text-left"> 
+          Facility / Venue Form List
+        </div>
+        <div className="px-4 pb-6">
 
           {/* Search Filter */}
-          <div className="mt-2 mb-4 flex">
+          <div className="flex">
 
             {/* Search */}
             <div className="flex-grow">
@@ -171,96 +176,104 @@ export default function FacilityVenueFormList(){
 
           </div>
 
-          {displayPaginationUser && (
-            <ReactPaginate
-              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-              breakLabel="..."
-              pageCount={pageCountUser}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageChange}
-              forcePage={currentPage}
-              containerClassName="pagination-top"
-              subContainerClassName="pages pagination"
-              activeClassName="active"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-            />
-          )}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead className="bg-gray-100">
-              <tr className="bg-gray-100">
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Ctrl ID</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Request Office</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Activity</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Facility/Venue</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Requestor</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-            {loading ? (
-              <tr>
-                <td colSpan={8} className="px-2 py-2 text-center table-font">
-                  <div className="flex justify-center items-center">
-                    <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                    <span className="loading-table">Loading</span>
-                  </div>
-                </td>
-              </tr>
-            ):(
-              currentList.length > 0 ? (
-                currentList.map((list)=>(
-                  <tr key={list.id}>
-                    <td className="px-2 py-2 text-center font-bold table-font">
-                      <Link
-                        to={`/joms/facilityvenue/form/${list.id}`}
-                        className="relative group inline-flex items-center"
-                      >
-                        {/* Initially show the ID */}
-                        <span className="group-hover:hidden">{list.id}</span>
-
-                        {/* Show the View Icon on hover */}
-                        <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
-                          <FontAwesomeIcon icon={faEye} />
-                        </span>
-                      </Link>
-                    </td>
-                    {/* <td className="px-2 py-2 text-base text-center font-bold table-font"><Link to={`/joms/facilityvenue/form/${list.id}`}>{list.id}</Link></td> */}
-                    <td className="px-2 py-2 text-sm text-left table-font">{formatDate(list.date_request)}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.request_office}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.title_activity}</td>
-                    <td className="px-2 py-2 text-sm text-left w-1/4 table-font">
-                      {list.date_start === list.date_end ? (
-                        `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatTime(list.time_end)}`
-                      ):(
-                        `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatDate(list.date_end)} @ ${formatTime(list.time_end)}`
-                      )}
-                    </td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.facility}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                    <td className="px-2 py-2 text-sm text-left table-font">{list.remarks}</td>
-                  </tr>
-                ))
-              ):(
-                <tr>
-                  <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                    No records found.
-                  </td>
-                </tr>
-              )
+          {/* Top Pagination */}
+          <div className="mt-6">
+            {displayPaginationUser && (
+              <ReactPaginate
+                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                breakLabel="..."
+                pageCount={pageCountUser}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                forcePage={currentPage}
+                containerClassName="pagination-top"
+                subContainerClassName="pages pagination"
+                activeClassName="active"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+              />
             )}
-            </tbody>
-          </table>
+          </div>
+
+          {/* Table */}
+          <div className="ppa-div-table">
+            <table className="ppa-table w-full">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 w-[5%]  text-center ppa-table-header">#</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Request Office</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Activity</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Date</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Facility/Venue</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Requestor</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
+                </tr>
+              </thead>
+              <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                {loading ? (
+                  <tr>
+                    <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
+                      <div className="flex justify-center items-center">
+                        <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                        <span className="loading-table">Loading List</span>
+                      </div>
+                    </td>
+                  </tr>
+                ):(
+                  currentList.length > 0 ? (
+                    currentList.map((list)=>(
+                      <tr key={list.id}>
+                        <td className="px-4 py-4 font-bold text-center ppa-table-body-id">
+                          <Link
+                            to={`/joms/facilityvenue/form/${list.id}`}
+                            className="group flex justify-center items-center"
+                          >
+                            {/* Initially show the ID */}
+                            <span className="group-hover:hidden">{list.id}</span>
+
+                            {/* Show the View Icon on hover */}
+                            <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                              <FontAwesomeIcon icon={faEye} />
+                            </span>
+                          </Link>
+                        </td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{formatDate(list.date_request)}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{list.request_office}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{list.title_activity}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">
+                          {list.date_start === list.date_end ? (
+                            `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatTime(list.time_end)}`
+                          ):(
+                            `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatDate(list.date_end)} @ ${formatTime(list.time_end)}`
+                          )}
+                        </td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{list.facility}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{list.requestor}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">{list.remarks}</td>
+                      </tr>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
+                        No records found
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Bottom Pagination */}
           {displayPaginationUser && (
             <ReactPaginate
               previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
@@ -284,8 +297,8 @@ export default function FacilityVenueFormList(){
               nextLinkClassName="page-link"
             />
           )}
-        </div>
 
+        </div>
       </div>
       ):(
         <Restrict />

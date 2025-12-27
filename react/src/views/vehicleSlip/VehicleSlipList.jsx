@@ -13,12 +13,6 @@ export default function VehicleSlipList(){
 
   const { currentUserCode } = useUserStateContext();
 
-  // Restrictions Condition 
-  const ucode = currentUserCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const roles = ["AM", "GSO", "DM", "HACK", "PM", "AU"];
-  const accessOnly = roles.some(role => codes.includes(role));
-
   // Loading
   const [loading, setLoading] = useState(true);
 
@@ -107,163 +101,174 @@ export default function VehicleSlipList(){
     setCurrentPage(selected);
   };
 
+  // Restrictions Condition
+  const ucode = currentUserCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const Admin = codes.includes("AM");
+  const GSO = codes.includes("GSO");
+  const AuthorizePerson = codes.includes("AU");
+  const SuperAdmin = codes.includes("HACK");
+  const PortManager = codes.includes("PM");
+  const Access = Admin || GSO || AuthorizePerson || PortManager || SuperAdmin;
+
   return (
     <PageComponent title="Request List">
-      
-      {loading ? (
-        <div className="flex items-left h-20 space-x-4">
-          {/* Loading Animation */}
-          <FontAwesomeIcon
-            icon={faGear}
-            className="text-4xl text-blue-700 gear"
-          />
-          <span className="loading">Loading...</span>
-        </div>
-      ):(
-        !accessOnly ? (
-          <Restrict />
-        ):(
-          <div>
-            {/* Table */}
-            <div className="font-roboto ppa-form-box bg-white">
-              <div className="ppa-form-header"> Vehicle Slip Request - All List </div>
-              <div className="p-2 ppa-div-table relative overflow-x-auto shadow-md sm:rounded-lg">
+      {Access ? (
+        <div className="ppa-widget mt-8">
+          <div className="joms-user-info-header text-left"> 
+            Vehicle Slip Request List
+          </div>
+          <div className="px-4 pb-6">
 
-                {/* Search Filter */}
-                <div className="mt-2 mb-4 flex">
-                  {/* Search */}
-                  <div className="flex-grow">
-                    <input
-                      type="text"
-                      placeholder="Search Here"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                      className="w-96 p-2 border border-gray-300 rounded text-sm"
-                    />
-                  </div>
-                  {/* Count */}
-                  <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
-                    <div className="text-right text-sm/[17px]">
-                      Total of{" "}
-                      {pageCountUser > 1 ? (
-                        <b>{startIndex} - {endIndex}</b>
-                      ) : (
-                        <b>{filteredList.length}</b>
-                      )}{" "}
-                      out of <b>{filteredList.length}</b> Request list
-                    </div>
-                  </div>
+            {/* Search Filter */}
+            <div className="mt-2 mb-4 flex">
+              {/* Search */}
+              <div className="flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search Here"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-96 p-2 border border-gray-300 rounded text-sm"
+                />
+              </div>
+              {/* Count */}
+              <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
+                <div className="text-right text-sm/[17px]">
+                  Total of{" "}
+                  {pageCountUser > 1 ? (
+                    <b>{startIndex} - {endIndex}</b>
+                  ) : (
+                    <b>{filteredList.length}</b>
+                  )}{" "}
+                  out of <b>{filteredList.length}</b> Request list
                 </div>
-                
-                {displayPaginationUser && (
-                  <ReactPaginate
-                    previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                    nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                    breakLabel="..."
-                    pageCount={pageCountUser}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={handlePageChange}
-                    forcePage={currentPage}
-                    containerClassName="pagination-top"
-                    subContainerClassName="pages pagination"
-                    activeClassName="active"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                  />
-                )}
-                <table className="ppa-table w-full mb-10 mt-2">
-                  <thead className="bg-gray-100">
-                    <tr className="bg-gray-100">
-                      <th className="w-10 px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">ID</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Purpose</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Place Visited</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Date Arrival</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Time Arrival</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Driver</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Vehicle</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">No Passengers</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Requestor</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ backgroundColor: '#fff' }}>
-                  {currentList.length > 0 ? (
-                    currentList.map((list)=>(
-                      <tr key={list.id}>
-                        <td className="px-2 py-2 text-lg text-center font-bold table-font">
-                          <Link
-                            to={`/joms/vehicle/form/${list.id}`}
-                            className="relative group inline-flex items-center"
-                          >
-                            {/* Initially show the ID */}
-                            <span className="group-hover:hidden">{list.id}</span>
-
-                            {/* Show the View Icon on hover */}
-                            <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
-                              <FontAwesomeIcon icon={faEye} />
-                            </span>
-                          </Link>
-                        </td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.date_request}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.purpose}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.place_visited}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.date_arrival}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.time_arrival}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.driver ? list.driver : "None"}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.vehicle_type ? list.vehicle_type : "None"}</td>
-                        <td className="px-2 py-2 text-sm w-1 text-center table-font">{list.passengers}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.requestor}</td>
-                        <td className="px-2 py-2 text-sm text-left table-font">{list.remarks}</td>
-                      </tr>
-                    ))
-                  ):(
-                    <tr>
-                      <td colSpan={13} className="px-2 py-2 text-center text-sm text-gray-600">
-                        No records found.
-                      </td>
-                    </tr>
-                  )}
-                  </tbody>
-                </table>
-                {displayPaginationUser && (
-                  <ReactPaginate
-                    previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                    nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                    breakLabel="..."
-                    pageCount={pageCountUser}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={handlePageChange}
-                    forcePage={currentPage}
-                    containerClassName="pagination"
-                    subContainerClassName="pages pagination"
-                    activeClassName="active"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                  />
-                )}
-
               </div>
             </div>
-          </div>
-        )
-      )}
-      
 
+            {/* Top Pagination */}
+            <div className="mt-6">
+              {displayPaginationUser && (
+                <ReactPaginate
+                  previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                  nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                  breakLabel="..."
+                  pageCount={pageCountUser}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={5}
+                  onPageChange={handlePageChange}
+                  forcePage={currentPage}
+                  containerClassName="pagination-top"
+                  subContainerClassName="pages pagination"
+                  activeClassName="active"
+                  pageClassName="page-item"
+                  pageLinkClassName="page-link"
+                  breakClassName="page-item"
+                  breakLinkClassName="page-link"
+                  previousClassName="page-item"
+                  previousLinkClassName="page-link"
+                  nextClassName="page-item"
+                  nextLinkClassName="page-link"
+                />
+              )}
+            </div>
+
+            {/* Table */}
+            <div className="ppa-div-table">
+              <table className="ppa-table w-full">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Place Visited</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Arrival</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Time Arrival</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Driver</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Vehicle</th>
+                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Requestor</th>
+                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={9} className="px-2 py-5 text-center ppa-table-body">
+                        <div className="flex justify-center items-center">
+                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                          <span className="loading-table">Loading List</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ):(
+                    currentList.length > 0 ? (
+                      currentList.map((list)=>(
+                        <tr key={list.id}>
+                          <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
+                            <Link
+                              to={`/joms/facilityvenue/form/${list.id}`}
+                              className="group flex justify-center items-center"
+                            >
+                              {/* Initially show the ID */}
+                              <span className="group-hover:hidden">{list.id}</span>
+  
+                              {/* Show the View Icon on hover */}
+                              <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                                <FontAwesomeIcon icon={faEye} />
+                              </span>
+                            </Link>
+                          </td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.date_request}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.place_visited}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.date_arrival}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.time_arrival}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.driver ? list.driver : "None"}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.vehicle_type ? list.vehicle_type : "None"}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.requestor}</td>
+                          <td className="px-4 py-2 text-left ppa-table-body">{list.remarks}</td>
+                        </tr>
+                      ))
+                    ):(
+                      <tr>
+                        <td colSpan={9} className="px-2 py-5 text-center ppa-table-body">
+                          No records found
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Bottom Pagination */}
+            {displayPaginationUser && (
+              <ReactPaginate
+                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                breakLabel="..."
+                pageCount={pageCountUser}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                forcePage={currentPage}
+                containerClassName="pagination"
+                subContainerClassName="pages pagination"
+                activeClassName="active"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+              />
+            )}
+
+          </div>
+        </div>
+      ):(
+        <Restrict />
+      )}
     </PageComponent>
   );
 

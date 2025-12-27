@@ -238,7 +238,7 @@ export default function FacilityVenueForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid!</p>
-            <p className="popup-message">You've entered the wrong date and time.</p>
+            <p className="popup-message">You've entered an invalid date and time.</p>
           </div>
         );
       }else if(responseData === 'invalidDate'){
@@ -247,7 +247,7 @@ export default function FacilityVenueForm(){
         setPopupMessage(
           <div>
             <p className="popup-title">Invalid!</p>
-            <p className="popup-message">Start date/time must be today or later.</p>
+            <p className="popup-message">Start date and time must be today or later.</p>
           </div>
         );
       }else{
@@ -266,6 +266,15 @@ export default function FacilityVenueForm(){
             <div>
               <p className="popup-title">Sorry</p>
               <p className="popup-message">Facility unavailable on this day.</p>
+            </div>
+          );
+        }else if(responseData === "facility"){
+          setShowPopup(true);
+          setPopupContent('check-error');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Form Invalid</p>
+              <p className="popup-message">Please select the facility/venue you are requesting.</p>
             </div>
           );
         }else{
@@ -454,1205 +463,371 @@ export default function FacilityVenueForm(){
   return(
     <PageComponent title="Request Form">
       {/* Form Content */}
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Facility / Venue Request Form </div>
+      <div className="ppa-widget mt-8 pb-6">
+        <div className="joms-user-info-header text-left"> Request for Facility / Venue Form </div>
         
-        <div className="ppa-widget">
+        {confirmation ? (
+        <div className="form-container">
 
-          {confirmation ? (
-          <div className="form-container">
-
-            {/* Title */}
-            <div className="px-4 pt-4">
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Kindly double-check your forms, please. </h2>
-            </div>
-
-            <form id="fac_submit" onSubmit={SubmitFacilityForm}>
-
-              <div className="px-4">
-
-                {/* Date */}
-                <div className="flex items-center mt-4">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Date:
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {formatDate(today)}
-                  </div>
-                </div>
-
-                {/* Requesting Office/Division */}
-                <div className="flex items-center mt-2">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Requesting Office/Division:
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {reqOffice}
-                  </div>
-                </div>
-
-                {/* Title/Purpose of Activity */}
-                <div className="flex items-center mt-2">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Title/Purpose of Activity:
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {titleReq}
-                  </div>
-                </div>
-
-                {/* Date and Time of Activity (Start) */}
-                <div className="flex items-center mt-2">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Date and Time of Activity (Start):
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {formatDate(DateStart)} @ {formatTime(timeStart)}
-                  </div>
-                </div>
-
-                {/* Date and Time of Activity (End) */}
-                <div className="flex items-center mt-2">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Date and Time of Activity (End):
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {formatDate(DateEnd)} @ {formatTime(timeEnd)}
-                  </div>
-                </div>
-
-                {/* Facility */}
-                <div className="flex items-center mt-2">
-                  <div className="w-64">
-                    <label className="form-title">
-                    Facility:
-                    </label> 
-                  </div>
-                  <div className="w-1/2 ppa-form-preview">
-                    {mphCheck ? ("Multi-Purpose Hall"):null}
-                    {confCheck ? ("Conference Room"):null}
-                    {dormCheck ? ("Dormitory"):null}
-                    {otherCheck ? ("Others"):null}
-                  </div>
-                </div>
-
-                {/* For Facility */}
-                {mphCheck || confCheck || otherCheck ? (
-                  <div className="mt-8 border-t border-black">
-                    
-                    {/* Caption */}
-                    <div>
-                      <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
-                    </div>
-
-                    <div className="grid grid-cols-2">
-
-                      {/* Left */}
-                      <div className="col-span-1 ml-10">
-
-                        {/* Table */}
-                        <div className="mt-4">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkTable ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 form-title">
-                              <span>Tables</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {NoOfTable ? NoOfTable : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Chair */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkChairs ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 form-title">
-                              <span>Chairs</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {NoOfChairs ? NoOfChairs : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Projector */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkProjector ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 form-title">
-                              <span>Projector</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Projector Screen */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkProjectorScreen ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Projector Screen</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Document Camera */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkDocumentCamera ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Document Camera</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right */}
-                      <div className="col-span-1">
-
-                        {/* Laptop */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkLaptop ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Laptop</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Television */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkTelevision ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Television</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Sound System */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkSoundSystem ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Sound System</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Videoke */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkVideoke ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Videoke</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Microphone */}
-                        <div className="mt-2">
-                          <div className="flex items-center">
-                            <div className="ppa-checklist">
-                            {checkMicrphone ? 'X':null}
-                            </div>
-                            <div className="w-22 ml-1 form-title">
-                              <span>Microphone</span>
-                            </div>
-                            <div className="w-30 ml-2">
-                            (No.<span className="border-b border-black px-5 font-bold text-center"> 
-                              {NoOfMicrophone ? NoOfMicrophone : null} 
-                            </span>)
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-                      
-                    </div>
-
-                    {/* Others */}
-                    <div className="mt-2 m-10">
-                      <div className="w-full">
-                        <div className="mt-1">
-                          <div className="flex items-center">
-                            <div className="w-12 ppa-checklist">
-                              {checkOther ? 'X':null}
-                            </div>
-                            <div className="w-12 ml-1 form-title">
-                              <span>Others</span>
-                            </div>
-                            <div className="w-1/2 h-6 border-b p-0 pl-2 border-black text-sm text-left ml-4 ">
-                            <span className=""> {OtherField ? OtherField : null} </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                ):null}
-
-                {/* For Dormitory */}
-                {dormCheck ? (
-                  <div className="mt-8 border-t border-black">
-
-                    {/* Caption */}
-                    <div>
-                      <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Dormitory </h2>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-
-                      {/* For Male */}
-                      <div className="col-span-1">
-                        <div className="form-title mt-5">
-                          Male Guest:
-                        </div>
-                        <div className="w-3/4 p-2">
-                        {getMale?.trim() ? (
-                          getMale.split("\n").map((name, index) => (
-                            <div key={index} className="mt-2 flex">
-                              <span className="font-bold">{`${index + 1}.`}</span>
-                              <div className="w-full ppa-form-list ml-2 pl-1 h-6">
-                                {name}
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="mt-2 text-gray-500 italic">No Male Guest</div>
-                        )}
-                        </div>
-                      </div>
-
-                      {/* For Female */}
-                      <div className="col-span-1">
-                        <div className="form-title mt-5">
-                          Female Guest:
-                        </div>
-                        <div className="w-3/4 p-2">
-                        {getFemale?.trim() ? (
-                          getFemale.split("\n").map((name, index) => (
-                            <div key={index} className="mt-2 flex">
-                              <span className="font-bold">{`${index + 1}.`}</span>
-                              <div className="w-full ppa-form-list ml-2 pl-1 h-6">
-                                {name}
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="mt-2 text-gray-500 italic">No Female Guest</div>
-                        )}
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Other */}
-                    <div className="mt-4 ml-16">
-                      <div className="flex">
-                        <div className="w-28 form-title">
-                          <span>Other Details:</span>
-                        </div>
-                        <div className="w-3/4 border-b border-black font-regular text-base text-left pl-2">
-                        {otherDetails}
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                ):null}
-
-                {/* For OPR Instruction */}
-                {(enableDormitory || enableFacility) && Admin && (
-                  <div className="mt-8 border-t border-black">
-
-                    {/* Caption */}
-                    <div>
-                      <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * OPR Instruction </h2>
-                    </div>
-
-                    <div className="w-1/2 ppa-form-box-view h-6 mt-4">
-                    {oprInstruct}
-                    </div>
-
-                  </div>
-                )}
-
-                {/* Button */}
-                <div className="mt-10 pb-4">
-                {!buttonHide && (
-                <>
-                  {/* Note */}
-                  <p className="note-form mb-4"><span> Note: </span>The Date and Time of Activity (Start and End) will no longer be editable once submitted. Please make sure to verify and confirm the schedule before requesting a facility.</p>
-                  {/* Submit */}
-                  <button 
-                    // form="fac_submit"
-                    type="submit"
-                    className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-base btn-cancel-form">
-                      Revise
-                    </button>
-                  )}
-                </>
-                )}
-                </div>
-
-              </div>
-
-            </form>
-
+          {/* Title */}
+          <div className="px-4 pt-4">
+            <h2 className="text-base font-bold leading-7 text-gray-900"> Kindly double-check your forms, please. </h2>
           </div>
-          ):(
-          <div className="form-container">
 
-            {/* Title */}
-            <div className="px-4 pt-4">
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-              <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
-            </div>
+          <form id="fac_submit" onSubmit={SubmitFacilityForm}>
 
-            {/* Form */}
-            <div className="grid grid-cols-2">
+            <div className="px-4">
 
-              {/* 1st Column */}
-              <div className="col-span-1 px-4">
-
-                {/* Date */}
-                <div className="items-center mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_date" className="form-title"> 
-                      Date: 
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input 
-                      type="text" 
-                      name="rep_date" 
-                      id="rep_date" 
-                      value={formatDate(today)} 
-                      className="block w-full ppa-form-field"
-                      disabled
-                    />
-                  </div>
-                </div>
-
-                {/* Requesting Office/Division */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Requesting Office/Division:
-                      {!reqOffice && fieldMissing.request_office && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rf_request"
-                      id="rf_request"
-                      autoComplete="rf_request"
-                      value={reqOffice}
-                      onChange={ev => setRegOffice(ev.target.value)}
-                      className={`block w-full ${(!reqOffice && fieldMissing.request_office) ? "ppa-form-error":"ppa-form-field"}`}
-                      maxLength={255}
-                    />
-                  </div>
-                </div>
-
-                {/* Title/Purpose of Activity */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Title/Purpose of Activity:
-                      {!titleReq && fieldMissing.title_of_activity && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rep_title"
-                      id="rep_title"
-                      autoComplete="rep_title"
-                      value={titleReq}
-                      onChange={ev => setTitleReq(ev.target.value)}
-                      className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form-field"}`}
-                      maxLength={255}
-                    />
-                  </div>
-                </div>
-
-                {/* Date Start */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Date of Activity (Start):
-                      {!DateStart && fieldMissing.date_start && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="date"
-                      name="date_start"
-                      id="date_start"
-                      value={DateStart}
-                      onChange={ev => {
-                        setDateStart(ev.target.value);
-                        setDateEndMin(ev.target.value);
-                      }}
-                      min={today}
-                      className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form-field"}`}
-                      disabled={disableForm}
-                    />
-                  </div>
-                </div>
-
-                {/* Date Start */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Time of Activity (Start):
-                      {!timeStart && fieldMissing.time_start && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="time"
-                      name="time_start"
-                      id="time_start"
-                      value={timeStart}
-                      onChange={ev => setTimeStart(ev.target.value)}
-                      min={today}
-                      className={`block w-full ${(!timeStart && fieldMissing.time_start) ? "ppa-form-error":"ppa-form-field"}`}
-                      disabled={disableForm}
-                    />
-                  </div>
-                </div>
-
-                {/* Date End */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Date of Activity (End):
-                      {!DateEnd && fieldMissing.date_end && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="date"
-                      name="date_end"
-                      id="date_end"
-                      value={DateEnd}
-                      onChange={ev => {
-                        setDateEnd(ev.target.value);
-                        if (ev.target.value < DateStart) {
-                          // If DateEnd is before DateStart, set DateEnd to DateStart
-                          setDateEnd(DateStart);
-                        }
-                      }}
-                      min={DateEndMin}
-                      className={`block w-full ${(!DateEnd && fieldMissing.date_end) ? "ppa-form-error":"ppa-form-field"}`}
-                      disabled={disableForm}
-                    />
-                  </div>
-                </div>
-
-                {/* Time End */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Time of Activity (End):
-                      {!timeEnd && fieldMissing.time_end && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="time"
-                      name="time_end"
-                      id="time_end"
-                      value={timeEnd}
-                      onChange={ev => setTimeEnd(ev.target.value)}
-                      className={`block w-full ${(!timeEnd && fieldMissing.time_end) ? "ppa-form-error":"ppa-form-field"}`}
-                      disabled={disableForm}
-                    />
-                  </div>
-                </div>
-
-              </div>
-
-              {/* 2nd Column */}
-              <div className="col-span-1 px-4">
-                
-                {/* Checkbox */}
-                <div className="mt-6 font-roboto">
-                  <label htmlFor="rf_request" className="flex form-title">
-                    Facilities / Venue being Requested :
-                    {(!mphCheck && !confCheck && !dormCheck && !otherCheck && checkFacility) && (
-                      <p className="font-roboto form-validation mt-2">Don't forget this field!</p>
-                    )}
+              {/* Date */}
+              <div className="flex items-center mt-4">
+                <div className="w-64">
+                  <label className="form-title">
+                  Date:
                   </label> 
                 </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {formatDate(today)}
+                </div>
+              </div>
 
-                {/* Check Area */}
-                <div className="pt-4 pl-4">
+              {/* Requesting Office/Division */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="form-title">
+                  Requesting Office/Division:
+                  </label> 
+                </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {reqOffice}
+                </div>
+              </div>
 
-                  {/* For MPH */}
-                  <div className="relative flex items-center font-roboto">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="mph-checkbox"
-                        type="checkbox"
-                        checked={mphCheck}
-                        onChange={(ev) => {
-                          const isChecked = ev.target.checked ? 1 : 0;
-                          handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck, setDormCheck);
-                          if (!ev.target.checked) {
-                            setCheckTable(false);
-                            setNoOfTable(null);
-                            setCheckChairs(false);
-                            setNoOfChairs(null);
-                            setCheckOther(false);
-                            setOtherField(null);
-                            setCheckMicrphone(false);
-                            setNoOfMicrophone(null);
-                            setCheckVideoke(false);
-                            setCheckSoundSystem(false);
-                            setCheckTelevision(false);
-                            setCheckLaptop(false);
-                            setCheckDocumentCamera(false);
-                            setCheckProjectorScreen(false);
-                            setCheckProjector(false);
-                          }
-                          setMphCheck(isChecked);
-                        }}
-                        className={`focus:ring-gray-400 h-6 w-6 ${!mphCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
-                        disabled={disableForm}
-                      />
+              {/* Title/Purpose of Activity */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="form-title">
+                  Title/Purpose of Activity:
+                  </label> 
+                </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {titleReq}
+                </div>
+              </div>
+
+              {/* Date and Time of Activity (Start) */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="form-title">
+                  Date and Time of Activity (Start):
+                  </label> 
+                </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {formatDate(DateStart)} @ {formatTime(timeStart)}
+                </div>
+              </div>
+
+              {/* Date and Time of Activity (End) */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="form-title">
+                  Date and Time of Activity (End):
+                  </label> 
+                </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {formatDate(DateEnd)} @ {formatTime(timeEnd)}
+                </div>
+              </div>
+
+              {/* Facility */}
+              <div className="flex items-center mt-2">
+                <div className="w-64">
+                  <label className="form-title">
+                  Facility:
+                  </label> 
+                </div>
+                <div className="w-1/2 ppa-form-preview">
+                  {mphCheck ? ("Multi-Purpose Hall"):null}
+                  {confCheck ? ("Conference Room"):null}
+                  {dormCheck ? ("Dormitory"):null}
+                  {otherCheck ? ("Others"):null}
+                </div>
+              </div>
+
+              {/* For Facility */}
+              {mphCheck || confCheck || otherCheck ? (
+                <div className="mt-8 border-t border-black">
+                  
+                  {/* Caption */}
+                  <div>
+                    <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
+                  </div>
+
+                  <div className="grid grid-cols-2">
+
+                    {/* Left */}
+                    <div className="col-span-1 ml-10">
+
+                      {/* Table */}
+                      <div className="mt-4">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkTable ? 'X':null}
+                          </div>
+                          <div className="w-12 ml-1 form-title">
+                            <span>Tables</span>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                            {NoOfTable ? NoOfTable : null} 
+                          </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Chair */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkChairs ? 'X':null}
+                          </div>
+                          <div className="w-12 ml-1 form-title">
+                            <span>Chairs</span>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                            {NoOfChairs ? NoOfChairs : null} 
+                          </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Projector */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkProjector ? 'X':null}
+                          </div>
+                          <div className="w-12 ml-1 form-title">
+                            <span>Projector</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Projector Screen */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkProjectorScreen ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Projector Screen</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Document Camera */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkDocumentCamera ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Document Camera</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="ml-3">
-                      <label htmlFor="rf_request" className="form-title-check">
-                        Multi-Purpose Hall (MPH)
-                      </label> 
+
+                    {/* Right */}
+                    <div className="col-span-1">
+
+                      {/* Laptop */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkLaptop ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Laptop</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Television */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkTelevision ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Television</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sound System */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkSoundSystem ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Sound System</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Videoke */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkVideoke ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Videoke</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Microphone */}
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          <div className="ppa-checklist">
+                          {checkMicrphone ? 'X':null}
+                          </div>
+                          <div className="w-22 ml-1 form-title">
+                            <span>Microphone</span>
+                          </div>
+                          <div className="w-30 ml-2">
+                          (No.<span className="border-b border-black px-5 font-bold text-center"> 
+                            {NoOfMicrophone ? NoOfMicrophone : null} 
+                          </span>)
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    
+                  </div>
+
+                  {/* Others */}
+                  <div className="mt-2 m-10">
+                    <div className="w-full">
+                      <div className="mt-1">
+                        <div className="flex items-center">
+                          <div className="w-12 ppa-checklist">
+                            {checkOther ? 'X':null}
+                          </div>
+                          <div className="w-12 ml-1 form-title">
+                            <span>Others</span>
+                          </div>
+                          <div className="w-1/2 h-6 border-b p-0 pl-2 border-black text-sm text-left ml-4 ">
+                          <span className=""> {OtherField ? OtherField : null} </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Conference Hall */}
-                  <div className="relative flex items-center font-roboto pt-4">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="conference-checkbox"
-                        type="checkbox"
-                        checked={confCheck}
-                        onChange={(ev) => {
-                          const isChecked = ev.target.checked ? 1 : 0;
-                          handleCheckboxChange(setConfCheck, ev.target.checked, setOtherCheck, setDormCheck, setMphCheck);
-                          if (!ev.target.checked) {
-                            setCheckTable(false);
-                            setNoOfTable(null);
-                            setCheckChairs(false);
-                            setNoOfChairs(null);
-                            setCheckOther(false);
-                            setOtherField(null);
-                            setCheckMicrphone(false);
-                            setNoOfMicrophone(null);
-                            setCheckVideoke(false);
-                            setCheckSoundSystem(false);
-                            setCheckTelevision(false);
-                            setCheckLaptop(false);
-                            setCheckDocumentCamera(false);
-                            setCheckProjectorScreen(false);
-                            setCheckProjector(false);
-                          }
-                          setConfCheck(isChecked);
-                        }}
-                        className={`focus:ring-gray-400 h-6 w-6 ${!confCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
-                        disabled={disableForm}
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="rf_request" className="form-title-check">
-                        Conference Hall
-                      </label> 
-                    </div>
+                </div>
+              ):null}
+
+              {/* For Dormitory */}
+              {dormCheck ? (
+                <div className="mt-8 border-t border-black">
+
+                  {/* Caption */}
+                  <div>
+                    <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Dormitory </h2>
                   </div>
 
-                  {/* Dormitory */}
-                  <div className="relative flex items-center font-roboto pt-4">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="dormitory-checkbox"
-                        type="checkbox"
-                        checked={dormCheck}
-                        onChange={(ev) => {
-                          const isChecked = ev.target.checked ? 1 : 0;
-                          handleCheckboxChange(setDormCheck, ev.target.checked, setOtherCheck, setMphCheck, setConfCheck);
-                          setDormCheck(isChecked);
-                        }}
-                        className={`focus:ring-gray-400 h-6 w-6 ${!dormCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
-                        disabled={disableForm}
-                      />
+                  <div className="grid grid-cols-2 gap-4">
+
+                    {/* For Male */}
+                    <div className="col-span-1">
+                      <div className="form-title mt-5">
+                        Male Guest:
+                      </div>
+                      <div className="w-3/4 p-2">
+                      {getMale?.trim() ? (
+                        getMale.split("\n").map((name, index) => (
+                          <div key={index} className="mt-2 flex">
+                            <span className="font-bold">{`${index + 1}.`}</span>
+                            <div className="w-full ppa-form-list ml-2 pl-1 h-6">
+                              {name}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="mt-2 text-gray-500 italic">No Male Guest</div>
+                      )}
+                      </div>
                     </div>
-                    <div className="ml-3">
-                      <label htmlFor="rf_request" className="form-title-check">
-                        Dormitory
-                      </label> 
+
+                    {/* For Female */}
+                    <div className="col-span-1">
+                      <div className="form-title mt-5">
+                        Female Guest:
+                      </div>
+                      <div className="w-3/4 p-2">
+                      {getFemale?.trim() ? (
+                        getFemale.split("\n").map((name, index) => (
+                          <div key={index} className="mt-2 flex">
+                            <span className="font-bold">{`${index + 1}.`}</span>
+                            <div className="w-full ppa-form-list ml-2 pl-1 h-6">
+                              {name}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="mt-2 text-gray-500 italic">No Female Guest</div>
+                      )}
+                      </div>
                     </div>
+
                   </div>
 
                   {/* Other */}
-                  <div className="relative flex items-center font-roboto pt-4">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="other-checkbox"
-                        type="checkbox"
-                        checked={otherCheck}
-                        onChange={(ev) => {
-                          const isChecked = ev.target.checked ? 1 : 0;
-                          handleCheckboxChange(setOtherCheck, ev.target.checked, setMphCheck, setConfCheck, setDormCheck);
-                          if (!ev.target.checked) {
-                            setCheckTable(false);
-                            setNoOfTable(null);
-                            setCheckChairs(false);
-                            setNoOfChairs(null);
-                            setCheckOther(false);
-                            setOtherField(null);
-                            setCheckMicrphone(false);
-                            setNoOfMicrophone(null);
-                            setCheckVideoke(false);
-                            setCheckSoundSystem(false);
-                            setCheckTelevision(false);
-                            setCheckLaptop(false);
-                            setCheckDocumentCamera(false);
-                            setCheckProjectorScreen(false);
-                            setCheckProjector(false);
-                          }
-                          setOtherCheck(isChecked);
-                        }}
-                        className={`focus:ring-gray-400 h-6 w-6 ${!otherCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
-                        disabled={disableForm}
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <label htmlFor="rf_request" className="form-title-check">
-                        Other
-                      </label> 
+                  <div className="mt-4 ml-16">
+                    <div className="flex">
+                      <div className="w-28 form-title">
+                        <span>Other Details:</span>
+                      </div>
+                      <div className="w-3/4 border-b border-black font-regular text-base text-left pl-2">
+                      {otherDetails}
+                      </div>
                     </div>
                   </div>
 
                 </div>
+              ):null}
 
-              </div>
-
-            </div>
-
-            {/* For MPH / Conference Room / Others */}
-            {enableFacility && (
-            <div className="px-4">
-              <div className="mt-8 border-t border-black">
-
-                {/* Caption */}
-                <div>
-                  <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
-                </div>
-
-                {/* Check Boxes */}
-                <div className="grid grid-cols-2">
-
-                  {/* 1st Column */}
-                  <div className="col-span-1">
-
-                    {/* Table */}
-                    <div className="relative flex items-center mt-4">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="mph-checktable"
-                          name="mph-checktable"
-                          type="checkbox"
-                          checked={checkTable}
-                          onChange={() => {
-                            setCheckTable(!checkTable);
-                            if (checkTable) {
-                              setNoOfTable('');
-                            }
-                          }}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                          Tables
-                        </label> 
-                      </div>
-                      {checkTable && (
-                        <div className="flex items-center w-32 ml-2">
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                            (No. 
-                          </label> 
-                          <input
-                            type="number"
-                            name="no-of-table"
-                            id="no-of-table"
-                            value={NoOfTable}
-                            onChange={handleInputTableChange}
-                            className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                          />
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                            ) 
-                          </label>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Chair */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="mph-checkchair"
-                          name="mph-checkchair"
-                          type="checkbox"
-                          checked={checkChairs}
-                          onChange={() => {
-                            setCheckChairs(!checkChairs);
-                            if (checkChairs) {
-                              setNoOfChairs('');
-                            }
-                          }}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                          Chair
-                        </label> 
-                      </div>
-                      {checkChairs && (
-                        <div className="flex items-center w-32 ml-2">
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                            (No. 
-                          </label> 
-                          <input
-                            type="number"
-                            name="no-of-chair"
-                            id="no-of-chair"
-                            value={NoOfChairs}
-                            onChange={handleInputChairChange}
-                            className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                          />
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                            ) 
-                          </label>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Projector */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkProjector}
-                          onChange={ev => setCheckProjector(!checkProjector)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Projector
-                        </label> 
-                      </div>
-                    </div>
-
-                    {/* Projector Screen */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkProjectorScreen}
-                          onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Projector Screen
-                        </label> 
-                      </div>
-                    </div>
-
-                    {/* Document Camera */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkDocumentCamera}
-                          onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Document Camera
-                        </label> 
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* 2nd Column */}
-                  <div className="col-span-1">
-
-                    {/* Laptop */}
-                    <div className="relative flex items-center mt-4">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkLaptop}
-                          onChange={ev => setCheckLaptop(!checkLaptop)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Laptop
-                        </label> 
-                      </div>
-                    </div>
-
-                    {/* Television */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkTelevision}
-                          onChange={ev => setCheckTelevision(!checkTelevision)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Television
-                        </label> 
-                      </div>
-                    </div>
-
-                    {/* Sound System */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkSoundSystem}
-                          onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Sound System
-                        </label> 
-                      </div>
-                    </div>
-
-                    {/* Videoke */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="other-checkbox"
-                          type="checkbox"
-                          checked={checkVideoke}
-                          onChange={ev => setCheckVideoke(!checkVideoke)}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Videoke
-                        </label> 
-                      </div>
-                    </div>
-                  
-                    {/* Microphone */}
-                    <div className="relative flex items-center mt-3">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="mph-checkmicrophone"
-                          name="mph-checkmicrophone"
-                          type="checkbox"
-                          checked={checkMicrphone}
-                          onChange={() => {
-                            setCheckMicrphone(!checkMicrphone);
-                            if (checkMicrphone) {
-                              setNoOfMicrophone('');
-                            }
-                          }}
-                          className={`focus:ring-gray-400 h-6 w-6 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <label htmlFor="rf_request" className="form-title-check">
-                        Microphone
-                        </label> 
-                      </div>
-                      {checkMicrphone && (
-                        <div className="flex items-center w-32 ml-2">
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
-                            (No. 
-                          </label> 
-                          <input
-                            type="number"
-                            name="no-of-microphone"
-                            id="no-of-microphone"
-                            value={NoOfMicrophone}
-                            onChange={handleInputMicrophoneChange}
-                            className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
-                          />
-                          <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
-                            ) 
-                          </label>
-                        </div>
-                      )}
-                    </div>
-
-                  </div>
-                  
-                </div>
-
-                {/* Other */}
-                <div className="relative flex items-center mt-3">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="mph-checkmicrophone"
-                      name="mph-checkmicrophone"
-                      type="checkbox"
-                      checked={checkOther}
-                      onChange={() => {
-                        setCheckOther(!checkOther);
-                      }}
-                      className={`focus:ring-gray-400 h-6 w-6 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <label htmlFor="rf_request" className="form-title-check">
-                    Others
-                    </label> 
-                  </div>
-                  {checkOther && (
-                    <div className="flex items-center w-full ml-2">
-                      <input
-                        type="text"
-                        name="other-specfic"
-                        id="other-specfic"
-                        placeholder="Please Specify"
-                        value={OtherField}
-                        onChange={ev => setOtherField(ev.target.value)}
-                        className="block w-3/4 border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900"
-                      />
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            </div>
-            )}
-
-            {/* For Dormitory */}
-            {enableDormitory && (
-            <div className="px-4">
-              <div className="mt-8 border-t border-black">
-
-                {/* Caption */}
-                <div>
-                  <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
-                </div>
-
-                {/* Form */}
-                <div className="grid grid-cols-2 gap-4">
-
-                  {/* Male */}
-                  <div className="col-span-1">
-                    <div className="mt-6">
-
-                      <div className="mb-4">
-                        <label htmlFor="type_of_property" className="form-title"> <strong>Input name of male guests:</strong> </label>
-                      </div>
-
-                      {/* Show on the Form */}
-                      <textarea
-                        id="dorm-male-list"
-                        name="dorm-male-list"
-                        rows={5}
-                        value={getMale}
-                        onChange={ev => setGetMale(ev.target.value)}
-                        style={{ resize: 'none' }}
-                        className="block w-10/12 ppa-form-field"
-                      />
-                      <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-
-                    </div>
-                  </div>
-
-                  {/* FeMale */}
-                  <div className="col-span-1">
-                    <div className="mt-6">
-
-                      <div className="mb-4">
-                        <label htmlFor="type_of_property" className="form-title"> <strong>Input name of female guests:</strong> </label>
-                      </div>
-
-                      {/* Show on the Form */}
-                      <textarea
-                        id="dorm-male-list"
-                        name="dorm-male-list"
-                        rows={5}
-                        value={getFemale}
-                        onChange={ev => setGetFemale(ev.target.value)}
-                        style={{ resize: 'none' }}
-                        className="block w-10/12 ppa-form-field"
-                      />
-                      <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
-
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* For Other */}
-                <div className="flex mt-10">
-                  <div className="w-40">
-                    <label htmlFor="recomendations" className="form-title">
-                      Other Details :
-                    </label>
-                  </div>
-                  <div className="w-3/4">
-                    <textarea
-                      id="recomendations"
-                      name="recomendations"
-                      rows={3}
-                      style={{ resize: "none" }}
-                      value={otherDetails}
-                      onChange={(ev) => setOtherDetails(ev.target.value)}
-                      className="block w-full ppa-form-field"
-                    />
-                    <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
-                  </div>  
-                </div>
-
-              </div>
-            </div>
-            )}
-
-            {/* For OPR */}
-            {(enableDormitory || enableFacility) && Admin && (
-              <div className="px-4">
+              {/* For OPR Instruction */}
+              {(enableDormitory || enableFacility) && Admin && (
                 <div className="mt-8 border-t border-black">
+
                   {/* Caption */}
                   <div>
-                    <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * OPR Instruction </h2>
+                    <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * OPR Instruction </h2>
                   </div>
 
-                  <div className="flex items-center mt-2 font-roboto">
-                    <div className="w-1/2">
-                      <textarea
-                        id="recomendations"
-                        name="recomendations"
-                        rows={3}
-                        style={{ resize: "none" }}
-                        value={oprInstruct}
-                        onChange={ev => setOprInstruct(ev.target.value)}
-                        className="block w-full ppa-form-field"
-                        placeholder="Input here"
-                        maxLength={255}
-                      />
-                    </div>
+                  <div className="w-1/2 ppa-form-box-view h-6 mt-4">
+                  {oprInstruct}
                   </div>
+
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Button */}
-            <div className="mt-10 pl-4 pb-4">
-              {disableForm ? (
+              {/* Button */}
+              <div className="mt-10 pb-4">
+              {!buttonHide && (
               <>
-                {/* Check Form */}
+                {/* Note */}
+                <p className="note-form mb-4"><span> Note: </span>The Date and Time of Activity (Start and End) will no longer be editable once submitted. Please make sure to verify and confirm the schedule before requesting a facility.</p>
+                {/* Submit */}
                 <button 
-                  onClick={handleConfirm} 
-                  className="py-2 px-4 text-base btn-default-form">
-                  Submit
-                </button>
-
-                {/* Cancel */}
-                <button onClick={handleCancel} className="ml-2 py-2 px-4 text-base btn-cancel-form">
-                  Cancel
-                </button>
-              </>
-              ):(
-              <>
-                {/* Check Availability */}
-                <button 
+                  // form="fac_submit"
                   type="submit"
-                  onClick={checkAvailability}
                   className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
@@ -1662,17 +837,847 @@ export default function FacilityVenueForm(){
                       <span className="ml-1">Loading</span>
                     </div>
                   ):(
-                    'Check Availability'
+                    'Confirm'
                   )}
                 </button>
+
+                {/* Cancel */}
+                {!submitLoading && (
+                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-base btn-cancel-form">
+                    Revise
+                  </button>
+                )}
               </>
               )}
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+        ):(
+        <div className="form-container">
+
+          {/* Title */}
+          <div className="px-4 pt-4">
+            <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
+            <p className="text-xs font-bold text-red-500">* - fields that need to be filled out</p>
+          </div>
+
+          {/* Form */}
+          <div className="grid grid-cols-2">
+
+            {/* 1st Column */}
+            <div className="col-span-1 px-4">
+
+              {/* Date */}
+              <div className="items-center mt-4">
+                <div className="w-40">
+                  <label htmlFor="rep_date" className="form-title"> 
+                    Date: 
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input 
+                    type="text" 
+                    name="rep_date" 
+                    id="rep_date" 
+                    value={formatDate(today)} 
+                    className="block w-full ppa-form-field"
+                    disabled
+                  />
+                </div>
+              </div>
+
+              {/* Requesting Office/Division */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Requesting Office/Division:
+                    {(!reqOffice && fieldMissing.request_office) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="rf_request"
+                    id="rf_request"
+                    autoComplete="rf_request"
+                    value={reqOffice}
+                    onChange={ev => setRegOffice(ev.target.value)}
+                    className={`block w-full ${(!reqOffice && fieldMissing.request_office) ? "ppa-form-error":"ppa-form-field"}`}
+                    maxLength={255}
+                  />
+                </div>
+              </div>
+
+              {/* Title/Purpose of Activity */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Title/Purpose of Activity:
+                    {(!titleReq && fieldMissing.title_of_activity) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="rep_title"
+                    id="rep_title"
+                    autoComplete="rep_title"
+                    value={titleReq}
+                    onChange={ev => setTitleReq(ev.target.value)}
+                    className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form-field"}`}
+                    maxLength={255}
+                  />
+                </div>
+              </div>
+
+              {/* Date Start */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Date of Activity (Start):
+                    {(!DateStart && fieldMissing.date_start) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="date"
+                    name="date_start"
+                    id="date_start"
+                    value={DateStart}
+                    onChange={ev => {
+                      setDateStart(ev.target.value);
+                      setDateEndMin(ev.target.value);
+                    }}
+                    min={today}
+                    className={`block w-full ${(!titleReq && fieldMissing.title_of_activity) ? "ppa-form-error":"ppa-form-field"}`}
+                    disabled={disableForm}
+                  />
+                </div>
+              </div>
+
+              {/* Date Start */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Time of Activity (Start):
+                    {(!timeStart && fieldMissing.time_start) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="time"
+                    name="time_start"
+                    id="time_start"
+                    value={timeStart}
+                    onChange={ev => setTimeStart(ev.target.value)}
+                    min={today}
+                    className={`block w-full ${(!timeStart && fieldMissing.time_start) ? "ppa-form-error":"ppa-form-field"}`}
+                    disabled={disableForm}
+                  />
+                </div>
+              </div>
+
+              {/* Date End */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Date of Activity (End):
+                    {(!DateEnd && fieldMissing.date_end) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="date"
+                    name="date_end"
+                    id="date_end"
+                    value={DateEnd}
+                    onChange={ev => {
+                      setDateEnd(ev.target.value);
+                      if (ev.target.value < DateStart) {
+                        // If DateEnd is before DateStart, set DateEnd to DateStart
+                        setDateEnd(DateStart);
+                      }
+                    }}
+                    min={DateEndMin}
+                    className={`block w-full ${(!DateEnd && fieldMissing.date_end) ? "ppa-form-error":"ppa-form-field"}`}
+                    disabled={disableForm}
+                  />
+                </div>
+              </div>
+
+              {/* Time End */}
+              <div className="items-center mt-4">
+                <div className="w-full">
+                  <label htmlFor="rep_description" className="flex form-title">
+                    Time of Activity (End):
+                    {(!timeEnd && fieldMissing.time_end) ? (
+                      <p className="form-validation">This form is required</p>
+                    ):( <p className="form-validation"> * </p> )}
+                  </label> 
+                </div>
+                <div className="w-full">
+                  <input
+                    type="time"
+                    name="time_end"
+                    id="time_end"
+                    value={timeEnd}
+                    onChange={ev => setTimeEnd(ev.target.value)}
+                    className={`block w-full ${(!timeEnd && fieldMissing.time_end) ? "ppa-form-error":"ppa-form-field"}`}
+                    disabled={disableForm}
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            {/* 2nd Column */}
+            <div className="col-span-1 px-4">
+              
+              {/* Checkbox */}
+              <div className="mt-6 font-roboto">
+                <label htmlFor="rf_request" className="flex form-title">
+                  Facilities / Venue being Requested :
+                  {(!mphCheck && !confCheck && !dormCheck && !otherCheck && checkFacility) ? (
+                    <p className="font-roboto form-validation mt-2">Don't forget this field!</p>
+                  ):( <p className="form-validation"> * </p> )}
+                </label> 
+              </div>
+
+              {/* Check Area */}
+              <div className="pt-4 pl-4">
+
+                {/* For MPH */}
+                <div className="relative flex items-center font-roboto">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="mph-checkbox"
+                      type="checkbox"
+                      checked={mphCheck}
+                      onChange={(ev) => {
+                        const isChecked = ev.target.checked ? 1 : 0;
+                        handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck, setDormCheck);
+                        if (!ev.target.checked) {
+                          setCheckTable(false);
+                          setNoOfTable(null);
+                          setCheckChairs(false);
+                          setNoOfChairs(null);
+                          setCheckOther(false);
+                          setOtherField(null);
+                          setCheckMicrphone(false);
+                          setNoOfMicrophone(null);
+                          setCheckVideoke(false);
+                          setCheckSoundSystem(false);
+                          setCheckTelevision(false);
+                          setCheckLaptop(false);
+                          setCheckDocumentCamera(false);
+                          setCheckProjectorScreen(false);
+                          setCheckProjector(false);
+                        }
+                        setMphCheck(isChecked);
+                      }}
+                      className={`focus:ring-gray-400 h-6 w-6 ${!mphCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
+                      disabled={disableForm}
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <label htmlFor="rf_request" className="form-title-check">
+                      Multi-Purpose Hall (MPH)
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Conference Hall */}
+                <div className="relative flex items-center font-roboto pt-4">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="conference-checkbox"
+                      type="checkbox"
+                      checked={confCheck}
+                      onChange={(ev) => {
+                        const isChecked = ev.target.checked ? 1 : 0;
+                        handleCheckboxChange(setConfCheck, ev.target.checked, setOtherCheck, setDormCheck, setMphCheck);
+                        if (!ev.target.checked) {
+                          setCheckTable(false);
+                          setNoOfTable(null);
+                          setCheckChairs(false);
+                          setNoOfChairs(null);
+                          setCheckOther(false);
+                          setOtherField(null);
+                          setCheckMicrphone(false);
+                          setNoOfMicrophone(null);
+                          setCheckVideoke(false);
+                          setCheckSoundSystem(false);
+                          setCheckTelevision(false);
+                          setCheckLaptop(false);
+                          setCheckDocumentCamera(false);
+                          setCheckProjectorScreen(false);
+                          setCheckProjector(false);
+                        }
+                        setConfCheck(isChecked);
+                      }}
+                      className={`focus:ring-gray-400 h-6 w-6 ${!confCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
+                      disabled={disableForm}
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <label htmlFor="rf_request" className="form-title-check">
+                      Conference Hall
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Dormitory */}
+                <div className="relative flex items-center font-roboto pt-4">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="dormitory-checkbox"
+                      type="checkbox"
+                      checked={dormCheck}
+                      onChange={(ev) => {
+                        const isChecked = ev.target.checked ? 1 : 0;
+                        handleCheckboxChange(setDormCheck, ev.target.checked, setOtherCheck, setMphCheck, setConfCheck);
+                        setDormCheck(isChecked);
+                      }}
+                      className={`focus:ring-gray-400 h-6 w-6 ${!dormCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
+                      disabled={disableForm}
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <label htmlFor="rf_request" className="form-title-check">
+                      Dormitory
+                    </label> 
+                  </div>
+                </div>
+
+                {/* Other */}
+                <div className="relative flex items-center font-roboto pt-4">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="other-checkbox"
+                      type="checkbox"
+                      checked={otherCheck}
+                      onChange={(ev) => {
+                        const isChecked = ev.target.checked ? 1 : 0;
+                        handleCheckboxChange(setOtherCheck, ev.target.checked, setMphCheck, setConfCheck, setDormCheck);
+                        if (!ev.target.checked) {
+                          setCheckTable(false);
+                          setNoOfTable(null);
+                          setCheckChairs(false);
+                          setNoOfChairs(null);
+                          setCheckOther(false);
+                          setOtherField(null);
+                          setCheckMicrphone(false);
+                          setNoOfMicrophone(null);
+                          setCheckVideoke(false);
+                          setCheckSoundSystem(false);
+                          setCheckTelevision(false);
+                          setCheckLaptop(false);
+                          setCheckDocumentCamera(false);
+                          setCheckProjectorScreen(false);
+                          setCheckProjector(false);
+                        }
+                        setOtherCheck(isChecked);
+                      }}
+                      className={`focus:ring-gray-400 h-6 w-6 ${!otherCheck ? 'text-indigo-600' : 'text-gray-400'} border-black-500 rounded`}
+                      disabled={disableForm}
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <label htmlFor="rf_request" className="form-title-check">
+                      Other
+                    </label> 
+                  </div>
+                </div>
+
+              </div>
+
             </div>
 
           </div>
+
+          {/* For MPH / Conference Room / Others */}
+          {enableFacility && (
+          <div className="px-4">
+            <div className="mt-8 border-t border-black">
+
+              {/* Caption */}
+              <div>
+                <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
+              </div>
+
+              {/* Check Boxes */}
+              <div className="grid grid-cols-2">
+
+                {/* 1st Column */}
+                <div className="col-span-1">
+
+                  {/* Table */}
+                  <div className="relative flex items-center mt-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="mph-checktable"
+                        name="mph-checktable"
+                        type="checkbox"
+                        checked={checkTable}
+                        onChange={() => {
+                          setCheckTable(!checkTable);
+                          if (checkTable) {
+                            setNoOfTable('');
+                          }
+                        }}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkTable ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                        Tables
+                      </label> 
+                    </div>
+                    {checkTable && (
+                      <div className="flex items-center w-32 ml-2">
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                          (No. 
+                        </label> 
+                        <input
+                          type="number"
+                          name="no-of-table"
+                          id="no-of-table"
+                          value={NoOfTable}
+                          onChange={handleInputTableChange}
+                          className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                        />
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                          ) 
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Chair */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="mph-checkchair"
+                        name="mph-checkchair"
+                        type="checkbox"
+                        checked={checkChairs}
+                        onChange={() => {
+                          setCheckChairs(!checkChairs);
+                          if (checkChairs) {
+                            setNoOfChairs('');
+                          }
+                        }}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkChairs ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                        Chair
+                      </label> 
+                    </div>
+                    {checkChairs && (
+                      <div className="flex items-center w-32 ml-2">
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                          (No. 
+                        </label> 
+                        <input
+                          type="number"
+                          name="no-of-chair"
+                          id="no-of-chair"
+                          value={NoOfChairs}
+                          onChange={handleInputChairChange}
+                          className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                        />
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                          ) 
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Projector */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkProjector}
+                        onChange={ev => setCheckProjector(!checkProjector)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkProjector ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Projector
+                      </label> 
+                    </div>
+                  </div>
+
+                  {/* Projector Screen */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkProjectorScreen}
+                        onChange={ev => setCheckProjectorScreen(!checkProjectorScreen)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkProjectorScreen ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Projector Screen
+                      </label> 
+                    </div>
+                  </div>
+
+                  {/* Document Camera */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkDocumentCamera}
+                        onChange={ev => setCheckDocumentCamera(!checkDocumentCamera)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkDocumentCamera ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Document Camera
+                      </label> 
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* 2nd Column */}
+                <div className="col-span-1">
+
+                  {/* Laptop */}
+                  <div className="relative flex items-center mt-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkLaptop}
+                        onChange={ev => setCheckLaptop(!checkLaptop)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkLaptop ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Laptop
+                      </label> 
+                    </div>
+                  </div>
+
+                  {/* Television */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkTelevision}
+                        onChange={ev => setCheckTelevision(!checkTelevision)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkTelevision ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Television
+                      </label> 
+                    </div>
+                  </div>
+
+                  {/* Sound System */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkSoundSystem}
+                        onChange={ev => setCheckSoundSystem(!checkSoundSystem)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkSoundSystem ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Sound System
+                      </label> 
+                    </div>
+                  </div>
+
+                  {/* Videoke */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="other-checkbox"
+                        type="checkbox"
+                        checked={checkVideoke}
+                        onChange={ev => setCheckVideoke(!checkVideoke)}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkVideoke ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Videoke
+                      </label> 
+                    </div>
+                  </div>
+                
+                  {/* Microphone */}
+                  <div className="relative flex items-center mt-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="mph-checkmicrophone"
+                        name="mph-checkmicrophone"
+                        type="checkbox"
+                        checked={checkMicrphone}
+                        onChange={() => {
+                          setCheckMicrphone(!checkMicrphone);
+                          if (checkMicrphone) {
+                            setNoOfMicrophone('');
+                          }
+                        }}
+                        className={`focus:ring-gray-400 h-6 w-6 ${checkMicrphone ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="rf_request" className="form-title-check">
+                      Microphone
+                      </label> 
+                    </div>
+                    {checkMicrphone && (
+                      <div className="flex items-center w-32 ml-2">
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900">
+                          (No. 
+                        </label> 
+                        <input
+                          type="number"
+                          name="no-of-microphone"
+                          id="no-of-microphone"
+                          value={NoOfMicrophone}
+                          onChange={handleInputMicrophoneChange}
+                          className="block w-full border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900 sm:max-w-xs sm:text-sm sm:leading-6"
+                        />
+                        <label htmlFor="rf_request" className="block text-base font-medium leading-6 text-gray-900 ml-1">
+                          ) 
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+                
+              </div>
+
+              {/* Other */}
+              <div className="relative flex items-center mt-3">
+                <div className="flex items-center h-5">
+                  <input
+                    id="mph-checkmicrophone"
+                    name="mph-checkmicrophone"
+                    type="checkbox"
+                    checked={checkOther}
+                    onChange={() => {
+                      setCheckOther(!checkOther);
+                    }}
+                    className={`focus:ring-gray-400 h-6 w-6 ${checkOther ? 'text-gray-400' : 'text-indigo-600'} border-black-500 rounded`}
+                  />
+                </div>
+                <div className="ml-3">
+                  <label htmlFor="rf_request" className="form-title-check">
+                  Others
+                  </label> 
+                </div>
+                {checkOther && (
+                  <div className="flex items-center w-full ml-2">
+                    <input
+                      type="text"
+                      name="other-specfic"
+                      id="other-specfic"
+                      placeholder="Please Specify"
+                      value={OtherField}
+                      onChange={ev => setOtherField(ev.target.value)}
+                      className="block w-3/4 border-l-0 border-t-0 border-r-0 ml-1 py-0 text-gray-900"
+                    />
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
           )}
 
+          {/* For Dormitory */}
+          {enableDormitory && (
+          <div className="px-4">
+            <div className="mt-8 border-t border-black">
+
+              {/* Caption */}
+              <div>
+                <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * For the Dormitory </h2>
+              </div>
+
+              {/* Form */}
+              <div className="grid grid-cols-2 gap-4">
+
+                {/* Male */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+
+                    <div className="mb-4">
+                      <label htmlFor="type_of_property" className="form-title"> <strong>Input name of male guests:</strong> </label>
+                    </div>
+
+                    {/* Show on the Form */}
+                    <textarea
+                      id="dorm-male-list"
+                      name="dorm-male-list"
+                      rows={5}
+                      value={getMale}
+                      onChange={ev => setGetMale(ev.target.value)}
+                      style={{ resize: 'none' }}
+                      className="block w-10/12 ppa-form-field"
+                    />
+                    <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+
+                  </div>
+                </div>
+
+                {/* FeMale */}
+                <div className="col-span-1">
+                  <div className="mt-6">
+
+                    <div className="mb-4">
+                      <label htmlFor="type_of_property" className="form-title"> <strong>Input name of female guests:</strong> </label>
+                    </div>
+
+                    {/* Show on the Form */}
+                    <textarea
+                      id="dorm-male-list"
+                      name="dorm-male-list"
+                      rows={5}
+                      value={getFemale}
+                      onChange={ev => setGetFemale(ev.target.value)}
+                      style={{ resize: 'none' }}
+                      className="block w-10/12 ppa-form-field"
+                    />
+                    <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
+
+                  </div>
+                </div>
+
+              </div>
+
+              {/* For Other */}
+              <div className="flex mt-10">
+                <div className="w-40">
+                  <label htmlFor="recomendations" className="form-title">
+                    Other Details :
+                  </label>
+                </div>
+                <div className="w-3/4">
+                  <textarea
+                    id="recomendations"
+                    name="recomendations"
+                    rows={3}
+                    style={{ resize: "none" }}
+                    value={otherDetails}
+                    onChange={(ev) => setOtherDetails(ev.target.value)}
+                    className="block w-full ppa-form-field"
+                  />
+                  <p className="text-red-500 text-xs mt-2">Leave blank if none</p>
+                </div>  
+              </div>
+
+            </div>
+          </div>
+          )}
+
+          {/* For OPR */}
+          {(enableDormitory || enableFacility) && Admin && (
+            <div className="px-4">
+              <div className="mt-8 border-t border-black">
+                {/* Caption */}
+                <div>
+                  <h2 className="pt-4 text-base font-bold leading-7 text-gray-900"> * OPR Instruction </h2>
+                </div>
+
+                <div className="flex items-center mt-2 font-roboto">
+                  <div className="w-1/2">
+                    <textarea
+                      id="recomendations"
+                      name="recomendations"
+                      rows={3}
+                      style={{ resize: "none" }}
+                      value={oprInstruct}
+                      onChange={ev => setOprInstruct(ev.target.value)}
+                      className="block w-full ppa-form-field"
+                      placeholder="Input here"
+                      maxLength={255}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Button */}
+          <div className="mt-10 pl-4 pb-4">
+            {disableForm ? (
+            <>
+              {/* Check Form */}
+              <button 
+                onClick={handleConfirm} 
+                className="py-2 px-4 text-base btn-default-form">
+                Submit
+              </button>
+
+              {/* Cancel */}
+              <button onClick={handleCancel} className="ml-2 py-2 px-4 text-base btn-cancel-form">
+                Cancel
+              </button>
+            </>
+            ):(
+            <>
+              {/* Check Availability */}
+              <button 
+                type="submit"
+                onClick={checkAvailability}
+                className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-1">Loading</span>
+                  </div>
+                ):(
+                  'Check Availability'
+                )}
+              </button>
+            </>
+            )}
+          </div>
+
         </div>
+        )}
 
       </div>
 

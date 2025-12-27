@@ -90,10 +90,6 @@ const TopNav = () =>{
     }
   },[currentUserId]);
 
-  const handleIconClick = () => {
-    // Reset the notification count
-    //setCount(null);
-  };
 
   // Click the notification
   const OpenLink = (id, redirect_id, type) => {
@@ -127,7 +123,7 @@ const TopNav = () =>{
 
               {/* Display number of Notification */}
               <div>
-                <Menu.Button className="notification-icon" onClick={handleIconClick}>
+                <Menu.Button className="notification-icon">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-7 w-7" aria-hidden="true" />

@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
   Route::get('/pendingrequestcount/{id}', [JOMSDashboardController::class, 'PendingRequestCount']);
   Route::get('/formtracking/{id}', [JOMSDashboardController::class, 'FormTracking']);
+  Route::get('/requestedpersonnel', [JOMSDashboardController::class, 'getPersonnelRequest']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -145,12 +146,12 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/getdriverdet', [VehicleSlipController::class, 'getDriverDetails']);
   Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
   Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
-  Route::put('/availvehicledriver/{id}', [VehicleSlipController::class, 'availableVehicleDriver']);
   Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
   Route::put('/notavailvehicle/{id}', [VehicleSlipController::class, 'notavailableVehicle']);
-  Route::put('/ontravelset/{id}', [VehicleSlipController::class, 'OnTravel']);
+  Route::put('/checktravelslip', [VehicleSlipController::class, 'CheckTravelSlip']);
   Route::put('/editvehicle/{id}', [VehicleSlipController::class, 'editVehicle']);
   Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
+  Route::get('/closevehicle/{id}', [VehicleSlipController::class, 'closeRequest']);
 });
 
 // --- Login --- //

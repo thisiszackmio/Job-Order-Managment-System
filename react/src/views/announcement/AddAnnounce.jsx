@@ -89,16 +89,21 @@ export default function AddAnnouncements(){
     <PageComponent title="Add Announcement">
       {/* Main Content */}
       {Authorize ? (
-        <div className="font-roboto ppa-form-box">
-          <div className="ppa-form-header"> Announcement Details </div>
-          <div style={{ padding: '6px 10px 50px 10px' }}>
+        <div className="ppa-widget mt-8">
+          <div className="flex justify-between items-center">
+            {/* Header */}
+            <div className="joms-user-info-header text-left"> 
+              Add Announcement Details
+            </div>
+          </div>
 
+          <div className="p-4">
             <form onSubmit={onSubmit}>
 
               {/* Date */}
-              <div className="flex items-center mt-6 ">
+              <div className="flex items-center">
                 <div className="w-40">
-                  <label htmlFor="rep_date" className="block text-base leading-6 text-black"> 
+                  <label htmlFor="rep_date" className="flex form-title"> 
                     Date: 
                   </label> 
                 </div>
@@ -108,7 +113,7 @@ export default function AddAnnouncements(){
                     name="rep_date" 
                     id="rep_date" 
                     defaultValue={today}
-                    className="block w-full ppa-form"
+                    className="block w-full ppa-form-field"
                     readOnly
                   />
                 </div>
@@ -117,7 +122,7 @@ export default function AddAnnouncements(){
               {/* Details */}
               <div className="flex items-center mt-4 ">
                 <div className="w-40">
-                  <label htmlFor="ppd_name" className="block text-base font-medium leading-6 text-black"> Details: </label> 
+                  <label htmlFor="ppd_name" className="flex form-title"> Details: </label> 
                 </div>
 
                 <div className="w-full flex">
@@ -130,7 +135,7 @@ export default function AddAnnouncements(){
                       value={details}
                       maxLength={maxCharacters}
                       style={{ resize: "none" }} 
-                      className="block w-full ppa-form"
+                      className="block w-full ppa-form-field"
                     />
                     <p className="text-sm text-gray-500"> {maxCharacters - details.length} characters remaining </p>
                     {!details && requiredField.details && (
@@ -141,7 +146,7 @@ export default function AddAnnouncements(){
               </div>  
 
               {/* Button */}
-              <div className="mt-10">
+              <div className="mt-6">
                 {/* Submit */}
                 <button 
                   type="submit"
@@ -160,7 +165,6 @@ export default function AddAnnouncements(){
               </div>
 
             </form>
-
           </div>
         </div>
       ):(

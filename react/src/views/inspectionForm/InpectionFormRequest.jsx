@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import submitAnimation from '/default/ring-loading.gif';
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
@@ -7,6 +8,8 @@ import Popup from "../../components/Popup";
 
 export default function RepairRequestForm(){
   const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
+
+  const navigate = useNavigate();
 
   // Date
   const today = new Date().toISOString().split('T')[0];
@@ -17,12 +20,6 @@ export default function RepairRequestForm(){
     const options = { month: 'long', day: 'numeric', year: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
-
-  const ucode = currentUserCode;
-  const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const PortManager = codes.includes("PM");
-  const DivisionManager = codes.includes("DM");
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -48,14 +45,6 @@ export default function RepairRequestForm(){
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const [supervisor, setSupervisor] = useState([]);
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Error</p>
-      <p className="popup-message">There was a problem, please contact the developer (IP phone: <b>4048</b>). (Error 500)</p>
-    </div>
-  );
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -129,7 +118,7 @@ export default function RepairRequestForm(){
       if(error.response.status === 500) {
         setShowPopup(true);
         setPopupContent('error');
-        setPopupMessage(DevErrorText);
+        setPopupMessage(error.response.status);
       }else{
         const responseErrors = error.response.data.errors;
         setInputErrors(responseErrors);
@@ -198,25 +187,33 @@ export default function RepairRequestForm(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.href = '/joms/myrequest';
+    navigate(`/joms/myrequest`);
   }
+
+  const ucode = currentUserCode;
+  const codes = ucode.split(',').map(code => code.trim());
+  const Admin = codes.includes("AM");
+  const PortManager = codes.includes("PM");
+  const DivisionManager = codes.includes("DM");
+  const SuperHacker = codes.includes("NERD");
+  const GSO = codes.includes("GSO");
 
   return (
     <PageComponent title="Request Form">
 
       {/* Form Content */}
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> 
+      <div className="ppa-widget mt-8">
+        <div className="joms-user-info-header text-left"> 
           Request for Pre/Post Inspection Repair
         </div>
 
-        <div className="ppa-widget">
+        <div className="pb-2">
           {confirmation ? (
           <div className="form-container">
             <form onSubmit={SubmitInspectionForm}>
 
                 {/* Title */}
-                <div className="pl-4 mt-6">
+                <div className="pl-4">
                   <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
                 </div>
 
@@ -362,14 +359,14 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Button */}
-                <div className="mt-10 pl-4 mb-6">
-
-                {Admin || DivisionManager || PortManager ? null : (
-                  <p className="note-form mb-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
-                )}
+                <div className="mt-5 pl-4 mb-6">
                 
                 {!buttonHide && (
                 <>
+                  {Admin || DivisionManager || PortManager || GSO || SuperHacker ? null : (
+                    <p className="note-form mb-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
+                  )}
+
                   {/* Submit */}
                   <button 
                     // form="fac_submit"
@@ -402,9 +399,9 @@ export default function RepairRequestForm(){
           ):(
           <div className="form-container">
             {/* Title */}
-            <div className="px-4 pt-4">
+            <div className="px-4">
               <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-              <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+              <p className="text-xs font-bold text-red-500">* - fields that need to be filled out</p>
             </div>
 
             {/* Form */}
@@ -571,9 +568,9 @@ export default function RepairRequestForm(){
                   <div className="w-full">
                     <label htmlFor="rep_type_of_property" className="flex form-title">
                       Type of Property:
-                      {!typeOfProperty && inputErrors.type_of_property && (
+                      {(!typeOfProperty && inputErrors.type_of_property) ? (
                         <p className="form-validation">This form is required</p>
-                      )}
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -600,9 +597,9 @@ export default function RepairRequestForm(){
                   <div className="w-full">
                     <label htmlFor="rep_description" className="flex form-title">
                       Description:
-                      {!propertyDescription && inputErrors.property_description && (
+                      {(!propertyDescription && inputErrors.property_description) ? (
                         <p className="form-validation">This form is required</p>
-                      )}
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -623,9 +620,9 @@ export default function RepairRequestForm(){
                   <div className="w-full">
                     <label htmlFor="rep_location" className="flex form-title">
                       Location (Div/Section/Unit):
-                      {!propertyLocation && inputErrors.location && (
+                      {(!propertyLocation && inputErrors.location) ? (
                         <p className="form-validation">This form is required</p>
-                      )}
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -646,9 +643,9 @@ export default function RepairRequestForm(){
                   <div className="w-full">
                     <label htmlFor="rep_complain" className="flex form-title">
                       Complain/Defect:
-                      {!ComplainDefect && inputErrors.complain && (
+                      {(!ComplainDefect && inputErrors.complain) ? (
                         <p className="form-validation">This form is required</p>
-                      )}
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -670,9 +667,9 @@ export default function RepairRequestForm(){
                     <div className="w-full">
                       <label htmlFor="rep_type_of_property" className="flex form-title">
                         Immediate Supervisor:
-                        {!selectedSupervisor.id && inputErrors.supervisor_id && (
+                        {(!selectedSupervisor.id && inputErrors.supervisor_id) ? (
                           <p className="form-validation">This form is required</p>
-                        )}
+                        ):( <p className="form-validation"> * </p> )}
                       </label> 
                     </div>
                     <div className="w-full">

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
 import submitAnimation from '/default/ring-loading.gif';
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
+import loading_table from "/default/ring-loading.gif";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus, faCheckToSlot, faXmark, faPenToSquare, faCheck, faUserAltSlash, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -329,240 +328,265 @@ export default function AddVehicleType(){
     <PageComponent title="Vehicle Information">
       {Access ? (
       <>
-        {/* Header */}
-        <div className="ppa-form-header text-base flex justify-between items-center">
-          <div>Vehicle List</div>
-          <div className="flex space-x-4">
-            {!addVehicle && <FontAwesomeIcon onClick={() => setAddVehicle(true)} className="icon-delete" title="Add Vehicle" icon={faPlus} />}
-          </div>
-        </div>
+        {/* List */}
+        {!addVehicle && (
+          <div className="ppa-widget mt-8">
+            <div className="flex justify-between items-center">
+              {/* Header */}
+              <div className="joms-user-info-header text-left"> 
+                Vehicle List
+              </div>
+              <div className="flex space-x-4 pt-8 pr-4"> 
+                {!addVehicle && <FontAwesomeIcon onClick={() => setAddVehicle(true)} className="icon-delete" title="Add Vehicle" icon={faPlus} />}
+              </div>
+            </div>
 
-        <div className="p-2 ppa-form-box">
-          {/* Table */}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Name</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Vehicle Plate</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">No of Usage</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-1 py-3 text-base text-center border-0 border-custom">
-                    <div className="flex justify-center items-center">
-                      <span className="loading-table">Fetching Data</span>
-                    </div>
-                  </td>
-                </tr>
-              ):(
-                vehicle && vehicle?.length > 0 ? (
-                  vehicle.map((veh, index) => (
-                    <tr key={index}>
-                      <td className="px-3 py-2 w-1/4 text-center text-base align-middle">
-                        {editingId === veh.vehicle_id ? (
-                          <div className="flex justify-center items-center">
-                            <input
-                              type="text"
-                              name="vehicle_name"
-                              id="vehicle_name"
-                              value={updateVehicleName}
-                              onChange={ev => setUpdateVehicleName(ev.target.value)}
-                              className="ppa-form w-3/4 text-center"
-                            />
-                          </div>
-                        ) : (
-                          veh.vehicle_name
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-center text-base align-middle">
-                        {editingId === veh.vehicle_id ? (
+            {/* Table */}
+            <div className="ppa-div-table p-4">
+              <table className="ppa-table w-full">
+                {/* Header */}
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Vehicle Name</th>
+                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Vehicle Plate</th>
+                    <th className="px-4 py-2 w-[20%] text-center ppa-table-header">No of Usage</th>
+                    <th className="px-4 py-2 w-[20%] text-center ppa-table-header">Status</th>
+                    <th className="px-4 py-2 w-[20%] text-center ppa-table-header">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={5} className="px-2 py-5 text-center ppa-table-body">
                         <div className="flex justify-center items-center">
-                          <input
-                            type="text"
-                            name="vehicle_name"
-                            id="vehicle_name"
-                            value={updateVehiclePlate}
-                            onChange={ev => setUpdateVehiclePlate(ev.target.value)}
-                            className="ppa-form w-3/4 text-center"
-                          />
-                        </div>
-                        ) : (
-                        veh.vehicle_plate
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-center text-base">{veh.vehicle_usage}</td>
-                      <td className="px-3 py-2 text-center text-base">
-                        <strong>{veh.vehicle_status == 3 ? (
-                          <p className="text-red-700">Not Available</p>
-                        ):veh.vehicle_status == 1 ? (
-                          <p className="text-red-700">On Travel</p>
-                        ):(
-                          <p className="text-black">Available</p>
-                        )}</strong>
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex justify-center items-center space-x-4">
-                          {editingId == veh.vehicle_id ? (
-                          <>
-                            {/* Save */}
-                            <FontAwesomeIcon
-                              onClick={() => handleUpdateVehicle(veh.vehicle_id)}
-                              className="icon-approve"
-                              title="Save Vehicle"
-                              icon={faCheck}
-                            />
-
-                            {/* Close */}
-                            <FontAwesomeIcon
-                              onClick={() => setEditingId(null)}
-                              className="icon-close"
-                              title="Close"
-                              icon={faXmark}
-                            />
-                          </>
-                          ):(
-                            veh.vehicle_status == 3 ? (
-                            <>
-                              {/* Set to Available */}
-                              <FontAwesomeIcon 
-                                onClick={() => editingId === null && handleSetAvailable(veh.vehicle_id, veh.vehicle_status)} 
-                                className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                title="Set Vehicle to Available" 
-                                icon={faUser} 
-                              />
-                            </>
-                            ):veh.vehicle_status == 1 ? (
-                            <>
-                              {/* Set to Available */}
-                              <FontAwesomeIcon 
-                                onClick={() => editingId === null && handleSetAvailable(veh.vehicle_id, veh.vehicle_status)} 
-                                className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                title="Vehicle Arrived" 
-                                icon={faUser} 
-                              />
-                            </>
-                            ):(
-                            <>
-                              {/* Edit Vehicle */}
-                              <FontAwesomeIcon
-                                onClick={() => editingId === null && handleEditClick(veh.vehicle_id)}
-                                className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                title="Edit Vehicle"
-                                icon={faPenToSquare}
-                              />
-
-                              {/* Set to Not Available */}
-                              <FontAwesomeIcon 
-                                onClick={() => editingId === null && handleNotAvailableConfirmation(veh.vehicle_id)} 
-                                className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                title="Set Vehicle to Not Available" 
-                                icon={faUserAltSlash} 
-                              />
-
-                              {/* Delete */}
-                              <FontAwesomeIcon
-                                onClick={() => editingId === null && handleRemovalConfirmation(veh.vehicle_id)}
-                                className={`icon-remove ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                title="Remove Vehicle"
-                                icon={faTrash}
-                              />
-                            </>
-                            )
-                          )}
+                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                          <span className="loading-table">Loading</span>
                         </div>
                       </td>
                     </tr>
-                  ))
-                ):(
-                  <tr>
-                  <td colSpan={5} className="px-2 py-2 text-center text-sm text-gray-600">
-                    No records found.
-                  </td>
-                </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
+                  ):(
+                    vehicle && vehicle?.length > 0 ? (
+                      vehicle.map((veh, index) => (
+                        <tr key={index}>
+                          <td className="px-4 py-4 text-left ppa-table-body">
+                            {editingId === veh.vehicle_id ? (
+                              <div className="flex">
+                                <input
+                                  type="text"
+                                  name="vehicle_name"
+                                  id="vehicle_name"
+                                  value={updateVehicleName}
+                                  onChange={ev => setUpdateVehicleName(ev.target.value)}
+                                  className="ppa-form-field w-full"
+                                />
+                              </div>
+                            ) : (
+                              veh.vehicle_name
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-left ppa-table-body">
+                            {editingId === veh.vehicle_id ? (
+                            <div className="flex">
+                              <input
+                                type="text"
+                                name="vehicle_name"
+                                id="vehicle_name"
+                                value={updateVehiclePlate}
+                                onChange={ev => setUpdateVehiclePlate(ev.target.value)}
+                                className="ppa-form-field w-full"
+                              />
+                            </div>
+                            ) : (
+                            veh.vehicle_plate
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-center ppa-table-body">{veh.vehicle_usage}</td>
+                          <td className="px-4 py-4 text-center ppa-table-body">
+                            <strong>{veh.vehicle_status == 3 ? (
+                              <p className="text-red-700">Not Available</p>
+                            ):veh.vehicle_status == 1 ? (
+                              <p className="text-red-700">On Travel</p>
+                            ):(
+                              <p className="text-black">Available</p>
+                            )}</strong>
+                          </td>
+                          <td className="px-4 py-4 text-center ppa-table-body">
+                            <div className="flex justify-center items-center space-x-4">
+                              {editingId == veh.vehicle_id ? (
+                                submitLoading ? (
+                                  <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                                ):(
+                                <>
+                                  {/* Save */}
+                                  <FontAwesomeIcon
+                                    onClick={() => handleUpdateVehicle(veh.vehicle_id)}
+                                    className="icon-approve"
+                                    title="Save Vehicle"
+                                    icon={faCheck}
+                                  />
 
+                                  {/* Close */}
+                                  <FontAwesomeIcon
+                                    onClick={() => setEditingId(null)}
+                                    className="icon-close"
+                                    title="Close"
+                                    icon={faXmark}
+                                  />
+                                </>
+                                )
+                              ):(
+                                veh.vehicle_status == 3 ? (
+                                <>
+                                  {/* Set to Available */}
+                                  <FontAwesomeIcon 
+                                    onClick={() => editingId === null && handleSetAvailable(veh.vehicle_id, veh.vehicle_status)} 
+                                    className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                    title="Set Vehicle to Available" 
+                                    icon={faUser} 
+                                  />
+                                </>
+                                ):veh.vehicle_status == 1 ? (
+                                <>
+                                  {/* Set to Available */}
+                                  <FontAwesomeIcon 
+                                    onClick={() => editingId === null && handleSetAvailable(veh.vehicle_id, veh.vehicle_status)} 
+                                    className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                    title="Vehicle Arrived" 
+                                    icon={faUser} 
+                                  />
+                                </>
+                                ):(
+                                <>
+                                  {/* Edit Vehicle */}
+                                  <FontAwesomeIcon
+                                    onClick={() => editingId === null && handleEditClick(veh.vehicle_id)}
+                                    className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                    title="Edit Vehicle"
+                                    icon={faPenToSquare}
+                                  />
+
+                                  {/* Set to Not Available */}
+                                  <FontAwesomeIcon 
+                                    onClick={() => editingId === null && handleNotAvailableConfirmation(veh.vehicle_id)} 
+                                    className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                    title="Set Vehicle to Not Available" 
+                                    icon={faUserAltSlash} 
+                                  />
+
+                                  {/* Delete */}
+                                  <FontAwesomeIcon
+                                    onClick={() => editingId === null && handleRemovalConfirmation(veh.vehicle_id)}
+                                    className={`icon-remove ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                    title="Remove Vehicle"
+                                    icon={faTrash}
+                                  />
+                                </>
+                                )
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ):(
+                      <tr>
+                        <td colSpan={5} className="px-2 py-5 text-center ppa-table-body">
+                          <div className="flex justify-center items-center w-full font-bold">
+                            No records found
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+        )}
+
+        {/* Add Vehicle */}
         {addVehicle && (
-        <>
-          <div className="ppa-form-header text-base flex justify-between items-center mt-6">
-            <div>Add Vehicle</div>
-            <div className="flex space-x-4">
-              <FontAwesomeIcon onClick={() => {
-                setAddVehicle(false);
-                setVehicleName('');
-                setVehiclePlate('');
-              }} className="icon-delete" title="Close" icon={faXmark} />
+          <div className="ppa-widget mt-8">
+            <div className="flex justify-between items-center">
+              {/* Header */}
+              <div className="joms-user-info-header text-left"> 
+                Add Vehicle
+              </div>
+              <div className="flex space-x-4 pt-8 pr-4"> 
+                <FontAwesomeIcon onClick={() => {
+                  setAddVehicle(false);
+                  setVehicleName('');
+                  setVehiclePlate('');
+                }} className="icon-delete" title="Close" icon={faXmark} />
+              </div>
+            </div>
+            
+            <div className="p-4 ppa-form-box mb-5 w-1/2">
+              <form id="submitVehicle" onSubmit={GetVehicleDetails}>
+
+                {/* Vehicle Name */}
+                <div className="items-center">
+                  <div className="w-40">
+                    <label htmlFor="rep_date" className="form-title"> 
+                      Vehicle Name: 
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <input
+                      type="text"
+                      name="vehicle_name"
+                      id="vehicle_name"
+                      value={vehicleName}
+                      onChange={ev => setVehicleName(ev.target.value)}
+                      className="block w-full ppa-form-field"
+                    />
+                  </div>
+                </div>
+
+                {/* Vehicle Name */}
+                <div className="items-center mt-6">
+                  <div className="w-40">
+                    <label htmlFor="rep_date" className="form-title"> 
+                      Vehicle Plate: 
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <input
+                      type="text"
+                      name="vehicle_plate"
+                      id="vehicle_plate"
+                      autoComplete="rep_property_no"
+                      value={vehiclePlate}
+                      onChange={ev => setVehiclePlate(ev.target.value)}
+                      className="block w-full ppa-form-field"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="mt-6">
+                  {vehicleName && vehiclePlate && (
+                    <button 
+                      type="submit"
+                      form="submitVehicle"
+                      className={`py-1.5 px-3 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                      disabled={submitLoading}
+                    >
+                    {submitLoading ? (
+                      <div className="flex">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-1">Loading</span>
+                      </div>
+                    ):(
+                    'Submit'
+                    )}
+                    </button>
+                  )}
+                </div>
+
+              </form>
             </div>
           </div>
-
-          <div className="p-2 ppa-form-box mb-5">
-            <form id="submitVehicle" onSubmit={GetVehicleDetails}>
-              {/* Form */}
-              <div className="flex items-center">
-
-                  {/* Vehicle Name */}
-                  <div className="flex items-center">
-                    <div className="w-40">
-                      <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black"> Vehicle Name: </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="vehicle_name"
-                        id="vehicle_name"
-                        value={vehicleName}
-                        onChange={ev => setVehicleName(ev.target.value)}
-                        className="block w-full ppa-form"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Vehicle Plate */}
-                  <div className="flex items-center">
-                    <div className="w-40">
-                      <label htmlFor="rep_property_no" className="block text-base font-medium leading-6 text-black"> Vehicle Plate: </label> 
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        type="text"
-                        name="vehicle_plate"
-                        id="vehicle_plate"
-                        autoComplete="rep_property_no"
-                        value={vehiclePlate}
-                        onChange={ev => setVehiclePlate(ev.target.value)}
-                        className="block w-full ppa-form"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Button */}
-                  <button 
-                    type="submit"
-                    form="submitVehicle"
-                    className={`ml-3 py-1.5 px-3 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                    disabled={submitLoading}
-                  >
-                  {submitLoading ? (
-                    <div className="flex">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-1">Loading</span>
-                    </div>
-                  ):(
-                  'Submit'
-                  )}
-                  </button>
-
-              </div>
-            </form>
-          </div>
-        </>
         )}
       </>
       ):(

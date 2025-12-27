@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
+import loading_table from "/default/ring-loading.gif";
 import submitAnimation from '/default/ring-loading.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -280,157 +281,190 @@ export default function AddPersonnel(){
     <PageComponent title="Personnel">
       {Access ? (
       <>
-      
-        {/* For the Personnel List */}
-        <div className="ppa-form-header text-base flex justify-between items-center">
-          <div>Personnel List</div>
-          <div className="flex space-x-4"> 
-            {!addPersonnel && (
-              <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
-            )}
-          </div>
-        </div>
+        {/* List */}
+        {!addPersonnel && (
+          <div className="ppa-widget mt-8">
+            <div className="flex justify-between items-center">
+              {/* Header */}
+              <div className="joms-user-info-header text-left"> 
+                Personnel List
+              </div>
+              <div className="flex space-x-4 pt-8 pr-4"> 
+                {!addPersonnel && (
+                  <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
+                )}
+              </div>
+            </div>
 
-        {/* For the Personnel List */}
-        <div className="p-2 ppa-form-box">
-          {/* Table */}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-3 py-2 text-left text-sm font-medium text-gray-600 uppercase">Name</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Assignment</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
-                <th className="px-3 py-2 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-              {loading ? (
-                <tr>
-                  <td colSpan={4} className="px-1 py-3 text-base text-center border-0 border-custom">
-                    <div className="flex justify-center items-center">
-                      <span className="loading-table">Fetching Data</span>
-                    </div>
-                  </td>
-                </tr>
-              ):(
-                personnelList.map.length > 0 ? (
-                  personnelList.map(staffList => (
-                    <tr key={staffList.personnel_id}>
-                      <td className="px-3 py-2 w-1/4 text-left table-font">{staffList.personnel_name}</td>
-                      <td className="px-3 py-2 text-center table-font">{staffList.assignment}</td>
-                      <td className="px-3 py-2 text-center table-font">
-                        <strong>{staffList.status == 3 ? (
-                          <p className="text-red-700">Not Available</p>
-                          ):staffList.status == 1 ? (
-                            <p className="text-red-700">On Travel</p>
-                          ):(
-                            <p className="text-black">Available</p>
-                          )}</strong>
-                      </td>
-                      <td className="px-3 py-2 text-center table-font">
-                        {staffList.status == 3 ? (
-                          <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Set Personnel to Available" icon={faUser} />
-                        ):staffList.status == 1 ? (
-                          <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Personnel Arrrived" icon={faHouse} />
-                        ):(
-                        <>
-                          <FontAwesomeIcon onClick={() => handleNotAvailableConfirmation(staffList.personnel_id)} className="icon-avail mr-4" title="Set Personnel to Not Available" icon={faUserAltSlash} />
-                          <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" title="Removel Personnel" icon={faTrash} />
-                        </>
-                        )}
+            {/* Table */}
+            <div className="ppa-div-table p-4">
+              <table className="ppa-table w-full">
+                {/* Header */}
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 w-[25%] text-left ppa-table-header">Name</th>
+                    <th className="px-4 py-2 w-[25%] text-left ppa-table-header">Assignment</th>
+                    <th className="px-4 py-2 w-[25%] text-center ppa-table-header">Status</th>
+                    <th className="px-4 py-2 w-[25%] text-center ppa-table-header">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={4} className="px-2 py-5 text-center ppa-table-body">
+                        <div className="flex justify-center items-center">
+                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                          <span className="loading-table">Loading</span>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                ):(
-                  <tr>
-                    <td colSpan={4} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* For Adding Personnel */}
-        {addPersonnel && (
-        <>
-          <div className="ppa-form-header text-base flex justify-between items-center mt-4">
-            <div>Assign Personnel</div>
-            <div className="flex space-x-4">
-              <FontAwesomeIcon onClick={() => {
-                SetAddPersonnel(false);
-                setSelectPersonnel({ id: '', name: '' });
-                setPersonnelCategory('');
-              }} className="icon-delete" title="Close" icon={faXmark} />
+                  ):(
+                    personnelList.map.length > 0 ? (
+                      personnelList.map(staffList => (
+                        <tr key={staffList.personnel_id}>
+                          <td className="px-4 py-4 text-left ppa-table-body">{staffList.personnel_name}</td>
+                          <td className="px-4 py-4 text-left ppa-table-body">{staffList.assignment}</td>
+                          <td className="px-4 py-4 text-center ppa-table-body">
+                            <strong>{staffList.status == 3 ? (
+                              <p className="text-red-700">Not Available</p>
+                              ):staffList.status == 1 ? (
+                                <p className="text-red-700">On Travel</p>
+                              ):(
+                                <p className="text-black">Available</p>
+                              )}</strong>
+                          </td>
+                          <td className="px-4 py-4 text-center ppa-table-body">
+                            {staffList.status == 3 ? (
+                              <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Set Personnel to Available" icon={faUser} />
+                            ):staffList.status == 1 ? (
+                              <FontAwesomeIcon onClick={() => handleAvailableConfirmation(staffList.personnel_id, staffList.status)} className="icon-avail mr-4" title="Personnel Arrrived" icon={faHouse} />
+                            ):(
+                            <>
+                              <FontAwesomeIcon onClick={() => handleNotAvailableConfirmation(staffList.personnel_id)} className="icon-avail mr-4" title="Set Personnel to Not Available" icon={faUserAltSlash} />
+                              <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" title="Removel Personnel" icon={faTrash} />
+                            </>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ):(
+                      <tr>
+                        <td colSpan={4} className="px-2 py-5 text-center ppa-table-body">
+                          <div className="flex justify-center items-center w-full font-bold">
+                            No records found
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
             </div>
+            
           </div>
-          <div className="p-2 ppa-form-box mb-5">
-            <form onSubmit={submitPersonnel}>
-              <div className="flex items-center">
-
-                {/* Select Personnnel */}
-                <select 
-                  name="personnel" 
-                  id="personnel" 
-                  value={selectPersonnel.id}
-                  onChange={ev => {
-                    const selectedId = parseInt(ev.target.value);
-                    const selectedPersonnel = personnel.find(staff => staff.id === selectedId);
-                    
-                    setSelectPersonnel(selectedPersonnel ? { id: selectedPersonnel.id, name: selectedPersonnel.name } : { id: '', name: '' });
-                  }}
-                  className="block w-2/5 ppa-form"
-                >
-                  <option value="" disabled>Select a Personnel</option>
-                  {personnel.map(staff => (
-                    <option key={staff.id} value={staff.id}>{staff.name}</option>
-                  ))}
-                </select>
-
-                {/* Select Personnnel */}
-                <select 
-                  name="personnel_category" 
-                  id="personnel_category" 
-                  value={personnelCategory}
-                  onChange={ev => {
-                    setPersonnelCategory(ev.target.value);
-                  }}
-                  className="block w-2/5 ppa-form ml-4"
-                >
-                  <option value="" disabled>Select an Assignment </option>
-                  <option value="Driver/Mechanic">Driver/Mechanic</option>
-                  <option value="IT Service">IT Service</option>
-                  <option value="Janitorial Service">Janitorial Service</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Electrical Works">Electrical Works</option>
-                  <option value="Watering Services">Watering Services</option>
-                  <option value="Engeneering Services">Engeneering Services</option>
-                </select>
-
-                {/* Submit */}
-                <button 
-                  type="submit"
-                  className={`ml-3 py-2 px-3 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                  disabled={submitLoading || !selectPersonnel.id || !personnelCategory}
-                >
-                {submitLoading ? (
-                  <div className="flex">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-2">Loading</span>
-                  </div>
-                ):(
-                'Submit'
-                )}
-                </button>
-
-              </div>
-            </form>
-          </div>
-        </>
         )}
 
+        {/* Add Personnl */}
+        {addPersonnel && (
+          <div className="ppa-widget mt-8">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <div className="joms-user-info-header text-left"> 
+                Add Personnel
+              </div>
+              <div className="flex space-x-4 pt-8 pr-4"> 
+                <FontAwesomeIcon onClick={() => {
+                  SetAddPersonnel(false);
+                  setSelectPersonnel({ id: '', name: '' });
+                  setPersonnelCategory('');
+                }} className="icon-delete" title="Close" icon={faXmark} />
+              </div>
+            </div>
+
+            <div className="p-4 ppa-form-box mb-5 w-1/2">
+              <form onSubmit={submitPersonnel}>
+                {/* Select Personnnel */}
+                <div className="items-center">
+                  <div className="w-40">
+                    <label htmlFor="rep_date" className="form-title"> 
+                      Select Personnel: 
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <select 
+                      name="personnel" 
+                      id="personnel" 
+                      value={selectPersonnel.id}
+                      onChange={ev => {
+                        const selectedId = parseInt(ev.target.value);
+                        const selectedPersonnel = personnel.find(staff => staff.id === selectedId);
+                        
+                        setSelectPersonnel(selectedPersonnel ? { id: selectedPersonnel.id, name: selectedPersonnel.name } : { id: '', name: '' });
+                      }}
+                      className="block w-full ppa-form-field"
+                    >
+                      <option value="" disabled> -- </option>
+                      {personnel.map(staff => (
+                        <option key={staff.id} value={staff.id}>{staff.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Select Assignment */}
+                <div className="items-center mt-6">
+                  <div className="w-40">
+                    <label htmlFor="rep_date" className="form-title"> 
+                      Select Assignment: 
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <select 
+                      name="personnel_category" 
+                      id="personnel_category" 
+                      value={personnelCategory}
+                      onChange={ev => {
+                        setPersonnelCategory(ev.target.value);
+                      }}
+                      className="block w-full ppa-form-field"
+                    >
+                      <option value="" disabled> -- </option>
+                      <option value="Driver/Mechanic">Driver/Mechanic</option>
+                      <option value="IT Service">IT Service</option>
+                      <option value="Janitorial Service">Janitorial Service</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Electrical Works">Electrical Works</option>
+                      <option value="Watering Services">Watering Services</option>
+                      <option value="Engeneering Services">Engeneering Services</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="mt-6">
+                  {selectPersonnel && personnelCategory && (
+                    <button 
+                      type="submit"
+                      className={`py-2 px-3 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                      disabled={submitLoading || !selectPersonnel.id || !personnelCategory}
+                    >
+                    {submitLoading ? (
+                      <div className="flex">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-2">Loading</span>
+                      </div>
+                    ):(
+                    'Submit'
+                    )}
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+            
+          </div>
+        )}
+        
       </>
       ):(
         <Restrict />

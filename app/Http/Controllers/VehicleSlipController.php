@@ -162,7 +162,7 @@ class VehicleSlipController extends Controller
             'passengers' => 'required|string',
             'place_visited' => 'required|string',
             'date_arrival' => 'required|date',
-            'time_arrival' => 'required|date_format:H:i:s',
+            'time_arrival' => 'required|date_format:H:i',
             'vehicle_type' => 'nullable|string',
             'driver_id' => 'nullable|numeric',
             'driver' => 'nullable|string',
@@ -175,43 +175,39 @@ class VehicleSlipController extends Controller
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($VehicleSlipData->admin_approval === 0 || $VehicleSlipData->admin_approval === 1) {
-            return response()->json(['message' => 'Request is already close'], 201);
+        $updateVehicleSlip = $VehicleSlipData->update([
+            'purpose' => $updateVehicleInfo['purpose'],
+            'passengers' => $updateVehicleInfo['passengers'],
+            'place_visited' => $updateVehicleInfo['place_visited'],
+            'date_arrival' => $updateVehicleInfo['date_arrival'],
+            'time_arrival' => $updateVehicleInfo['time_arrival'],
+            'vehicle_type' => $updateVehicleInfo['vehicle_type'],
+            'driver_id' => $updateVehicleInfo['driver_id'],
+            'driver' => $updateVehicleInfo['driver'],
+            'notes' => $updateVehicleInfo['notes'],
+        ]);
+
+        if($updateVehicleSlip){
+
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $VehicleSlipData->id;
+            $track->type_of_request = 'Vehicle';
+            $track->remarks = $request->input('authority').' updated the form.';
+            $track->save();
+
+            // Logs
+            $logs = new LogsModel();
+            $logs->category = 'FORM';
+            $logs->message = $request->input('authority')." has updated ".$VehicleSlipData->user_name."'s request on Vehicle Slip No.".$VehicleSlipData->id.".";
+            $logs->save();
+
+            return response()->json(['message' => 'User details updated successfully.'], 200);
         } else {
-
-            $updateVehicleSlip = $VehicleSlipData->update([
-                'purpose' => $updateVehicleInfo['purpose'],
-                'passengers' => $updateVehicleInfo['passengers'],
-                'place_visited' => $updateVehicleInfo['place_visited'],
-                'date_arrival' => $updateVehicleInfo['date_arrival'],
-                'time_arrival' => $updateVehicleInfo['time_arrival'],
-                'vehicle_type' => $updateVehicleInfo['vehicle_type'],
-                'driver_id' => $updateVehicleInfo['driver_id'],
-                'driver' => $updateVehicleInfo['driver'],
-                'notes' => $updateVehicleInfo['notes'],
-            ]);
-
-            if($updateVehicleSlip){
-
-                // Add to the Trackers
-                $track = new FormTracker();
-                $track->form_id = $VehicleSlipData->id;
-                $track->type_of_request = 'Vehicle';
-                $track->remarks = $request->input('authority').' updated the form.';
-                $track->save();
-
-                // Logs
-                $logs = new LogsModel();
-                $logs->category = 'FORM';
-                $logs->message = $request->input('authority')." has updated ".$VehicleSlipData->user_name."'s request on Vehicle Slip No.".$VehicleSlipData->id.".";
-                $logs->save();
-
-                return response()->json(['message' => 'User details updated successfully.'], 200);
-            } else {
-                return response()->json(['error' => 'There area some missing.'], 406);
-            }
-
+            return response()->json(['error' => 'There area some missing.'], 406);
         }
+
+
     }
 
     /**
@@ -281,7 +277,13 @@ class VehicleSlipController extends Controller
         ? $rootUrl . '/storage/displayesig/' . $DriverAssign->esign 
         : null;
 
+        // Prev & Next IDs
+        $prevId = VehicleSlipModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
+        $nextId = VehicleSlipModel::where('id', '>', $id)->orderBy('id', 'asc')->value('id');
+
         $respondData = [
+            'next' => $nextId,
+            'prev' => $prevId,
             'form' => $VehicleSlipForm,
             'pmId' => $PMId,
             'pmName' => $PMName,
@@ -625,83 +627,6 @@ class VehicleSlipController extends Controller
     }
 
     /**
-     *  Activate On-Travel on assigned Driver and Vehicle
-     */
-    public function OnTravel($id){
-        $today = Carbon::now();
-        $dateNow = Carbon::now()->toDateString();
-
-        $VehicleDataRequest = VehicleSlipModel::where('date_arrival', '<=', $dateNow)
-            ->whereIn('admin_approval', [2, 1])
-            ->orderBy('date_arrival', 'desc')
-            ->get();
-
-        if ($VehicleDataRequest->isEmpty()) {
-            return response()->json(['message' => 'No Vehicle Travel Yet'], 201);
-        } else {
-            $employee = PPAEmployee::find($id);
-            $clearances = array_map('trim', explode(',', $employee->code_clearance));
-
-            foreach ($VehicleDataRequest as $slip) {
-                if ($slip->user_id == $employee->id || in_array('GSO', $clearances) || in_array('AM', $clearances) || in_array('NERD', $clearances)) {
-                    if (preg_match('/^(.*?)\s*\((.*?)\)$/', $slip->vehicle_type, $matches)) {
-                        $vehicleName = trim($matches[1]);
-                        $plateNumber = trim($matches[2]);
-                    } else {
-                        $vehicleName = $slip->vehicle_type;
-                        $plateNumber = null;
-                    }
-
-                    // Combine arrival date & time
-                    $arrivalDateTime = Carbon::createFromFormat('Y-m-d H:i:s', "{$slip->date_arrival} {$slip->time_arrival}");
-
-                    // -- Vehicle -- //
-                    $vehicleReq = VehicleTypeModel::where('vehicle_name', $vehicleName)->where('vehicle_plate', $plateNumber)->first();
-
-                    // Check if the vehicle is available
-                    if($vehicleReq && $vehicleReq->status == 0){
-                        $vehicleReq->update([
-                            'status' => 1,
-                            'date_used' => $today->toDateString(),
-                        ]);
-                    }
-
-                    if($vehicleReq && $vehicleReq->status == 1 || $vehicleReq->status == 2){
-                        if ($arrivalDateTime->lessThanOrEqualTo($today)) {
-                            $vehicleReq->update([
-                                'status' => 0,
-                                'date_used' => null,
-                            ]);
-                        }
-                    }
-
-                    // -- Driver -- //
-                    $driverReq = AssignPersonnelModel::where('personnel_id', $slip->driver_id)->first();
-
-                    // Check if the driver is available
-                    if($driverReq && $driverReq->status == 0){
-                        $driverReq->update([
-                            'status' => 1,
-                            'date_assigned' => $today->toDateString(),
-                        ]);
-                    }
-
-                    if($driverReq && $driverReq->status == 1 || $driverReq->status == 2){
-                        if ($arrivalDateTime->lessThanOrEqualTo($today)) {
-                            $driverReq->update([
-                                'status' => 0,
-                                'date_assigned' => null,
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            return response()->json(['message' => 'Vehicle and Driver Updated'], 200);
-        }
-    }
-
-    /**
      *  Admin Manager and Port Manager Decline and Reason
      */
     public function submitAdminDeclineRequest(Request $request, $id){
@@ -906,15 +831,15 @@ class VehicleSlipController extends Controller
      */
     public function getVehicleDetails(Request $request){
 
-        $date = $request->query('date');
-        $time = $request->query('time');
+        $date = $request->date;
+        $time = $request->time;
 
         // Get the Vehicle Slip Request
         $vehicleSlipReq = VehicleSlipModel::where('date_arrival', $date)
-            ->whereTime('time_arrival', '>=', $time)
-            ->whereIn('admin_approval', [1, 2])
-            ->get()
-            ->map(function ($slip) {
+        ->whereTime('time_arrival', '>=', $time)
+        ->whereIn('admin_approval', [1, 2])
+        ->get()
+        ->map(function ($slip) {
                 // Split vehicle_type into name & plate
                 if (preg_match('/^(.*?)\s*\((.*?)\)$/', $slip->vehicle_type, $matches)) {
                     return [
@@ -1105,35 +1030,6 @@ class VehicleSlipController extends Controller
     }
 
     /**
-     *  Available Vehicle and Driver
-     */
-    public function availableVehicleDriver(Request $request, $id){
-        $DriverDet = AssignPersonnelModel::where('form_id', $id)->first();
-        $VehicleDetailRequest = VehicleTypeModel::where('form_id', $id)->first();
-        $VehicleSlipForm = VehicleSlipModel::find($id);
-
-        if (!$VehicleDetailRequest && !$DriverDet) {
-            return response()->json(['error' => 'Data Error'], 404);
-        }
-
-        // Update the status
-        $DriverDet->status = 0;
-        $DriverDet->date_assigned = null;
-        $VehicleDetailRequest->status = 0;
-        $VehicleDetailRequest->date_used = null;
-
-        if($VehicleDetailRequest->save() && $DriverDet->save()){
-            // Creating logs only if both operations are successful
-            $logs = new LogsModel();
-            $logs->category = 'VEHICLE';
-            $logs->message = $request->input('authority').' set the driver ('.$VehicleSlipForm->driver.') and vehicle ('.$VehicleSlipForm->vehicle_type.').';
-            $logs->save();
-        }
-
-        return response()->json(['message' => 'Vehicle Available.'], 200);
-    }
-
-    /**
      *  Update Vehicle Details
      */
     public function editVehicle(Request $request, $id){
@@ -1195,7 +1091,6 @@ class VehicleSlipController extends Controller
 
         // Update the status
         $VehicleDetailRequest->status = 2;
-        $VehicleDetailRequest->date_used = null;
 
         if($VehicleDetailRequest->save()){
             // Creating logs only if both operations are successful
@@ -1206,6 +1101,88 @@ class VehicleSlipController extends Controller
         }
 
         return response()->json(['message' => 'Vehicle Available.'], 200);
+    }
+
+    /**
+     *  Check Travel Slip
+     */
+    public function CheckTravelSlip(Request $request){
+        $id = $request->id;
+        $date = $request->date;
+
+        $VehicleDataRequest = VehicleSlipModel::where('date_arrival', $date)
+            ->whereIn('admin_approval', [2, 1])
+            ->orderBy('date_arrival', 'desc')
+            ->get();
+
+        if ($VehicleDataRequest->isEmpty()) {
+            // Set both Driver and Vehicle to be available
+            VehicleTypeModel::whereIn('status', [0, 1, 2])->whereNotNull('date_used')->update(['status' => 0,'date_used' => null, ]);
+            $driverReq = AssignPersonnelModel::whereIn('status', [0, 1, 2])->whereNotNull('date_assigned')->update(['status' => 0,'date_assigned' => null, ]);
+            return response()->json(['message' => 'No Vehicle Travel Yet'], 201);
+        } else {
+            // Real Condition
+            $employee = PPAEmployee::find($id);
+            $clearances = array_map('trim', explode(',', $employee->code_clearance));
+
+            foreach ($VehicleDataRequest as $slip) {
+                if ($slip->user_id == $employee->id || in_array('GSO', $clearances) || in_array('AM', $clearances) || in_array('NERD', $clearances)) {
+                    if (preg_match('/^(.*?)\s*\((.*?)\)$/', $slip->vehicle_type, $matches)) {
+                        $vehicleName = trim($matches[1]);
+                        $plateNumber = trim($matches[2]);
+                    } else {
+                        $vehicleName = $slip->vehicle_type;
+                        $plateNumber = null;
+                    }
+
+                    $vehicleReq = VehicleTypeModel::where('vehicle_name', $vehicleName)->where('vehicle_plate', $plateNumber)->first();
+                    $driverReq = AssignPersonnelModel::where('personnel_id', $slip->driver_id)->first();
+                    $yesterdayDateUsed = Carbon::parse($vehicleReq->date_used)->subDay()->format('Y-m-d');
+
+                    // -- Vehicle -- //
+                    if($vehicleReq->status == 0){
+                        $vehicleReq->update([
+                            'status' => 1,
+                            'date_used' => $date,
+                        ]);
+                    }
+                    
+                    if($vehicleReq->status == 2 && $vehicleReq->date_used == null){
+                        $vehicleReq->update([
+                            'status' => 0,
+                            'date_used' => null,
+                        ]);
+                    }
+
+                    
+
+                    // -- Driver -- //
+                    if($driverReq->status == 0){
+                        $driverReq->update([
+                            'status' => 1,
+                            'date_assigned' => $date,
+                        ]);
+                    }
+                    
+                    if($driverReq->status == 2 && $driverReq->date_assigned == null){
+                        $driverReq->update([
+                            'status' => 0,
+                            'date_assigned' => $null,
+                        ]);
+                    }
+                    
+                    // Set the Driver and Vehicle into Available if the yesterday
+                    $yesterdayDateUsed = Carbon::parse($vehicleReq->date_used)->subDay()->format('Y-m-d');
+                    $getVehicleReq = VehicleTypeModel::where('date_used', $yesterdayDateUsed)->update(['status' => 0, 'date_used' => null, ]);
+                    $driverReq = AssignPersonnelModel::where('date_assigned', $yesterdayDateUsed)->update(['status' => 0,'date_assigned' => null, ]);
+                }
+            }
+
+            return response()->json(['message' => 'Vehicle and Driver Updated'], 200);
+
+        }
+
+        // return response()->json($getVehicleReq);
     }
 
 }

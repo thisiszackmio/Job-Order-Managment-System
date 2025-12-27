@@ -155,125 +155,123 @@ export default function Logs() {
     <PageComponent title="Logs">
 
       {/* Main */}
-      <div className="font-roboto ppa-form-box">
-        <div className="ppa-form-header">Log Details</div>
-        <div style={{ padding: '6px 10px 10px 10px' }}>
+      <div className="ppa-widget mt-8">
+        <div className="joms-user-info-header text-left"> 
+          Log Details
+        </div>
 
+        <div className="px-4 pb-6">
           {/* Date Range */}
-          <div className="flex items-center justify-center space-x-2 mt-4 mb-4">
-            
+          <div className="flex items-end justify-center gap-4 mt-4 mb-4">
+
             {/* From Date */}
-            <div className="flex items-center space-x-4">
-              <label htmlFor="from_date" className="block w-10 text-base font-medium leading-6 text-black">
+            <div>
+              <label htmlFor="from_date" className="form-title block mb-1">
                 From:
               </label>
-              <input
+              <input 
                 type="date"
                 name="from_date"
                 id="from_date"
                 defaultValue={today}
                 onChange={ev => setFromDate(ev.target.value)}
-                className="block w-40 ppa-form"
+                className="block w-40 ppa-form-field"
               />
             </div>
 
             {/* To Date */}
-            <div className="flex items-center space-x-4">
-              <label htmlFor="to_date" className="block w-4 text-base font-medium leading-6 text-black">
+            <div>
+              <label htmlFor="to_date" className="form-title block mb-1">
                 To:
               </label>
-              <input
+              <input 
                 type="date"
                 name="to_date"
                 id="to_date"
                 defaultValue={today}
                 min={fromDate}
-                onChange={(ev) => handleToDateChange(ev)}
-                className="block w-40 ppa-form"
+                onChange={handleToDateChange}
+                className="block w-40 ppa-form-field"
               />
             </div>
 
-            {/* From Button */}
-            {submitButton ? (
-            <>
-              <div className="flex items-center space-x-4">
-                <button 
-                  type="submit"
-                  onClick={getLogsInfo}
-                  className="btn-default-form"
-                >
-                  Go
-                </button>
-              </div>
-              
-              {logsFunction ? (
-                <div className="flex items-center space-x-4">
-                  <button type="button" onClick={handleButtonClick}
-                    className={`btn-pdf ${ submitLoading && 'btn-genpdf'}`}
-                    disabled={submitLoading}
+            {/* Go Button */}
+            {submitButton && (
+              <div>
+                <div className="h-[22px]"></div>
+                {submitButton ? (
+                <>
+                  <button 
+                    type="submit"
+                    onClick={getLogsInfo}
+                    className="btn-default-form h-[42px]"
                   >
-                    {submitLoading ? (
-                      <div className="flex items-center justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Generating</span>
-                      </div>
-                    ) : (
-                      'Get PDF'
-                    )}
+                    Go
                   </button>
-                </div>
-              ):null}
 
-              </>
-            ):null}
+                  {logsFunction ? (
+                    <button type="button" onClick={handleButtonClick}
+                      className={`btn-pdf h-[42px] ml-3 ${ submitLoading && 'btn-genpdf'}`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex items-center justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Generating</span>
+                        </div>
+                      ) : (
+                        'Get PDF'
+                      )}
+                    </button>
+                  ):null}
+
+                </>
+                ):null}
+              </div>
+            )}
 
           </div>
-
-          {logsFunction ? (
-          <>
-            {/* Table */}
-            <table className="ppa-table w-full">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-1 py-1 w-44 text-left text-sm font-medium text-gray-600 uppercase">Date and Time</th>
-                  <th className="px-1 py-1 w-20 text-center text-sm font-medium text-gray-600 uppercase">Category</th>
-                  <th className="px-1 py-1 w-96 text-center text-sm font-medium text-gray-600 uppercase">Description</th>
-                </tr>
-              </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {loadingLogs ? (
-                  <tr>
-                    <td colSpan={3} className="px-1 py-3 text-base text-center border-0 border-custom">
-                      <div className="flex justify-center items-center">
-                        <img className="h-8 w-auto mr-1" src={loading_table} alt="Loading" />
-                        <span className="loading-table">Loading Logs</span>
-                      </div>
-                    </td>
-                  </tr>
-                ):(
-                <>
-                  {getLogs?.LogsData?.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="px-1 py-3 text-base text-center border-0 border-custom"> No Logs </td>
-                    </tr>
-                  ):(
-                  <>
-                    {getLogs?.LogsData?.map((data) => (
-                      <tr key={data.id}>
-                        <td className="px-1 py-1.5 text-left table-font text-base">{data?.date}</td>
-                        <td className="px-1 py-1.5 text-center table-font text-base">{data?.category}</td>
-                        <td className="px-1 py-1.5 text-center table-font text-base">{data?.message}</td>
-                      </tr>
-                    ))}
-                  </>
-                  )}
-                </>
-                )}
-              </tbody>
-            </table>
-          </>
-          ):null}
           
+          {/* Table */}
+          <div className="mt-8">
+          {logsFunction ? (
+            loadingLogs ? (
+              <div className="flex justify-center items-center py-8">
+                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                <span className="loading-table">Loading Logs</span>
+              </div>
+            ):(
+              <div className="ppa-div-table">
+                <table className="ppa-table w-full">
+                  <thead className="sticky top-0 z-10">
+                    <tr>
+                      <th className="px-4 py-2 text-left ppa-table-header">Date and Time</th>
+                      <th className="px-4 py-2 text-left ppa-table-header">Category</th>
+                      <th className="px-4 py-2 text-left ppa-table-header">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="ppa-tbody scrollable-tbody" style={{ backgroundColor: '#fff' }}>
+                    {getLogs?.LogsData?.length > 0 ? (
+                      getLogs?.LogsData?.map((data) => (
+                        <tr key={data.id}>
+                          <td className="px-4 py-4 text-left ppa-table-body">{data?.date}</td>
+                          <td className="px-4 py-4 text-left ppa-table-body">{data?.category}</td>
+                          <td className="px-4 py-4 text-left ppa-table-body">{data?.message}</td>
+                        </tr>
+                      ))
+                    ):(
+                      <tr>
+                        <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
+                          No Logs
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ):null}
+          </div>
         </div>
       </div>
 
@@ -295,17 +293,17 @@ export default function Logs() {
                 <table className="ppa-table w-full">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="px-1 py-1 w-44 text-left text-sm font-medium text-gray-600 uppercase">Date and Time</th>
-                      <th className="px-1 py-1 w-20 text-center text-sm font-medium text-gray-600 uppercase">Category</th>
-                      <th className="px-1 py-1 w-96 text-center text-sm font-medium text-gray-600 uppercase">Message</th>
+                      <th className="px-1 py-1 w-[20%] text-left ppa-table-header">Date and Time</th>
+                      <th className="px-1 py-1 w-[20%] text-center ppa-table-header">Category</th>
+                      <th className="px-1 py-1 w-[65%] text-left ppa-table-header">Message</th>
                     </tr>
                   </thead>
                   <tbody style={{ backgroundColor: '#fff' }}>
                     {getLogs?.LogsData?.map((data) => (
                       <tr key={data.id}>
-                        <td className="px-1 py-1.5 text-left table-font text-base">{data?.date}</td>
-                        <td className="px-1 py-1.5 text-center table-font text-base">{data?.category}</td>
-                        <td className="px-1 py-1.5 text-center table-font text-base">{data?.message}</td>
+                        <td className="px-1 py-1.5 text-left ppa-table-body">{data?.date}</td>
+                        <td className="px-1 py-1.5 text-center ppa-table-body">{data?.category}</td>
+                        <td className="px-1 py-1.5 text-left ppa-table-body">{data?.message}</td>
                       </tr>
                     ))}
                   </tbody>

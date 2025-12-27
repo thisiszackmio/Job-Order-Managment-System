@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import loading_table from "/default/ring-loading.gif";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../../context/ContextProvider";
 import axiosClient from "../../axios";
+import ReactPaginate from "react-paginate";
 
 export default function MyRequest(){
 
@@ -130,38 +131,94 @@ export default function MyRequest(){
     }
   }, [currentUserId]);
 
+  // For pagination
+  const ListPerPage = 5;
+
+  // Inspection pagination
+  const [inspPage, setInspPage] = useState(0);
+  // Facility pagination
+  const [facPage, setFacPage] = useState(0);
+  // Vehicle pagination
+  const [vehPage, setVehPage] = useState(0);
+
+  // Inspection
+  const paginatedInspection = inspectionForm?.slice(
+    inspPage * ListPerPage,
+    (inspPage + 1) * ListPerPage
+  );
+  // Facility
+  const paginatedFacility = facilityForm?.slice(
+    facPage * ListPerPage,
+    (facPage + 1) * ListPerPage
+  );
+  // Vehicle
+  const paginatedVehicle = vehicleForm?.slice(
+    vehPage * ListPerPage,
+    (vehPage + 1) * ListPerPage
+  );
+
+  // Inspection count
+  const inspPageCount = Math.ceil((inspectionForm?.length || 0) / ListPerPage);
+  const facPageCount  = Math.ceil((facilityForm?.length || 0) / ListPerPage);
+  const vehPageCount  = Math.ceil((vehicleForm?.length || 0) / ListPerPage);
+
   return(
     <PageComponent title="My Request List">
-
       {/* Post Repair Form */}
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Pre/Post Repair Inspection Form </div>
+      <div className="ppa-widget mt-8">
+        <div className="joms-user-info-header text-left"> Pre/Post Repair Inspection Form </div>
+
+        {/* Pagination */}
+        <div className="px-4 mt-2">
+          {inspPageCount > 1 && (
+            <ReactPaginate
+              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+              breakLabel="..."
+              pageCount={inspPageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={({ selected }) => setInspPage(selected)}
+              forcePage={inspPage}
+              containerClassName="pagination-top"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+            />
+          )}
+        </div>
 
         {loading ? (
-          <div className="flex justify-center items-center pt-2 pb-2">
+          <div className="flex justify-center items-center pt-2 pb-8">
             <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
-            <table className="ppa-table w-full mb-10 mt-2"> 
+          <div className="px-4 pb-4 ppa-div-table">
+            <table className="ppa-table w-full">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Ctrl ID</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Property Number</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Type of Property</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Description</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Complain/Defect</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Approver</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                <tr>
+                  <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Type of Property</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Description</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Complain/Defect</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Approver</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Remarks</th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {inspectionForm && inspectionForm?.length > 0 ? (
-                  inspectionForm.map((getInspData)=>(
+              <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                {paginatedInspection && paginatedInspection?.length > 0 ? (
+                  paginatedInspection.map((getInspData)=>(
                     <tr key={getInspData.id}>
-                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
+                      <td className="px-4 py-4 w-[5%] font-bold text-center ppa-table-body-id">
                         <Link 
                           to={`/joms/inspection/form/${getInspData.id}`} 
                           className="group flex justify-center items-center"
@@ -175,58 +232,82 @@ export default function MyRequest(){
                           </span>
                         </Link>
                       </td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.date_request}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.property_number ? getInspData.property_number : 'N/A'}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.type}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.description}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.complain}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.supervisor}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getInspData.remarks}</td>
+                      <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getInspData.date_request}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.type}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.description}</td>
+                      <td className="px-4 py-2 w-[20%] text-left ppa-table-body">{getInspData.complain}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.supervisor}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.remarks}</td>
                     </tr>
                   ))
                 ):(
                   <tr>
-                    <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
+                    <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
+                      No records found
                     </td>
                   </tr>
                 )}
-              
               </tbody>
             </table>
           </div>
         )}
-
       </div>
 
       {/* Facility Form */}
-      <div className="font-roboto ppa-form-box bg-white mt-6">
-        <div className="ppa-form-header"> Facility / Venue Request Form </div>
+      <div className="ppa-widget mt-14">
+        <div className="joms-user-info-header text-left"> Facility / Venue Request Form </div>
+
+        {/* Pagination */}
+        <div className="px-4 mt-2">
+          {facPageCount > 1 && (
+            <ReactPaginate
+              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+              breakLabel="..."
+              pageCount={facPageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={({ selected }) => setFacPage(selected)}
+              forcePage={facPage}
+              containerClassName="pagination-top"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+            />
+          )}
+        </div>
 
         {loading ? (
-          <div className="flex justify-center items-center pt-2 pb-2">
+          <div className="flex justify-center items-center pt-2 pb-8">
             <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
-        ) : (
-          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
-            <table className="ppa-table w-full mb-10 mt-2">
+        ):(
+          <div className="px-4 pb-4 ppa-div-table">
+            <table className="ppa-table w-full">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Ctrl ID</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Request Office</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Activity</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Facility/Venue</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                <tr>
+                  <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Request Office</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Activity</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Date</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Facility/Venue</th>
+                  <th className="px-4 py-2 w-[25%] text-left ppa-table-header">Remarks</th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {facilityForm && facilityForm.length > 0 ? (
-                  facilityForm.map((getFacData) => (
+              <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                {paginatedFacility && paginatedFacility.length > 0 ? (
+                  paginatedFacility.map((getFacData) => (
                     <tr key={getFacData.id}>
-                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
+                      <td className="px-4 py-4 w-[5%] font-bold text-center ppa-table-body-id">
                         <Link 
                           to={`/joms/facilityvenue/form/${getFacData.id}`} 
                           className="group flex justify-center items-center"
@@ -240,24 +321,24 @@ export default function MyRequest(){
                           </span>
                         </Link>
                       </td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getFacData.date_requested}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getFacData.request_office}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getFacData.title_of_activity}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">
+                      <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getFacData.date_requested}</td>
+                      <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getFacData.request_office}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getFacData.title_of_activity}</td>
+                      <td className="px-4 py-2 w-[20%] text-left ppa-table-body">
                         {getFacData.date_start === getFacData.date_end ? (
                           `${getFacData.date_start} @ ${getFacData.time_start} to ${getFacData.time_end}`
                         ) : (
                           `${getFacData.date_start} @ ${getFacData.time_start} to ${getFacData.date_end} @ ${getFacData.time_end}`
                         )}
                       </td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getFacData.facility}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getFacData.remarks}</td>
+                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getFacData.facility}</td>
+                      <td className="px-4 py-2 w-[25%] text-left ppa-table-body">{getFacData.remarks}</td>
                     </tr>
                   ))
-                ) : (
+                ):(
                   <tr>
-                    <td colSpan={7} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
+                    <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
+                      No records found
                     </td>
                   </tr>
                 )}
@@ -268,35 +349,60 @@ export default function MyRequest(){
       </div>
 
       {/* Vehicle Form */}
-      <div className="font-roboto ppa-form-box bg-white mt-6">
-        <div className="ppa-form-header"> Vehicle Slip </div>
-        
+      <div className="ppa-widget mt-14">
+        <div className="joms-user-info-header text-left"> Vehicle Slip </div>
+
+        {/* Pagination */}
+        <div className="px-4 mt-2">
+          {vehPageCount > 1 && (
+            <ReactPaginate
+              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+              breakLabel="..."
+              pageCount={vehPageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={({ selected }) => setVehPage(selected)}
+              forcePage={vehPage}
+              containerClassName="pagination-top"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+            />
+          )}
+        </div>
+
         {loading ? (
-          <div className="flex justify-center items-center pt-2 pb-2">
+          <div className="flex justify-center items-center pt-2 pb-8">
             <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="p-2 ppa-div-table ppa-widget" style={{ maxHeight: '400px', overflowY: 'auto'}}>
-            <table className="ppa-table w-full mb-10 mt-2">
+          <div className="px-4 pb-4 ppa-div-table">
+            <table className="ppa-table w-full">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Slip No</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date Request</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Purpose</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Place</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Date and Time for Arrival</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Vehicle</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">Driver</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 uppercase">No of Passengers</th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 uppercase">Remarks</th>
+                <tr>
+                  <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Purpose</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Arrival</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Vehicle</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Driver</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {vehicleForm && vehicleForm?.length > 0 ? (
-                  vehicleForm.map((getVehData) => (
+              <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                {paginatedVehicle && paginatedVehicle?.length > 0 ? (
+                  paginatedVehicle.map((getVehData) => (
                     <tr key={getVehData.id}>
-                      <td className="px-2 py-2 text-sm font-bold text-center table-font">
+                      <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
                         <Link 
                           to={`/joms/vehicle/form/${getVehData.id}`} 
                           className="group flex justify-center items-center"
@@ -310,20 +416,18 @@ export default function MyRequest(){
                           </span>
                         </Link>
                       </td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.date_request}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.purpose}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.place}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.date_arrival} @ {getVehData.time_arrival}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.vehicle}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.driver}</td>
-                      <td className="px-2 py-2 text-sm text-center w-1 table-font">{getVehData.no_passengers}</td>
-                      <td className="px-2 py-2 text-sm text-left table-font">{getVehData.remarks}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.date_request}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.purpose}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.date_arrival} @ {getVehData.time_arrival}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.vehicle}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.driver}</td>
+                      <td className="px-4 py-2 text-left ppa-table-body">{getVehData.remarks}</td>
                     </tr>
                   ))
                 ):(
                   <tr>
-                    <td colSpan={9} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
+                    <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
+                      No records found
                     </td>
                   </tr>
                 )}
@@ -331,7 +435,6 @@ export default function MyRequest(){
             </table>
           </div>
         )}
-
       </div>
 
     </PageComponent>

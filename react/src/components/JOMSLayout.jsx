@@ -1,36 +1,40 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
-import ppaLogo from '/default/ppa_logo.png';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faTableList, faClipboardUser, faVanShuttle, faScroll, faUserTie, faUserGear } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
+import TopNav from "./TopNav";
 import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../axios";
 import Footer from "./Footer";
 import Popup from "./Popup";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+import ppaLogo from '/default/ppa_logo.png';
+import moment from "moment-timezone";
 
 export default function JOMSLayout() {
-  const { currentUserId, currentUserName, currentUserAvatar, setCurrentUserToken, currentUserCode } = useUserStateContext();
+  const { currentUserId, currentUserAvatar, setCurrentUserToken, currentUserCode } = useUserStateContext();
+
+  const location = useLocation();
+  const pathname = location.pathname;
+  const navigate = useNavigate();
 
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState(null);
-  const [submitLoading, setSubmitLoading] = useState(false);
+
+  const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [showLink, setShowLink] = useState(false);
 
   useEffect(() => {
     const now = new Date();
-    const startDate = new Date("2025-09-25");
-    const endDate = new Date("2025-10-02");
+    const startDate = new Date("2025-12-27");
+    const endDate = new Date("2026-01-10");
 
     if (now >= startDate && now <= endDate) {
       setShowLink(true);
@@ -47,8 +51,30 @@ export default function JOMSLayout() {
     }
   }, [isSidebarMinimized, setActiveAccordion]);
 
+  const isRequestFormsActive =
+  location.pathname.includes("/joms/inspection/form") ||
+  location.pathname.includes("/joms/facilityvenue/form") ||
+  location.pathname.includes("/joms/vehicle/form") ||
+  location.pathname.includes("/joms/inspection") || 
+  location.pathname.includes("/joms/facilityvenue") ||
+  location.pathname.includes("/joms/vehicle") ||
+  location.pathname.includes("/joms/allannouncement") ||
+  location.pathname.includes("/joms/addannouncement") ||
+  location.pathname.includes("/joms/systemstat") || 
+  location.pathname.includes("/joms/settings") ||
+  location.pathname.includes("/joms/logs") ||
+  location.pathname.includes("/joms/userlist") ||
+  location.pathname.includes("/joms/addemployee");
+
+  // For the Profile
+  function handleProfile(){
+    setActiveAccordion(null);
+    navigate(`/joms/user`);
+  }
+
   // Logout
   function handleLogout(){
+    setActiveAccordion(null);
     setShowPopup(true);
     setPopupContent('Logout');
     setPopupMessage(
@@ -80,46 +106,6 @@ export default function JOMSLayout() {
     setShowPopup(false);
   }
 
-  // Variable
-  const [pendingCount, getPendingCount] = useState(null);
-
-  // Get the Data
-  const PendingCount = () => {
-    axiosClient
-    .get(`/pendingrequestcount/${currentUserId}`)
-    .then((response) => {
-      const responsePenData = response.data.pending_count ?? null;
-
-      getPendingCount(responsePenData);
-    });
-  }
-
-  const OnTravelSet = () => {
-    axiosClient
-    .put(`/ontravelset/${currentUserId}`)
-    .then((response) => {
-      console.log(response.data.message);
-    })
-    .catch((error) => {
-      if (error.response && error.response.status === 404) {
-        // Custom handling for 404
-        console.warn("No Driver and Vehicle to be available");
-        // Optional: Show a popup or notification here
-      } else {
-        // Handle other errors
-        console.error("Unexpected error occurred:", error);
-      }
-    });
-  }
-
-  // Get the useEffect
-  useEffect(() => {
-    OnTravelSet();
-    if(currentUserId){
-      PendingCount();
-    }
-  }, [currentUserId]);
-
   // Restrictions
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
@@ -131,25 +117,27 @@ export default function JOMSLayout() {
   const AssignPersonnel = codes.includes("AP");
   const Authority = codes.includes("AU");
 
-  return (
+  return(
     <div className="w-full h-full font-roboto">
+
       {/* Side Bar */}
       <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
         <div className={`transition-width duration-300 ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
+
           {/* Logo */}
-          <div className="flex justify-center items-center py-4">
-            <img src={ppaLogo} alt="PPA PMO/LNI" className={`transition-width duration-300 ${isSidebarMinimized ? 'w-10' : 'w-4/5 items-center'}`} />
+          <div className="flex justify-center items-center pt-4">
+            <img src={ppaLogo} alt="PPA PMO/LNI" className={`transition-width duration-300 ${isSidebarMinimized ? 'w-10' : 'w-3/4 items-center'}`} />
           </div>
 
           {/* Title Text */}
           {!isSidebarMinimized ? (
-              <div className="text-title mb-10">
+              <div className="text-title mb-8">
                 <span className="first-letter">J</span>ob <span className="first-letter">O</span>rder <br />
                 <span className="first-letter">M</span>anagement <br />
                 <span className="first-letter">S</span>ystem
               </div>
           ):(
-            <div className="text-title mb-10 vertical-text">
+            <div className="text-title mb-8 vertical-text">
               <span className="block first-letter text-center">J</span>
               <span className="block first-letter text-center">O</span>
               <span className="block first-letter text-center">M</span>
@@ -158,24 +146,24 @@ export default function JOMSLayout() {
           )}
 
           {/* Nav */}
-          <ul className={`mt-10 ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
+          <ul className={`ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
 
             {/* Relase Note */}
             {showLink && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/systemupdate" ? "nav-active" : ""}`}>
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
                   <Link to="/joms/systemupdate" className="flex items-center">
                     <FontAwesomeIcon icon={faUserGear} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Update <span className="ml-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">Hi</span></p>}
+                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Update </p>}
                   </Link>
                 </div>
               </li>
             )}
 
             {/* Dashboard */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/dashboard" ? "nav-active" : ""}`}>
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to="/joms/dashboard" onClick={() => { PendingCount(); OnTravelSet(); }} className="flex items-center">
+                <Link to="/joms/dashboard" className="flex items-center">
                   <FontAwesomeIcon icon={faTachometerAlt} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">Dashboard</p>}
                 </Link>
@@ -183,9 +171,9 @@ export default function JOMSLayout() {
             </li>
 
             {/* My Request */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4">
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to={`/joms/myrequest`} onClick={() => { PendingCount(); OnTravelSet(); }} className="flex items-center">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/myrequest" ? "nav-active" : ""}`}>
+              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full ':''}`}>
+                <Link to={`/joms/myrequest`} className="flex items-center">
                   <FontAwesomeIcon icon={faTableList} />
                   {!isSidebarMinimized && <p className="ml-4 text-lg">My Request</p>}
                 </Link>
@@ -194,22 +182,22 @@ export default function JOMSLayout() {
 
             {/* Pending Request */}
             {(SuperAdmin || GSO || AdminManager || DivisionManager || AssignPersonnel || PortManager ) && (
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4">
+            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/pending" ? "nav-active" : ""}`}>
               <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full' : ''}`}>
-                <Link to={`/joms/pending`} onClick={() => { PendingCount(); OnTravelSet(); }} className="flex items-center">
+                <Link to={`/joms/pending`} className="flex items-center">
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faTableList} />
                     {!isSidebarMinimized && (
                       <p className="ml-4 text-lg">Pending Request</p>
                     )}
                   </div>
-                  {!isSidebarMinimized && (
+                  {/* {!isSidebarMinimized && (
                     pendingCount && (
                       <span className="absolute right-9 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                         {pendingCount}
                       </span>
                     )
-                  )}
+                  )} */}
                 </Link>
               </div>
             </li>
@@ -217,7 +205,6 @@ export default function JOMSLayout() {
 
             {/* Request Forms */}
             <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4"> 
-              
               <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
               {!isSidebarMinimized && 
               <>
@@ -228,18 +215,18 @@ export default function JOMSLayout() {
                 </label>
               </>
               }
-              
-              {(activeAccordion === 1 || !isSidebarMinimized) && (
-                <section>
+
+              {(activeAccordion === 1 || !isSidebarMinimized || isRequestFormsActive ) && (
+                <section className={`accordion-content ${(activeAccordion === 1 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
                   <ul id="menu1" className="pl-3 mt-4">
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/joms/inspection/form" onClick={() => { PendingCount(); OnTravelSet(); }} >Pre/Post Repair Inspection Form</Link>
+                      <Link to="/joms/inspection/form" className={`${location.pathname === "/joms/inspection/form" ? "active-submenu" : ""}`}>Pre/Post Repair Inspection Form</Link>
                     </li>
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/joms/facilityvenue/form" onClick={() => { PendingCount(); OnTravelSet(); }}>Facility / Venue Request Form</Link>
+                      <Link to="/joms/facilityvenue/form" className={`${location.pathname === "/joms/facilityvenue/form" ? "active-submenu" : ""}`}>Facility / Venue Request Form</Link>
                     </li>
                     <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                      <Link to="/joms/vehicle/form" onClick={() => { PendingCount(); OnTravelSet(); }}>Vehicle Slip Form</Link>
+                      <Link to="/joms/vehicle/form" className={`${location.pathname === "/joms/vehicle/form" ? "active-submenu" : ""}`}>Vehicle Slip Form</Link>
                     </li>
                   </ul>
                 </section>
@@ -249,7 +236,6 @@ export default function JOMSLayout() {
             {/* Request List */}
             {(SuperAdmin || GSO || AssignPersonnel || Authority || DivisionManager || PortManager || AdminManager) && (
               <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
-
                 <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
                 <>
@@ -261,20 +247,20 @@ export default function JOMSLayout() {
                 </>
                 }
 
-                {(activeAccordion === 2 || !isSidebarMinimized) && (
-                  <section>
+                {(activeAccordion === 2 || !isSidebarMinimized || isRequestFormsActive) && (
+                  <section className={`accordion-content ${(activeAccordion === 2 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
                     <ul id="menu2" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/inspection" onClick={() => { PendingCount(); OnTravelSet(); }}>Pre/Post Repair Inspection Form</Link>
+                        <Link to="/joms/inspection" className={`${location.pathname === "/joms/inspection" ? "active-submenu" : ""}`}>Pre/Post Repair Inspection Form</Link>
                       </li>
                       {(!AssignPersonnel || !Authority) && (
                         <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                          <Link to="/joms/facilityvenue" onClick={() => { PendingCount(); OnTravelSet(); }}>Facility / Venue Request Form</Link>
+                          <Link to="/joms/facilityvenue" className={`${location.pathname === "/joms/facilityvenue" ? "active-submenu" : ""}`}>Facility / Venue Request Form</Link>
                         </li>
                       )}
                       {(!AssignPersonnel || Authority || SuperAdmin) && (
                         <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                          <Link to="/joms/vehicle" onClick={() => { PendingCount(); OnTravelSet(); }}>Vehicle Slip Form</Link>
+                          <Link to="/joms/vehicle" className={`${location.pathname === "/joms/vehicle" ? "active-submenu" : ""}`}>Vehicle Slip Form</Link>
                         </li>
                       )}
                     </ul>
@@ -283,23 +269,11 @@ export default function JOMSLayout() {
               </li>
             )}
 
-            {/* Vehicle */}
-            {/* {(SuperAdmin || GSO || AssignPersonnel) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
-                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/vehicleavail" onClick={() => { PendingCount(); }} className="flex items-center">
-                    <FontAwesomeIcon icon={faList} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">Vehicle Slip</p>}
-                  </Link>
-                </div>
-              </li>
-            )} */}
-
             {/* Personnel */}
             {(SuperAdmin || GSO || AssignPersonnel) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/personnel" ? "nav-active" : ""}`}>
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/personnel" onClick={() => { PendingCount(); }} className="flex items-center">
+                  <Link to="/joms/personnel" className="flex items-center">
                     <FontAwesomeIcon icon={faClipboardUser} />
                     {!isSidebarMinimized && <p className="ml-4 text-lg">Personnel</p>}
                   </Link>
@@ -309,9 +283,9 @@ export default function JOMSLayout() {
 
             {/* Vehicle */}
             {(SuperAdmin || GSO || AssignPersonnel) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/vehicletype" ? "nav-active" : ""}`}>
                 <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/vehicletype" onClick={() => { PendingCount(); }} className="flex items-center">
+                  <Link to="/joms/vehicletype" className="flex items-center">
                     <FontAwesomeIcon icon={faVanShuttle} />
                     {!isSidebarMinimized && <p className="ml-4 text-lg">Vehicle</p>}
                   </Link>
@@ -321,7 +295,7 @@ export default function JOMSLayout() {
 
             {/* Announcements */}
             {(SuperAdmin || PortManager || AdminManager || DivisionManager || GSO) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4 ">
                 <FontAwesomeIcon icon={faScroll} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
                   <>
@@ -333,14 +307,14 @@ export default function JOMSLayout() {
                   </>
                 }
 
-                {(activeAccordion === 3 || !isSidebarMinimized) && (
-                  <section>
+                {(activeAccordion === 3 || !isSidebarMinimized || isRequestFormsActive) && (
+                  <section className={`accordion-content ${(activeAccordion === 3 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
                     <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/allannouncement" onClick={() => { PendingCount(); }}>All Announcements Lists</Link>
+                        <Link to="/joms/addannouncement" className={`${location.pathname === "/joms/addannouncement" ? "active-submenu" : ""}`}>Add Announcements Data</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/addannouncement" onClick={() => { PendingCount(); }}>Add Announcements Data</Link>
+                        <Link to="/joms/allannouncement" className={`${location.pathname === "/joms/allannouncement" ? "active-submenu" : ""}`}>All Announcements Lists</Link>
                       </li>
                     </ul>
                   </section>
@@ -351,7 +325,7 @@ export default function JOMSLayout() {
 
             {/* Superadmin Settings */}
             {SuperAdmin && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
+              <li className="w-full justify-between text-white cursor-pointer items-center mb-4 ">
                 <FontAwesomeIcon icon={faUserTie} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
                 {!isSidebarMinimized && 
                   <>
@@ -363,23 +337,20 @@ export default function JOMSLayout() {
                   </>
                 }
 
-                {(activeAccordion === 4 || !isSidebarMinimized) && (
-                  <section>
+                {(activeAccordion === 4 || !isSidebarMinimized || isRequestFormsActive) && (
+                  <section className={`accordion-content ${(activeAccordion === 4 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
                     <ul id="menu1" className="pl-3 mt-4">
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/systemstat" onClick={() => { PendingCount(); }}>System Status</Link>
+                        <Link to="/joms/settings" className={`${location.pathname === "/joms/settings" ? "active-submenu" : ""}`}>General Settings</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/settings" onClick={() => { PendingCount(); }}>General Settings</Link>
+                        <Link to="/joms/logs" className={`${location.pathname === "/joms/logs" ? "active-submenu" : ""}`}>Logs</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/logs" onClick={() => { PendingCount(); }}>Logs</Link>
+                        <Link to="/joms/userlist" className={`${location.pathname === "/joms/userlist" ? "active-submenu" : ""}`}>All Employee Lists</Link>
                       </li>
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/userlist" onClick={() => { PendingCount(); }}>All Employee Lists</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/addemployee" onClick={() => { PendingCount(); }}>Add Employee Data</Link>
+                        <Link to="/joms/addemployee" className={`${location.pathname === "/joms/addemployee" ? "active-submenu" : ""}`}>Add Employee Data</Link>
                       </li>
                     </ul>
                   </section>
@@ -387,30 +358,6 @@ export default function JOMSLayout() {
               </li>
             )}
 
-
-          </ul>
-
-          {/* Logout Area */}
-          <ul className="logout-position mt-10">
-            {/* Logout */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 mt-3`}>
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <FontAwesomeIcon icon={faSignOutAlt} />
-                {!isSidebarMinimized && <a onClick={() => handleLogout()} className="text-base  ml-4 leading-4 text-lg">Logout</a>}
-              </div>
-            </li>
-            {/* Account */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center mb-3 ${isSidebarMinimized ? 'mt-5':'mt-3'}`}>
-              <div className="flex items-center">
-              <img src={currentUserAvatar} className="ppa-display-picture" alt="" />
-              {!isSidebarMinimized ? 
-                <p className="text-base leading-4 text-sm">
-                  <Link to="/joms/user">{currentUserName?.name}</Link>
-                  <p className="mt-1 font-bold">ID: {currentUserId}</p>
-                </p> 
-              : null }  
-              </div>
-            </li>
           </ul>
 
         </div>
@@ -418,11 +365,40 @@ export default function JOMSLayout() {
 
       {/* Main Content */}
       <div className={`ppa-content transition-width duration-300 ${isSidebarMinimized ? 'adjust-content' : ''}`}>
+        {/* Top Nav */}
         <div className="ppa-hamburger">
           <button onClick={() => setIsSidebarMinimized(!isSidebarMinimized)} className="text-white">
             <FontAwesomeIcon icon={faBars} className="ham-haha" />
           </button>
         </div>
+        <div className="nav-btn">
+          <TopNav />
+        </div>
+        <div className="profile relative">
+          <ul>
+            <li className="relative">
+              <img src={currentUserAvatar} className="ppa-display-picture cursor-pointer" alt="" onClick={() => handleToggle(5)} />
+
+              {/* Dropdown Container */}
+              <div className={`profile-dropdown ${activeAccordion === 5 ? "open" : ""}`}>
+                <ul className="profile-menu">
+                  <li>
+                    <button className="profile-item logout-btn" onClick={handleProfile}>
+                      Profile
+                    </button>
+                  </li>
+
+                  <li>
+                    <button className="profile-item logout-btn" onClick={handleLogout}>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+
         <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
           <Outlet />
         </div>
@@ -440,6 +416,7 @@ export default function JOMSLayout() {
           userId={currentUserId}
         />
       )}
+
     </div>
   );
 }

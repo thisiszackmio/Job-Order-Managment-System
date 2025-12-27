@@ -94,9 +94,11 @@ export default function FacilityVenueForm(){
     });
   } 
 
-  useEffect(() => { 
-    fetchVehicle();
-    fetchDriver();
+  useEffect(() => {
+    if(VRDateArrival && VRTimeArrival){
+      fetchVehicle();
+      fetchDriver();
+    } 
   }, [VRDateArrival, VRTimeArrival]);
 
   // Confirm Function
@@ -222,6 +224,24 @@ export default function FacilityVenueForm(){
     window.location.href = '/joms/myrequest';
   }
 
+  // On travel
+  function OnTravel(){
+    axiosClient.put("/checktravelslip", {
+      id: currentUserId,
+      date: today,
+    })
+    .then((response) => {
+      const responseData = response.data;
+      console.log(responseData)    
+    });
+  }
+
+  useEffect(() => {
+    if(currentUserId){
+      OnTravel();
+    }
+  }, [currentUserId]);
+
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
@@ -233,10 +253,10 @@ export default function FacilityVenueForm(){
   return(
     <PageComponent title="Request Form">
       {/* Form Content */}
-      <div className="font-roboto ppa-form-box bg-white">
-        <div className="ppa-form-header"> Vehicle Slip Request </div>
+      <div className="ppa-widget mt-8 pb-6">
+        <div className="joms-user-info-header text-left"> Request for Vehicle Slip Request </div>
 
-        <div className="ppa-widget">
+        <div>
 
           {confirmation ? (
           <div className="form-container">
@@ -414,7 +434,7 @@ export default function FacilityVenueForm(){
             {/* Title */}
             <div className="px-4 pt-4">
               <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-              <p className="text-xs font-bold text-red-500">Please double check the form before submitting</p>
+              <p className="text-xs font-bold text-red-500">* - fields that need to be filled out</p>
             </div>
 
             {/* Form */}
@@ -444,9 +464,12 @@ export default function FacilityVenueForm(){
 
                 {/* Type of Travel */}
                 <div className="items-center mt-4 font-roboto">
-                  <div className="font-roboto w-48 pb-2">
-                    <label htmlFor="rf_request" className="form-title">
+                  <div className="font-roboto w-full pb-2">
+                    <label htmlFor="rf_request" className="form-title flex">
                       Type of Travel:
+                      {!selectedTravelType && inputErrors.type_of_slip ? (
+                        <p className="form-validation">This form is required</p>
+                      ):( <p className="form-validation"> * </p> )}
                     </label>
                   </div>
                   <div className="w-full flex items-center space-x-20">
@@ -484,17 +507,17 @@ export default function FacilityVenueForm(){
                         Outside the City
                       </label>
                     </div>
-                    {!selectedTravelType && inputErrors.type_of_slip && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Purpose */}
                 <div className="items-center mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="vr_purpose" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="vr_purpose" className="form-title flex">
                       Purpose:
+                      {!VRPurpose && inputErrors.purpose ? (
+                        <p className="form-validation">This form is required</p>
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -513,17 +536,17 @@ export default function FacilityVenueForm(){
                       maxLength={500}
                       className={`block w-full ${(!VRPurpose && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
                     />
-                    {!VRPurpose && inputErrors.purpose && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Place */}
                 <div className="items-center mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="vr_place" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="vr_place" className="form-title flex">
                       Place/s To Be Visited:
+                      {!VRPlace && inputErrors.place_visited ? (
+                        <p className="form-validation">This form is required</p>
+                      ):( <p className="form-validation"> * </p> )}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -542,17 +565,17 @@ export default function FacilityVenueForm(){
                       className={`block w-full ${(!VRPlace && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
                       maxLength={255}
                     />
-                    {!VRPlace && inputErrors.place_visited && (
-                      <p className="form-validation">This form is required</p>
-                    )}
                   </div>
                 </div>
 
                 {/* Date of Arrival */}
                 <div className="items-center mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="vr_datearrival" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="vr_datearrival" className="form-title flex">
                       Date of Arrival:
+                      {!VRDateArrival && inputErrors.date_arrival ? (
+                        <p className="form-validation">This form is required</p>
+                      ):(<p className="form-validation"> * </p>)}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -565,17 +588,18 @@ export default function FacilityVenueForm(){
                       min={today}
                       className={`block w-full ${(!VRDateArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
                     />
-                    {!VRDateArrival && inputErrors.date_arrival ? (
-                      <p className="form-validation">This form is required</p>
-                    ):(<p className="text-gray-500 text-xs">Please enter the date of arrival at your destination.</p>)}
+                    <p className="text-gray-500 text-xs">Please enter the date of arrival at your destination.</p>
                   </div>
                 </div>
 
                 {/* Time of Arrival */}
                 <div className="items-center mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="vr_timearrival" className="form-title">
+                  <div className="w-full">
+                    <label htmlFor="vr_timearrival" className="form-title flex">
                       Time of Arrival:
+                      {!VRTimeArrival && inputErrors.time_arrival ? (
+                        <p className="form-validation">This form is required</p>
+                      ):(<p className="form-validation"> * </p>)}
                     </label> 
                   </div>
                   <div className="w-full">
@@ -587,9 +611,7 @@ export default function FacilityVenueForm(){
                       onChange={ev => setVRTimeArrival(ev.target.value)}
                       className={`block w-full ${(!VRTimeArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
                     />
-                    {!VRTimeArrival && inputErrors.time_arrival ? (
-                      <p className="form-validation">This form is required</p>
-                    ):(<p className="text-gray-500 text-xs">Please enter the time of arrival at your destination.</p>)}
+                    <p className="text-gray-500 text-xs">Please enter the time of arrival at your destination.</p>
                   </div>
                 </div>
 
@@ -602,9 +624,12 @@ export default function FacilityVenueForm(){
                 <>
                   {/* Vehicle Type */}
                   <div className="items-center mt-4">
-                    <div className="w-48">
-                      <label htmlFor="rep_type_of_property" className="form-title">
+                    <div className="w-full">
+                      <label htmlFor="rep_type_of_property" className="form-title flex">
                         Vehicle Type:
+                        {!vehicalName && inputErrors.vehicle_type && (
+                          <p className="form-validation">This form is required</p>
+                        )}
                       </label> 
                     </div>
                     <div className="w-full">
@@ -635,8 +660,11 @@ export default function FacilityVenueForm(){
                   {/* Driver Details */}
                   <div className="items-center mt-4">
                     <div className="w-48">
-                      <label htmlFor="rep_type_of_property" className="form-title">
+                      <label htmlFor="rep_type_of_property" className="form-title flex">
                         Driver:
+                        {!pointDriver.did && inputErrors.driver && (
+                          <p className="form-validation">This form is required</p>
+                        )}
                       </label> 
                     </div>
                     <div className="w-full">
@@ -666,9 +694,6 @@ export default function FacilityVenueForm(){
                           </option>
                         ))}
                       </select>
-                      {!pointDriver.did && inputErrors.driver && (
-                        <p className="form-validation">This form is required</p>
-                      )}
                     </div>
                   </div>
                 </>  

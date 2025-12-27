@@ -699,7 +699,6 @@ class UserController extends Controller
 
         // Update the status
         $data->status = 2;
-        $data->date_assigned = null;
 
         if($data->save()){
             // Creating logs only if both operations are successful

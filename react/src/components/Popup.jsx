@@ -92,6 +92,7 @@ const Popup = ({
           popupContent == "adf" ||
           popupContent == "adminApproval" ||
           popupContent == "adminDisapproval" ||
+          popupContent == "availablePersonnel" ||
           popupContent == 'Logout') && (
             <div class="f-modal-icon f-modal-warning animate">
               <span class="f-modal-body scaleWarning"></span>

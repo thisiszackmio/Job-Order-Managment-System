@@ -30,12 +30,10 @@ import UserListJLMS from './views/settings/UserList';
 import UserDetailsJLMS from './views/settings/UserDetails';
 import ViewUser from './views/ViewUser';
 import PendingRequest from './views/sidebar/Pending';
-import VehicleAvailability from './views/sidebar/VehicleAvailability';
 
 import JLMS from './views/jlms';
 import Login from './views/Login';
 import Maintenance from './views/settings/Maintenance';
-import SystemStats from './views/settings/SystemStatus'; 
 import FileNotFound from './components/404';
 
 const routes = [
@@ -74,14 +72,12 @@ const routes = [
       { path: '/joms/allannouncement', element: <AllAnnouncements /> },
       { path: '/joms/addannouncement', element: <AddAnnouncements /> },
       { path: '/joms/settings', element: <Maintenance /> },
-      { path: '/joms/systemstat', element: <SystemStats /> },
       { path: '/joms/logs', element: <Logs /> },
       { path: '/joms/addemployee', element: <UserRegistrationJLMS /> },
       { path: '/joms/userlist', element: <UserListJLMS /> },
       { path: '/joms/userdetails/:id', element: <UserDetailsJLMS /> },
       { path: '/joms/user', element: <ViewUser /> },
       { path: '/joms/pending', element: <PendingRequest /> },
-      { path: '/joms/vehicleavail', element: <VehicleAvailability /> },
       // Inspection
       { path: '/joms/inspection', element: <InspectionFormList /> },
       { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },

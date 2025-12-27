@@ -2,13 +2,19 @@ import { useEffect, useState, useRef  } from "react";
 import axiosClient from "../../axios";
 import PageComponent from "../../components/PageComponent";
 import Popup from "../../components/Popup";
+import loading_table from "/default/ring-loading.gif";
 import submitAnimation from '/default/ring-loading.gif';
 import { useUserStateContext } from "../../context/ContextProvider";
 import Restrict from "../../components/Restrict";
+import { faTrash, faPlus, faCheckToSlot, faXmark, faPenToSquare, faCheck, faUserAltSlash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function AllAnnouncements(){
 
   const { currentUserCode } = useUserStateContext();
+
+  // Function
+  const [loading, setLoading] = useState(true);
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -63,6 +69,7 @@ export default function AllAnnouncements(){
       });
 
       setAnnounceList({mappedData});
+      setLoading(false);
     });
   },[]);
 
@@ -167,104 +174,117 @@ export default function AllAnnouncements(){
   
       {/* Main Content */}
       {Authorize ? (
-        <div className="font-roboto ppa-form-box">
-          <div className="ppa-form-header"> Announcement List </div>
-              <div style={{ padding: '6px 10px 10px 10px' }}>
-                {/* Table */}
-                <table className="ppa-table w-full mb-10 mt-2">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-1.5 py-1.5 text-center text-sm font-medium text-gray-600 uppercase">Date</th>
-                      <th className="px-1.5 py-1.5 text-center text-sm w-1 font-medium text-gray-600 uppercase">Message</th>
-                      <th className="px-1.5 py-1.5 text-center text-sm font-medium text-gray-600 uppercase">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ backgroundColor: '#fff' }}>
-                    {announceList?.mappedData?.length > 0 ? (
-                      announceList?.mappedData?.map((getData)=>(
-                        <tr key={getData.id}>
-                          <td className="px-4 py-3 text-center align-top w-1/4 table-font">{getData.date_of_request}</td>
-                          <td className="px-4 py-3 text-left table-font">
+        <div className="ppa-widget mt-8">
+          <div className="flex justify-between items-center">
+            {/* Header */}
+              <div className="joms-user-info-header text-left"> 
+                Announcement List
+              </div>
+          </div>
+
+          {/* Table */}
+          <div className="ppa-div-table p-4">
+            <table className="ppa-table w-full">
+              {/* Header */}
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Date</th>
+                  <th className="px-4 py-2 w-[60%] text-center ppa-table-header">Message</th>
+                  <th className="px-4 py-2 w-[20%] text-center ppa-table-header">Action</th>
+                </tr>
+              </thead>
+              <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
+                      <div className="flex justify-center items-center">
+                        <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                        <span className="loading-table">Loading</span>
+                      </div>
+                    </td>
+                  </tr>
+                ):(
+                  announceList?.mappedData?.length > 0 ? (
+                    announceList?.mappedData?.map((getData)=>(
+                      <tr key={getData.id}>
+                        <td className="px-4 py-4 text-left ppa-table-body">{getData.date_of_request}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">
+                          {editingId === getData.id ? (
+                          <>
+                            <textarea
+                              ref={textareaRef}
+                              className="w-full ppa-form-field"
+                              style={{ resize: "none",  overflow: "hidden" }}
+                              type="text"
+                              rows={3}
+                              value={editedDetails}
+                              onChange={handleChange}
+                              maxLength={maxCharacters}
+                            />
+                            <p className="text-sm text-gray-500"> {maxCharacters - editedDetails.length} characters remaining </p>
+                          </>
+                          ):(
+                            getData.details
+                          )}
+                        </td>
+                        <td className="px-4 py-4 text-left ppa-table-body">
+                          <div className="flex justify-center items-center space-x-4">
                             {editingId === getData.id ? (
-                            <>
-                              <textarea
-                                ref={textareaRef}
-                                className="w-full ppa-form"
-                                style={{ resize: "none",  overflow: "hidden" }}
-                                type="text"
-                                rows={3}
-                                value={editedDetails}
-                                onChange={handleChange}
-                                maxLength={maxCharacters}
-                              />
-                              <p className="text-sm text-gray-500"> {maxCharacters - editedDetails.length} characters remaining </p>
-                            </>
-                            ):(
-                              getData.details
-                            )}
-                          </td>
-                          <td className="w-1/4">
-                            <div className="flex justify-center">
-                              {editingId === getData.id ? (
-                              <>
-                                {/* Submit */}
-                                <button 
-                                  type="submit"
-                                  onClick={() => handleSaveClick(event, getData.id)}
-                                  className={`ml-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                  disabled={submitLoading}
-                                >
-                                  {submitLoading ? (
-                                    <div className="flex">
-                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                      <span className="ml-2">Loading</span>
-                                    </div>
-                                  ):(
-                                    'Submit'
-                                  )}
-                                </button>
-                                {/* Cancel */}
-                                {!submitLoading && (
-                                  <button
-                                    className="btn-cancel-form ml-2"
-                                    onClick={handleCancelClick}
-                                  >
-                                    Cancel
-                                  </button>
-                                )}
-                              </>
+                              submitLoading ? (
+                                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
                               ):(
                               <>
-                                {/* Edit Button */}
-                                <button 
-                                  className="btn-default-form mr-2"
-                                  onClick={() => handleEditClick(getData.id, getData.details)}
-                                >
-                                  Edit
-                                </button>
-                                {/* Cancel Button */}
-                                <button 
-                                  className="btn-cancel-form"
-                                  onClick={() => handleDeleteConfirmation(getData.id)}
-                                >
-                                  Delete
-                                </button>
+
+                                {/* Save */}
+                                <FontAwesomeIcon
+                                  onClick={() => handleSaveClick(event, getData.id)}
+                                  className="icon-approve"
+                                  icon={faCheck}
+                                />
+
+                                {/* Close */}
+                                <FontAwesomeIcon
+                                  className="icon-close"
+                                  onClick={handleCancelClick}
+                                  icon={faXmark}
+                                />
+
                               </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ):(
-                      <tr>
-                        <td colSpan={3} className="px-2 py-2 text-center text-sm text-gray-600">
-                          No records found.
+                              )
+                            ):(
+                              <>
+                                {/* Edit */}
+                                <FontAwesomeIcon 
+                                  className="icon-edit"
+                                  onClick={() => handleEditClick(getData.id, getData.details)}
+                                  icon={faPenToSquare} 
+                                />
+
+                                {/* Remove */}
+                                <FontAwesomeIcon 
+                                  className="icon-remove"
+                                  onClick={() => handleDeleteConfirmation(getData.id)}
+                                  icon={faTrash} 
+                                />
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
+                        <div className="flex justify-center items-center w-full font-bold">
+                          No announcements
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       ):(
         <Restrict />

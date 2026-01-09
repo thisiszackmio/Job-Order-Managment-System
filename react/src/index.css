@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Employee's Detail */
+.user-active { color: #008000; }
+.user-deleted { color: #808080; }
+.user-need { color: #FFFF00; border: 1px solid #000; border-radius: 10px; }
+.ppa-avatar { object-fit: cover; height: 0.8in; width: 0.9in; object-position: top; border-radius: 60px; }
+
+/* Dashboard */
 .greeting { font-size: 30px; font-weight: bold; margin-bottom: 50px; }
 .ppa-req-personnel { object-fit: cover; height: 0.7in; width: 0.7in; object-position: top; border-radius: 60px; margin-bottom: 15px; }
 .ppa-req-name { position: absolute; top: 8px; left: 78px; font-size: 16px; font-weight: bold; color: #272727; }
@@ -218,6 +225,7 @@ input:focus, textarea:focus {
 }
 .ppa-form-field:focus { box-shadow: 0px 0px 5px #272727 !important; transition: 100ms; }
 .ppa-form-error:focus { box-shadow: 0px 0px 5px #C41E3A !important; border-color: #ff0000 !important; transition: 100ms; }
+.ppa-user-code { position: relative; left: 5%; }
 /* Target all disabled inputs */
 input:disabled, input[disabled], textarea:disabled, textarea[disabled], select:disabled,
 select[disabled] { background-color: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; cursor: not-allowed; opacity: 1; }
@@ -225,6 +233,7 @@ select[disabled] { background-color: #f3f4f6; color: #6b7280; border: 1px solid 
 .form-validation { color: #ff0000; font-size: 12px; margin-top: 4px; margin-left: 10px; }
 .cost { padding-left: 20px !important; }
 .ppa-form-field { margin-top: 10px; border: 1px solid #808080; border-radius: 5px; font-size: 15px; }
+.ppa-form-edit { border: 1px solid #808080; border-radius: 5px; font-size: 15px; }
 .ppa-form-error { margin-top: 10px; border: 1px solid #C41E3A; border-radius: 5px; font-size: 15px; }
 .ppa-form-view { border-bottom: 1px solid; padding-left: 5px; }
 h2.req-title { font-size: 18px; font-weight: 900; }
@@ -232,9 +241,10 @@ h2.req-title { font-size: 18px; font-weight: 900; }
 .ppa-form-list { border-bottom: 1px solid #000; }
 .ppa-form-box-view { border: 1px solid #272727; height: 6rem; padding: 10px; border-radius: 5px; }
 .ppa-form-preview { padding: 4px 10px; border: 1px solid; font-weight: bold; border-radius: 5px; }
+.ppa-esignature-prf { position: absolute; }
 
 /* Request Form */
-.icon-form { color: #808080; transition: 200ms; top: 0; left: 21.5rem; }
+.icon-form { color: #808080; transition: 200ms; top: 0; left: 13rem; }
 .icon-form:hover { color: #272727; cursor: pointer; }
 .icon-delete { width: 20px; height: 20px; transition: 200ms; color: #272727; }
 .icon-delete:hover { color: #696262; cursor: pointer; }

@@ -140,14 +140,14 @@ export default function UserListJLMS(){
           <table className="ppa-table w-full mb-10 mt-2">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-3 py-3 text-center text-sm w-1 font-medium text-gray-600 uppercase">ID</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Avatar</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Name</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Division</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Position</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Username</th>  
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Clearance</th>
-                <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 uppercase">Status</th>
+                <th className="px-4 py-2 text-center ppa-table-header">ID</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Avatar</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Name</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Division</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Position</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Username</th>  
+                <th className="px-4 py-2 text-center ppa-table-header">Clearance</th>
+                <th className="px-4 py-2 text-center ppa-table-header">Status</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: '#fff' }}>
@@ -164,14 +164,14 @@ export default function UserListJLMS(){
                 currentUser.length > 0 ? (
                   currentUser.map((getData)=>(
                     <tr key={getData.id}>
-                      <td className="px-3 py-2 text-center">{getData.id}</td>
-                      <td className="px-3 py-2 text-center table-font w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
-                      <td className="px-3 py-2 text-left table-font"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
-                      <td className="px-3 py-2 text-center table-font">{getData.division}</td>
-                      <td className="px-3 py-2 text-center table-font">{getData.position}</td>
-                      <td className="px-3 py-2 text-center table-font">{getData.username}</td>
-                      <td className="px-3 py-2 text-center table-font">{getData.code_clearance}</td>
-                      <td className="px-3 py-2 text-center table-font">
+                      <td className="px-3 py-2 text-center ppa-table-body">{getData.id}</td>
+                      <td className="px-3 py-2 text-center ppa-table-body w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
+                      <td className="px-3 py-2 text-center ppa-table-body"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
+                      <td className="px-3 py-2 text-center ppa-table-body">{getData.division}</td>
+                      <td className="px-3 py-2 text-center ppa-table-body">{getData.position}</td>
+                      <td className="px-3 py-2 text-center ppa-table-body">{getData.username}</td>
+                      <td className="px-3 py-2 text-center ppa-table-body">{getData.code_clearance}</td>
+                      <td className="px-3 py-2 text-center ppa-table-body">
                         {getData.status == 0 && (<FontAwesomeIcon className="user-deleted" title="Deleted" icon={faCircle} />)}
                         {getData.status == 1 && (<FontAwesomeIcon className="user-active" title="Active" icon={faCircle} />)}
                         {getData.status == 2 && (<FontAwesomeIcon className="user-need" title="Not Activate" icon={faCircle} />)}

@@ -116,6 +116,7 @@ export default function JOMSLayout() {
   const GSO = codes.includes("GSO");
   const AssignPersonnel = codes.includes("AP");
   const Authority = codes.includes("AU");
+  const SuperHacker = codes.includes("NERD");
 
   return(
     <div className="w-full h-full font-roboto">
@@ -346,12 +347,16 @@ export default function JOMSLayout() {
                       <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                         <Link to="/joms/logs" className={`${location.pathname === "/joms/logs" ? "active-submenu" : ""}`}>Logs</Link>
                       </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/userlist" className={`${location.pathname === "/joms/userlist" ? "active-submenu" : ""}`}>All Employee Lists</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/addemployee" className={`${location.pathname === "/joms/addemployee" ? "active-submenu" : ""}`}>Add Employee Data</Link>
-                      </li>
+                      {SuperHacker && (
+                      <>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/joms/userlist" className={`${location.pathname === "/joms/userlist" ? "active-submenu" : ""}`}>All Employee Lists</Link>
+                        </li>
+                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
+                          <Link to="/joms/addemployee" className={`${location.pathname === "/joms/addemployee" ? "active-submenu" : ""}`}>Add Employee Data</Link>
+                        </li>
+                      </>
+                      )}
                     </ul>
                   </section>
                 )}

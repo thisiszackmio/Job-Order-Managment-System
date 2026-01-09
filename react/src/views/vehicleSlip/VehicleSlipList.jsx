@@ -205,7 +205,7 @@ export default function VehicleSlipList(){
                         <tr key={list.id}>
                           <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
                             <Link
-                              to={`/joms/facilityvenue/form/${list.id}`}
+                              to={`/joms/vehicle/form/${list.id}`}
                               className="group flex justify-center items-center"
                             >
                               {/* Initially show the ID */}

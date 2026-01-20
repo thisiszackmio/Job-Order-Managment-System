@@ -1328,7 +1328,7 @@ export default function UserDetailsJLMS(){
                     <div className="items-center mt-2">
                       <form id="user_avatar" onSubmit={SubmitAvatar} method="POST" action="#" encType="multipart/form-data">
                         <div className="flex items-center">
-                          <div className="w-36">
+                          <div className="w-48 md:w-36">
                           <label htmlFor="ppa-avatar" className="block text-lg font-bold leading-6 text-gray-900">
                               Upload Avatar:
                             </label> 
@@ -1366,7 +1366,7 @@ export default function UserDetailsJLMS(){
                     <div className="items-center mt-2">
                       <form id="user_esig" onSubmit={SubmitEsig} action="#" method="POST" encType="multipart/form-data">
                         <div className="flex items-center">
-                          <div className="w-36">
+                          <div className="w-48 md:w-36">
                           <label htmlFor="ppa-esignature" className="block text-lg font-bold leading-6 text-gray-900">
                               Upload Esig:
                             </label> 
@@ -1406,44 +1406,46 @@ export default function UserDetailsJLMS(){
 
             {/* Tracking the Logins */}
             {userDet?.status != 0 && (
-            <div className="ppa-widget mt-12">
-              <div className="joms-user-info-header text-left"> LOGIN TRACKING </div>
-              <div className="px-4 pb-4">
-                <div className="ppa-div-table">
-                  <table className="ppa-table w-full">
-                    <thead>
-                      <tr>
-                        <th className="px-4 py-2 text-left ppa-table-header">Date Time</th>
-                        <th className="px-4 py-2 text-left ppa-table-header">Browser</th>
-                        <th className="px-4 py-2 text-center ppa-table-header">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody style={{ backgroundColor: '#fff' }}>
-                      {getSec?.user_id ? (
-                        <tr key={getSec.id}>
-                          <td className="px-4 py-2 text-left ppa-table-body">{formatDateTime(getSec.datetime)}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{getSec.browser}</td>
-                          <td className="px-4 py-2 text-center ppa-table-body">
-                            {/* Update Details */}
-                            <button onClick={() => handleDeleteToken(getSec.user_id)} 
-                              className="py-2 px-4 btn-cancel-form"
-                            >
-                              Remove Token
-                            </button>
-                          </td>
-                        </tr>
-                      ):(
-                        <tr>
-                          <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
-                            No Tracking
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+              !defaultForm && (
+                <div className="ppa-widget mt-12">
+                  <div className="joms-user-info-header text-left"> LOGIN TRACKING </div>
+                  <div className="px-4 pb-4">
+                    <div className="ppa-div-table">
+                      <table className="ppa-table w-full">
+                        <thead>
+                          <tr>
+                            <th className="px-4 py-2 text-left ppa-table-header">Date Time</th>
+                            <th className="px-4 py-2 text-left ppa-table-header">Browser</th>
+                            <th className="px-4 py-2 text-center ppa-table-header">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody style={{ backgroundColor: '#fff' }}>
+                          {getSec?.user_id ? (
+                            <tr key={getSec.id}>
+                              <td className="px-4 py-2 text-left ppa-table-body">{formatDateTime(getSec.datetime)}</td>
+                              <td className="px-4 py-2 text-left ppa-table-body">{getSec.browser}</td>
+                              <td className="px-4 py-2 text-center ppa-table-body">
+                                {/* Update Details */}
+                                <button onClick={() => handleDeleteToken(getSec.user_id)} 
+                                  className="py-2 px-4 btn-cancel-form"
+                                >
+                                  Remove Token
+                                </button>
+                              </td>
+                            </tr>
+                          ):(
+                            <tr>
+                              <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
+                                No Tracking
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )
             )}
 
           </div>

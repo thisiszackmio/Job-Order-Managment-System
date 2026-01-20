@@ -18,10 +18,41 @@ export default function JOMSLayout() {
   const pathname = location.pathname;
   const navigate = useNavigate();
 
-  const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
-  const [activeAccordion, setActiveAccordion] = useState(null);
-
   const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
+
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(true);
+  const [activeAccordion, setActiveAccordion] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect Mobile Screen
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    };
+
+    checkScreen(); // run on load
+    window.addEventListener('resize', checkScreen);
+
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
+  // Force close the sidebar
+  useEffect(() => {
+    if (!isMobile) {
+      setIsSidebarMinimized(false);   // force minimized
+      setActiveAccordion(null);      // close accordion
+    }else{
+      setIsSidebarMinimized(true);   // force minimized
+      setActiveAccordion(null);      // close accordion
+    }
+  }, [isMobile]);
+
+  // Close Accordion of sidebar
+  useEffect(() => {
+    if (isSidebarMinimized) {
+      setActiveAccordion(null);
+    }
+  }, [isSidebarMinimized, setActiveAccordion]);
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -44,12 +75,6 @@ export default function JOMSLayout() {
   const handleToggle = (index) => {
     setActiveAccordion(index === activeAccordion ? null : index);
   };
-
-  useEffect(() => {
-    if (isSidebarMinimized) {
-      setActiveAccordion(null);
-    }
-  }, [isSidebarMinimized, setActiveAccordion]);
 
   const isRequestFormsActive =
   location.pathname.includes("/joms/inspection/form") ||
@@ -122,12 +147,21 @@ export default function JOMSLayout() {
     <div className="w-full h-full font-roboto">
 
       {/* Side Bar */}
-      <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
+      <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden', zIndex: '50'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
         <div className={`transition-width duration-300 ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
 
           {/* Logo */}
           <div className="flex justify-center items-center pt-4">
             <img src={ppaLogo} alt="PPA PMO/LNI" className={`transition-width duration-300 ${isSidebarMinimized ? 'w-10' : 'w-3/4 items-center'}`} />
+          </div>
+
+          {/* Top Nav on mobile */}
+          <div className="relative">
+            <div className="ppa-hamburger-mobile">
+              <button onClick={() => setIsSidebarMinimized(!isSidebarMinimized)} className="text-white">
+                <FontAwesomeIcon icon={faBars} className="ham-hehe" />
+              </button>
+            </div>
           </div>
 
           {/* Title Text */}
@@ -407,7 +441,6 @@ export default function JOMSLayout() {
         <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
           <Outlet />
         </div>
-        <Footer />
       </div>
 
       {showPopup && (

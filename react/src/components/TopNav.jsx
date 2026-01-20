@@ -117,7 +117,7 @@ const TopNav = () =>{
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex h-16 items-center justify-between" style={{ position: 'relative', left: '-25px' }}>
         {/* Notification Icon */}
-        <div className="hidden md:flex items-center">
+        <div className="flex items-center">
           <div className="relative">
             <Menu as="div" className="relative">
 
@@ -152,7 +152,7 @@ const TopNav = () =>{
                   leaveTo="transform opacity-0 scale-95"
                 >
 
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Menu.Items className="mobile-nav absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     {maintenance ? (
                       <p className="text-base font-bold text-center leading-7 py-4">Notification is disable on Maint Mode</p>
                     ):(

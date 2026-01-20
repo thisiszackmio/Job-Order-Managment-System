@@ -101,7 +101,7 @@ export default function AddAnnouncements(){
             <form onSubmit={onSubmit}>
 
               {/* Date */}
-              <div className="flex items-center">
+              <div className="md:flex items-center">
                 <div className="w-40">
                   <label htmlFor="rep_date" className="flex form-title"> 
                     Date: 
@@ -120,7 +120,7 @@ export default function AddAnnouncements(){
               </div>
 
               {/* Details */}
-              <div className="flex items-center mt-4 ">
+              <div className="md:flex items-center mt-2 md:mt-4">
                 <div className="w-40">
                   <label htmlFor="ppd_name" className="flex form-title"> Details: </label> 
                 </div>
@@ -146,15 +146,15 @@ export default function AddAnnouncements(){
               </div>  
 
               {/* Button */}
-              <div className="mt-6">
+              <div className="mt-4 md:mt-6 justify-center md:justify-start">
                 {/* Submit */}
                 <button 
                   type="submit"
-                  className={`ml-2 py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  className={`w-full md:w-auto py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
-                    <div className="flex">
+                    <div className="flex justify-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-1">Loading</span>
                     </div>

@@ -164,6 +164,7 @@ export default function MyRequest(){
 
   return(
     <PageComponent title="My Request List">
+      
       {/* Post Repair Form */}
       <div className="ppa-widget mt-8">
         <div className="joms-user-info-header text-left"> Pre/Post Repair Inspection Form </div>
@@ -201,24 +202,24 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="px-4 pb-4 ppa-div-table">
+          <div className="px-4 pb-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
-                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
-                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Type of Property</th>
-                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Description</th>
-                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Complain/Defect</th>
-                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Approver</th>
-                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Remarks</th>
+                  <th className="px-2 md:px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                  <th className="px-2 md:px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Type of Property</th>
+                  <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Description</th>
+                  <th className="px-2 md:px-4 py-2 w-[20%] text-left ppa-table-header">Complain/Defect</th>
+                  <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Approver</th>
+                  <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Remarks</th>
                 </tr>
               </thead>
               <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
                 {paginatedInspection && paginatedInspection?.length > 0 ? (
                   paginatedInspection.map((getInspData)=>(
                     <tr key={getInspData.id}>
-                      <td className="px-4 py-4 w-[5%] font-bold text-center ppa-table-body-id">
+                      <td className="px-2 py-2 md:px-4 md:py-4 w-[5%] font-bold text-center ppa-table-body-id">
                         <Link 
                           to={`/joms/inspection/form/${getInspData.id}`} 
                           className="group flex justify-center items-center"
@@ -232,12 +233,12 @@ export default function MyRequest(){
                           </span>
                         </Link>
                       </td>
-                      <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getInspData.date_request}</td>
-                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.type}</td>
-                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.description}</td>
-                      <td className="px-4 py-2 w-[20%] text-left ppa-table-body">{getInspData.complain}</td>
-                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.supervisor}</td>
-                      <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getInspData.remarks}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[10%] text-left ppa-table-body">{getInspData.date_request}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.type}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.description}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[20%] text-left ppa-table-body">{getInspData.complain}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.supervisor}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.remarks}</td>
                     </tr>
                   ))
                 ):(
@@ -290,7 +291,7 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="px-4 pb-4 ppa-div-table">
+          <div className="px-4 pb-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               <thead>
                 <tr>
@@ -385,7 +386,7 @@ export default function MyRequest(){
             <span className="loading-table">Loading</span>
           </div>
         ):(
-          <div className="px-4 pb-4 ppa-div-table">
+          <div className="px-4 pb-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               <thead>
                 <tr>

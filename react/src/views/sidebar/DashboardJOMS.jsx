@@ -212,7 +212,7 @@ export default function DashboardJOMS(){
           <span className="loading">Loading...</span>
         </div>
       ):(
-       loading ? (
+        loading ? (
           <div className="flex justify-center items-center pt-2 pb-8">
             <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
             <span className="loading-table">Loading Dashboard</span>
@@ -226,12 +226,11 @@ export default function DashboardJOMS(){
           </div>
 
           {/* Request Form */}
-          <div className="grid grid-cols-4 gap-2 mt-6">
-
+          <div className="grid mt-6 request-forms">
             {/* For Repair */}
             <div className="col-span-1 ppa-widget relative">
               <img className="joms-icons" src={repair} alt="Your Company"/>
-              <div className="joms-dashboard-title pt-2 pr-4 text-right"> Inspection Repair </div>
+              <div className="joms-dashboard-title pt-2 pr-4 text-right pl-20"> Inspection Repair </div>
               <div className="joms-count text-right pr-4">{inspectionForm?.count}</div>
               <div className="border-b border-gray-300 mx-4"></div>
               <div className="joms-word-count">No of Request Today: <strong>{inspectionForm?.today}</strong></div>
@@ -247,7 +246,7 @@ export default function DashboardJOMS(){
             </div>
 
             {/* For Vehicle Slip */}
-            <div className="col-span-1 ppa-widget relative">
+            <div className="col-span-1 ppa-widget relative mobile-form">
               <img className="joms-icons" src={vehicleSlip} alt="Your Company"/>
               <div className="joms-dashboard-title pt-2 pr-4 text-right"> Vehicle Slip </div>
               <div className="joms-count text-right pr-4">{vehicleForm?.count}</div>
@@ -256,7 +255,7 @@ export default function DashboardJOMS(){
             </div>
 
             {/* For Locator Slip  */}
-            <div className="col-span-1 ppa-widget relative">
+            <div className="col-span-1 ppa-widget relative mobile-form">
               <img className="mx-auto joms-icons" src={locator} alt="Your Company"/>
               <div className="joms-dashboard-title pt-2 pr-4 text-right"> Locator Slip </div>
               <img className="mx-auto joms-comsing-soon" src={comingsoon} alt="Your Company"/>
@@ -264,11 +263,10 @@ export default function DashboardJOMS(){
               <div className="border-b border-gray-300 mx-4"></div>
               <div className="joms-word-count">No of Request Today: <strong>{vehicleForm?.today}</strong></div> */}
             </div>
-
           </div>
 
           {/* Announcements */}
-          <div className="ppa-widget mt-14 pb-2">
+          <div className="ppa-widget mt-12 md:mt-14 pb-2">
             <div className="joms-user-info-header text-left">Announcement Board</div>
             <div className="px-3 pb-3" style={{ minHeight: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
               <table className="ppa-table w-full">
@@ -295,12 +293,12 @@ export default function DashboardJOMS(){
               </table>
             </div>
           </div>
-          
+
           {/* For Most Personel and Stats for the Request Form */}
-          <div className="grid gap-3 grid-cols-[35%_65%] [@media(min-width:1440px)]:grid-cols-[22%_78%]">
+          <div className="ppa-dashboard-stats">
             {/* Most Requested Personnel */}
             <div>
-              <div className="ppa-widget mt-14 h-100">
+              <div className="ppa-widget mt-12 md:mt-14 h-100">
                 {/* Header */}
                 <div className="joms-user-info-header text-left"> 
                   Most Requested Personnel
@@ -322,10 +320,10 @@ export default function DashboardJOMS(){
                 </div>
               </div>
             </div>
-            
+
             {/* Logs */}
             <div>
-              <div className="ppa-widget mt-14">
+              <div className="ppa-widget mt-12 md:mt-14">
                 <div className="joms-user-info-header text-left">Logs</div>
                 <div className="joms-dashboard-title px-4 text-left pb-2"> As for <strong>{currentDate}</strong> </div>
                 <div className="ppa-div-table px-4" style={{ minHeight: '475px', maxHeight: '475px', overflowY: 'auto' }}>
@@ -359,7 +357,7 @@ export default function DashboardJOMS(){
           </div>
 
           {/* Members */}
-          <div className="ppa-widget mt-14">
+          <div className="ppa-widget mt-12 md:mt-14">
             <div className="joms-user-info-header text-left">Members</div>
             <div className="members-container p-4 ppa-div-table" style={{ minHeight: 'auto', maxHeight: '400px', overflowY: 'auto' }}>
             {teams?.TeamData?.map((TeamData)=>(
@@ -373,8 +371,7 @@ export default function DashboardJOMS(){
           </div>
 
         </div>
-       )
-      )}
+       ))}
     </PageComponent>
   )
 }

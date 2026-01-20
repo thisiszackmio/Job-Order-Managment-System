@@ -148,7 +148,7 @@ export default function FacilityVenueFormList(){
         <div className="px-4 pb-6">
 
           {/* Search Filter */}
-          <div className="flex">
+          <div className="md:flex">
 
             {/* Search */}
             <div className="flex-grow">
@@ -157,12 +157,12 @@ export default function FacilityVenueFormList(){
                 placeholder="Search Here"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-96 p-2 border border-gray-300 rounded text-sm"
+                className="w-full md:w-96 p-2 border border-gray-300 rounded text-sm"
               />
             </div>
 
             {/* Count */}
-            <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
+            <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
               <div className="text-right text-sm/[17px]">
                 Total of{" "}
                 {pageCountUser > 1 ? (
@@ -204,7 +204,7 @@ export default function FacilityVenueFormList(){
           </div>
 
           {/* Table */}
-          <div className="ppa-div-table">
+          <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               <thead>
                 <tr>

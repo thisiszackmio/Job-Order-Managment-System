@@ -270,63 +270,63 @@ export default function FacilityVenueForm(){
               <div className="px-4">
 
                 {/* Date */}
-                <div className="flex items-center mt-4">
+                <div className="md:flex items-center mt-4">
                   <div className="w-40">
                     <label className="form-title">
                     Date:
                     </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                     {formatDate(today)}
                   </div>
                 </div>
 
                 {/* Travel Type */}
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Travel Type: </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                   {selectedTravelType == 'within' ? "Within the City" : "Outside the City"}
                   </div>
                 </div>
 
                 {/* Purpose */}
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Purpose: </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                   {VRPurpose}
                   </div>
                 </div>
 
                 {/* Place/s to be Visited */}
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Place/s to be Visited: </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                   {VRPlace}
                   </div>
                 </div>
 
                 {/* Date of Arrival */}
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Date of Arrival: </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                   {formatDate(VRDateArrival)}
                   </div>
                 </div>
 
                 {/* Time of Arrival */}
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Time of Arrival: </label> 
                   </div>
-                  <div className="w-1/2 ppa-form-preview">
+                  <div className="w-full md:w-1/2 ppa-form-preview">
                   {formatTime(VRTimeArrival)}
                   </div>
                 </div>
@@ -334,21 +334,21 @@ export default function FacilityVenueForm(){
                 {(GSO || PersonAuthority) && (
                 <>
                   {/* Vehicle Type */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2">
                     <div className="w-40">
                       <label className="form-title"> Vehicle Type: </label> 
                     </div>
-                    <div className="w-1/2 ppa-form-preview">
+                    <div className="w-full md:w-1/2 ppa-form-preview">
                     {vehicalName}
                     </div>
                   </div>
 
                   {/* Driver */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2">
                     <div className="w-40">
                       <label className="form-title"> Driver: </label> 
                     </div>
-                    <div className="w-1/2 ppa-form-preview">
+                    <div className="w-full md:w-1/2 ppa-form-preview">
                     {pointDriver.dname}
                     </div>
                   </div>
@@ -357,7 +357,7 @@ export default function FacilityVenueForm(){
 
                 {/* Passenger/s */}
                 {VRPassenger ? (
-                <div className="flex items-center mt-2">
+                <div className="md:flex items-center mt-2">
                   <div className="w-40">
                     <label className="form-title"> Passenger/s: </label> 
                   </div>
@@ -365,7 +365,7 @@ export default function FacilityVenueForm(){
                   {/* Render columns based on passenger count */}
                   <div 
                     style={{ columnCount: VRPassenger?.split("\n").filter(name => name.trim()).length > 5 ? 2 : 1 }} 
-                    className="w-1/2 ppa-form-preview-border"
+                    className="w-full md:w-1/2 ppa-form-preview-border"
                   >
                     {VRPassenger
                       ?.split("\n")                   // Split passengers by newline
@@ -385,23 +385,23 @@ export default function FacilityVenueForm(){
 
                 {/* Note */}
                 {VRNote ? (
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2">
                     <div className="w-40">
                       <label className="form-title"> Note: </label> 
                     </div>
-                    <div className="w-1/2 ppa-form-preview">
+                    <div className="w-full md:w-1/2 ppa-form-preview">
                     {VRNote}
                     </div>
                   </div>
                 ):null}
 
                 {/* Button */}
-                <div className="mt-10 pb-4">
+                <div className="mt-10 pb-4 mobile-btn flex justify-center md:justify-start">
                 {!buttonHide && (
                   <>
                   {/* Submit */}
                   <button type="submit"
-                    className={`py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                    className={`w-full md:w-auto py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -416,7 +416,7 @@ export default function FacilityVenueForm(){
 
                     {/* Cancel */}
                     {!submitLoading && (
-                      <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-sm btn-cancel-form">
+                      <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-sm btn-cancel-form">
                         Revise
                       </button>
                     )}
@@ -438,7 +438,7 @@ export default function FacilityVenueForm(){
             </div>
 
             {/* Form */}
-            <div className="grid grid-cols-2">
+            <div className="md:grid md:grid-cols-2">
 
               {/* 1st Column */}
               <div className="col-span-1 px-4">
@@ -457,13 +457,13 @@ export default function FacilityVenueForm(){
                       id="vr_date"
                       defaultValue={today}
                       className="block w-full ppa-form-field"
-                      readOnly
+                      disabled
                     />
                   </div>
                 </div>
 
                 {/* Type of Travel */}
-                <div className="items-center mt-4 font-roboto">
+                <div className="items-center mt-2 md:mt-4 font-roboto">
                   <div className="font-roboto w-full pb-2">
                     <label htmlFor="rf_request" className="form-title flex">
                       Type of Travel:
@@ -472,7 +472,7 @@ export default function FacilityVenueForm(){
                       ):( <p className="form-validation"> * </p> )}
                     </label>
                   </div>
-                  <div className="w-full flex items-center space-x-20">
+                  <div className="w-full flex items-center space-x-10 md:space-x-20">
 
                     {/* Within City */}
                     <div className="flex items-center">
@@ -511,7 +511,7 @@ export default function FacilityVenueForm(){
                 </div>
 
                 {/* Purpose */}
-                <div className="items-center mt-4 font-roboto">
+                <div className="items-center mt-2 md:mt-4 font-roboto">
                   <div className="w-full">
                     <label htmlFor="vr_purpose" className="form-title flex">
                       Purpose:
@@ -540,7 +540,7 @@ export default function FacilityVenueForm(){
                 </div>
 
                 {/* Place */}
-                <div className="items-center mt-4 font-roboto">
+                <div className="items-center mt-2 md:mt-4 font-roboto">
                   <div className="w-full">
                     <label htmlFor="vr_place" className="form-title flex">
                       Place/s To Be Visited:
@@ -569,7 +569,7 @@ export default function FacilityVenueForm(){
                 </div>
 
                 {/* Date of Arrival */}
-                <div className="items-center mt-4 font-roboto">
+                <div className="items-center mt-2 md:mt-4 font-roboto">
                   <div className="w-full">
                     <label htmlFor="vr_datearrival" className="form-title flex">
                       Date of Arrival:
@@ -593,7 +593,7 @@ export default function FacilityVenueForm(){
                 </div>
 
                 {/* Time of Arrival */}
-                <div className="items-center mt-4 font-roboto">
+                <div className="items-center mt-2 md:mt-4 font-roboto">
                   <div className="w-full">
                     <label htmlFor="vr_timearrival" className="form-title flex">
                       Time of Arrival:
@@ -623,7 +623,7 @@ export default function FacilityVenueForm(){
                 {(GSO || PersonAuthority) && (
                 <>
                   {/* Vehicle Type */}
-                  <div className="items-center mt-4">
+                  <div className="items-center mt-2 md:mt-4">
                     <div className="w-full">
                       <label htmlFor="rep_type_of_property" className="form-title flex">
                         Vehicle Type:
@@ -658,7 +658,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Driver Details */}
-                  <div className="items-center mt-4">
+                  <div className="items-center mt-2 md:mt-4">
                     <div className="w-48">
                       <label htmlFor="rep_type_of_property" className="form-title flex">
                         Driver:
@@ -700,7 +700,7 @@ export default function FacilityVenueForm(){
                 )}
 
                 {/* Passengers */}
-                <div className="mt-4 font-roboto">
+                <div className="mt-2 md:mt-4 font-roboto">
                   <div className="w-48">
                     <label htmlFor="vr_passengers" className="form-title">
                       Passengers:
@@ -736,7 +736,7 @@ export default function FacilityVenueForm(){
 
                 {/* Note */}
                 {selectedTravelType == 'outside' && (
-                  <div className="mt-4 font-roboto">
+                  <div className="mt-2 md:mt-4 font-roboto">
                     <div className="w-48">
                       <label htmlFor="vr_passengers" className="form-title">
                         Note:
@@ -767,10 +767,10 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Button */}
-              <div className="mt-10 pb-4 px-4">
+              <div className="mt-10 pb-4 px-4 mobile-btn flex justify-center md:justify-start">
                 <button 
                   onClick={handleConfirm} 
-                  className="py-2 px-4 text-sm btn-default-form">
+                  className="w-full md:w-auto py-2 px-4 text-sm btn-default-form">
                   Submit
                 </button>
               </div>

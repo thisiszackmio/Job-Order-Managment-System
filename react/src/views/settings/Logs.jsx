@@ -3,6 +3,7 @@ import PageComponent from "../../components/PageComponent";
 import { useEffect, useRef, useState } from 'react';
 import axiosClient from '../../axios';
 import loading_table from "/default/ring-loading.gif";
+import noPhone from "/default/no-phone.png";
 import { useReactToPrint } from 'react-to-print';
 
 export default function Logs() {
@@ -15,6 +16,20 @@ export default function Logs() {
   const [logsFunction, getLogsFunctions] = useState(false);
   const [loadingLogs, getLoadingLogs] = useState(true);
   const [submitButton, setSubmitButton] = useState(true);
+
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect Mobile Screen
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    };
+
+    checkScreen(); // run on load
+    window.addEventListener('resize', checkScreen);
+
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
 
   // For the ToDate Input
   const handleToDateChange = (ev) => {
@@ -154,166 +169,191 @@ export default function Logs() {
   return(
     <PageComponent title="Logs">
 
-      {/* Main */}
-      <div className="ppa-widget mt-8">
-        <div className="joms-user-info-header text-left"> 
-          Log Details
-        </div>
+      {!isMobile ? (
+      <>
+        {/* Main */}
+        <div className="ppa-widget mt-8">
+          <div className="joms-user-info-header text-left"> 
+            Log Details
+          </div>
 
-        <div className="px-4 pb-6">
-          {/* Date Range */}
-          <div className="flex items-end justify-center gap-4 mt-4 mb-4">
+          <div className="px-4 pb-6">
+            {/* Date Range */}
+            <div className="flex items-end justify-center gap-4 mt-4 mb-4">
 
-            {/* From Date */}
-            <div>
-              <label htmlFor="from_date" className="form-title block mb-1">
-                From:
-              </label>
-              <input 
-                type="date"
-                name="from_date"
-                id="from_date"
-                defaultValue={today}
-                onChange={ev => setFromDate(ev.target.value)}
-                className="block w-40 ppa-form-field"
-              />
-            </div>
-
-            {/* To Date */}
-            <div>
-              <label htmlFor="to_date" className="form-title block mb-1">
-                To:
-              </label>
-              <input 
-                type="date"
-                name="to_date"
-                id="to_date"
-                defaultValue={today}
-                min={fromDate}
-                onChange={handleToDateChange}
-                className="block w-40 ppa-form-field"
-              />
-            </div>
-
-            {/* Go Button */}
-            {submitButton && (
+              {/* From Date */}
               <div>
-                <div className="h-[22px]"></div>
-                {submitButton ? (
-                <>
-                  <button 
-                    type="submit"
-                    onClick={getLogsInfo}
-                    className="btn-default-form h-[42px]"
-                  >
-                    Go
-                  </button>
+                <label htmlFor="from_date" className="form-title block mb-1">
+                  From:
+                </label>
+                <input 
+                  type="date"
+                  name="from_date"
+                  id="from_date"
+                  defaultValue={today}
+                  onChange={ev => setFromDate(ev.target.value)}
+                  className="block w-40 ppa-form-field"
+                />
+              </div>
 
-                  {logsFunction ? (
-                    <button type="button" onClick={handleButtonClick}
-                      className={`btn-pdf h-[42px] ml-3 ${ submitLoading && 'btn-genpdf'}`}
-                      disabled={submitLoading}
+              {/* To Date */}
+              <div>
+                <label htmlFor="to_date" className="form-title block mb-1">
+                  To:
+                </label>
+                <input 
+                  type="date"
+                  name="to_date"
+                  id="to_date"
+                  defaultValue={today}
+                  min={fromDate}
+                  onChange={handleToDateChange}
+                  className="block w-40 ppa-form-field"
+                />
+              </div>
+
+              {/* Go Button */}
+              {submitButton && (
+                <div>
+                  <div className="h-[22px]"></div>
+                  {submitButton ? (
+                  <>
+                    <button 
+                      type="submit"
+                      onClick={getLogsInfo}
+                      className="btn-default-form h-[42px]"
                     >
-                      {submitLoading ? (
-                        <div className="flex items-center justify-center">
-                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                          <span className="ml-2">Generating</span>
-                        </div>
-                      ) : (
-                        'Get PDF'
-                      )}
+                      Go
                     </button>
+
+                    {logsFunction ? (
+                      <button type="button" onClick={handleButtonClick}
+                        className={`btn-pdf h-[42px] ml-3 ${ submitLoading && 'btn-genpdf'}`}
+                        disabled={submitLoading}
+                      >
+                        {submitLoading ? (
+                          <div className="flex items-center justify-center">
+                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                            <span className="ml-2">Generating</span>
+                          </div>
+                        ) : (
+                          'Get PDF'
+                        )}
+                      </button>
+                    ):null}
+
+                  </>
                   ):null}
+                </div>
+              )}
 
-                </>
-                ):null}
-              </div>
-            )}
-
-          </div>
-          
-          {/* Table */}
-          <div className="mt-8">
-          {logsFunction ? (
-            loadingLogs ? (
-              <div className="flex justify-center items-center py-8">
-                <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                <span className="loading-table">Loading Logs</span>
-              </div>
-            ):(
-              <div className="ppa-div-table">
-                <table className="ppa-table w-full">
-                  <thead className="sticky top-0 z-10">
-                    <tr>
-                      <th className="px-4 py-2 text-left ppa-table-header">Date and Time</th>
-                      <th className="px-4 py-2 text-left ppa-table-header">Category</th>
-                      <th className="px-4 py-2 text-left ppa-table-header">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody className="ppa-tbody scrollable-tbody" style={{ backgroundColor: '#fff' }}>
-                    {getLogs?.LogsData?.length > 0 ? (
-                      getLogs?.LogsData?.map((data) => (
-                        <tr key={data.id}>
-                          <td className="px-4 py-4 text-left ppa-table-body">{data?.date}</td>
-                          <td className="px-4 py-4 text-left ppa-table-body">{data?.category}</td>
-                          <td className="px-4 py-4 text-left ppa-table-body">{data?.message}</td>
-                        </tr>
-                      ))
-                    ):(
+            </div>
+            
+            {/* Table */}
+            <div className="mt-8">
+            {logsFunction ? (
+              loadingLogs ? (
+                <div className="flex justify-center items-center py-8">
+                  <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                  <span className="loading-table">Loading Logs</span>
+                </div>
+              ):(
+                <div className="ppa-div-table">
+                  <table className="ppa-table w-full">
+                    <thead className="sticky top-0 z-10">
                       <tr>
-                        <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
-                          No Logs
-                        </td>
+                        <th className="px-4 py-2 text-left ppa-table-header">Date and Time</th>
+                        <th className="px-4 py-2 text-left ppa-table-header">Category</th>
+                        <th className="px-4 py-2 text-left ppa-table-header">Description</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )
-          ):null}
-          </div>
-        </div>
-      </div>
-
-      {/* PDF */}
-      <div>
-        <div className="hidden md:none font-roboto logs-pdf">
-          <div ref={componentRef}>
-            <div style={{ width: '210mm', height: '297mm', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '0px solid' }}>
-
-              {/* Title */}
-              <div>
-                <div className="logs-title-company">Philippine Ports Authority - PMO Lanao Del Norte / Iligan</div>
-                <div className="logs-title-system"> Job Order Management System Logs </div>
-                <div className="logs-title-date"> {fromDate} to {toDate} </div>
-              </div>
-
-              {/* Table */}
-              <div>
-                <table className="ppa-table w-full">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-1 py-1 w-[20%] text-left ppa-table-header">Date and Time</th>
-                      <th className="px-1 py-1 w-[20%] text-center ppa-table-header">Category</th>
-                      <th className="px-1 py-1 w-[65%] text-left ppa-table-header">Message</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ backgroundColor: '#fff' }}>
-                    {getLogs?.LogsData?.map((data) => (
-                      <tr key={data.id}>
-                        <td className="px-1 py-1.5 text-left ppa-table-body">{data?.date}</td>
-                        <td className="px-1 py-1.5 text-center ppa-table-body">{data?.category}</td>
-                        <td className="px-1 py-1.5 text-left ppa-table-body">{data?.message}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
+                    </thead>
+                    <tbody className="ppa-tbody scrollable-tbody" style={{ backgroundColor: '#fff' }}>
+                      {getLogs?.LogsData?.length > 0 ? (
+                        getLogs?.LogsData?.map((data) => (
+                          <tr key={data.id}>
+                            <td className="px-4 py-4 text-left ppa-table-body">{data?.date}</td>
+                            <td className="px-4 py-4 text-left ppa-table-body">{data?.category}</td>
+                            <td className="px-4 py-4 text-left ppa-table-body">{data?.message}</td>
+                          </tr>
+                        ))
+                      ):(
+                        <tr>
+                          <td colSpan={3} className="px-2 py-5 text-center ppa-table-body">
+                            No Logs
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            ):null}
             </div>
           </div>
         </div>
+
+        {/* PDF */}
+        <div>
+          <div className="hidden md:none font-roboto logs-pdf">
+            <div ref={componentRef}>
+              <div style={{ width: '210mm', height: '297mm', paddingLeft: '15px', paddingRight: '15px', paddingTop: '10px', border: '0px solid' }}>
+
+                {/* Title */}
+                <div>
+                  <div className="logs-title-company">Philippine Ports Authority - PMO Lanao Del Norte / Iligan</div>
+                  <div className="logs-title-system"> Job Order Management System Logs </div>
+                  <div className="logs-title-date"> {fromDate} to {toDate} </div>
+                </div>
+
+                {/* Table */}
+                <div>
+                  <table className="ppa-table w-full">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="px-1 py-1 w-[20%] text-left ppa-table-header">Date and Time</th>
+                        <th className="px-1 py-1 w-[20%] text-center ppa-table-header">Category</th>
+                        <th className="px-1 py-1 w-[65%] text-left ppa-table-header">Message</th>
+                      </tr>
+                    </thead>
+                    <tbody style={{ backgroundColor: '#fff' }}>
+                      {getLogs?.LogsData?.map((data) => (
+                        <tr key={data.id}>
+                          <td className="px-1 py-1.5 text-left ppa-table-body">{data?.date}</td>
+                          <td className="px-1 py-1.5 text-center ppa-table-body">{data?.category}</td>
+                          <td className="px-1 py-1.5 text-left ppa-table-body">{data?.message}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+      ):(
+      <div className="min-h-100 font-roboto items-center justify-center flex flex-col">
+        <div className="container-fluid flex flex-col items-center text-center">
+
+          {/* Image Section */}
+          <img
+            className="no-phone mb-5"
+            src={noPhone}
+            alt="Under Maintenance"
+          />
+
+          {/* Text Section */}
+          <div className="w-full">
+            <h1 className="no-phone-tag">SORRY!</h1>
+            <p className="description">
+              This page is not accessible on mobile devices.
+            </p>
+          </div>
+
+        </div>
       </div>
+      )}
 
     </PageComponent>
   );

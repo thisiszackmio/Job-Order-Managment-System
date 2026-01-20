@@ -114,7 +114,7 @@ export default function UserListJLMS(){
         <div className="font-roboto">
 
           {/* Search Filter */}
-          <div className="mt-5 mb-4 flex">
+          <div className="mt-5 mb-4 md:flex">
 
             {/* Search */}
             <div className="flex-grow">
@@ -136,58 +136,87 @@ export default function UserListJLMS(){
 
           </div>
 
+          {/* Top Pagination */}
+          <div className="mb-3">
+            {displayPaginationUser && (
+              <ReactPaginate
+                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                breakLabel="..."
+                pageCount={pageCountUser}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                containerClassName="pagination"
+                subContainerClassName="pages pagination"
+                activeClassName="active"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+              />
+            )}
+          </div>
+
           {/* Table */}
-          <table className="ppa-table w-full mb-10 mt-2">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-center ppa-table-header">ID</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Avatar</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Name</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Division</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Position</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Username</th>  
-                <th className="px-4 py-2 text-center ppa-table-header">Clearance</th>
-                <th className="px-4 py-2 text-center ppa-table-header">Status</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: '#fff' }}>
-              {loadingArea ? (
-                <tr>
-                  <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                    <div className="flex justify-center items-center py-4">
-                      <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                      <span className="loading-table">Loading Employee List</span>
-                    </div>
-                  </td>
+          <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
+            <table className="ppa-table w-full">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-center ppa-table-header">ID</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Avatar</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Name</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Division</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Position</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Username</th>  
+                  <th className="px-4 py-2 text-center ppa-table-header">Clearance</th>
+                  <th className="px-4 py-2 text-center ppa-table-header">Status</th>
                 </tr>
-              ):(
-                currentUser.length > 0 ? (
-                  currentUser.map((getData)=>(
-                    <tr key={getData.id}>
-                      <td className="px-3 py-2 text-center ppa-table-body">{getData.id}</td>
-                      <td className="px-3 py-2 text-center ppa-table-body w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
-                      <td className="px-3 py-2 text-center ppa-table-body"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
-                      <td className="px-3 py-2 text-center ppa-table-body">{getData.division}</td>
-                      <td className="px-3 py-2 text-center ppa-table-body">{getData.position}</td>
-                      <td className="px-3 py-2 text-center ppa-table-body">{getData.username}</td>
-                      <td className="px-3 py-2 text-center ppa-table-body">{getData.code_clearance}</td>
-                      <td className="px-3 py-2 text-center ppa-table-body">
-                        {getData.status == 0 && (<FontAwesomeIcon className="user-deleted" title="Deleted" icon={faCircle} />)}
-                        {getData.status == 1 && (<FontAwesomeIcon className="user-active" title="Active" icon={faCircle} />)}
-                        {getData.status == 2 && (<FontAwesomeIcon className="user-need" title="Not Activate" icon={faCircle} />)}
-                      </td>
-                    </tr>
-                  ))
-                ):(
+              </thead>
+              <tbody style={{ backgroundColor: '#fff' }}>
+                {loadingArea ? (
                   <tr>
                     <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                      No records found.
+                      <div className="flex justify-center items-center py-4">
+                        <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
+                        <span className="loading-table">Loading Employee List</span>
+                      </div>
                     </td>
                   </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                ):(
+                  currentUser.length > 0 ? (
+                    currentUser.map((getData)=>(
+                      <tr key={getData.id}>
+                        <td className="px-3 py-2 text-center ppa-table-body">{getData.id}</td>
+                        <td className="px-3 py-2 text-center ppa-table-body w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
+                        <td className="px-3 py-2 text-center ppa-table-body"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
+                        <td className="px-3 py-2 text-center ppa-table-body">{getData.division}</td>
+                        <td className="px-3 py-2 text-center ppa-table-body">{getData.position}</td>
+                        <td className="px-3 py-2 text-center ppa-table-body">{getData.username}</td>
+                        <td className="px-3 py-2 text-center ppa-table-body">{getData.code_clearance}</td>
+                        <td className="px-3 py-2 text-center ppa-table-body">
+                          {getData.status == 0 && (<FontAwesomeIcon className="user-deleted" title="Deleted" icon={faCircle} />)}
+                          {getData.status == 1 && (<FontAwesomeIcon className="user-active" title="Active" icon={faCircle} />)}
+                          {getData.status == 2 && (<FontAwesomeIcon className="user-need" title="Not Activate" icon={faCircle} />)}
+                        </td>
+                      </tr>
+                    ))
+                  ):(
+                    <tr>
+                      <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
+                        No records found.
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+          
           {/* Pagination */}
           {displayPaginationUser && (
             <ReactPaginate

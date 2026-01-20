@@ -151,7 +151,7 @@ export default function UserRegistrationJLMS(){
       }else{
         const responseErrors = error.response.data.errors;
         const passwordErrors = error.response.data.error;
-        setInputErrors(responseErrors);
+        setInputErrors(responseErrors);x
         setPasswordNotMatch(passwordErrors);
       }
     })
@@ -178,6 +178,7 @@ export default function UserRegistrationJLMS(){
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const Authorize = codes.includes("HACK");
+  const HacKer = codes.includes("NERD");
 
   return(
     <PageComponent title="Add Employee">
@@ -185,22 +186,25 @@ export default function UserRegistrationJLMS(){
       {/* Main Content */}
       {Authorize ? (
       <>
-        <div className="font-roboto ppa-form-box bg-white">
-          <div className="ppa-form-header"> Input Employee Details  </div>
+        <div className="ppa-widget mt-8">
+          <div className="joms-user-info-header text-left"> 
+            Input Employee Details
+          </div>
 
-          <div className="p-4">
+          <div className="p-4 form-container">
+
             {/* Form */}
             <form onSubmit={onSubmit} action="#" method="POST" encType="multipart/form-data">
-
-              <div className="grid grid-cols-2">
+            
+              <div className="md:grid md:grid-cols-2">
 
                 {/* 1st Column */}
                 <div className="col-span-1">
 
                   {/* Name Surname */}
-                  <div className="flex items-center mt-4">
+                  <div className="md:flex items-center">
                     <div className="w-40">
-                      <label htmlFor="ppd_name" className="form-title-text"> Name: </label> 
+                      <label htmlFor="ppd_name" className="form-title"> Name: </label> 
                     </div>
 
                     <div className="w-full flex">
@@ -212,14 +216,14 @@ export default function UserRegistrationJLMS(){
                           value={lastName}
                           onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
                           placeholder="Surname"
-                          className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form"}`}
+                          className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form-field"}`}
                         />
                       </div>
                     </div>
-                  </div>  
+                  </div> 
 
                   {/* Name First Name */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center">
                     <div className="w-40"></div>
                     <div className="w-full flex">
                       <div className="w-full">
@@ -230,14 +234,14 @@ export default function UserRegistrationJLMS(){
                           value={firstName}
                           onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
                           placeholder="First Name"
-                          className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form"}`}
+                          className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form-field"}`}
                         />
                       </div>
                     </div>
                   </div> 
 
                   {/* Name Middle Initial */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center">
                     <div className="w-40"></div>
                     <div className="w-full flex">
                       <div className="w-full">
@@ -249,7 +253,7 @@ export default function UserRegistrationJLMS(){
                           onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
                           maxLength={2}
                           placeholder="Middle Initial (e.g. A , Ll)"
-                          className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form"}`}
+                          className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form-field"}`}
                         />
                         {!lastName && !firstName && !middleName && inputErrors.lastname && inputErrors.firstname && inputErrors.middlename ? (
                           <p className="form-validation">Please Input the given name</p>
@@ -266,9 +270,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Gender */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="rep_property_no" className="form-title-text">
+                      <label htmlFor="rep_property_no" className="form-title">
                         Gender:
                       </label> 
                     </div>
@@ -278,7 +282,7 @@ export default function UserRegistrationJLMS(){
                         id="gender"
                         value={gender}
                         onChange={ev => setGender(ev.target.value)}
-                        className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form"}`}
+                        className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form-field"}`}
                       >
                         <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Gender</option>
                         <option value="Male">Male</option>
@@ -291,9 +295,9 @@ export default function UserRegistrationJLMS(){
                   </div> 
 
                   {/* Position */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="ppa-position" className="form-title-text">
+                      <label htmlFor="ppa-position" className="form-title">
                         Position:
                       </label> 
                     </div>
@@ -305,7 +309,7 @@ export default function UserRegistrationJLMS(){
                         value={position}
                         onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
                         placeholder="Division Manager A"
-                        className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form"}`}
+                        className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form-field"}`}
                       />
                       {!position && inputErrors && inputErrors.position && (
                         <p className="form-validation">This form is required</p>
@@ -314,9 +318,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Division */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="ppa-division" className="form-title-text">
+                      <label htmlFor="ppa-division" className="form-title">
                         Division:
                       </label> 
                     </div>
@@ -326,7 +330,7 @@ export default function UserRegistrationJLMS(){
                         id="ppa-division"
                         value={division}
                         onChange={ev => setDivision(ev.target.value)}
-                        className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form"}`}
+                        className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form-field"}`}
                       >
                         <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
                         <option value="Administrative Division">Administrative Division</option>
@@ -344,9 +348,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Username */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="ppa-username" className="form-title-text">
+                      <label htmlFor="ppa-username" className="form-title">
                         Username:
                       </label> 
                     </div>
@@ -357,7 +361,7 @@ export default function UserRegistrationJLMS(){
                         type="text"
                         value={getusername}
                         onChange={ev => setUsername(ev.target.value)}
-                        className={`block w-full ${(!getusername && inputErrors.username) ? "ppa-form-error":"ppa-form"}`}
+                        className={`block w-full ${(!getusername && inputErrors.username) ? "ppa-form-error":"ppa-form-field"}`}
                         autoComplete="new-username"
                       />
                       {!getusername && inputErrors && inputErrors.username && (
@@ -367,9 +371,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Password */}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="password" className="form-title-text">
+                      <label htmlFor="password" className="form-title">
                         Password:
                       </label> 
                     </div>
@@ -380,7 +384,7 @@ export default function UserRegistrationJLMS(){
                         type={showPassword ? 'text' : 'password'}
                         value={getpassword}
                         onChange={ev => setPassword(ev.target.value)}
-                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form"}`}
+                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form-field"}`}
                         autoComplete="new-password"
                       />
                       <button
@@ -397,9 +401,9 @@ export default function UserRegistrationJLMS(){
                   </div>
 
                   {/* Password Confirmation*/}
-                  <div className="flex items-center mt-2">
+                  <div className="md:flex items-center mt-2 md:mt-0">
                     <div className="w-40">
-                      <label htmlFor="rep_property_no" className="form-title-text">
+                      <label htmlFor="rep_property_no" className="form-title">
                         Repeat Password:
                       </label> 
                     </div>
@@ -411,7 +415,7 @@ export default function UserRegistrationJLMS(){
                         autoComplete="position"
                         value={passwordCorfirmation}
                         onChange={ev => setPasswordConfirmation(ev.target.value)}
-                        className="block w-full ppa-form input-placeholder"
+                        className="block w-full ppa-form-field input-placeholder"
                       />
                       <button
                         type="button"
@@ -429,12 +433,12 @@ export default function UserRegistrationJLMS(){
                 </div>
 
                 {/* 2nd Column */}
-                <div className="col-span-1 pl-10">
+                <div className="col-span-1 md:pl-10 mt-2 md:mt-0">
 
                   {/* Avatar */}
-                  <div className="items-center mt-4">
+                  <div className="items-center">
                     <div className="w-36">
-                    <label htmlFor="ppa-avatar" className="form-title-text">
+                    <label htmlFor="ppa-avatar" className="form-title">
                         Upload Avatar:
                       </label> 
                     </div>
@@ -469,7 +473,7 @@ export default function UserRegistrationJLMS(){
                   {/* Esig */}
                   <div className="items-center mt-2">
                     <div className="w-36">
-                    <label htmlFor="ppa-esignature" className="form-title-text">
+                    <label htmlFor="ppa-esignature" className="form-title">
                         Upload Esig:
                       </label> 
                     </div>
@@ -505,12 +509,12 @@ export default function UserRegistrationJLMS(){
                   <div className="items-center mt-2">
 
                     <div className="font-roboto">
-                      <label htmlFor="rf_request" className="form-title-text">
+                      <label htmlFor="rf_request" className="form-title">
                         Code Clearance:
                       </label> 
                     </div>
 
-                    <div className="grid grid-cols-2">
+                    <div className="md:grid md:grid-cols-2">
 
                       {/* 1st Column */}
                       <div className="col-span-1">
@@ -592,8 +596,28 @@ export default function UserRegistrationJLMS(){
                       {/* 2nd Column */}
                       <div className="col-span-1">
 
+                        {/* for SuperSuper Admin*/}
+                        {HacKer && (
+                          <div className="relative flex items-center font-roboto mt-2">
+                            <div className="flex items-center h-5">
+                              <input
+                                id="pm-checkbox"
+                                type="checkbox"
+                                checked={selectedRoles.includes('NERD')}
+                                onChange={(e) => handleCheckboxChange(e, 'NERD')}
+                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                              />
+                            </div>
+                            <div className="ml-3">
+                              <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                                SuperHacker
+                              </label> 
+                            </div>
+                          </div>
+                        )}
+
                         {/* For HACK - IT Superadmin */}
-                        <div className="relative flex items-center font-roboto">
+                        <div className="relative flex items-center font-roboto mt-2">
                           <div className="flex items-center h-5">
                             <input
                               id="hack-checkbox"
@@ -640,25 +664,25 @@ export default function UserRegistrationJLMS(){
 
                 </div>
 
-              </div>
+                {/* Button */}
+                <div className="mt-8 md:mt-10">
+                  {/* Submit */}
+                  <button 
+                    type="submit"
+                    className={`w-full md:w-auto py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                    disabled={submitLoading}
+                  >
+                    {submitLoading ? (
+                      <div className="flex justify-center">
+                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                        <span className="ml-1">Loading</span>
+                      </div>
+                    ):(
+                      'Submit'
+                    )}
+                  </button>
+                </div>
 
-              {/* Button */}
-              <div className="mt-10">
-                {/* Submit */}
-                <button 
-                  type="submit"
-                  className={`py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <div className="flex">
-                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                      <span className="ml-1">Loading</span>
-                    </div>
-                  ):(
-                    'Submit'
-                  )}
-                </button>
               </div>
 
             </form>

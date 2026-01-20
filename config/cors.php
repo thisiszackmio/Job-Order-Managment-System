@@ -19,7 +19,10 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'http://localhost:9200',     // Vite dev local
+        'http://20.20.49.151:9200',   // Vite dev network
+    ],
 
     'allowed_origins_patterns' => [],
 

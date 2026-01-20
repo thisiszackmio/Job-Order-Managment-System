@@ -33,6 +33,20 @@ export default function AddPersonnel(){
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  const [isMobile, setIsMobile] = useState(false);
+    
+  // Detect Mobile Screen
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    };
+
+    checkScreen(); // run on load
+    window.addEventListener('resize', checkScreen);
+
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
   // Disable the Scroll on Popup
   useEffect(() => {
     // Define the class to be added/removed
@@ -290,14 +304,14 @@ export default function AddPersonnel(){
                 Personnel List
               </div>
               <div className="flex space-x-4 pt-8 pr-4"> 
-                {!addPersonnel && (
+                {!addPersonnel && !isMobile && (
                   <FontAwesomeIcon onClick={() => SetAddPersonnel(true)} className="icon-delete" title="Add Personnel" icon={faUserPlus} />
                 )}
               </div>
             </div>
 
             {/* Table */}
-            <div className="ppa-div-table p-4">
+            <div className="ppa-div-table p-4 overflow-x-auto md:overflow-x-visible">
               <table className="ppa-table w-full">
                 {/* Header */}
                 <thead>
@@ -341,7 +355,9 @@ export default function AddPersonnel(){
                             ):(
                             <>
                               <FontAwesomeIcon onClick={() => handleNotAvailableConfirmation(staffList.personnel_id)} className="icon-avail mr-4" title="Set Personnel to Not Available" icon={faUserAltSlash} />
-                              <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" title="Removel Personnel" icon={faTrash} />
+                              {!isMobile && (
+                                <FontAwesomeIcon onClick={() => handleRemovalConfirmation(staffList.personnel_id)} className="icon-remove" title="Removel Personnel" icon={faTrash} />
+                              )}
                             </>
                             )}
                           </td>
@@ -381,7 +397,7 @@ export default function AddPersonnel(){
               </div>
             </div>
 
-            <div className="p-4 ppa-form-box mb-5 w-1/2">
+            <div className="p-4 ppa-form-box mb-5 w-full md:w-1/2">
               <form onSubmit={submitPersonnel}>
                 {/* Select Personnnel */}
                 <div className="items-center">
@@ -412,7 +428,7 @@ export default function AddPersonnel(){
                 </div>
 
                 {/* Select Assignment */}
-                <div className="items-center mt-6">
+                <div className="items-center mt-2 md:mt-6">
                   <div className="w-40">
                     <label htmlFor="rep_date" className="form-title"> 
                       Select Assignment: 
@@ -441,15 +457,15 @@ export default function AddPersonnel(){
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-6">
+                <div className="mt-6 flex justify-center md:justify-start">
                   {selectPersonnel && personnelCategory && (
                     <button 
                       type="submit"
-                      className={`py-2 px-3 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                      className={`w-full md:w-auto py-2 px-3 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                       disabled={submitLoading || !selectPersonnel.id || !personnelCategory}
                     >
                     {submitLoading ? (
-                      <div className="flex">
+                      <div className="flex justify-center">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                         <span className="ml-2">Loading</span>
                       </div>

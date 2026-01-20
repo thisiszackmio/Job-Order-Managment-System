@@ -461,30 +461,29 @@ export default function UserDetailsJLMS(){
       );
     })
     .catch((error) => {
-      if (error.response && error.response.status === 404) {
-        // User not found
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">User not Found!</p>
-            <p className="popup-message">You cannot update the user detail, please inform the developer (Error 404)</p>
-          </div>
-        );
-      } else if (error.response && error.response.status === 204){
+      if (error.response && error.response.status === 204){
         // Something wrong on submitting
         setShowPopup(true);
-        setPopupContent('error');
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
             <p className="popup-title">There is something wrong</p>
             <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
           </div>
         );
+      } else if(error.response.data.errors.avatar){
+        setShowPopup(true);
+        setPopupContent('check-error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Field is required</p>
+            <p className="popup-message">This avatar exceeds 2 MB. Please upload a smaller file.</p>
+          </div>
+        );
       } else if (error.response && error.response.status === 422) {
         // Empty Fields
         setShowPopup(true);
-        setPopupContent('error');
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
             <p className="popup-title">Field is required</p>
@@ -531,30 +530,29 @@ export default function UserDetailsJLMS(){
       );
     })
     .catch((error) => {
-      if (error.response && error.response.status === 404) {
-        // User not found
-        setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(
-          <div>
-            <p className="popup-title">User not Found!</p>
-            <p className="popup-message">You cannot update the user detail, please inform the developer (Error 404)</p>
-          </div>
-        );
-      } else if (error.response && error.response.status === 204){
+      if (error.response && error.response.status === 204){
         // Something wrong on submitting
         setShowPopup(true);
-        setPopupContent('error');
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
             <p className="popup-title">There is something wrong</p>
             <p className="popup-message">Please contact the developer on the issue (Error 204)</p>
           </div>
         );
+      } else if(error.response.data.errors.esig){
+        setShowPopup(true);
+        setPopupContent('check-error');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Upload Failed</p>
+            <p className="popup-message">This esig exceeds 2 MB. Please upload a smaller file.</p>
+          </div>
+        );
       } else if (error.response && error.response.status === 422) {
         // Empty Fields
         setShowPopup(true);
-        setPopupContent('error');
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
             <p className="popup-title">Field is required</p>
@@ -672,7 +670,8 @@ export default function UserDetailsJLMS(){
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const SuperHacker = codes.includes("HACK") || codes.includes("NERD");
+  const SuperAdmin = codes.includes("HACK") || codes.includes("NERD");
+  const HacKer = codes.includes("NERD");
 
   return(
   <PageComponent title="Employee Details">
@@ -687,10 +686,10 @@ export default function UserDetailsJLMS(){
         <span className="loading">Loading...</span>
       </div>
     ):(
-      SuperHacker ? (
+      SuperAdmin || HacKer ? (
       <>
         {/* Detail */}
-        <div className="grid grid-cols-[64%_34%] gap-5 mt-6">
+        <div className="md:grid md:grid-cols-[75%_23%] md:gap-5 mt-6">
           
           {/* User Details */}
           <div>
@@ -713,14 +712,14 @@ export default function UserDetailsJLMS(){
                   <>
                     {/* Edit Details */}
                     {enableDetail && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start mt-2">
                         {/* Submit */}
                         <button
                           onClick={ () => { submitUpdateDetail() } }
-                          className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                          className={`w-full md:w-auto ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                         >
                           {submitLoading ? (
-                            <div className="flex">
+                            <div className="flex justify-center">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                               <span className="ml-2">Loading</span>
                             </div>
@@ -735,7 +734,7 @@ export default function UserDetailsJLMS(){
                               setEnableDetails(false);
                               setDefaultForm(false);
                               setTyprOfEdit('');
-                            }} className="ml-2 btn-cancel-form">
+                            }} className="w-full md:w-auto ml-2 btn-cancel-form">
                             Cancel
                           </button>
                         )}
@@ -744,14 +743,14 @@ export default function UserDetailsJLMS(){
 
                     {/* Edit Accounts */}
                     {enableAccount && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start mt-2">
                         {/* Submit */}
                         <button
                           onClick={ () => { submitUpdateAccount() } }
-                          className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                          className={`w-full md:w-auto ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                         >
                           {submitLoading ? (
-                            <div className="flex">
+                            <div className="flex justify-center">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                               <span className="ml-2">Loading</span>
                             </div>
@@ -766,7 +765,7 @@ export default function UserDetailsJLMS(){
                               setEnableAccount(false);
                               setDefaultForm(false);
                               setTyprOfEdit('');
-                            }} className="ml-2 btn-cancel-form">
+                            }} className="w-full md:w-auto ml-2 btn-cancel-form">
                             Cancel
                           </button>
                         )}
@@ -775,14 +774,14 @@ export default function UserDetailsJLMS(){
 
                     {/* Edit Code Clearancec */}
                     {enableCodeClearance && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start mt-2">
                         {/* Submit */}
                         <button
                           onClick={ () => { submitUpdateCodeClearance() } }
-                          className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                          className={`w-full md:w-auto ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                         >
                           {submitLoading ? (
-                            <div className="flex">
+                            <div className="flex justify-center">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                               <span className="ml-2">Loading</span>
                             </div>
@@ -797,7 +796,7 @@ export default function UserDetailsJLMS(){
                               setEnableCodeClearance(false);
                               setDefaultForm(false);
                               setTyprOfEdit('');
-                            }} className="ml-2 btn-cancel-form">
+                            }} className="w-full md:w-auto ml-2 btn-cancel-form">
                             Cancel
                           </button>
                         )}
@@ -806,16 +805,16 @@ export default function UserDetailsJLMS(){
 
                     {/* Edit Avatar */}
                     {enableAvatar && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start mt-2">
                         {/* Submit */}
                         <button 
                           form="user_avatar"
                           type="submit"
-                          className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                          className={`w-full md:w-auto ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                           disabled={submitLoading}
                         >
                           {submitLoading ? (
-                            <div className="flex">
+                            <div className="flex justify-center">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                               <span className="ml-1">Loading</span>
                             </div>
@@ -830,7 +829,7 @@ export default function UserDetailsJLMS(){
                               setEnableAvatar(false);
                               setDefaultForm(false);
                               setTyprOfEdit('');
-                            }} className="ml-2 btn-cancel-form">
+                            }} className="w-full md:w-auto ml-2 btn-cancel-form">
                             Cancel
                           </button>
                         )}
@@ -839,16 +838,16 @@ export default function UserDetailsJLMS(){
 
                     {/* Edit Esig */}
                     {enableEsig && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start mt-2">
                         {/* Submit */}
                         <button 
                           form="user_esig"
                           type="submit"
-                          className={`${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                          className={`w-full md:w-auto ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                           disabled={submitLoading}
                         >
                           {submitLoading ? (
-                            <div className="flex">
+                            <div className="flex justify-center">
                               <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                               <span className="ml-1">Loading</span>
                             </div>
@@ -863,7 +862,7 @@ export default function UserDetailsJLMS(){
                               setEnableEsig(false);
                               setDefaultForm(false);
                               setTyprOfEdit('');
-                            }} className="ml-2 btn-cancel-form">
+                            }} className="w-full md:w-auto ml-2 btn-cancel-form">
                             Cancel
                           </button>
                         )}
@@ -871,7 +870,7 @@ export default function UserDetailsJLMS(){
                     )}
                   </>
                   ):(
-                  <div className="grid grid-cols-[120px_1fr_auto] gap-3 items-center mt-4 w-full">
+                  <div className="md:grid md:grid-cols-[120px_1fr_auto] md:gap-3 items-center mt-0 md:mt-4 w-full">
                     {/* Label */}
                     <label htmlFor="rep_type_of_property" className="form-title">
                       Edit Items:
@@ -883,7 +882,7 @@ export default function UserDetailsJLMS(){
                       autoComplete="rep_type_of_property"
                       value={typeOfEdit}
                       onChange={ev => setTyprOfEdit(ev.target.value)}
-                      className="block w-full ppa-form-edit"
+                      className="block w-full ppa-form-edit mt-2 md:mt-0"
                     >
                       <option value="" disabled>Select an option</option>
                       <option value="UD">Update Details</option>
@@ -897,7 +896,7 @@ export default function UserDetailsJLMS(){
                     {typeOfEdit && (
                       <button 
                         onClick={EditFunction}
-                        className="py-2 px-4 btn-default whitespace-nowrap"
+                        className="w-full md:w-auto mt-3 md:mt-0 py-2 px-4 btn-default whitespace-nowrap"
                       >
                         Enable
                       </button>
@@ -907,18 +906,27 @@ export default function UserDetailsJLMS(){
                 )}
 
                 {/* Details */}
-                <div className="mt-8">
+                <div className="mt-5">
+
+                  {/* Type of Edit */}
+                  <div className="form-title-header mb-4">
+                    {enableDetail ? ("Update User Details")
+                    :enableAccount ? ("Update User Account")
+                    :enableCodeClearance ? ("Update User Code Clearance")
+                    :enableAvatar ? ("Update User Avatar")
+                    :enableEsig ? ("Update User Esignature"):null}
+                  </div>
 
                   {/* User Status*/}
                   <div className="flex items-center">
-                    <div className="w-36">
+                    <div className="w-48 md:w-36">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         User Status:
                       </label> 
                     </div>
                     <div className="w-full pl-1 text-lg">
                       {(enableDetail || enableAccount || enableCodeClearance || enableAvatar || enableEsig) ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -946,14 +954,14 @@ export default function UserDetailsJLMS(){
 
                   {/* User ID*/}
                   <div className="flex items-center mt-2">
-                    <div className="w-36">
+                    <div className="w-48 md:w-36">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         User ID:
                       </label> 
                     </div>
                     <div className="w-full pl-1 text-lg">
                       {(enableDetail || enableAccount || enableCodeClearance || enableAvatar || enableEsig) ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -971,14 +979,14 @@ export default function UserDetailsJLMS(){
 
                   {/* User Name*/}
                   <div className="flex items-center mt-2">
-                    <div className="w-36">
+                    <div className="w-48 md:w-36">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         {enableDetail ? ("First Name:"):("User Name:")}
                       </label> 
                     </div>
                     <div className="w-full pl-1 text-lg">
                       {enableDetail ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -988,7 +996,7 @@ export default function UserDetailsJLMS(){
                           />
                         </div>
                       ):(enableAccount || enableCodeClearance || enableAvatar || enableEsig) ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -1007,13 +1015,13 @@ export default function UserDetailsJLMS(){
                   {/* Middle Name */}
                   {enableDetail && (
                     <div className="flex items-center mt-2">
-                      <div className="w-36">
+                      <div className="w-48 md:w-36">
                         <label className="block text-lg font-bold leading-6 text-gray-900">
                           Middle Initial:
                         </label> 
                       </div>
                       <div className="w-full pl-1 text-lg">
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -1029,13 +1037,13 @@ export default function UserDetailsJLMS(){
                   {/* Last Name */}
                   {enableDetail && (
                     <div className="flex items-center mt-2">
-                      <div className="w-36">
+                      <div className="w-48 md:w-36">
                         <label className="block text-lg font-bold leading-6 text-gray-900">
                           Last Name:
                         </label> 
                       </div>
                       <div className="w-full pl-1 text-lg">
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -1051,14 +1059,14 @@ export default function UserDetailsJLMS(){
                   {/* User Position */}
                   {!enableAccount && !enableCodeClearance && !enableAvatar && !enableEsig && (
                   <div className="flex items-center mt-2">
-                    <div className="w-36">
+                    <div className="w-48 md:w-36">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         Position:
                       </label> 
                     </div>
                     <div className="w-full pl-1 text-lg">
                       {enableDetail ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <input
                             type="text"
                             className="w-full ppa-form-edit"
@@ -1079,14 +1087,14 @@ export default function UserDetailsJLMS(){
                   {/* User Division */}
                   {!enableAccount && !enableCodeClearance && !enableAvatar && !enableEsig && (
                   <div className="flex items-center mt-2">
-                    <div className="w-36">
+                    <div className="w-48 md:w-36">
                       <label className="block text-lg font-bold leading-6 text-gray-900">
                         Division:
                       </label> 
                     </div>
                     <div className="w-full pl-1 text-lg">
                       {enableDetail ? (
-                        <div className="w-1/2">
+                        <div className="w-full md:w-1/2">
                           <select
                             type="text"
                             className="w-full ppa-form-edit"
@@ -1114,14 +1122,14 @@ export default function UserDetailsJLMS(){
                   {/* User username */}
                   {!enableDetail && !enableCodeClearance && !enableAvatar && !enableEsig && (
                     <div className="flex items-center mt-2">
-                      <div className="w-36">
+                      <div className="w-48 md:w-36">
                         <label className="block text-lg font-bold leading-6 text-gray-900">
                           Username:
                         </label> 
                       </div>
                       <div className="w-full pl-1 text-lg">
                         {enableAccount ? (
-                          <div className="w-1/2">
+                          <div className="w-full md:w-1/2">
                             <input
                               type="text"
                               className="w-full ppa-form-edit"
@@ -1140,14 +1148,14 @@ export default function UserDetailsJLMS(){
 
                   {/* User Password */}
                   {enableAccount && (
-                    <div className="flex items-center mt-2">
-                      <div className="w-36">
+                    <div className="flex items-center mt-2 user-password">
+                      <div className="w-48 md:w-36">
                         <label className="block text-lg font-bold leading-6 text-gray-900">
                           Password:
                         </label> 
                       </div>
                       <div className="w-full pl-1 text-lg">
-                        <div className="w-1/2 relative">
+                        <div className="w-full md:w-1/2 relative">
                           <input
                             type={showPassword ? 'text' : 'password'}
                             value={getpassword}
@@ -1177,8 +1185,29 @@ export default function UserDetailsJLMS(){
                       <div className="w-full text-lg mt-2">
                         {enableCodeClearance ? (
                         <>
+
+                          {/* for SuperSuper Admin*/}
+                          {HacKer && (
+                            <div className="relative flex items-center font-roboto">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="pm-checkbox"
+                                  type="checkbox"
+                                  checked={selectedRoles.includes('NERD')}
+                                  onChange={(e) => handleCheckboxChange(e, 'NERD')}
+                                  className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                                  SuperHacker
+                                </label> 
+                              </div>
+                            </div>
+                          )}
+
                           {/* For PM - Port Manager */}
-                          <div className="relative flex items-center font-roboto">
+                          <div className="relative flex items-center font-roboto mt-2">
                             <div className="flex items-center h-5">
                               <input
                                 id="pm-checkbox"
@@ -1425,7 +1454,7 @@ export default function UserDetailsJLMS(){
             {!defaultForm && (
             <>
               {/* Avatar */}
-              <div className="ppa-widget">
+              <div className="ppa-widget mt-10 md:mt-0">
                 <div className="joms-user-info-header text-left"> AVATAR </div>
                 <div className="px-4 pb-4 flex justify-center">
                   <img

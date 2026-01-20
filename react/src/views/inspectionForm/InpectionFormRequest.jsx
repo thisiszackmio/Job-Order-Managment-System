@@ -217,13 +217,13 @@ export default function RepairRequestForm(){
                   <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
                 </div>
 
-                <div className="grid grid-cols-2">
+                <div className="md:grid md:grid-cols-2">
 
                   {/* Part A left side */}
                   <div className="col-span-1 px-4">
 
                     {/* Date */}
-                    <div className="flex items-center mt-6">
+                    <div className="md:flex items-center mt-6">
                       <div className="w-48">
                         <label className="form-title">
                         Date:
@@ -235,7 +235,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Property No */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-48">
                         <label className="form-title">
                         Property No:
@@ -247,7 +247,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Acquisition Date */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-48">
                         <label className="form-title">
                         Acquisition Date:
@@ -259,7 +259,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Acquisition Cost */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-48">
                         <label className="form-title">
                         Acquisition Cost:
@@ -274,7 +274,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Brand/Model */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-48">
                         <label className="form-title">
                         Brand/Model:
@@ -286,7 +286,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Serial/Engine No */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-48">
                         <label className="form-title">
                         Serial/Engine No:
@@ -303,7 +303,7 @@ export default function RepairRequestForm(){
                   <div className="col-span-1 px-4">
 
                     {/* Type of Property */}
-                    <div className="flex items-center mt-6">
+                    <div className="md:flex items-center mt-2 md:mt-6">
                       <div className="w-52">
                         <label className="form-title"> Type of Property: </label> 
                       </div>
@@ -313,7 +313,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Description */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-52">
                         <label className="form-title"> Description: </label> 
                       </div>
@@ -323,7 +323,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Location */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-52">
                         <label className="form-title"> Location: </label> 
                       </div>
@@ -333,7 +333,7 @@ export default function RepairRequestForm(){
                     </div>
 
                     {/* Supervisor */}
-                    <div className="flex items-center mt-2">
+                    <div className="md:flex items-center mt-2">
                       <div className="w-52">
                         <label className="form-title"> Supervisor: </label> 
                       </div>
@@ -347,7 +347,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Complain */}
-                <div className="flex items-center mt-2 px-4">
+                <div className="md:flex items-center mt-2 px-4">
                   <div className="w-40">
                     <label className="form-title">
                     Complain:
@@ -358,24 +358,25 @@ export default function RepairRequestForm(){
                   </div>
                 </div>
 
+                {Admin || DivisionManager || PortManager || GSO || SuperHacker ? null : (
+                  <p className="note-form mb-4 px-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
+                )}
+
                 {/* Button */}
-                <div className="mt-5 pl-4 mb-6">
+                <div className="mt-5 pl-4 mb-6 mobile-btn flex justify-center md:justify-start">
                 
                 {!buttonHide && (
                 <>
-                  {Admin || DivisionManager || PortManager || GSO || SuperHacker ? null : (
-                    <p className="note-form mb-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
-                  )}
 
                   {/* Submit */}
                   <button 
                     // form="fac_submit"
                     type="submit"
-                    className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                    className={`w-full md:w-auto py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
-                      <div className="flex">
+                      <div className="flex justify-center">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                         <span className="ml-1">Loading</span>
                       </div>
@@ -386,7 +387,7 @@ export default function RepairRequestForm(){
     
                   {/* Cancel */}
                   {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-base btn-cancel-form">
+                    <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-base btn-cancel-form">
                       Revise
                     </button>
                   )}
@@ -405,7 +406,7 @@ export default function RepairRequestForm(){
             </div>
 
             {/* Form */}
-            <div className="grid grid-cols-2">
+            <div className="md:grid md:grid-cols-2">
 
               {/* 1st Column */}
               <div className="col-span-1 px-4">
@@ -430,7 +431,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Property Number */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_property_no" className="form-title"> 
                       Property Number: 
@@ -454,7 +455,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Acquisition Date */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_acquisition_date" className="form-title">    
                       Acquisition Date:
@@ -477,7 +478,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Acquisition Cost */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_acquisition_cost" className="form-title">
                       Acquisition Cost:
@@ -511,7 +512,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Brand/Model */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_brand_model" className="form-title">
                       Brand/Model:
@@ -535,7 +536,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Serial/Engine No */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-40">
                     <label htmlFor="rep_serial_engine_no" className="form-title">                  
                       Serial/Engine No.:
@@ -564,7 +565,7 @@ export default function RepairRequestForm(){
               <div className="col-span-1 px-4">
 
                 {/* Type of Property */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-full">
                     <label htmlFor="rep_type_of_property" className="flex form-title">
                       Type of Property:
@@ -593,7 +594,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Description */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-full">
                     <label htmlFor="rep_description" className="flex form-title">
                       Description:
@@ -616,7 +617,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Location */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-full">
                     <label htmlFor="rep_location" className="flex form-title">
                       Location (Div/Section/Unit):
@@ -639,7 +640,7 @@ export default function RepairRequestForm(){
                 </div>
 
                 {/* Complain / Defect */}
-                <div className="items-center mt-4">
+                <div className="items-center mt-2 md:mt-4">
                   <div className="w-full">
                     <label htmlFor="rep_complain" className="flex form-title">
                       Complain/Defect:
@@ -663,7 +664,7 @@ export default function RepairRequestForm(){
 
                 {/* Supervisor */}
                 {(Admin || DivisionManager|| PortManager) ? null : (
-                  <div className="items-center mt-4">
+                  <div className="items-center mt-2 md:mt-4">
                     <div className="w-full">
                       <label htmlFor="rep_type_of_property" className="flex form-title">
                         Immediate Supervisor:
@@ -698,15 +699,14 @@ export default function RepairRequestForm(){
 
               </div>
 
-              
             </div>
 
             {/* Button */}
-            <div className="mt-10 pl-4 pb-4">
+            <div className="mt-10 pl-4 pb-4 mobile-btn flex justify-center md:justify-start">
               {/* Check Form */}
               <button 
                 onClick={handleConfirm} 
-                className="py-2 px-4 text-base btn-default-form">
+                className="w-full md:w-auto py-2 px-4 text-base btn-default-form">
                 Submit
               </button>
             </div>

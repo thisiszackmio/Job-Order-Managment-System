@@ -479,73 +479,73 @@ export default function FacilityVenueForm(){
             <div className="px-4">
 
               {/* Date */}
-              <div className="flex items-center mt-4">
+              <div className="md:flex items-center mt-4">
                 <div className="w-64">
                   <label className="form-title">
                   Date:
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {formatDate(today)}
                 </div>
               </div>
 
               {/* Requesting Office/Division */}
-              <div className="flex items-center mt-2">
+              <div className="md:flex items-center mt-2">
                 <div className="w-64">
                   <label className="form-title">
                   Requesting Office/Division:
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {reqOffice}
                 </div>
               </div>
 
               {/* Title/Purpose of Activity */}
-              <div className="flex items-center mt-2">
+              <div className="md:flex items-center mt-2">
                 <div className="w-64">
                   <label className="form-title">
                   Title/Purpose of Activity:
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {titleReq}
                 </div>
               </div>
 
               {/* Date and Time of Activity (Start) */}
-              <div className="flex items-center mt-2">
+              <div className="md:flex items-center mt-2">
                 <div className="w-64">
                   <label className="form-title">
                   Date and Time of Activity (Start):
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {formatDate(DateStart)} @ {formatTime(timeStart)}
                 </div>
               </div>
 
               {/* Date and Time of Activity (End) */}
-              <div className="flex items-center mt-2">
+              <div className="md:flex items-center mt-2">
                 <div className="w-64">
                   <label className="form-title">
                   Date and Time of Activity (End):
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {formatDate(DateEnd)} @ {formatTime(timeEnd)}
                 </div>
               </div>
 
               {/* Facility */}
-              <div className="flex items-center mt-2">
+              <div className="md:flex items-center mt-2">
                 <div className="w-64">
                   <label className="form-title">
                   Facility:
                   </label> 
                 </div>
-                <div className="w-1/2 ppa-form-preview">
+                <div className="w-full md:w-1/2 ppa-form-preview">
                   {mphCheck ? ("Multi-Purpose Hall"):null}
                   {confCheck ? ("Conference Room"):null}
                   {dormCheck ? ("Dormitory"):null}
@@ -562,10 +562,10 @@ export default function FacilityVenueForm(){
                     <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
                   </div>
 
-                  <div className="grid grid-cols-2">
+                  <div className="md:grid md:grid-cols-2">
 
                     {/* Left */}
-                    <div className="col-span-1 ml-10">
+                    <div className="col-span-1 md:ml-10">
 
                       {/* Table */}
                       <div className="mt-4">
@@ -711,7 +711,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Others */}
-                  <div className="mt-2 m-10">
+                  <div className="mt-2 md:mt-10">
                     <div className="w-full">
                       <div className="mt-1">
                         <div className="flex items-center">
@@ -741,14 +741,14 @@ export default function FacilityVenueForm(){
                     <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * For the Dormitory </h2>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="md:grid md:grid-cols-2 md:gap-4">
 
                     {/* For Male */}
                     <div className="col-span-1">
                       <div className="form-title mt-5">
                         Male Guest:
                       </div>
-                      <div className="w-3/4 p-2">
+                      <div className="w-full md:w-3/4 p-2">
                       {getMale?.trim() ? (
                         getMale.split("\n").map((name, index) => (
                           <div key={index} className="mt-2 flex">
@@ -769,7 +769,7 @@ export default function FacilityVenueForm(){
                       <div className="form-title mt-5">
                         Female Guest:
                       </div>
-                      <div className="w-3/4 p-2">
+                      <div className="w-full md:w-3/4 p-2">
                       {getFemale?.trim() ? (
                         getFemale.split("\n").map((name, index) => (
                           <div key={index} className="mt-2 flex">
@@ -788,12 +788,12 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Other */}
-                  <div className="mt-4 ml-16">
-                    <div className="flex">
+                  <div className="mt-4 md:ml-16">
+                    <div className="md:flex">
                       <div className="w-28 form-title">
                         <span>Other Details:</span>
                       </div>
-                      <div className="w-3/4 border-b border-black font-regular text-base text-left pl-2">
+                      <div className="w-full md:w-3/4 mt-2 md:mt-0 border-b border-black font-regular text-base text-left pl-2">
                       {otherDetails}
                       </div>
                     </div>
@@ -811,39 +811,40 @@ export default function FacilityVenueForm(){
                     <h2 className="text-base font-bold leading-7 text-gray-900 mt-5"> * OPR Instruction </h2>
                   </div>
 
-                  <div className="w-1/2 ppa-form-box-view h-6 mt-4">
+                  <div className="w-full md:w-1/2 ppa-form-box-view h-6 mt-4">
                   {oprInstruct}
                   </div>
 
                 </div>
               )}
 
+              {/* Note */}
+              <p className="note-form mb-4"><span> Note: </span>The Date and Time of Activity (Start and End) will no longer be editable once submitted. Please make sure to verify and confirm the schedule before requesting a facility.</p>
+
               {/* Button */}
-              <div className="mt-10 pb-4">
+              <div className="mt-10 pb-4 mobile-btn flex justify-center md:justify-start">
               {!buttonHide && (
               <>
-                {/* Note */}
-                <p className="note-form mb-4"><span> Note: </span>The Date and Time of Activity (Start and End) will no longer be editable once submitted. Please make sure to verify and confirm the schedule before requesting a facility.</p>
                 {/* Submit */}
                 <button 
                   // form="fac_submit"
                   type="submit"
-                  className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  className={`w-full md:w-auto py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (
-                    <div className="flex">
+                    <div className="flex justif-center">
                       <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                       <span className="ml-1">Loading</span>
                     </div>
                   ):(
                     'Confirm'
-                  )}
+                  )}  
                 </button>
 
                 {/* Cancel */}
                 {!submitLoading && (
-                  <button onClick={() => setConfirmation(false)} className="ml-2 py-2 px-4 text-base btn-cancel-form">
+                  <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-base btn-cancel-form">
                     Revise
                   </button>
                 )}
@@ -866,7 +867,7 @@ export default function FacilityVenueForm(){
           </div>
 
           {/* Form */}
-          <div className="grid grid-cols-2">
+          <div className="md:grid md:grid-cols-2">
 
             {/* 1st Column */}
             <div className="col-span-1 px-4">
@@ -891,7 +892,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Requesting Office/Division */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Requesting Office/Division:
@@ -915,7 +916,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Title/Purpose of Activity */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Title/Purpose of Activity:
@@ -939,7 +940,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Date Start */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Date of Activity (Start):
@@ -966,7 +967,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Date Start */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Time of Activity (Start):
@@ -990,7 +991,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Date End */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Date of Activity (End):
@@ -1020,7 +1021,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Time End */}
-              <div className="items-center mt-4">
+              <div className="items-center mt-2 md:mt-4">
                 <div className="w-full">
                   <label htmlFor="rep_description" className="flex form-title">
                     Time of Activity (End):
@@ -1048,7 +1049,7 @@ export default function FacilityVenueForm(){
             <div className="col-span-1 px-4">
               
               {/* Checkbox */}
-              <div className="mt-6 font-roboto">
+              <div className="mt-2 md:mt-6 font-roboto">
                 <label htmlFor="rf_request" className="flex form-title">
                   Facilities / Venue being Requested :
                   {(!mphCheck && !confCheck && !dormCheck && !otherCheck && checkFacility) ? (
@@ -1220,7 +1221,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Check Boxes */}
-              <div className="grid grid-cols-2">
+              <div className="md:grid md:grid-cols-2">
 
                 {/* 1st Column */}
                 <div className="col-span-1">
@@ -1268,7 +1269,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Chair */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="mph-checkchair"
@@ -1310,7 +1311,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Projector */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1328,7 +1329,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Projector Screen */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1346,7 +1347,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Document Camera */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1369,7 +1370,7 @@ export default function FacilityVenueForm(){
                 <div className="col-span-1">
 
                   {/* Laptop */}
-                  <div className="relative flex items-center mt-4">
+                  <div className="relative flex items-center mt-2 md:mt-4">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1387,7 +1388,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Television */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1405,7 +1406,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Sound System */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1423,7 +1424,7 @@ export default function FacilityVenueForm(){
                   </div>
 
                   {/* Videoke */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="other-checkbox"
@@ -1441,7 +1442,7 @@ export default function FacilityVenueForm(){
                   </div>
                 
                   {/* Microphone */}
-                  <div className="relative flex items-center mt-3">
+                  <div className="relative flex items-center mt-2 md:mt-3">
                     <div className="flex items-center h-5">
                       <input
                         id="mph-checkmicrophone"
@@ -1487,7 +1488,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Other */}
-              <div className="relative flex items-center mt-3">
+              <div className="relative flex items-center mt-2 md:mt-3">
                 <div className="flex items-center h-5">
                   <input
                     id="mph-checkmicrophone"
@@ -1535,7 +1536,7 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* Form */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="md:grid md:grid-cols-2 md:gap-4">
 
                 {/* Male */}
                 <div className="col-span-1">
@@ -1553,7 +1554,7 @@ export default function FacilityVenueForm(){
                       value={getMale}
                       onChange={ev => setGetMale(ev.target.value)}
                       style={{ resize: 'none' }}
-                      className="block w-10/12 ppa-form-field"
+                      className="block w-full md:w-10/12 ppa-form-field"
                     />
                     <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
 
@@ -1562,7 +1563,7 @@ export default function FacilityVenueForm(){
 
                 {/* FeMale */}
                 <div className="col-span-1">
-                  <div className="mt-6">
+                  <div className="mt-2 md:mt-6">
 
                     <div className="mb-4">
                       <label htmlFor="type_of_property" className="form-title"> <strong>Input name of female guests:</strong> </label>
@@ -1576,7 +1577,7 @@ export default function FacilityVenueForm(){
                       value={getFemale}
                       onChange={ev => setGetFemale(ev.target.value)}
                       style={{ resize: 'none' }}
-                      className="block w-10/12 ppa-form-field"
+                      className="block w-full md:w-10/12 ppa-form-field"
                     />
                     <p className="text-red-500 text-xs mt-1">Separate name on next line</p>
 
@@ -1586,13 +1587,13 @@ export default function FacilityVenueForm(){
               </div>
 
               {/* For Other */}
-              <div className="flex mt-10">
+              <div className="md:flex mt-2 md:mt-10">
                 <div className="w-40">
                   <label htmlFor="recomendations" className="form-title">
                     Other Details :
                   </label>
                 </div>
-                <div className="w-3/4">
+                <div className="w-full md:w-3/4">
                   <textarea
                     id="recomendations"
                     name="recomendations"
@@ -1620,7 +1621,7 @@ export default function FacilityVenueForm(){
                 </div>
 
                 <div className="flex items-center mt-2 font-roboto">
-                  <div className="w-1/2">
+                  <div className="w-full md:w-1/2">
                     <textarea
                       id="recomendations"
                       name="recomendations"
@@ -1639,18 +1640,18 @@ export default function FacilityVenueForm(){
           )}
 
           {/* Button */}
-          <div className="mt-10 pl-4 pb-4">
+          <div className="mt-10 pl-4 pb-4 mobile-btn flex justify-center md:justify-start">
             {disableForm ? (
             <>
               {/* Check Form */}
               <button 
                 onClick={handleConfirm} 
-                className="py-2 px-4 text-base btn-default-form">
+                className="w-full md:w-auto py-2 px-4 text-base btn-default-form">
                 Submit
               </button>
 
               {/* Cancel */}
-              <button onClick={handleCancel} className="ml-2 py-2 px-4 text-base btn-cancel-form">
+              <button onClick={handleCancel} className="w-full md:w-auto ml-2 py-2 px-4 text-base btn-cancel-form">
                 Cancel
               </button>
             </>
@@ -1660,11 +1661,11 @@ export default function FacilityVenueForm(){
               <button 
                 type="submit"
                 onClick={checkAvailability}
-                className={`py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                className={`w-full md:w-auto py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                 disabled={submitLoading}
               >
                 {submitLoading ? (
-                  <div className="flex">
+                  <div className="flex justify-center">
                     <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                     <span className="ml-1">Loading</span>
                   </div>

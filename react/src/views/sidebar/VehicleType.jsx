@@ -34,6 +34,20 @@ export default function AddVehicleType(){
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect Mobile Screen
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    };
+
+    checkScreen(); // run on load
+    window.addEventListener('resize', checkScreen);
+
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
   // Disable the Scroll on Popup
   useEffect(() => {
     // Define the class to be added/removed
@@ -336,13 +350,15 @@ export default function AddVehicleType(){
               <div className="joms-user-info-header text-left"> 
                 Vehicle List
               </div>
-              <div className="flex space-x-4 pt-8 pr-4"> 
-                {!addVehicle && <FontAwesomeIcon onClick={() => setAddVehicle(true)} className="icon-delete" title="Add Vehicle" icon={faPlus} />}
-              </div>
+              {!isMobile && (
+                <div className="flex space-x-4 pt-8 pr-4"> 
+                  {!addVehicle && <FontAwesomeIcon onClick={() => setAddVehicle(true)} className="icon-delete" title="Add Vehicle" icon={faPlus} />}
+                </div>
+              )}
             </div>
 
             {/* Table */}
-            <div className="ppa-div-table p-4">
+            <div className="ppa-div-table p-4 overflow-x-auto md:overflow-x-visible">
               <table className="ppa-table w-full">
                 {/* Header */}
                 <thead>
@@ -458,12 +474,14 @@ export default function AddVehicleType(){
                                 ):(
                                 <>
                                   {/* Edit Vehicle */}
-                                  <FontAwesomeIcon
-                                    onClick={() => editingId === null && handleEditClick(veh.vehicle_id)}
-                                    className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                    title="Edit Vehicle"
-                                    icon={faPenToSquare}
-                                  />
+                                  {!isMobile && (
+                                    <FontAwesomeIcon
+                                      onClick={() => editingId === null && handleEditClick(veh.vehicle_id)}
+                                      className={`icon-edit ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                      title="Edit Vehicle"
+                                      icon={faPenToSquare}
+                                    />
+                                  )}
 
                                   {/* Set to Not Available */}
                                   <FontAwesomeIcon 
@@ -474,12 +492,14 @@ export default function AddVehicleType(){
                                   />
 
                                   {/* Delete */}
-                                  <FontAwesomeIcon
-                                    onClick={() => editingId === null && handleRemovalConfirmation(veh.vehicle_id)}
-                                    className={`icon-remove ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
-                                    title="Remove Vehicle"
-                                    icon={faTrash}
-                                  />
+                                  {!isMobile && (
+                                    <FontAwesomeIcon
+                                      onClick={() => editingId === null && handleRemovalConfirmation(veh.vehicle_id)}
+                                      className={`icon-remove ${editingId !== null ? 'pointer-events-none opacity-50' : ''}`}
+                                      title="Remove Vehicle"
+                                      icon={faTrash}
+                                    />
+                                  )}
                                 </>
                                 )
                               )}
@@ -521,7 +541,7 @@ export default function AddVehicleType(){
               </div>
             </div>
             
-            <div className="p-4 ppa-form-box mb-5 w-1/2">
+            <div className="p-4 ppa-form-box mb-5 w-full md:w-1/2">
               <form id="submitVehicle" onSubmit={GetVehicleDetails}>
 
                 {/* Vehicle Name */}
@@ -544,7 +564,7 @@ export default function AddVehicleType(){
                 </div>
 
                 {/* Vehicle Name */}
-                <div className="items-center mt-6">
+                <div className="items-center mt-2 md:mt-6">
                   <div className="w-40">
                     <label htmlFor="rep_date" className="form-title"> 
                       Vehicle Plate: 
@@ -564,16 +584,16 @@ export default function AddVehicleType(){
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-6">
+                <div className="mt-6 justify-center md:justify-start">
                   {vehicleName && vehiclePlate && (
                     <button 
                       type="submit"
                       form="submitVehicle"
-                      className={`py-1.5 px-3 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                      className={`w-full md:w-auto py-1.5 px-3 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
                       disabled={submitLoading}
                     >
                     {submitLoading ? (
-                      <div className="flex">
+                      <div className="flex justify-center">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
                         <span className="ml-1">Loading</span>
                       </div>

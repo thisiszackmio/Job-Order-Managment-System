@@ -121,7 +121,7 @@ export default function VehicleSlipList(){
           <div className="px-4 pb-6">
 
             {/* Search Filter */}
-            <div className="mt-2 mb-4 flex">
+            <div className="mt-2 mb-4 md:flex">
               {/* Search */}
               <div className="flex-grow">
                 <input
@@ -129,7 +129,7 @@ export default function VehicleSlipList(){
                   placeholder="Search Here"
                   value={searchTerm}
                   onChange={handleSearchChange}
-                  className="w-96 p-2 border border-gray-300 rounded text-sm"
+                  className="w-full md:w-96 p-2 border border-gray-300 rounded text-sm"
                 />
               </div>
               {/* Count */}
@@ -174,7 +174,7 @@ export default function VehicleSlipList(){
             </div>
 
             {/* Table */}
-            <div className="ppa-div-table">
+            <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
               <table className="ppa-table w-full">
                 <thead>
                   <tr>

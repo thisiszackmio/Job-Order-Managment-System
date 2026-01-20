@@ -3,48 +3,40 @@ import { Link } from "react-router-dom";
 
 export default function JLMS(){
   return(
-    <div className="font-roboto">
-
-      <header className="flex justify-between items-center px-4 py-6 sm:px-4 lg:px-4">
-        {/* Logo and Title container */}
-        <div className="flex items-center space-x-4">
-          <img
-            src={ppalogo}
-            alt="PPA PMO/LNI"
-            className="transition-width duration-300 w-[300px] h-[300px] object-contain"
-          />
-          <div className="flex flex-col">
-            <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-none">
-              JLMS
-            </div>
-            <h1 className="text-2xl font-regular tracking-tight text-gray-900 font-roboto">
-              Joint Local Management System
-            </h1>
+  <>
+    <header className="ppa-logo-name">
+      <div className="ppa-wrap space-x-4">
+        <img src={ppalogo} alt="PPA PMO/LNI" className="ppa-img-logo" />
+        <div className="ppa-ld-text">
+          <div className="ppa-ltitle">
+            JLMS
           </div>
+          <h1 className="ppa-lword">
+            Joint Local Management System
+          </h1>
         </div>
-      </header>
+      </div>
+    </header>
 
-      {/* System Link Section */}
-
-      {/* First Row: AMS, JOMS, PPS */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* AMS */}
-        <Link to={`/ams/`}> 
+    {/* System Link Section */}
+    {/* 1st Row */}
+    <div className="ppa-system-wrap-3">
+      
+      {/* AMS */}
+      <Link to={`/ams/`}> 
         <div className="relative text-center">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/asset.gif" alt="Your Company" />
             <div className="text-5xl font-bold mt-2">AMS</div>
           </div>
-
-          <div className="ppa-system-text text-lg text-gray-700">
+          <div className="ppa-system-text">
             Asset Management System
           </div>
-          
         </div>
-        </Link>
+      </Link>
 
-        {/* JOMS */}
-        <Link to={`/joms`}> 
+      {/* JOMS */}
+      <Link to={`/joms`}> 
         <div className="relative">
           <div className="ppa-system-abbr joms">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/task-unscreen.gif" alt="Your Company" />
@@ -54,17 +46,40 @@ export default function JLMS(){
             Job Order Management System
           </div>
         </div>
-        </Link>
+      </Link>
 
-        {/* PPS */}
-        <div className="relative text-center">
+      {/* PPS */}
+      <div className="relative text-center">
+        <div className="ppa-system-abbr">
+          <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/personnel-unscreen.gif" alt="Your Company" />
+          <div className="text-5xl font-bold mt-2">PPS</div>
+        </div>
+
+        <div className="ppa-system-text">
+          Personnel Profiling System
+        </div>
+
+        {/* Coming Soon Badge */}
+        <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full border border-yellow-300 animate-pulse shadow-sm">
+          🚧 Coming Soon
+        </div>
+      </div>
+
+    </div>
+
+    {/* 2nd Row */}
+    <div className="ppa-system-wrap-2">
+      
+      {/* DTS Row */}
+      <div className="ppa-system-2">
+        <div className="">
           <div className="ppa-system-abbr">
-            <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/personnel-unscreen.gif" alt="Your Company" />
-            <div className="text-5xl font-bold mt-2">PPS</div>
+            <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/folder-unscreen.gif" alt="Your Company" />
+            <div className="text-5xl font-bold mt-2">DTS</div>
           </div>
 
-          <div className="ppa-system-text px-4">
-            Personnel Profiling System
+          <div className="ppa-system-text">
+            Document Tracking System
           </div>
 
           {/* Coming Soon Badge */}
@@ -74,53 +89,30 @@ export default function JLMS(){
         </div>
       </div>
 
-      {/* Second Row: DTS, DIS */}
-      <div className="grid grid-cols-2 gap-4 mt-20">
-        {/* DTS Row */}
-        <div className="flex justify-end w-full text-center">
-          <div className="w-1/2">
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/folder-unscreen.gif" alt="Your Company" />
-              <div className="text-5xl font-bold mt-2">DTS</div>
-            </div>
+      {/* DIS */}
+      <div className="ppa-system-2">
+        <div className="">
+          <div className="ppa-system-abbr">
+            <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/file-info-unscreen.gif" alt="Your Company" />
+            <div className="text-5xl font-bold mt-2">DIS</div>
+          </div>
 
-            <div className="ppa-system-text">
-              Document Tracking System
-            </div>
+          <div className="ppa-system-text">
+            Database of Issuance System
+          </div>
 
-            {/* Coming Soon Badge */}
-            <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full border border-yellow-300 animate-pulse shadow-sm">
-              🚧 Coming Soon
-            </div>
+          {/* Coming Soon Badge */}
+          <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full border border-yellow-300 animate-pulse shadow-sm">
+            🚧 Coming Soon
           </div>
         </div>
-
-
-        {/* DIS */}
-        <div className="flex justify-start w-full text-center">
-          <div className="w-1/2">
-            <div className="ppa-system-abbr">
-              <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/file-info-unscreen.gif" alt="Your Company" />
-              <div className="text-5xl font-bold mt-2">DIS</div>
-            </div>
-
-            <div className="ppa-system-text">
-              Database of Issuance System
-            </div>
-
-            {/* Coming Soon Badge */}
-            <div className="mt-4 inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full border border-yellow-300 animate-pulse shadow-sm">
-              🚧 Coming Soon
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <footer className="text-sm font-bold p-5 text-right font-roboto mt-10">
-        <p>&copy; 2025 All rights reserved. Developed by PPA PMO/LNI - IT Team </p>
-      </footer>
-
     </div>
+
+    <footer className="footer-content">
+      <p>&copy; 2026 All rights reserved. Developed by PPA PMO/LNI - IT Team </p>
+    </footer>
+  </>
   );
 }

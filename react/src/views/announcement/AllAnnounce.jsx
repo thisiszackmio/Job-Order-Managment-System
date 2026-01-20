@@ -183,7 +183,7 @@ export default function AllAnnouncements(){
           </div>
 
           {/* Table */}
-          <div className="ppa-div-table p-4">
+          <div className="ppa-div-table p-4 overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               {/* Header */}
               <thead>

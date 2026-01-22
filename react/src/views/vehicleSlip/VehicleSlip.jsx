@@ -361,7 +361,7 @@ export default function VehicleSlip(){
       place_visited: updateVisited,
       date_arrival: updateArrivalDate,
       time_arrival: updateArrivalTime,
-      vehicle_type: updateVehicle,
+      vehicle_type: updateVehicle ? updateVehicle : vehicleData?.vehicle_type,
       driver_id: updatePointDriver.did ? updatePointDriver.did : vehicleData?.driver_id,
       driver: updatePointDriver.dname ? updatePointDriver.dname : vehicleData?.driver,
       notes: updateNotes
@@ -824,17 +824,19 @@ export default function VehicleSlip(){
                             {PortManager && (
                             <>
                               {![0, 1, 2, 3].includes(vehicleData?.admin_approval) && (
-                              <>
-                                {/* Approve */}
-                                <button onClick={handleAdminConfirmation} className="px-4 btn-default-form text-sm">
-                                  Approve 
-                                </button>
+                                vehicleData?.admin_approval == 5 && (
+                                  <>
+                                    {/* Approve */}
+                                    <button onClick={handleAdminConfirmation} className="px-4 btn-default-form text-sm">
+                                      Approve 
+                                    </button>
 
-                                {/* Decline */}
-                                <button onClick={() => setAdminDisapproval(true)} className="ml-2 py-2 px-4 btn-cancel-form text-sm">
-                                  Disapprove
-                                </button>
-                              </>
+                                    {/* Decline */}
+                                    <button onClick={() => setAdminDisapproval(true)} className="ml-2 py-2 px-4 btn-cancel-form text-sm">
+                                      Disapprove
+                                    </button>
+                                  </>
+                                )
                               )}
                             </>
                             )}

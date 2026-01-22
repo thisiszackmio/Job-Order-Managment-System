@@ -822,7 +822,7 @@ export default function FacilityVenueForm(){
               <p className="note-form mb-4"><span> Note: </span>The Date and Time of Activity (Start and End) will no longer be editable once submitted. Please make sure to verify and confirm the schedule before requesting a facility.</p>
 
               {/* Button */}
-              <div className="mt-10 pb-4 mobile-btn flex justify-center md:justify-start">
+              <div className="mt-10 pb-4 flex justify-center md:justify-start">
               {!buttonHide && (
               <>
                 {/* Submit */}

@@ -796,7 +796,7 @@ export default function InspectionForm(){
     });
   }
 
-    // Close Form Popup 
+  // Close Form Popup 
   const handleCloseForm = () => {
     setShowPopup(true);
     setPopupContent('gsofc');
@@ -912,7 +912,6 @@ export default function InspectionForm(){
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
   const DivisionManager = codes.includes("DM");
-  const SuperAdmin = codes.includes("HACK");
   const SuperHacker = codes.includes("NERD");
   const roles = ["AM", "GSO", "HACK", "PM", "DM", "AU", "AP", "NERD"];
   const accessOnly = roles.some(role => codes.includes(role));
@@ -922,132 +921,115 @@ export default function InspectionForm(){
     <PageComponent title="Request Form">
       {dataAccess != 'Not-Found' ? (
         clearance ? (
-        <>
-
-          {/* Detail */}
           <div className="grid gap-3 [@media(min-width:1440px)]:grid-cols-[65%_34%]">
-
             {/* Form */}
             <div>
               <div className="ppa-widget mt-10 mb-6 pb-8">
+
                 {/* Header */}
                 <div className="joms-user-info-header text-left"> 
                   Pre/Post Repair Inspection Form
                 </div>
+
                 {/* Button Pagination */}
                 <div className="text-sm flex justify-between items-center w-full mb-2">
                   {(GSO || DivisionManager || Admin || SuperHacker) && (
-                    <>
-                      {/* Previous */}
-                      <button
-                        onClick={handlePrev}
-                        disabled={!inspectionData?.form?.prev_id || loading}
-                        className={`ml-4 rounded ${
-                          inspectionData?.form?.prev_id
-                            ? "ppa-arrow"
-                            : "ppa-arrow-disable cursor-not-allowed"
-                        }`}
-                        style={{
-                          visibility: inspectionData?.form?.prev_id ? "visible" : "hidden"
-                        }}
-                      >
-                        <span className="flex items-center group-hover:text-white transition-colors">
-                          <FontAwesomeIcon
-                            className="icon-form group-hover:text-white transition-colors"
-                            title="Prev"
-                            icon={faArrowLeft}
-                          />
-                          &nbsp; Page{" "}
-                          {inspectionData?.form?.prev_id && inspectionData?.form?.prev_id}
-                        </span>
-                      </button>
+                  <>
+                    {/* Previous */}
+                    <button
+                      onClick={handlePrev}
+                      disabled={!inspectionData?.form?.prev_id || loading}
+                      className={`ml-4 rounded ${
+                        inspectionData?.form?.prev_id
+                          ? "ppa-arrow"
+                          : "ppa-arrow-disable cursor-not-allowed"
+                      }`}
+                      style={{
+                        visibility: inspectionData?.form?.prev_id ? "visible" : "hidden"
+                      }}
+                    >
+                      <span className="flex items-center group-hover:text-white transition-colors">
+                        <FontAwesomeIcon
+                          className="icon-form group-hover:text-white transition-colors"
+                          title="Prev"
+                          icon={faArrowLeft}
+                        />
+                        &nbsp; Page{" "}
+                        {inspectionData?.form?.prev_id && inspectionData?.form?.prev_id}
+                      </span>
+                    </button>
 
-                      {/* Next */}
-                      <button
-                        onClick={handleNext}
-                        disabled={!inspectionData?.form?.next_id || loading}
-                        className={`mr-4 rounded ${
-                          inspectionData?.form?.next_id
-                            ? "ppa-arrow"
-                            : "ppa-arrow-disable cursor-not-allowed"
-                        }`}
-                        style={{
-                          visibility: inspectionData?.form?.next_id ? "visible" : "hidden"
-                        }}
-                      >
-                        <span className="flex items-center group-hover:text-white transition-colors">
-                          Page{" "}
-                          {inspectionData?.form?.next_id && inspectionData?.form?.next_id}
-                          &nbsp;
-                          <FontAwesomeIcon
-                            className="icon-form group-hover:text-white transition-colors"
-                            title="Prev"
-                            icon={faArrowRight}
-                          />
-                        </span>
-                      </button>
-                    </>
+                    {/* Next */}
+                    <button
+                      onClick={handleNext}
+                      disabled={!inspectionData?.form?.next_id || loading}
+                      className={`mr-4 rounded ${
+                        inspectionData?.form?.next_id
+                          ? "ppa-arrow"
+                          : "ppa-arrow-disable cursor-not-allowed"
+                      }`}
+                      style={{
+                        visibility: inspectionData?.form?.next_id ? "visible" : "hidden"
+                      }}
+                    >
+                      <span className="flex items-center group-hover:text-white transition-colors">
+                        Page{" "}
+                        {inspectionData?.form?.next_id && inspectionData?.form?.next_id}
+                        &nbsp;
+                        <FontAwesomeIcon
+                          className="icon-form group-hover:text-white transition-colors"
+                          title="Prev"
+                          icon={faArrowRight}
+                        />
+                      </span>
+                    </button>
+                  </>
                   )}
                 </div>
-                {/* Control Number */}
+
+                {/* Form Header */}
                 <div className="px-4 mt-4 text-base md:flex justify-between items-center">
                   {!loading && !loadingPDF && (
                   <>
+                    {/* Control Number */}
                     <div>
                       <span>Control No: <span className="px-2 ppa-form-view">{id}</span></span>
                     </div>
+                    {/* Button Functions */}
                     <div className="mt-3 flex justify-right space-x-3">
                       {!partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
                       <>
-                        {/* Cancel Button */}
-                        {(SuperHacker || GSO) ? (
-                        <>
-                          {/* GSO */}
-                          {GSO && (
-                            currentUserId == inspectionData?.form?.user_id ? (
-                              inspectionData?.form?.form_status == 11 && !inspectionData?.form?.date_of_filling && (
-                                <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                              )
-                            ):(
-                              [6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !inspectionData?.form?.date_of_filling && (
-                                <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                              )
+                        {/* === Cancel Button === */}
+                        {/* GSO */}
+                        {GSO && (
+                          currentUserId == inspectionData?.form?.user_id ? (
+                            inspectionData?.form?.form_status == 11 && !inspectionData?.form?.date_of_filling && (
+                              <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
                             )
-                          )}
-
-                          {/* SuperAdmin */}
-                          {SuperAdmin && (
-                            currentUserId == inspectionData?.form?.user_id && (
-                              inspectionData?.form?.form_status == 11 && !inspectionData?.form?.date_of_filling && (
-                                <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
-                              )
-                            )
-                          )}
-                        </>
-                        ):(
-                          currentUserId == inspectionData?.form?.user_id && (
-                            inspectionData?.form?.form_status == 11 && (
+                          ):(
+                            [6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !inspectionData?.form?.date_of_filling && (
                               <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
                             )
                           )
                         )}
-
-                        {/* Approval */}
-                        {/* Admin */}
-                        {Admin && (
-                          inspectionData?.form?.form_status == 5 && (
-                            !submitLoading && !buttonHide && (
-                              <button
-                                onClick={() => handleAdminApprovalConfirmation()} 
-                                className="w-full md:w-auto py-2 px-4 text-sm btn-default-form"
-                              >
-                                Approve
-                              </button>
+                        {/* SuperHacker */}
+                        {SuperHacker && (
+                          currentUserId == inspectionData?.form?.user_id ? (
+                            inspectionData?.form?.form_status == 11 && !inspectionData?.form?.date_of_filling && (
+                              <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
                             )
+                          ):([6, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !inspectionData?.form?.date_of_filling && (
+                            <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
+                          ))
+                        )}
+                        {/* Reqular Requestor */}
+                        {currentUserId == inspectionData?.form?.user_id && (!SuperHacker && !GSO) && (
+                          [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
+                            <FontAwesomeIcon onClick={() => handleCloseForm()} className="icon-delete" title="Cancel Request" icon={faCircleXmark} />
                           )
                         )}
 
-                        {/* Supervisor */}
+                        {/* === Supervisor === */}
                         {DivisionManager && currentUserId == inspectionData?.form?.supervisor_id && inspectionData?.form?.form_status == 11 && (
                           enableSupDecline ? (
                           <>
@@ -1068,6 +1050,20 @@ export default function InspectionForm(){
                           )
                         )}
 
+                        {/* === Admin === */}
+                        {Admin && (
+                          inspectionData?.form?.form_status == 5 && (
+                            !submitLoading && !buttonHide && (
+                              <button
+                                onClick={() => handleAdminApprovalConfirmation()} 
+                                className="w-full md:w-auto py-2 px-4 text-sm btn-default-form"
+                              >
+                                Approve
+                              </button>
+                            )
+                          )
+                        )}
+
                         {/* For the Generate PDF */}
                         {!isMobile && (
                           !enablePartA && (
@@ -1078,14 +1074,15 @@ export default function InspectionForm(){
                             ):null
                           )
                         )}
-
                       </>
                       )}
                     </div>
                   </>
                   )}
                 </div>
-                {/* Form */}
+
+                {/* Form Body */}
+                <div>
                 {loadingPDF ? (
                   <div className="flex justify-center items-center py-6">
                     <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
@@ -1136,7 +1133,7 @@ export default function InspectionForm(){
                             "You are assign on this request."
                           ):currentUserId == inspectionData?.form?.personnel_id && inspectionData?.form?.form_status == 3 ? (
                             "You are assign on this request."
-                          ):(currentUserId == inspectionData?.form?.personnel_id || GSO || SuperAdmin || SuperHacker) && inspectionData?.form?.form_status == 2 ? (
+                          ):(currentUserId == inspectionData?.form?.personnel_id || GSO || SuperHacker) && inspectionData?.form?.form_status == 2 ? (
                             "The assigned personnel has completed the form. It will only be editable for 24 hours (if you see this)."
                           ):(
                             [5, 11].includes(inspectionData?.form?.form_status) &&
@@ -1163,136 +1160,125 @@ export default function InspectionForm(){
                         <div className="md:flex md:justify-between items-center px-4">
                           <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
                           <div className="mt-2 md:mt-0 flex md:justify-start">
+                            {/* === Edit Button === */}
+                            {/* SuperHacker */}
+                            {SuperHacker && (
+                              [1, 11].includes(inspectionData?.form?.form_status) && (
+                                enablePartA ? (
+                                  !buttonHide && (
+                                  <>
+                                    {/* Submit */}
+                                    <button 
+                                      type="submit"
+                                      onClick={() => UpdatePartA()}
+                                      className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                      disabled={submitLoading}
+                                    >
+                                      {submitLoading ? (
+                                        <div className="flex justify-center">
+                                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                          <span className="ml-1">Loading</span>
+                                        </div>
+                                      ):(
+                                        'Save'
+                                      )}
+                                    </button>
 
-                            {/* Edit Button */}
-                            {(SuperHacker || GSO) ? (
-                            <>
-                              {/* SuperAdmin */}
-                              {SuperAdmin && (
-                                [1, 11].includes(inspectionData?.form?.form_status) && (
-                                  enablePartA ? (
-                                    !buttonHide && (
-                                      <>
-                                        {/* Submit */}
-                                        <button 
-                                          type="submit"
-                                          onClick={() => UpdatePartA()}
-                                          className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                          disabled={submitLoading}
-                                        >
-                                          {submitLoading ? (
-                                            <div className="flex justify-center">
-                                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                              <span className="ml-1">Loading</span>
-                                            </div>
-                                          ):(
-                                            'Save'
-                                          )}
-                                        </button>
-
-                                        {/* Cancel */}
-                                        {!submitLoading && (
-                                          <button onClick={() => { 
-                                              setEnablePartA(false);
-                                            }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                            Cancel
-                                          </button>
-                                        )}
-                                      </>
-                                    )
-                                  ):(
-                                    !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                      <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                                    )
+                                    {/* Cancel */}
+                                    {!submitLoading && (
+                                      <button onClick={() => { 
+                                          setEnablePartA(false);
+                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                        Cancel
+                                      </button>
+                                    )}
+                                  </>
                                   )
-                                )
-                              )}
-                              
-                              {/* GSO */}
-                              {GSO && (
-                                ![0, 1, 7].includes(inspectionData?.form?.form_status) && (
-                                  enablePartA ? (
-                                    !buttonHide && (
-                                      <>
-                                        {/* Submit */}
-                                        <button 
-                                          type="submit"
-                                          onClick={() => UpdatePartA()}
-                                          className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                          disabled={submitLoading}
-                                        >
-                                          {submitLoading ? (
-                                            <div className="flex justify-center">
-                                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                              <span className="ml-1">Loading</span>
-                                            </div>
-                                          ):(
-                                            'Save'
-                                          )}
-                                        </button>
-
-                                        {/* Cancel */}
-                                        {!submitLoading && (
-                                          <button onClick={() => { 
-                                              setEnablePartA(false);
-                                            }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                            Cancel
-                                          </button>
-                                        )}
-                                      </>
-                                    )
-                                  ):(
-                                    !enablePartA && !partBForm && !enablePartB && !enablePartC && !enablePartD && (
-                                      <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                                    )
-                                  )
-                                )
-                              )}
-                            
-                            </>
-                            ):(
-                            <>
-                              {/* For non-Authorize Requestor */}
-                              {currentUserId == inspectionData?.form?.user_id && (
-                                [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
-                                  enablePartA ? (
-                                    !buttonHide && (
-                                      <>
-                                        {/* Submit */}
-                                        <button 
-                                          type="submit"
-                                          onClick={() => UpdatePartA()}
-                                          className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                          disabled={submitLoading}
-                                        >
-                                          {submitLoading ? (
-                                            <div className="flex justify-center">
-                                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                              <span className="ml-1">Loading</span>
-                                            </div>
-                                          ):(
-                                            'Save'
-                                          )}
-                                        </button>
-
-                                        {/* Cancel */}
-                                        {!submitLoading && (
-                                          <button onClick={() => { 
-                                              setEnablePartA(false);
-                                            }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                            Cancel
-                                          </button>
-                                        )}
-                                      </>
-                                    )
-                                  ):(
+                                ):(
+                                  !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
                                     <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
                                   )
                                 )
-                              )}
-                            </>
+                              )
                             )}
+                            {/* GSO */}
+                            {GSO && (
+                              ![0, 1, 7].includes(inspectionData?.form?.form_status) && (
+                                enablePartA ? (
+                                  !buttonHide && (
+                                    <>
+                                      {/* Submit */}
+                                      <button 
+                                        type="submit"
+                                        onClick={() => UpdatePartA()}
+                                        className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                        disabled={submitLoading}
+                                      >
+                                        {submitLoading ? (
+                                          <div className="flex justify-center">
+                                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                            <span className="ml-1">Loading</span>
+                                          </div>
+                                        ):(
+                                          'Save'
+                                        )}
+                                      </button>
 
+                                      {/* Cancel */}
+                                      {!submitLoading && (
+                                        <button onClick={() => { 
+                                            setEnablePartA(false);
+                                          }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                          Cancel
+                                        </button>
+                                      )}
+                                    </>
+                                  )
+                                ):(
+                                  !enablePartA && !partBForm && !enablePartB && !enablePartC && !enablePartD && (
+                                    <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                                  )
+                                )
+                              )
+                            )}
+                            {/* For the Regular Requestor */}
+                            {currentUserId == inspectionData?.form?.user_id && (!SuperHacker && !GSO) && (
+                              [8, 9, 10, 11].includes(inspectionData?.form?.form_status) && (
+                                enablePartA ? (
+                                  !buttonHide && (
+                                    <>
+                                      {/* Submit */}
+                                      <button 
+                                        type="submit"
+                                        onClick={() => UpdatePartA()}
+                                        className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                        disabled={submitLoading}
+                                      >
+                                        {submitLoading ? (
+                                          <div className="flex justify-center">
+                                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                            <span className="ml-1">Loading</span>
+                                          </div>
+                                        ):(
+                                          'Save'
+                                        )}
+                                      </button>
+
+                                      {/* Cancel */}
+                                      {!submitLoading && (
+                                        <button onClick={() => { 
+                                            setEnablePartA(false);
+                                          }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                          Cancel
+                                        </button>
+                                      )}
+                                    </>
+                                  )
+                                ):(
+                                  <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
+                                )
+                              )
+                            )}
                           </div>
                         </div>
 
@@ -1653,53 +1639,10 @@ export default function InspectionForm(){
                         <div className="md:flex justify-between items-center mt-4 px-4">
                           <h2 className="req-title"> Part B: To be filled-up by Administrative Division </h2>
                           <div className="mt-2 md:mt-0 flex md:justify-start">
-
-                            {/* Edit Button */}
-                            {(SuperHacker || GSO) && (
-                            <>
-                              {/* SuperAdmin */}
-                              {SuperHacker && (
-                                inspectionData?.form?.form_status == 1 && (
-                                  enablePartB ? (
-                                  !buttonHide && (
-                                    <>
-                                      {/* Submit */}
-                                      <button type="submit"
-                                        onClick={() => UpdatePartB()}
-                                        className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                        disabled={submitLoading}
-                                      >
-                                        {submitLoading ? (
-                                          <div className="flex justify-center">
-                                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                            <span className="ml-1">Loading</span>
-                                          </div>
-                                        ):(
-                                          'Update'
-                                        )}
-                                      </button>
-
-                                      {/* Cancel */}
-                                      {!submitLoading && (
-                                        <button onClick={() => { 
-                                            setEnablePartB(false); 
-                                          }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                          Cancel
-                                        </button>
-                                      )}
-                                    </>
-                                  )
-                                  ):(
-                                    !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                      <FontAwesomeIcon onClick={() => { setEnablePartB(true); }} className="icon-form" title="Edit Part A" icon={faPenToSquare} />
-                                    )
-                                  )
-                                )
-                              )}
-                              
-                              {/* GSO */}
-                              {GSO && (
-                                partBForm ? (
+                            {/* === Edit Button === */}
+                            {/* GSO */}
+                            {GSO && (
+                              partBForm ? (
                                 !buttonHide && (
                                   !pointPersonnel.pid ? (
                                   <>
@@ -1778,54 +1721,90 @@ export default function InspectionForm(){
                                   )
                                   )
                                 )
-                                ):enablePartB ? (
-                                  !buttonHide && (
-                                    <>
-                                      {/* Submit */}
-                                      <button type="submit"
-                                        onClick={() => UpdatePartB()}
-                                        className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                        disabled={submitLoading}
-                                      >
-                                        {submitLoading ? (
-                                          <div className="flex justify-center">
-                                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                            <span className="ml-1">Loading</span>
-                                          </div>
-                                        ):(
-                                          'Update'
-                                        )}
-                                      </button>
-
-                                      {/* Cancel */}
-                                      {!submitLoading && (
-                                        <button onClick={() => { 
-                                            setEnablePartB(false); 
-                                            setUpdatePointPersonnel({ pid: '', pname: '' })
-                                          }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                          Cancel
-                                        </button>
-                                      )}
-                                    </>
-                                  )
-                                ):(
+                              ):enablePartB ? (
+                                !buttonHide && (
                                   <>
-                                    {/* Enable Part B Form */}
-                                    {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
-                                      !partBForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                        <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form self-center" title="Enable Form" icon={faPenToSquare} />
-                                      )
-                                    ):[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
-                                      !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                        <FontAwesomeIcon onClick={() => { setEnablePartB(true); }} className="icon-form self-center" title="Edit Part B" icon={faPenToSquare} />
-                                      )
-                                    ):null}
+                                    {/* Submit */}
+                                    <button type="submit"
+                                      onClick={() => UpdatePartB()}
+                                      className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                      disabled={submitLoading}
+                                    >
+                                      {submitLoading ? (
+                                        <div className="flex justify-center">
+                                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                          <span className="ml-1">Loading</span>
+                                        </div>
+                                      ):(
+                                        'Update'
+                                      )}
+                                    </button>
+
+                                    {/* Cancel */}
+                                    {!submitLoading && (
+                                      <button onClick={() => { 
+                                          setEnablePartB(false); 
+                                          setUpdatePointPersonnel({ pid: '', pname: '' })
+                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                        Cancel
+                                      </button>
+                                    )}
                                   </>
                                 )
-                              )}
-                            </>
+                              ):(
+                                <>
+                                  {/* Enable Part B Form */}
+                                  {[6, 8, 9, 10].includes(inspectionData?.form?.form_status) ? (
+                                    !partBForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                      <FontAwesomeIcon onClick={() => { setPartBForm(true); }} className="icon-form self-center" title="Enable Form" icon={faPenToSquare} />
+                                    )
+                                  ):[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) ? (
+                                    !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                      <FontAwesomeIcon onClick={() => { setEnablePartB(true); }} className="icon-form self-center" title="Edit Part B" icon={faPenToSquare} />
+                                    )
+                                  ):null}
+                                </>
+                              )
                             )}
+                            {/* SuperHacker */}
+                            {SuperHacker && (
+                              inspectionData?.form?.form_status == 1 && (
+                                enablePartB ? (
+                                !buttonHide && (
+                                  <>
+                                    {/* Submit */}
+                                    <button type="submit"
+                                      onClick={() => UpdatePartB()}
+                                      className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                      disabled={submitLoading}
+                                    >
+                                      {submitLoading ? (
+                                        <div className="flex justify-center">
+                                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                          <span className="ml-1">Loading</span>
+                                        </div>
+                                      ):(
+                                        'Update'
+                                      )}
+                                    </button>
 
+                                    {/* Cancel */}
+                                    {!submitLoading && (
+                                      <button onClick={() => { 
+                                          setEnablePartB(false); 
+                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                        Cancel
+                                      </button>
+                                    )}
+                                  </>
+                                )
+                                ):(
+                                  !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                    <FontAwesomeIcon onClick={() => { setEnablePartB(true); }} className="icon-form" title="Edit Part B" icon={faPenToSquare} />
+                                  )
+                                )
+                              )
+                            )}
                           </div>
                         </div>
 
@@ -2112,14 +2091,49 @@ export default function InspectionForm(){
                         <div className="md:flex justify-between items-center mt-4 px-4">
                           <h2 className="text-lg font-bold leading-7 text-gray-900"> Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job </h2>
                           <div className="mt-2 md:mt-0 flex md:justify-start">
+                            {/* === Edit Button === */}
+                            {/* GSO */}
+                            {inspectionData?.form?.date_of_filling && (
+                              GSO && (
+                              enablePartC ? (
+                              !buttonHide && (
+                              <>
+                                {/* Submit */}
+                                <button type="submit"
+                                  onClick={() => UpdatePartC()}
+                                  className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                  disabled={submitLoading}
+                                >
+                                  {submitLoading ? (
+                                    <div className="flex justify-center">
+                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                      <span className="ml-1">Loading</span>
+                                    </div>
+                                  ):(
+                                    'Update'
+                                  )}
+                                </button>
 
-                            {/* Edit Button */}
-                            {(SuperHacker || GSO) ? (
-                            <>
-                            
-                              {/* SuperAdmin */}
-                              {SuperHacker && (
-                                inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status != 1 ? (
+                                {/* Cancel */}
+                                {!submitLoading && (
+                                  <button onClick={() => { 
+                                      setEnablePartC(false); 
+                                    }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                    Cancel
+                                  </button>
+                                )}
+                              </>
+                              )
+                              ):(
+                                [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                  <FontAwesomeIcon onClick={() => { setEnablePartC(true); }} className="icon-form self-center" title="Edit Part C" icon={faPenToSquare} />
+                                )
+                              )
+                            )
+                            )}
+                            {/* SuperHacker */}
+                            {SuperHacker && (
+                              inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status != 1 ? (
                                   partCForm ? (
                                 !buttonHide && (
                                 <>
@@ -2189,49 +2203,77 @@ export default function InspectionForm(){
                                       )
                                     )
                                   )
-                                ):(
-                                  inspectionData?.form?.form_status == 1 && (
-                                    enablePartC ? (
-                                      !buttonHide && (
-                                      <>
-                                        {/* Submit */}
-                                        <button type="submit"
-                                          onClick={() => UpdatePartC()}
-                                          className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                          disabled={submitLoading}
-                                        >
-                                          {submitLoading ? (
-                                            <div className="flex">
-                                              <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                              <span className="ml-1">Loading</span>
-                                            </div>
-                                          ):(
-                                            'Update'
-                                          )}
-                                        </button>
-
-                                        {/* Cancel */}
-                                        {!submitLoading && (
-                                          <button onClick={() => { 
-                                              setEnablePartC(false); 
-                                            }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                            Cancel
-                                          </button>
+                              ):(
+                                inspectionData?.form?.form_status == 1 && (
+                                  enablePartC ? (
+                                    !buttonHide && (
+                                    <>
+                                      {/* Submit */}
+                                      <button type="submit"
+                                        onClick={() => UpdatePartC()}
+                                        className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                        disabled={submitLoading}
+                                      >
+                                        {submitLoading ? (
+                                          <div className="flex">
+                                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                            <span className="ml-1">Loading</span>
+                                          </div>
+                                        ):(
+                                          'Update'
                                         )}
-                                      </>
-                                      )
-                                    ):(
-                                      !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                        <FontAwesomeIcon onClick={() => { setEnablePartC(true); }} className="icon-form self-center" title="Edit Part C" icon={faPenToSquare} />
-                                      )
+                                      </button>
+
+                                      {/* Cancel */}
+                                      {!submitLoading && (
+                                        <button onClick={() => { 
+                                            setEnablePartC(false); 
+                                          }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                          Cancel
+                                        </button>
+                                      )}
+                                    </>
+                                    )
+                                  ):(
+                                    !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                      <FontAwesomeIcon onClick={() => { setEnablePartC(true); }} className="icon-form self-center" title="Edit Part C" icon={faPenToSquare} />
                                     )
                                   )
                                 )
-                              )}
+                              )
+                            )}
+                            {/* Assign Personnel */}
+                            {inspectionData?.form?.personnel_id == currentUserId && !SuperHacker && (
+                              partCForm ? (
+                                !buttonHide && (
+                                <>
+                                  {/* Submit */}
+                                  <button type="submit"
+                                    onClick={() => SubmitPartC()}
+                                    className={`w-full md:w-auto py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                    disabled={submitLoading}
+                                  >
+                                  {submitLoading ? (
+                                    <div className="flex justify-center">
+                                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                      <span className="ml-1">Loading</span>
+                                    </div>
+                                  ):(
+                                  'Submit'
+                                  )}
+                                  </button>
 
-                              {/* GSO */}
-                              {GSO && (
-                                enablePartC ? (
+                                  {/* Cancel */}
+                                  {!submitLoading && (
+                                    <button onClick={() => { 
+                                        setPartCForm(false); 
+                                      }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                      Cancel
+                                    </button>
+                                  )}
+                                </>
+                                )
+                              ):enablePartC ? (
                                 !buttonHide && (
                                 <>
                                   {/* Submit */}
@@ -2253,98 +2295,25 @@ export default function InspectionForm(){
                                   {/* Cancel */}
                                   {!submitLoading && (
                                     <button onClick={() => { 
-                                        setEnablePartC(false); 
+                                        setEnablePartC(false);
                                       }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
                                       Cancel
                                     </button>
                                   )}
                                 </>
                                 )
+                              ):(
+                                inspectionData?.form?.form_status == 4 ? (
+                                  !partCForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                    <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form self-center" title="Enable Form" icon={faPenToSquare} />
+                                  )
                                 ):(
-                                  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                  [2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
                                     <FontAwesomeIcon onClick={() => { setEnablePartC(true); }} className="icon-form self-center" title="Edit Part C" icon={faPenToSquare} />
                                   )
                                 )
-                              )}
-
-                            </>
-                            ):(
-                            <>
-                              {/* Assign Personnel */}
-                              {inspectionData?.form?.personnel_id == currentUserId && (
-                                partCForm ? (
-                                  !buttonHide && (
-                                  <>
-                                    {/* Submit */}
-                                    <button type="submit"
-                                      onClick={() => SubmitPartC()}
-                                      className={`w-full md:w-auto py-2 px-3 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                      disabled={submitLoading}
-                                    >
-                                    {submitLoading ? (
-                                      <div className="flex justify-center">
-                                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                        <span className="ml-1">Loading</span>
-                                      </div>
-                                    ):(
-                                    'Submit'
-                                    )}
-                                    </button>
-
-                                    {/* Cancel */}
-                                    {!submitLoading && (
-                                      <button onClick={() => { 
-                                          setPartCForm(false); 
-                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                        Cancel
-                                      </button>
-                                    )}
-                                  </>
-                                  )
-                                ):enablePartC ? (
-                                  !buttonHide && (
-                                  <>
-                                    {/* Submit */}
-                                    <button type="submit"
-                                      onClick={() => UpdatePartC()}
-                                      className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                      disabled={submitLoading}
-                                    >
-                                      {submitLoading ? (
-                                        <div className="flex justify-center">
-                                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                          <span className="ml-1">Loading</span>
-                                        </div>
-                                      ):(
-                                        'Update'
-                                      )}
-                                    </button>
-
-                                    {/* Cancel */}
-                                    {!submitLoading && (
-                                      <button onClick={() => { 
-                                          setEnablePartC(false);
-                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                        Cancel
-                                      </button>
-                                    )}
-                                  </>
-                                  )
-                                ):(
-                                  inspectionData?.form?.form_status == 4 ? (
-                                    !partCForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                      <FontAwesomeIcon onClick={() => { setPartCForm(true); }} className="icon-form self-center" title="Enable Form" icon={faPenToSquare} />
-                                    )
-                                  ):(
-                                    [2, 3].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                      <FontAwesomeIcon onClick={() => { setEnablePartC(true); }} className="icon-form self-center" title="Edit Part C" icon={faPenToSquare} />
-                                    )
-                                  )
-                                )
-                              )}
-                            </>
+                              )
                             )}
-                            
                           </div>
                         </div>
 
@@ -2373,7 +2342,7 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             ):(
-                              enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartC && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     type="date"
@@ -2404,7 +2373,7 @@ export default function InspectionForm(){
                               </label> 
                             </div>
                             {partCForm ? (
-                              <div className="w-full w-1/2">
+                              <div className="w-full md:w-1/2">
                                 <input
                                   type="text"
                                   value={inspectionData?.form?.personnel_name}
@@ -2413,7 +2382,7 @@ export default function InspectionForm(){
                                 />
                               </div>
                             ):(
-                              enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartC && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     type="text"
@@ -2454,7 +2423,7 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             ):(
-                              enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartC && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     id="findings"
@@ -2500,7 +2469,7 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             ):(
-                              enablePartC && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartC && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     id="recomendations"
@@ -2533,12 +2502,47 @@ export default function InspectionForm(){
                         <div className="md:flex justify-between items-center mt-4 px-4">
                           <h2 className="text-lg font-bold leading-7 text-gray-900"> Part D: To be filled-up by the DESIGNATED INSPECTOR after the completion of the repair job. </h2>
                           <div className="mt-2 md:mt-0 flex md:justify-start">
+                            {/* === Edit Button === */}
+                            {/* GSO */}
+                            {inspectionData?.form?.before_repair_date && (
+                              GSO && (
+                                enablePartD ? (
+                                  !buttonHide && (
+                                  <>
+                                    {/* Submit */}
+                                    <button type="submit"
+                                      onClick={() => UpdatePartD()}
+                                      className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                                      disabled={submitLoading}
+                                    >
+                                      {submitLoading ? (
+                                        <div className="flex">
+                                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                                          <span className="ml-1">Loading</span>
+                                        </div>
+                                      ):(
+                                        'Update'
+                                      )}
+                                    </button>
 
-                          {/* Edit Button */}
-                          {(SuperHacker || GSO) ? (
-                          <>
-
-                            {/* SuperAdmin */}
+                                    {/* Cancel */}
+                                    {!submitLoading && (
+                                      <button onClick={() => { 
+                                          setEnablePartD(false);
+                                        }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
+                                        Cancel
+                                      </button>
+                                    )}
+                                  </>
+                                  )
+                                ):(
+                                  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
+                                  <FontAwesomeIcon onClick={() => { setEnablePartD(true); }} className="icon-form self-center" title="Edit Part D" icon={faPenToSquare} />
+                                  )
+                                )
+                              )
+                            )}
+                            {/* SuperHacker */}
                             {SuperHacker && (
                               inspectionData?.form?.personnel_id == currentUserId && inspectionData?.form?.form_status != 1 ? (
                                 partDForm ? (
@@ -2649,50 +2653,8 @@ export default function InspectionForm(){
                                 )
                               )
                             )}
-
-                            {/* GSO */}
-                            {GSO && (
-                              enablePartD ? (
-                                !buttonHide && (
-                                <>
-                                  {/* Submit */}
-                                  <button type="submit"
-                                    onClick={() => UpdatePartD()}
-                                    className={`w-full md:w-auto py-2 px-4 text-sm mr-2 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                                    disabled={submitLoading}
-                                  >
-                                    {submitLoading ? (
-                                      <div className="flex">
-                                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                                        <span className="ml-1">Loading</span>
-                                      </div>
-                                    ):(
-                                      'Update'
-                                    )}
-                                  </button>
-
-                                  {/* Cancel */}
-                                  {!submitLoading && (
-                                    <button onClick={() => { 
-                                        setEnablePartD(false);
-                                      }} className="w-full md:w-auto py-2 px-4 text-sm btn-cancel-form">
-                                      Cancel
-                                    </button>
-                                  )}
-                                </>
-                                )
-                              ):(
-                                [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(inspectionData?.form?.form_status) && !partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD && (
-                                <FontAwesomeIcon onClick={() => { setEnablePartD(true); }} className="icon-form self-center" title="Edit Part D" icon={faPenToSquare} />
-                                )
-                              )
-                            )}
-
-                          </>
-                          ):(
-                          <>
-                            {/* Assign Personnel */}
-                            {inspectionData?.form?.personnel_id == currentUserId && (
+                            {/* Assign Personel */}
+                            {inspectionData?.form?.personnel_id == currentUserId && !SuperHacker && (
                               partDForm ? (
                                 !buttonHide && (
                                   <>
@@ -2763,9 +2725,6 @@ export default function InspectionForm(){
                                 )
                               )
                             )}
-                          </>
-                          )}
-
                           </div>
                         </div>
 
@@ -2794,7 +2753,7 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             ):(
-                              enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartD && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     type="date"
@@ -2834,7 +2793,7 @@ export default function InspectionForm(){
                                 />
                               </div>
                             ):(
-                              enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartD && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full md:w-1/2">
                                   <input
                                     type="text"
@@ -2875,7 +2834,7 @@ export default function InspectionForm(){
                                 )}
                               </div>
                             ):(
-                              enablePartD && (GSO || SuperAdmin || inspectionData?.form?.personnel_id == currentUserId) ? (
+                              enablePartD && (GSO || SuperHacker || inspectionData?.form?.personnel_id == currentUserId) ? (
                                 <div className="w-full w-1/2">
                                   <input
                                     id="remarks"
@@ -2904,6 +2863,8 @@ export default function InspectionForm(){
                     )
                   )
                 )}
+                </div>
+
               </div>
             </div>
 
@@ -2982,28 +2943,7 @@ export default function InspectionForm(){
                 </div>
               </div>
             </div>
-            
           </div>
-
-          {/* Popup */}
-          {showPopup && (
-            <Popup 
-              popupContent={popupContent}
-              popupMessage={popupMessage}
-              SubmitSupReason={SubmitSupReason}
-              handlelSupervisorApproval={handlelSupervisorApproval}
-              handlelAdminApproval={handlelAdminApproval}
-              CloseForceRequest={CloseForceRequest}
-              inspectionData={inspectionData?.form?.id}
-              justClose={justClose}
-              closePopup={closePopup}
-              submitLoading={submitLoading}
-              submitAnimation={submitAnimation}
-              form={SubmitPartB}
-            />
-          )}
-
-        </>
         ):<Restrict />
       ):null}
 
@@ -3517,7 +3457,23 @@ export default function InspectionForm(){
       </div>
       )}
       
-
+      {/* Popup */}
+      {showPopup && (
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          SubmitSupReason={SubmitSupReason}
+          handlelSupervisorApproval={handlelSupervisorApproval}
+          handlelAdminApproval={handlelAdminApproval}
+          CloseForceRequest={CloseForceRequest}
+          inspectionData={inspectionData?.form?.id}
+          justClose={justClose}
+          closePopup={closePopup}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          form={SubmitPartB}
+        />
+      )}
     </PageComponent>
   );
 }

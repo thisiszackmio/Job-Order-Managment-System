@@ -396,7 +396,7 @@ export default function FacilityVenueForm(){
                 ):null}
 
                 {/* Button */}
-                <div className="mt-10 pb-4 mobile-btn flex justify-center md:justify-start">
+                <div className="mt-6 md:mt-10 pb-4 flex justify-center md:justify-start">
                 {!buttonHide && (
                   <>
                   {/* Submit */}

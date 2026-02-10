@@ -8,6 +8,35 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const { setCurrentUserId, setCurrentUserName, setCurrentUserAvatar, setCurrentUserToken, setCurrentUserCode } = useUserStateContext();
 
+  // Disable RightClick
+  // useEffect(() => {
+  //   // Disable Right-Click
+  //   const disableRightClick = (e) => {
+  //     e.preventDefault();
+  //   };
+  //   window.addEventListener("contextmenu", disableRightClick);
+
+  //   // Disable Developer Tools Shortcuts
+  //   const disableDevToolsShortcuts = (e) => {
+  //     if (
+  //       e.key === "F12" || // F12 Key
+  //       (e.ctrlKey && e.shiftKey && e.key === "I") || // Ctrl+Shift+I
+  //       (e.ctrlKey && e.shiftKey && e.key === "C") || // Ctrl+Shift+C
+  //       (e.ctrlKey && e.shiftKey && e.key === "J") || // Ctrl+Shift+J
+  //       (e.ctrlKey && e.key === "U") // Ctrl+U (View Page Source)
+  //     ) {
+  //       e.preventDefault();
+  //     }
+  //   };
+  //   window.addEventListener("keydown", disableDevToolsShortcuts);
+
+  //   // Cleanup the event listeners on component unmount
+  //   return () => {
+  //     window.removeEventListener("contextmenu", disableRightClick);
+  //     window.removeEventListener("keydown", disableDevToolsShortcuts);
+  //   };
+  // }, []);
+
   // Variable
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,86 +45,76 @@ export default function Login() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changeMethod, setChangeMethod] = useState('');
 
+  // Conditional
   const [userExist, setUserExist] = useState(false);
+  const [loginGuard, setLoginGuard] = useState(false);
   const [changePass, setChangePass] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocusedUsername, setIsFocusedUsername] = useState(false);
+  const [isFocusedPassword, setIsFocusedPassword] = useState(false);
+  const [isFocusedOldPassword, setIsFocusedOldPassword] = useState(false);
+  const [isFocusedNewPassword, setIsFocusedNewPassword] = useState(false);
+  const [isFocusedConfirmPassword, setIsFocusedConfirmPassword] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  // Error
   const [inputErrors, setInputErrors] = useState('');
   const [logoutMessage, setLogoutMessage] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
-  const token = localStorage.getItem('TOKEN');
-  if (token) {
-    navigate('/joms/dashboard', { replace: true });
-  }
-}, []);
-
-  // Disable RightClick
-  useEffect(() => {
-    // Disable Right-Click
-    const disableRightClick = (e) => {
-      e.preventDefault();
-    };
-    window.addEventListener("contextmenu", disableRightClick);
-
-    // Disable Developer Tools Shortcuts
-    const disableDevToolsShortcuts = (e) => {
-      if (
-        e.key === "F12" || // F12 Key
-        (e.ctrlKey && e.shiftKey && e.key === "I") || // Ctrl+Shift+I
-        (e.ctrlKey && e.shiftKey && e.key === "C") || // Ctrl+Shift+C
-        (e.ctrlKey && e.shiftKey && e.key === "J") || // Ctrl+Shift+J
-        (e.ctrlKey && e.key === "U") // Ctrl+U (View Page Source)
-      ) {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("keydown", disableDevToolsShortcuts);
-
-    // Cleanup the event listeners on component unmount
-    return () => {
-      window.removeEventListener("contextmenu", disableRightClick);
-      window.removeEventListener("keydown", disableDevToolsShortcuts);
-    };
+    const token = localStorage.getItem('TOKEN');
+    if (token) {
+      navigate('/joms/dashboard', { replace: true });
+    }
   }, []);
 
   // Login Function
-  const onLogin = async (ev) =>{
+  async function onLogin(ev){
     if (ev) ev.preventDefault();
+
     setSubmitLoading(true);
-    setInputErrors(''); // Clear previous errors
+    setInputErrors('');
     setLogoutMessage('');
 
+    const LoginData = {
+      username,
+      password,
+      method: changeMethod,
+      loginType: loginGuard ? "Guard" : "Regular",
+    }
+
     try {
-        const response = await axiosClient.post("/login", {
-            username,
-            password,
-            method: changeMethod,
-        });
+      const response = await axiosClient.post("/login", LoginData);
 
-        // Assuming the response contains these fields
-        const { userId, userDet, userAvatar, token, code } = response.data;
+      // console.log(response);
 
-        // Set the user state or context
-        setCurrentUserId(userId);
-        setCurrentUserToken(token);
-        setCurrentUserCode(code);
-        setCurrentUserName(userDet);
-        setCurrentUserAvatar(userAvatar);
+      // Assuming the response contains these fields
+      const { userId, userDet, userAvatar, token, code } = response.data;
 
-        localStorage.removeItem("logoutReason");
+      // Set the user state or context
+      setCurrentUserId(userId);
+      setCurrentUserToken(token);
+      setCurrentUserCode(code);
+      setCurrentUserName(userDet);
+      setCurrentUserAvatar(userAvatar);
 
-        // Redirect to home page or dashboard
+      localStorage.removeItem("logoutReason");
+
+      if(setChangeMethod == 'Guard'){
+        alert("Welcome to Guard");
+      }else{
         window.location.href = '/joms/dashboard';
-    } catch (error) {
+      }
+
+    }catch(error){
       const responseData = error.response?.data?.error;
+
+      // console.log(responseData);
 
       if(responseData == "TokenExist"){
         setUserExist(true);
-        setChangeMethod('continue');
+        setChangeMethod('exist');
       }
       else if(responseData == "Invalid"){
         setInputErrors('Invalid Username / Password');
@@ -106,25 +125,26 @@ export default function Login() {
       else{
         setInputErrors('There is something wrong! Please contact the developer');
       }
-
-    } finally {
+    }finally{
       setSubmitLoading(false);
     }
+  }
 
-  };
+  // Update Password Function
+  function onUpdateLogin(ev){
+    if (ev) ev.preventDefault();
 
-  // Update Password
-  function onUpdateLogin(ev) {
-    ev.preventDefault();
-    setSubmitLoading(true);
-  
+    // setSubmitLoading(true);
+
+    const UpdateCredentials = {
+      username,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    }
+
     axiosClient
-      .put("/updateuser", {
-        username,
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      })
+      .put("/updateuser", UpdateCredentials)
       .then(() => {
         setInputErrors('Password updated successfully'); // Clear errors on success
         setChangePass(false);
@@ -149,389 +169,277 @@ export default function Login() {
       .finally(() => {
         setSubmitLoading(false);
       });
-  } 
+  }
 
   return(
     <div className="ppa-cover font-roboto">
-      {/* For the Desktop */}
-      <div className="w-3/4 ppa-login">
+
+      <div className="ppa-login">
         {/* 1st Column */}
         <div className="ppa-login-col-1">
-          <div className="login-welcome"> Welcome to </div>
           <img className="login-logo" src="/default/ppa_logo.png" alt="Your Company" />
-          <div className="login-title"> Job Order Management System </div>
-        </div>
+        </div>  
 
         {/* 2nd Column */}
         <div className="ppa-login-col-2">
-          <div className="login-wrap">
-            <div className="login-word">  {userExist ? "Still Login" : changePass ? "Update Credentials" : "Login"} </div>
-            {/* Error Code */}
-            {logoutMessage && (
-              <div className="login-error mb-8 mt-2"> {logoutMessage} </div>
-            )}
-            {inputErrors && (
-              <div className="login-error mb-8 mt-2"> {inputErrors} </div>
-            )}
-            {userExist ? (
-             <>
-              <div className="login-exist-message">
-              This account is currently active on another computer or browser. If you proceed, this device will become active instead.
-              </div>  
-              <button type="button" onClick={() => { onLogin(); setChangeMethod("continue"); }}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                Proceed
-              </button>
-              <p className="loginMessage text-center">Click here to <a onClick={() => {setUserExist(false)}} style={{ color: 'blue', cursor: 'pointer'}}>Login</a> </p>
-            </>
-            ):(
-              changePass ? (
-                <form onSubmit={onUpdateLogin} className="space-y-4" action="#" method="POST">
-                  {/* Current Password*/}
-                  <div className="relative">
-                    {/* Label with animated position */}
-                    <label
-                      htmlFor="old_password"
-                      className={`ppa-label-login ${
-                        isFocused || currentPassword ? "ppa-label-login-focused" : ""
-                      }`}
-                    >
-                      Current Password
-                    </label>
-
-                    {/* Input field */}
-                    <input
-                      id="old_password"
-                      name="old_password"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(ev) => setCurrentPassword(ev.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="block w-full ppa-form-login"
-                    />
-                  </div>
-
-                  {/* New Password*/}
-                  <div className="relative">
-                    
-                    {/* Label with animated position */}
-                    <label
-                      htmlFor="new_password"
-                      className={`ppa-label-login ${
-                        isFocused || newPassword ? "ppa-label-login-focused" : ""
-                      }`}
-                    >
-                      New Password
-                    </label>
-
-                    {/* Input field */}
-                    <input
-                      id="new_password"
-                      name="new_password"
-                      type="password"
-                      value={newPassword}
-                      onChange={(ev) => setNewPassword(ev.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="block w-full ppa-form-login"
-                    />
-
-                  </div>
-
-                  {/* Confirm Password*/}
-                  <div className="relative">
-                    
-                    {/* Label with animated position */}
-                    <label
-                      htmlFor="new_password"
-                      className={`ppa-label-login ${
-                        isFocused || confirmPassword ? "ppa-label-login-focused" : ""
-                      }`}
-                    >
-                      Confirm Password
-                    </label>
-
-                    {/* Input field */}
-                    <input
-                      id="confirm_password"
-                      name="confirm_password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(ev) => setConfirmPassword(ev.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="block w-full ppa-form-login"
-                    />
-
-                  </div>
-                  <p className="loginMessage">Password must contain at least one uppercase letter, one number, one symbol, and be at least 8 characters long. </p>
-
-                  {/* Submit Button */}
-                  <div>
-                    <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                      {submitLoading ? (
-                        <div className="flex w-full items-center justify-center">
-                          <span className="ml-1">Processing</span>
-                        </div>
-                      ) : (
-                        'Submit'
-                      )}
-                    </button>
-                    <p className="loginMessage text-center">Already Update? <a onClick={() => setChangePass(false)} style={{ color: 'blue', cursor: 'pointer'}}>Login Here</a> </p>
-                  </div>
-                </form>
-              ):(
-                <form onSubmit={onLogin} className="space-y-6" action="#" method="POST">
-
-                  {/* Username */}
-                  <div className="relative">
-                    <label
-                      htmlFor="username"
-                      className={`ppa-label-login ${
-                        isFocused || username ? "ppa-label-login-focused" : ""
-                      }`}
-                    >
-                      Username
-                    </label>
-
-                    <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      value={username}
-                      onChange={(ev) => setUsername(ev.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="block ppa-form-login"
-                    />
-                  </div>
-
-                  {/* Password */}
-                  <div className="relative">
-                    <label
-                      htmlFor="password"
-                      className={`ppa-label-login ${
-                        isFocused || password ? "ppa-label-login-focused" : ""
-                      }`}
-                    >
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={password}
-                      onChange={(ev) => setPassword(ev.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="block ppa-form-login"
-                    />
-                  </div>
-
-                  {/* Button */}
-                  <div>
-                    <button type="submit" onClick={() => setChangeMethod("login")} className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                      {submitLoading ? (
-                        <div className="flex w-full items-center justify-center">
-                          <span className="ml-1">Processing</span>
-                        </div>
-                      ) : (
-                        'Login'
-                      )}
-                    </button>
-                  </div>
-
-                </form>
-              )
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* For the Mobile Responsive */}
-      <div className="ppa-login-mobile">
-        {/* For the Welcoming Text */}
-        <div>
-          <img className="login-logo" src="/default/ppa_logo.png" alt="Your Company" />
           <div className="login-welcome"> Welcome to </div>
           <div className="login-title"> Job Order Management System </div>
-        </div>
-        {/* for the Logins */}
-        <div className="mt-5">
-          <div className="login-word">  {userExist ? "Still Login" : changePass ? "Update Credentials" : "Login"} </div>
-          {/* Error Code */}
-          {logoutMessage && (
-            <div className="login-error"> {logoutMessage} </div>
-          )}
-          {inputErrors && (
-            <div className="login-error"> {inputErrors} </div>
-          )}
-          {userExist ? (
-          <>
-            <div className="login-exist-message">
-              This account is currently active on another computer or browser. If you proceed, this device will become active instead.
-              </div>  
-              <button type="button" onClick={() => { onLogin(); setChangeMethod("continue"); }}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                Proceed
-              </button>
-              <p className="loginMessage text-center">Click here to <a onClick={() => {setUserExist(false)}} style={{ color: 'blue', cursor: 'pointer'}}>Login</a> </p>
-          </>
-          ):(
-            changePass ? (
-            <form onSubmit={onUpdateLogin} className="space-y-6" action="#" method="POST">
-              {/* Current Password*/}
-              <div className="relative mt-10">
-                {/* Label with animated position */}
-                <label
-                  htmlFor="old_password"
-                  className={`ppa-label-login ${
-                    isFocused || currentPassword ? "ppa-label-login-focused" : ""
-                  }`}
-                >
-                  Current Password
-                </label>
+          <div className="login-wrap">
+            <div className="mt-4 login-word"> {loginGuard ? "Guard Login" : userExist ? "Still Login" : changePass ? "Update Credentials" : "Login" } </div>
 
-                {/* Input field */}
-                <input
-                  id="old_password"
-                  name="old_password"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(ev) => setCurrentPassword(ev.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  className="block w-full ppa-form-login"
-                />
-              </div>
-              {/* New Password*/}
-              <div className="relative">
-                
-                {/* Label with animated position */}
-                <label
-                  htmlFor="new_password"
-                  className={`ppa-label-login ${
-                    isFocused || newPassword ? "ppa-label-login-focused" : ""
-                  }`}
-                >
-                  New Password
-                </label>
+            {/* Error Code */}
+            {logoutMessage ? (
+              <div className="login-error mb-2 mt-2"> {logoutMessage} </div>
+            ):inputErrors ? (
+              <div className="login-error mb-2 mt-2"> {inputErrors} </div>
+            ):null}
 
-                {/* Input field */}
-                <input
-                  id="new_password"
-                  name="new_password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(ev) => setNewPassword(ev.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  className="block w-full ppa-form-login"
-                />
+            {/* For Login Options */}
+            {loginGuard ? (
+              <form onSubmit={onLogin} className="space-y-6" action="#" method="POST">
 
-              </div>
-              {/* Confirm Password*/}
-              <div className="relative">
-                
-                {/* Label with animated position */}
-                <label
-                  htmlFor="new_password"
-                  className={`ppa-label-login ${
-                    isFocused || confirmPassword ? "ppa-label-login-focused" : ""
-                  }`}
-                >
-                  Confirm Password
-                </label>
+                {/* Username */}
+                <div className="relative">
+                  <label
+                    htmlFor="username"
+                    className={`ppa-label-login ${
+                      isFocusedUsername || username ? "ppa-label-login-focused" : ""
+                    }`}
+                  >
+                    Username
+                  </label>
 
-                {/* Input field */}
-                <input
-                  id="confirm_password"
-                  name="confirm_password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(ev) => setConfirmPassword(ev.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  className="block w-full ppa-form-login"
-                />
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    value={username}
+                    onChange={(ev) => setUsername(ev.target.value)}
+                    onFocus={() => setIsFocusedUsername(true)}
+                    onBlur={() => setIsFocusedUsername(false)}
+                    className="block ppa-form-login"
+                  />
+                </div>
 
-              </div>
-              <p className="loginMessage">Password must contain at least one uppercase letter, one number, one symbol, and be at least 8 characters long. </p>
-              <div>
-                    <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                      {submitLoading ? (
-                        <div className="flex w-full items-center justify-center">
-                          <span className="ml-1">Processing</span>
-                        </div>
-                      ) : (
-                        'Submit'
-                      )}
-                    </button>
-                    <p className="loginMessage text-center">Already Update? <a onClick={() => setChangePass(false)} style={{ color: 'blue', cursor: 'pointer'}}>Login Here</a> </p>
-                  </div>
-            </form>
+                {/* Password */}
+                <div className="relative">
+                  <label
+                    htmlFor="password"
+                    className={`ppa-label-login ${
+                      isFocusedPassword || password ? "ppa-label-login-focused" : ""
+                    }`}
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={(ev) => setPassword(ev.target.value)}
+                    onFocus={() => setIsFocusedPassword(true)}
+                    onBlur={() => setIsFocusedPassword(false)}
+                    className="block ppa-form-login"
+                  />
+                </div>
+
+                {/* Button */}
+                <div>
+                  <button type="submit" onClick={() => setChangeMethod("login")} className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                    {submitLoading ? (
+                      <div className="flex w-full items-center justify-center">
+                        <span className="ml-1">Processing</span>
+                      </div>
+                    ) : (
+                      'Login'
+                    )}
+                  </button>
+                  <p className="loginMessage text-center">Login as Guard: <a onClick={() => {setLoginGuard(true)}} style={{ color: 'blue', cursor: 'pointer'}}>Click Here</a> </p>
+                </div>
+
+              </form>
             ):(
-            <form onSubmit={onLogin} className="space-y-6" action="#" method="POST">
-              {/* Username */}
-              <div className="relative mt-10">
-                <label
-                  htmlFor="username"
-                  className={`ppa-label-login ${
-                    isFocused || username ? "ppa-label-login-focused" : ""
-                  }`}
-                >
-                  Username
-                </label>
-
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={username}
-                  onChange={(ev) => setUsername(ev.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  className="block ppa-form-login"
-                />
-              </div>
-              {/* Password */}
-              <div className="relative">
-                <label
-                  htmlFor="password"
-                  className={`ppa-label-login ${
-                    isFocused || password ? "ppa-label-login-focused" : ""
-                  }`}
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={password}
-                  onChange={(ev) => setPassword(ev.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  className="block ppa-form-login"
-                />
-              </div>
-              {/* Button */}
-              <div>
-                <button type="submit" onClick={() => setChangeMethod("login")} className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
-                  {submitLoading ? (
-                    <div className="flex w-full items-center justify-center">
-                      <span className="ml-1">Processing</span>
-                    </div>
-                  ) : (
-                    'Login'
-                  )}
+            <>
+              {/* For Regular User */}
+              {userExist ? (
+              <>
+                <div className="login-exist-message">
+                This account is currently active on another computer or browser. If you proceed, this device will become active instead.
+                </div>  
+                <button type="button" onClick={() => { onLogin();   ("exist"); }}  className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                  Proceed
                 </button>
-              </div>
-            </form>
-            )
-          )}
-        </div>
+                <p className="loginMessage text-center mt-1">Click here to <a onClick={() => {setUserExist(false)}} style={{ color: 'blue', cursor: 'pointer'}}>Login</a> </p>
+              </>
+              ):(
+                changePass ? (
+                  <form onSubmit={onUpdateLogin} className="mt-2 formlg-change" action="#" method="POST">
+
+                    <div className="space-y-2">
+
+                      {/* Current Password*/}
+                      <div className="relative">
+                        {/* Label with animated position */}
+                        <label
+                          htmlFor="old_password"
+                          className={`ppa-label-login ${
+                            currentPassword ? "ppa-label-login-focused" : ""
+                          }`}
+                        >
+                          Current Password
+                        </label>
+
+                        {/* Input field */}
+                        <input
+                          id="old_password"
+                          name="old_password"
+                          type="password"
+                          value={currentPassword}
+                          onChange={(ev) => setCurrentPassword(ev.target.value)}
+                          className="block w-full ppa-form-login"
+                        />
+                      </div>
+
+                      {/* New Password*/}
+                      <div className="relative">
+                        
+                        {/* Label with animated position */}
+                        <label
+                          htmlFor="new_password"
+                          className={`ppa-label-login ${
+                            newPassword ? "ppa-label-login-focused" : ""
+                          }`}
+                        >
+                          New Password
+                        </label>
+
+                        {/* Input field */}
+                        <input
+                          id="new_password"
+                          name="new_password"
+                          type="password"
+                          value={newPassword}
+                          onChange={(ev) => setNewPassword(ev.target.value)}
+                          className={`block w-full ppa-form-login ${isFocusedNewPassword ? 'mt-6' : '' }`}
+                        />
+
+                      </div>
+
+                      {/* Confirm Password*/}
+                      <div className="relative">
+                        
+                        {/* Label with animated position */}
+                        <label
+                          htmlFor="new_password"
+                          className={`ppa-label-login ${
+                            confirmPassword ? "ppa-label-login-focused" : ""
+                          }`}
+                        >
+                          Confirm Password
+                        </label>
+
+                        {/* Input field */}
+                        <input
+                          id="confirm_password"
+                          name="confirm_password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(ev) => setConfirmPassword(ev.target.value)}
+                          className={`block w-full ppa-form-login ${isFocusedConfirmPassword ? 'mt-6' : '' }`}
+                        />
+                        <p className="loginMessage">Password must contain at least one uppercase letter, one number, one symbol, and be at least 8 characters long. </p>
+                      </div>
+
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="mt-5">
+                      <button type="submit" className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                        {submitLoading ? (
+                          <div className="flex w-full items-center justify-center">
+                            <span className="ml-1">Processing</span>
+                          </div>
+                        ) : (
+                          'Submit'
+                        )}
+                      </button>
+                      <p className="loginMessage text-center mt-1">Already Update? <a onClick={() => setChangePass(false)} style={{ color: 'blue', cursor: 'pointer'}}>Login Here</a> </p>
+                    </div>
+                  </form>
+                ):(
+                  <form onSubmit={onLogin} className="mt-2 formlg-def" action="#" method="POST">
+
+                    {/* Username and Password */}
+                    <div className="space-y-2">
+                      {/* Username */}
+                      <div className="relative">
+                        <label
+                          htmlFor="username"
+                          className={`ppa-label-login ${
+                            username ? "ppa-label-login-focused" : ""
+                          }`}
+                        >
+                          Username
+                        </label>
+
+                        <input
+                          id="username"
+                          name="username"
+                          type="text"
+                          value={username}
+                          onChange={(ev) => setUsername(ev.target.value)}
+                          className="block ppa-form-login"
+                        />
+                      </div>
+
+                      {/* Password */}
+                      <div className="relative">
+                        <label
+                          htmlFor="password"
+                          className={`ppa-label-login ${
+                            password ? "ppa-label-login-focused" : ""
+                          }`}
+                        >
+                          Password
+                        </label>
+                        <input
+                          id="password"
+                          name="password"
+                          type="password"
+                          value={password}
+                          onChange={(ev) => setPassword(ev.target.value)}
+                          className="block ppa-form-login"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Button */}
+                    <div className="mt-5">
+                      <button type="submit" onClick={() => setChangeMethod("login")} className={`px-6 py-2 w-full ${ submitLoading ? 'process-btn-lg' : 'login-btn'}`} disabled={submitLoading}>
+                        {submitLoading ? (
+                          <div className="flex w-full items-center justify-center">
+                            <span className="ml-1">Processing</span>
+                          </div>
+                        ) : (
+                          'Login'
+                        )}
+                      </button>
+                      <p className="loginMessage text-center mt-1">Login as Guard: <a onClick={() => {setLoginGuard(true)}} style={{ color: 'blue', cursor: 'pointer'}}>Click Here</a> </p>
+                    </div>
+
+                  </form>
+                )
+              )}
+            </>
+            )}
+          </div>
+        </div>      
       </div>
+
     </div>
-  )
+  );
+
+
+
 }
   

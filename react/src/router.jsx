@@ -20,6 +20,7 @@ import FacilityVenueList from './views/facilityForm/FacilityFormList';
 import VehicleSlipFormRequest from './views/vehicleSlip/VehicleSlipRequest';
 import VehicleSlipForm from './views/vehicleSlip/VehicleSlip'; 
 import VehicleSlipList from './views/vehicleSlip/VehicleSlipList';
+import LocatorSlipForm from './views/locatorslip/LocatorSlip';
 import AddPersonnel from './views/sidebar/AddPersonnel';
 import AddVehicleType from './views/sidebar/VehicleType';
 import AllAnnouncements from './views/announcement/AllAnnounce';
@@ -30,6 +31,7 @@ import UserListJLMS from './views/settings/UserList';
 import UserDetailsJLMS from './views/settings/UserDetails';
 import ViewUser from './views/ViewUser';
 import PendingRequest from './views/sidebar/Pending';
+import QRScanner from './views/QRScanner';
 
 import JLMS from './views/jlms';
 import Login from './views/Login';
@@ -90,6 +92,8 @@ const routes = [
       { path: '/joms/vehicle/form', element: <VehicleSlipFormRequest /> },
       { path: '/joms/vehicle/form/:id', element: <VehicleSlipForm /> },
       { path: '/joms/vehicle', element: <VehicleSlipList /> },
+      // Locator
+      { path: '/joms/locator/form', element: <LocatorSlipForm /> },
     ]
   },
 

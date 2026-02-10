@@ -10,6 +10,7 @@ use App\Http\Controllers\VehicleSlipController;
 use App\Http\Controllers\JOMSDashboardController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ServerStatusController;
+use App\Http\Controllers\LocatorSlipController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\LogsModel;
@@ -49,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
     return response()->json(['success' => true, 'mode' => $mode]);
   });
+
+  // --- Notification --- //
+  Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
 
   // --- Dashboard --- //
   Route::get('/jomsdashboard', [JOMSDashboardController::class, 'FormCount']);
@@ -165,5 +169,4 @@ Route::get('/getlogs', [LogsController::class, 'dashboardLogs']);
 Route::post('/showlogs', [LogsController::class, 'showLogs']);
 
 // --- Test --- //
-Route::get('/notification/{id}', [NotificationController::class, 'getNotifications']);
-Route::get('/server/disk-usage', [ServerStatusController::class, 'diskUsage']);
+Route::get('/getlocreq/{id}', [LocatorSlipController::class, 'getRequestor']);

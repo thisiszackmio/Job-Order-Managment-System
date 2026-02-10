@@ -652,6 +652,24 @@ export default function UserRegistrationJLMS(){
                           </div>
                         </div>
 
+                        {/* For MEM - Members (COS and Regular) */}
+                        <div className="relative flex items-center font-roboto mt-2">
+                          <div className="flex items-center h-5">
+                            <input
+                              id="mem-checkbox"
+                              type="checkbox"
+                              checked={selectedRoles.includes('SEC')}
+                              onChange={(e) => handleCheckboxChange(e, 'SEC')}
+                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
+                              Security (SEC)
+                            </label> 
+                          </div>
+                        </div>
+
                       </div>
 
                       {inputErrors && inputErrors.code_clearance && (

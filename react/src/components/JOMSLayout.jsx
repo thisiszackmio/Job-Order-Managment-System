@@ -80,6 +80,7 @@ export default function JOMSLayout() {
   location.pathname.includes("/joms/inspection/form") ||
   location.pathname.includes("/joms/facilityvenue/form") ||
   location.pathname.includes("/joms/vehicle/form") ||
+  location.pathname.includes("/joms/locator/form") ||
   location.pathname.includes("/joms/inspection") || 
   location.pathname.includes("/joms/facilityvenue") ||
   location.pathname.includes("/joms/vehicle") ||
@@ -260,8 +261,11 @@ export default function JOMSLayout() {
                     <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                       <Link to="/joms/facilityvenue/form" className={`${location.pathname === "/joms/facilityvenue/form" ? "active-submenu" : ""}`}>Facility / Venue Request Form</Link>
                     </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
                       <Link to="/joms/vehicle/form" className={`${location.pathname === "/joms/vehicle/form" ? "active-submenu" : ""}`}>Vehicle Slip Form</Link>
+                    </li>
+                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
+                      <Link to="/joms/locator/form" className={`${location.pathname === "/joms/locator/form" ? "active-submenu" : ""}`}>Locator Slip Form</Link>
                     </li>
                   </ul>
                 </section>
@@ -441,6 +445,7 @@ export default function JOMSLayout() {
         <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
           <Outlet />
         </div>
+        <Footer />
       </div>
 
       {showPopup && (

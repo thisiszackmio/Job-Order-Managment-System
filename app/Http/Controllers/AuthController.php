@@ -98,40 +98,53 @@ class AuthController extends Controller
 
         // Root URL
         $rootUrl = URL::to('/');
-
+        // Agent
         $agent = new Agent();
-
+        // Validation
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string'
         ]);
 
         $pcName = gethostname();
+        $type = $request->input('loginType');
 
         // Get the user information
         $user = PPAEmployee::where('username', $credentials['username'])->first();
+        $reqCode = $user->code_clearance;
+        $codeClearance = array_map('trim', explode(',', $reqCode));
+        $accessGuard = ["HACK", "SEC"];
 
         // Check if the user account exists and the password is valid
         if(!$user || !Hash::check($credentials['password'], $user->password)){
             return response()->json(['error' => 'Invalid'], 422);
         }
 
-        // Check if the user is need to change pass
-        if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
+        // Check for the Guard Restriction
+        if($type == 'Guard'){
+            if(!empty(array_intersect($accessGuard, $codeClearance))){
+                echo 'Not Restric';
+            }else{
+                return response()->json(['error' => 'GuardOnly'], 403);
+            }
+        }else{
 
-        // Check if the user is not active anymore
-        if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
+            // Check if the user is need to change pass
+            if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
 
-        // Check if the user logs in even the token is active
-        $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
-        $method = $request->input('method');
+            // Check if the user is not active anymore
+            if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
 
-        if($existingToken && $method === 'login'){
-            return response()->json(['error' => 'TokenExist'], 404);
-        }else if($existingToken && $method === 'continue')
+            // Check if the user logs in even the token is active
+            $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
+            $method = $request->input('method');
 
-            if ($existingToken) {
-                $existingToken->delete();
+            if($existingToken && $method === 'login'){
+                return response()->json(['error' => 'TokenExist'], 404);
+            }
+
+            if($existingToken && $method === 'exist'){
+                if ($existingToken) { $existingToken->delete(); }
             }
 
             // Create a fresh token
@@ -168,7 +181,9 @@ class AuthController extends Controller
                 'code' => $user->code_clearance,
                 'token' => $token
             ]);
-        
+        }
+
+        return response()->json(['message' => 'LoginSuccessfull'], 200);
     }
 
     /**

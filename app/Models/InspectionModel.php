@@ -38,4 +38,11 @@ class InspectionModel extends Model
     ];
 
     protected $table = 'joms_inspection_form';
+
+    protected $casts = [
+        'date_of_filling' => 'date',
+        'date_of_last_repair' => 'date',
+        'before_repair_date' => 'date',
+        'after_reapir_date' => 'date',
+    ];
 }

@@ -1,28 +1,165 @@
-import { useEffect, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Fragment, useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useMatches, useNavigate } from "react-router-dom";
+import { BellIcon } from '@heroicons/react/24/outline'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faBars, faTachometerAlt, faList, faSignOutAlt, faTableList, faClipboardUser, faVanShuttle, faScroll, faUserTie, faUserGear } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faClipboard, faUsers, faFileLines, faBars, faTachometerAlt, faUserPlus, faAddressBook, faVanShuttle, faUserGear } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
-import TopNav from "./TopNav";
-import submitAnimation from '/default/ring-loading.gif';
-import axiosClient from "../axios";
 import Footer from "./Footer";
+import ppalogomini from '/default/img/logo-no-words.png';
+import axiosClient from "../axios";
+import { Menu, Transition } from "@headlessui/react";
+import loading_table from "/default/img/ring-loading.gif";
+import VehicleSlip from "/default/img/van.png";
+import repair from "/default/img/mechanic.png"
+import facilityicon from "/default/img/booking.png"
 import Popup from "./Popup";
-import ppaLogo from '/default/ppa_logo.png';
-import moment from "moment-timezone";
 
 export default function JOMSLayout() {
   const { currentUserId, currentUserAvatar, setCurrentUserToken, currentUserCode } = useUserStateContext();
 
+  //Time stamp notification
+  function formatTimeDifference(timestamp) {
+    const now = new Date();
+    const date = new Date(timestamp);
+  
+    const diffMilliseconds = now - date;
+    const diffSeconds = Math.floor(diffMilliseconds / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+  
+    if (diffYears > 0) {
+      return `${diffYears} ${diffYears === 1 ? 'year' : 'years'} ago`;
+    } else if (diffMonths > 0) {
+      return `${diffMonths} ${diffMonths === 1 ? 'month' : 'months'} ago`;
+    } else if (diffDays > 0) {
+      return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+    } else if (diffHours > 0) {
+      return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    } else if (diffMinutes > 0) {
+      return `${diffMinutes} ${diffMinutes === 1 ? 'minute' : 'minutes'} ago`;
+    } else {
+      return 'Just now';
+    }
+  }
+  
+  // For Maintenance Mode
+  const [maintenance, setMaintenance] = useState(false);
+  useEffect(() => {
+    axiosClient.get("settings/maintenance").then(response => {
+      setMaintenance(response.data.maintenance);
+    });
+  }, []);
+
+  // For Sticky Nav
+  const [showNav, setShowNav] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = 0;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setShowNav(false); // scroll down
+      } else {
+        setShowNav(true); // scroll up
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const matches = useMatches();
+
+  const currentMatch = matches[matches.length - 1];
+  const title = currentMatch?.handle?.title || "";
+
+  useEffect(() => {
+    if (title) {
+      document.title = `${title} | JOMS`;
+    }
+  }, [title]);
+
+  // --- For the Notification --- //
+  const [notifications, setNotifications] = useState([]);
+  const [count, setCount] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
+
+  const fetchNotification = async () => {
+    try{
+      const response = await axiosClient.get(`/notification/${currentUserId}`);
+      const dataNotification = response.data;
+
+      // console.log(dataNotification.count);
+      if(dataNotification){
+        setNotifications(dataNotification.notifications);
+        setCount(dataNotification.count)
+      }
+
+    } catch(error){
+      console.error(error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  }
+
+  useEffect(() => {
+    if(!currentUserId) return;
+
+    fetchNotification();
+
+    const interval = setInterval(() => {
+      fetchNotification();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+
+  }, [currentUserId]);
+
+  // Click the notification
+  const OpenLink = (id, redirect_id, type) => {
+    axiosClient
+      .put(`/read/${id}`)
+      .then(() => {
+        if (type === 'JOMS_Inspection') {
+          window.location.href = `/joms/inspection/form/${redirect_id}`;
+        }
+      
+        if (type === 'JOMS_Vehicle') {
+          window.location.href = `/joms/vehicle/form/${redirect_id}`;
+        }
+
+        if (type === 'JOMS_Facility') {
+          window.location.href = `/joms/facilityvenue/form/${redirect_id}`;
+        }
+      })
+      .catch((error) => {
+        console.error('Error marking notification as read:', error);
+      });
+  };
+
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
+  const [showLink, setShowLink] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const [activeAccordion, setActiveAccordion] = useState(null);
+
+  const isSidebarExpanded = !isSidebarMinimized || isSidebarHovered;
   const location = useLocation();
   const pathname = location.pathname;
   const navigate = useNavigate();
 
-  const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
-
-  const [isSidebarMinimized, setIsSidebarMinimized] = useState(true);
-  const [activeAccordion, setActiveAccordion] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const handleToggle = (index) => {
+    setActiveAccordion(index === activeAccordion ? null : index);
+  };
 
   // Detect Mobile Screen
   useEffect(() => {
@@ -36,61 +173,64 @@ export default function JOMSLayout() {
     return () => window.removeEventListener('resize', checkScreen);
   }, []);
 
-  // Force close the sidebar
+  //Force close the sidebar
   useEffect(() => {
-    if (!isMobile) {
-      setIsSidebarMinimized(false);   // force minimized
-      setActiveAccordion(null);      // close accordion
-    }else{
-      setIsSidebarMinimized(true);   // force minimized
-      setActiveAccordion(null);      // close accordion
+    if (isMobile) {
+      setIsSidebarMinimized(true);
+      setActiveAccordion(null);
     }
   }, [isMobile]);
 
-  // Close Accordion of sidebar
-  useEffect(() => {
-    if (isSidebarMinimized) {
-      setActiveAccordion(null);
-    }
-  }, [isSidebarMinimized, setActiveAccordion]);
-
-  // Popup
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
-
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [showLink, setShowLink] = useState(false);
-
+  // Showlink Date
   useEffect(() => {
     const now = new Date();
-    const startDate = new Date("2025-12-27");
-    const endDate = new Date("2026-01-10");
+    const startDate = new Date("2025-02-13");
+    const endDate = new Date("2026-02-28");
 
     if (now >= startDate && now <= endDate) {
       setShowLink(true);
     }
   }, []);
 
-  const handleToggle = (index) => {
-    setActiveAccordion(index === activeAccordion ? null : index);
-  };
+  // JOMS
+  const words = [
+    { letter: "J", word: "ob" },
+    { letter: "O", word: "rder" },
+    { letter: "M", word: "anagement" },
+    { letter: "S", word: "ystem" }
+  ];
 
-  const isRequestFormsActive =
-  location.pathname.includes("/joms/inspection/form") ||
-  location.pathname.includes("/joms/facilityvenue/form") ||
-  location.pathname.includes("/joms/vehicle/form") ||
-  location.pathname.includes("/joms/locator/form") ||
-  location.pathname.includes("/joms/inspection") || 
-  location.pathname.includes("/joms/facilityvenue") ||
-  location.pathname.includes("/joms/vehicle") ||
-  location.pathname.includes("/joms/allannouncement") ||
-  location.pathname.includes("/joms/addannouncement") ||
-  location.pathname.includes("/joms/systemstat") || 
-  location.pathname.includes("/joms/settings") ||
-  location.pathname.includes("/joms/logs") ||
-  location.pathname.includes("/joms/userlist") ||
-  location.pathname.includes("/joms/addemployee");
+  // Popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Disable the Scroll on Popup
+  useEffect(() => {
+  
+    // Define the classes to be added/removed
+    const popupClass = 'popup-show';
+
+    // Function to add the class to the body
+    const addPopupClass = () => document.body.classList.add(popupClass);
+
+    // Function to remove the class from the body
+    const removePopupClass = () => document.body.classList.remove(popupClass);
+
+    // Add or remove the class based on showPopup state
+    if (showPopup) {
+      addPopupClass();
+    } 
+    else {
+      removePopupClass();
+    }
+
+    // Cleanup function to remove the class when the component is unmounted or showPopup changes
+    return () => {
+      removePopupClass();
+    };
+  }, [showPopup]);
 
   // For the Profile
   function handleProfile(){
@@ -111,7 +251,8 @@ export default function JOMSLayout() {
     );
   }
 
-  function logout(){
+  function logout(ev){
+    if (ev) ev.preventDefault();
     setSubmitLoading(true);
     
     axiosClient
@@ -132,334 +273,472 @@ export default function JOMSLayout() {
     setShowPopup(false);
   }
 
+  // Close Accordion of sidebar
+  useEffect(() => {
+    if (isSidebarMinimized) {
+      setActiveAccordion(null);
+    }
+  }, [isSidebarMinimized, setActiveAccordion]);
+
   // Restrictions
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
   const SuperAdmin = codes.includes("HACK");
+  const ITAdmin = codes.includes("AUS");
+  const AuthorizePersonnel = codes.includes("AP");
   const PortManager = codes.includes("PM");
   const AdminManager = codes.includes("AM");
-  const DivisionManager = codes.includes("DM");
   const GSO = codes.includes("GSO");
-  const AssignPersonnel = codes.includes("AP");
-  const Authority = codes.includes("AU");
-  const SuperHacker = codes.includes("NERD");
+  const DivisionManager = codes.includes("DM");
+  const InspectionAuthorize = codes.includes("AUI");
+  const FacilityAuthorize = codes.includes("AUF");
+  const VehicleAuthorize = codes.includes("AUV");
 
   return(
-    <div className="w-full h-full font-roboto">
-
-      {/* Side Bar */}
-      <div style={{ maxHeight: '100vh', position: 'fixed', overflowY: 'auto', overflowX: 'hidden', zIndex: '50'}} className={`w-72 bg-ppa-themecolor ppa-sidebar shadow flex transition-width duration-300 ${isSidebarMinimized ? 'sidebar-close' : 'sidebar-open'}`}>
-        <div className={`transition-width duration-300 ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
-
-          {/* Logo */}
-          <div className="flex justify-center items-center pt-4">
-            <img src={ppaLogo} alt="PPA PMO/LNI" className={`transition-width duration-300 ${isSidebarMinimized ? 'w-10' : 'w-3/4 items-center'}`} />
-          </div>
-
-          {/* Top Nav on mobile */}
-          <div className="relative">
-            <div className="ppa-hamburger-mobile">
-              <button onClick={() => setIsSidebarMinimized(!isSidebarMinimized)} className="text-white">
-                <FontAwesomeIcon icon={faBars} className="ham-hehe" />
-              </button>
+  <div className="ppa-page font-roboto">
+    {/* Sidebar */}
+    <aside 
+      className={`
+        ppa-sidebar shadow-xl flex transition-all duration-300 ease-in-out
+        ${isSidebarExpanded ? "sidebar-open" : "sidebar-close"}
+      `}
+      onMouseEnter={() => setIsSidebarHovered(true)}
+      onMouseLeave={() => setIsSidebarHovered(false)}
+    >
+      <div className={`${isSidebarMinimized ? 'minimized' : 'not-minimized'} w-full`}>
+        {/* Logo Area */}
+        <div className={`themelogo ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+          <img
+            src={ppalogomini}
+            alt="Mini Logo"
+            className="ppa-logo"
+          />
+          <span className={`logo-text ${isSidebarExpanded ? "show" : "hide"}`}>
+            PPA PMO LNI
+          </span>
+        </div>
+        <hr className={`line-separate ${isSidebarExpanded ? "full" : "mini"}`} />
+        {/* System Name */}
+        <div className={`text-title mb-5 mt-5 ${isSidebarExpanded ? "full" : "mini"}`}>
+          {words.map((item, index) => (
+            <div key={index} className="title-row">
+              <span className="first-letter">{item.letter}</span>
+              <span className={`word-part ${isSidebarExpanded ? "show" : "hide"}`}>
+                {item.word}
+              </span>
             </div>
-          </div>
-
-          {/* Title Text */}
-          {!isSidebarMinimized ? (
-              <div className="text-title mb-8">
-                <span className="first-letter">J</span>ob <span className="first-letter">O</span>rder <br />
-                <span className="first-letter">M</span>anagement <br />
-                <span className="first-letter">S</span>ystem
-              </div>
-          ):(
-            <div className="text-title mb-8 vertical-text">
-              <span className="block first-letter text-center">J</span>
-              <span className="block first-letter text-center">O</span>
-              <span className="block first-letter text-center">M</span>
-              <span className="block first-letter text-center">S</span>
-            </div>
+          ))}
+        </div>
+        <hr className={`line-separate ${isSidebarExpanded ? "full" : "mini"}`} />
+        {/* Navigation */}
+        <ul className={`ppa-accordion mt-5 ${isSidebarMinimized ? 'nav-min':''}`}>
+          {/* Relase Note */}
+          {showLink && (
+            <li className={`sidebar-item ${
+              isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/systemupdate" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/systemupdate" className="sidebar-link">
+                <FontAwesomeIcon icon={faUserGear} className="ppa-icon" />
+                <span className="sidebar-text">System Update</span>
+              </Link>
+            </li>
           )}
 
-          {/* Nav */}
-          <ul className={`ppa-accordion ${isSidebarMinimized ? 'nav-min':''}`}>
+          {/* Dashboard */}
+          <li className={`sidebar-item mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } ${pathname === "/joms/dashboard" ? "nav-active" : "not-active"}`}
+          >
+            <Link to="/joms/dashboard" className="sidebar-link">
+              <FontAwesomeIcon icon={faTachometerAlt} className="ppa-icon" />
+              <span className="sidebar-text">Dashboard</span>
+            </Link>
+          </li>
 
-            {/* Relase Note */}
-            {showLink && (
-              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/systemupdate" ? "nav-active" : ""}`}>
-                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/systemupdate" className="flex items-center">
-                    <FontAwesomeIcon icon={faUserGear} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">System Update </p>}
-                  </Link>
-                </div>
-              </li>
-            )}
+          {/* My Request */}
+          <li className={`sidebar-item mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } ${pathname === "/joms/myrequest" ? "nav-active" : "not-active"}`}
+          >
+            <Link to="/joms/myrequest" className="sidebar-link">
+              <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+              <span className="sidebar-text">My Request</span>
+            </Link>
+          </li>
 
-            {/* Dashboard */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/dashboard" ? "nav-active" : ""}`}>
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                <Link to="/joms/dashboard" className="flex items-center">
-                  <FontAwesomeIcon icon={faTachometerAlt} />
-                  {!isSidebarMinimized && <p className="ml-4 text-lg">Dashboard</p>}
-                </Link>
-              </div>
+          {/* Pending Request */}
+          {(SuperAdmin || ITAdmin || AuthorizePersonnel || PortManager || AdminManager || DivisionManager || GSO ) && (
+            <li className={`sidebar-item mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/pending" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/pending" className="sidebar-link">
+                <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+                <span className="sidebar-text">Pending Request</span>
+              </Link>
             </li>
+          )}
 
-            {/* My Request */}
-            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/myrequest" ? "nav-active" : ""}`}>
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full ':''}`}>
-                <Link to={`/joms/myrequest`} className="flex items-center">
-                  <FontAwesomeIcon icon={faTableList} />
-                  {!isSidebarMinimized && <p className="ml-4 text-lg">My Request</p>}
-                </Link>
-              </div>
-            </li>
+          {/* Request Form */}
+          <li className={`sidebar-item cursor-pointer mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } 
+            ${location.pathname === "/joms/inspection/form" || 
+              location.pathname === "/joms/facilityvenue/form" || 
+              location.pathname === "/joms/vehicle/form" || 
+              location.pathname === "/joms/locator/form" ? "nav-active" : "not-active"}
+            `}
+          >
+            <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(1)} >
+              <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+              <span className="sidebar-text">Request Forms</span>
 
-            {/* Pending Request */}
-            {(SuperAdmin || GSO || AdminManager || DivisionManager || AssignPersonnel || PortManager ) && (
-            <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/pending" ? "nav-active" : ""}`}>
-              <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full' : ''}`}>
-                <Link to={`/joms/pending`} className="flex items-center">
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faTableList} />
-                    {!isSidebarMinimized && (
-                      <p className="ml-4 text-lg">Pending Request</p>
-                    )}
-                  </div>
-                  {/* {!isSidebarMinimized && (
-                    pendingCount && (
-                      <span className="absolute right-9 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        {pendingCount}
-                      </span>
-                    )
-                  )} */}
-                </Link>
-              </div>
-            </li>
-            )}
-
-            {/* Request Forms */}
-            <li className="w-full justify-between text-white cursor-pointer items-center mb-4 mt-4"> 
-              <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
-              {!isSidebarMinimized && 
-              <>
-                <input id="toggle1" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 1} onChange={() => handleToggle(1)} />
-                <label htmlFor="toggle1" className="w-full justify-between text-white cursor-pointer items-center text-lg">
-                  <span className="ml-4">Request Forms</span>
-                  <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                </label>
-              </>
-              }
-
-              {(activeAccordion === 1 || !isSidebarMinimized || isRequestFormsActive ) && (
-                <section className={`accordion-content ${(activeAccordion === 1 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
-                  <ul id="menu1" className="pl-3 mt-4">
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/joms/inspection/form" className={`${location.pathname === "/joms/inspection/form" ? "active-submenu" : ""}`}>Pre/Post Repair Inspection Form</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/joms/facilityvenue/form" className={`${location.pathname === "/joms/facilityvenue/form" ? "active-submenu" : ""}`}>Facility / Venue Request Form</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                      <Link to="/joms/vehicle/form" className={`${location.pathname === "/joms/vehicle/form" ? "active-submenu" : ""}`}>Vehicle Slip Form</Link>
-                    </li>
-                    <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                      <Link to="/joms/locator/form" className={`${location.pathname === "/joms/locator/form" ? "active-submenu" : ""}`}>Locator Slip Form</Link>
-                    </li>
-                  </ul>
-                </section>
+              {isSidebarExpanded && (
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  className={`icon-arrow ${activeAccordion === 1 ? "rotate" : ""}`}
+                />
               )}
+            </div>
+          </li>
+
+          {/* For Request Form Section */}
+          <section className={`accordion-content ${activeAccordion === 1 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Pre/Post Repair Inspection Form */}
+              <li className="mt-2">
+                <Link to="/joms/inspection/form"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/inspection/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Pre/Post Repair Inspection Form</span>
+                  )}
+                </Link>
+              </li>
+
+              {/* Facility / Venue Request Form */}
+              <li className="mt-1">
+                <Link to="/joms/facilityvenue/form"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/facilityvenue/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Facility / Venue Request Form</span>
+                  )}
+                </Link>
+              </li>
+
+              {/* Vehicle Slip Form */}
+              <li className="mt-1">
+                <Link  to="/joms/vehicle/form" 
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/vehicle/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Vehicle Slip Form</span>
+                  )}
+                  
+                </Link>
+              </li>
+
+              {/* Locator Slip Form */}
+              {/* <li className="mt-1">
+                <Link  to="/joms/locator/form" 
+                  className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/locator/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  <span className="submenu-text">Locator Slip Form</span>
+                </Link>
+              </li> */}
+            </ul>
+          </section>
+
+          {/* Request List */}
+          {(SuperAdmin || ITAdmin || AuthorizePersonnel || PortManager || AdminManager || DivisionManager || GSO || InspectionAuthorize || FacilityAuthorize || VehicleAuthorize ) && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/inspection" || 
+                location.pathname === "/joms/facilityvenue" || 
+                location.pathname === "/joms/vehicle" || 
+                location.pathname === "/joms/locator" ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(2)} >
+                <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+                <span className="sidebar-text">Request List</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 2 ? "rotate" : ""}`}
+                  />
+                )}
+              </div>
             </li>
+          )}
 
-            {/* Request List */}
-            {(SuperAdmin || GSO || AssignPersonnel || Authority || DivisionManager || PortManager || AdminManager) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4">
-                <FontAwesomeIcon icon={faList} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
-                {!isSidebarMinimized && 
-                <>
-                  <input id="toggle2" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 2} onChange={() => handleToggle(2)}/>
-                  <label htmlFor="toggle2" className="w-full justify-between text-white cursor-pointer items-center fle text-lg">
-                    <span className="ml-4">Request List</span>
-                    <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                  </label>
-                </>
-                }
-
-                {(activeAccordion === 2 || !isSidebarMinimized || isRequestFormsActive) && (
-                  <section className={`accordion-content ${(activeAccordion === 2 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
-                    <ul id="menu2" className="pl-3 mt-4">
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/inspection" className={`${location.pathname === "/joms/inspection" ? "active-submenu" : ""}`}>Pre/Post Repair Inspection Form</Link>
-                      </li>
-                      {(!AssignPersonnel || !Authority) && (
-                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                          <Link to="/joms/facilityvenue" className={`${location.pathname === "/joms/facilityvenue" ? "active-submenu" : ""}`}>Facility / Venue Request Form</Link>
-                        </li>
-                      )}
-                      {(!AssignPersonnel || Authority || SuperAdmin) && (
-                        <li className="flex w-full justify-between text-white cursor-pointer items-center">
-                          <Link to="/joms/vehicle" className={`${location.pathname === "/joms/vehicle" ? "active-submenu" : ""}`}>Vehicle Slip Form</Link>
-                        </li>
-                      )}
-                    </ul>
-                  </section>
-                )}
-              </li>
-            )}
-
-            {/* Personnel */}
-            {(SuperAdmin || GSO || AssignPersonnel) && (
-              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/personnel" ? "nav-active" : ""}`}>
-                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/personnel" className="flex items-center">
-                    <FontAwesomeIcon icon={faClipboardUser} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">Personnel</p>}
+          {/* For Request List Section */}
+          <section className={`accordion-content ${activeAccordion === 2 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Pre/Post Repair Inspection Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || InspectionAuthorize) && (
+                <li className="mt-2">
+                  <Link to="/joms/inspection"
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/inspection" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Pre/Post Repair Inspection Form</span>
                   </Link>
-                </div>
-              </li>
-            )}
+                </li>
+              )}
 
-            {/* Vehicle */}
-            {(SuperAdmin || GSO || AssignPersonnel) && (
-              <li className={`w-full justify-between text-white cursor-pointer items-center mb-4 ${pathname === "/joms/vehicletype" ? "nav-active" : ""}`}>
-                <div className={`${isSidebarMinimized ? 'flex justify-center items-center h-full':''}`}>
-                  <Link to="/joms/vehicletype" className="flex items-center">
-                    <FontAwesomeIcon icon={faVanShuttle} />
-                    {!isSidebarMinimized && <p className="ml-4 text-lg">Vehicle</p>}
+              {/* Facility / Venue Request Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || FacilityAuthorize) && (
+                <li className="mt-1">
+                  <Link to="/joms/facilityvenue"
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/facilityvenue" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Facility / Venue Request Form</span>
                   </Link>
-                </div>
-              </li>
-            )}
+                </li>
+              )}
 
-            {/* Announcements */}
-            {(SuperAdmin || PortManager || AdminManager || DivisionManager || GSO) && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4 ">
-                <FontAwesomeIcon icon={faScroll} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
-                {!isSidebarMinimized && 
-                  <>
-                    <input id="toggle3" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 3} onChange={() => handleToggle(3)} />
-                    <label htmlFor="toggle3" className="w-full justify-between text-white cursor-pointer items-center text-lg">
-                      <span className="ml-4">Announcements</span>
-                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                    </label>
-                  </>
-                }
+              {/* Vehicle Slip Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || VehicleAuthorize || AuthorizePersonnel) && (
+                <li className="mt-1">
+                  <Link  to="/joms/vehicle" 
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/vehicle" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Vehicle Slip Form</span>
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </section>
 
-                {(activeAccordion === 3 || !isSidebarMinimized || isRequestFormsActive) && (
-                  <section className={`accordion-content ${(activeAccordion === 3 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
-                    <ul id="menu1" className="pl-3 mt-4">
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/addannouncement" className={`${location.pathname === "/joms/addannouncement" ? "active-submenu" : ""}`}>Add Announcements Data</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/allannouncement" className={`${location.pathname === "/joms/allannouncement" ? "active-submenu" : ""}`}>All Announcements Lists</Link>
-                      </li>
-                    </ul>
-                  </section>
+          {/* Users */}
+          {(SuperAdmin || ITAdmin) && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/userlist" || 
+                location.pathname === "/joms/addemployee" ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(3)} >
+                <FontAwesomeIcon icon={faUsers} className="ppa-icon" />
+                <span className="sidebar-text">Users</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 3 ? "rotate" : ""}`}
+                  />
                 )}
-                
+              </div>
+            </li>
+          )}
+
+          {/* For User's List Section */}
+          <section className={`accordion-content ${activeAccordion === 3 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Add User */}
+              <li className="mt-2">
+                <Link to="/joms/addemployee"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/addemployee" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faUserPlus} className="ppa-icon" />
+                  <span className="submenu-text">Add User</span>
+                </Link>
               </li>
-            )}
 
-            {/* Superadmin Settings */}
-            {SuperAdmin && (
-              <li className="w-full justify-between text-white cursor-pointer items-center mb-4 ">
-                <FontAwesomeIcon icon={faUserTie} className={`${isSidebarMinimized ? 'flex justify-center items-center h-full icon-mini':''}`} />
-                {!isSidebarMinimized && 
-                  <>
-                    <input id="toggle4" type="checkbox" className="accordion-toggle" name="toggle" checked={activeAccordion === 4} onChange={() => handleToggle(4)} />
-                    <label htmlFor="toggle4" className="w-full justify-between text-white cursor-pointer items-center text-lg">
-                      <span className="ml-4">Hacker Settings</span>
-                      <span className="absolute right-9 icon-arrow"><FontAwesomeIcon className="icon-arrow" icon={faChevronRight} /></span>
-                    </label>
-                  </>
-                }
-
-                {(activeAccordion === 4 || !isSidebarMinimized || isRequestFormsActive) && (
-                  <section className={`accordion-content ${(activeAccordion === 4 || isRequestFormsActive) && !isSidebarMinimized ? "open" : "" }`} >
-                    <ul id="menu1" className="pl-3 mt-4">
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/settings" className={`${location.pathname === "/joms/settings" ? "active-submenu" : ""}`}>General Settings</Link>
-                      </li>
-                      <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                        <Link to="/joms/logs" className={`${location.pathname === "/joms/logs" ? "active-submenu" : ""}`}>Logs</Link>
-                      </li>
-                      {SuperHacker && (
-                      <>
-                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                          <Link to="/joms/userlist" className={`${location.pathname === "/joms/userlist" ? "active-submenu" : ""}`}>All Employee Lists</Link>
-                        </li>
-                        <li className="flex w-full justify-between text-white cursor-pointer items-center mb-4">
-                          <Link to="/joms/addemployee" className={`${location.pathname === "/joms/addemployee" ? "active-submenu" : ""}`}>Add Employee Data</Link>
-                        </li>
-                      </>
-                      )}
-                    </ul>
-                  </section>
-                )}
+              {/* All User */}
+              <li className="mt-1">
+                <Link to="/joms/userlist"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/userlist" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faAddressBook} className="ppa-icon" />
+                  <span className="submenu-text">All User</span>
+                </Link>
               </li>
-            )}
+            </ul>
+          </section>
 
-          </ul>
-
-        </div>
+          {/* Users */}
+          {(SuperAdmin || ITAdmin || VehicleAuthorize || AuthorizePersonnel || GSO || PortManager || AdminManager) && (
+            <li className={`sidebar-item mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/traveldetails" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/traveldetails" className="sidebar-link">
+                <FontAwesomeIcon icon={faVanShuttle} className="ppa-icon" />
+                <span className="sidebar-text">Vehicle & Personnel <br/> Details</span>
+              </Link>
+            </li>
+          )}
+        </ul>
       </div>
+    </aside>
 
-      {/* Main Content */}
-      <div className={`ppa-content transition-width duration-300 ${isSidebarMinimized ? 'adjust-content' : ''}`}>
-        {/* Top Nav */}
+    {/* --- MAIN CONTENT WRAPPER --- */}
+    <main className={`ppa-content transition-width duration-300 relative ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
+      <div className="navigation-area z-50 transition-transform duration-300" >
+        <h1 className="page-title">{title}</h1>
+        {/* Notification Icon */}
+        <div className="notification-area">
+          <div className="relative">
+            <Menu as="div" className="relative">
+              {/* Display number of Notification */}
+              <div>
+                <Menu.Button className="notification-icon">
+                  <span className="absolute -inset-1.5" />
+                  <span className="sr-only">View notifications</span>
+                  <BellIcon className="bell-icon" aria-hidden="true" />
+                </Menu.Button>
+              </div>
+              {/* Count */}
+              {!maintenance && (
+                !loadingNotifications ? (
+                  count ? (
+                    count > 10 ? (
+                      <span className="notification-count">9+</span>
+                    ):(
+                      <span className="notification-count">{count}</span>
+                    )
+                  ) : null
+                ):null
+              )}
+              {/* Display the message of notification */}
+              <div>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="mobile-nav absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {maintenance ? (
+                      <p className="text-base font-bold text-center leading-7 py-4">Notification is disable on Maint Mode</p>
+                    ):(
+                    <>
+                      <p className="notification-text font-roboto pl-3">Notifications</p>
+                      {notifications?.length > 0 ? (
+                        notifications?.map(NofiData => (
+                          <div key={NofiData?.id} className="notification-item">
+                            <a onClick={() => OpenLink(NofiData?.id, NofiData?.joms_id, NofiData?.joms_type)} className="noti-link">
+                              <div className="flex notification-container p-3 font-roboto">
+                                {/* Image and Icon */}
+                                <div className="w-32 items-center relative">
+                                  <img src={NofiData?.sender_avatar} className="notification_avatar" alt={`${NofiData?.sender_name}'s avatar`} />
+                                  <img src={
+                                    NofiData?.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                    NofiData?.joms_type == "JOMS_Inspection" ? repair : 
+                                    NofiData?.joms_type == "JOMS_Facility" ? facilityicon : 
+                                    null
+                                  } className="notification_icon" alt='Avatar' /> 
+                                </div>
+                                {/* Message */}
+                                <div className="w-full">
+                                  <h4 className={`noti-type ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>
+                                    {NofiData?.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData?.joms_id})`}
+                                    {NofiData?.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData?.joms_id})`}
+                                    {NofiData?.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData?.joms_id})`}
+                                  </h4>
+                                  <h3 className={`noti-message ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>{NofiData?.message}</h3>
+                                  <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData?.date_request)}</h4>
+                                </div>
+                              </div>
+                            </a>
+                          </div>
+                        ))
+                      ):(
+                        <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
+                      )}
+                    </>
+                    )}
+                  </Menu.Items>
+                </Transition>
+              </div>
+            </Menu>
+          </div>
+        </div>
+        {/* Hamburger */}
         <div className="ppa-hamburger">
           <button onClick={() => setIsSidebarMinimized(!isSidebarMinimized)} className="text-white">
             <FontAwesomeIcon icon={faBars} className="ham-haha" />
           </button>
         </div>
-        <div className="nav-btn">
-          <TopNav />
-        </div>
-        <div className="profile relative">
+        {/* Profile */}
+        <div className="profile">
           <ul>
             <li className="relative">
-              <img src={currentUserAvatar} className="ppa-display-picture cursor-pointer" alt="" onClick={() => handleToggle(5)} />
+            <img src={currentUserAvatar} className="ppa-display-picture cursor-pointer" alt="" onClick={() => handleToggle(5)} />
 
-              {/* Dropdown Container */}
-              <div className={`profile-dropdown ${activeAccordion === 5 ? "open" : ""}`}>
-                <ul className="profile-menu">
-                  <li>
-                    <button className="profile-item logout-btn" onClick={handleProfile}>
-                      Profile
-                    </button>
-                  </li>
+            {/* Dropdown Container */}
+            <div className={`profile-dropdown ${activeAccordion === 5 ? "open" : ""}`}>
+              <ul className="profile-menu">
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleProfile}>
+                    Profile
+                  </button>
+                </li>
 
-                  <li>
-                    <button className="profile-item logout-btn" onClick={handleLogout}>
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </li>
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </li>
           </ul>
         </div>
-
-        <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
-          <Outlet />
-        </div>
-        <Footer />
       </div>
 
-      {showPopup && (
-        <Popup 
-          popupContent={popupContent}
-          popupMessage={popupMessage}
-          submitLoading={submitLoading}
-          submitAnimation={submitAnimation}
-          logout={logout}
-          justClose={justClose}
-          userId={currentUserId}
-        />
-      )}
-
-    </div>
+      {/* For the main content */}
+      <div className="content-here">
+        <Outlet />
+      </div>
+      <Footer />
+    </main>
+    
+    {showPopup && (
+    <Popup 
+      popupContent={popupContent}
+      popupMessage={popupMessage}
+      submitLoading={submitLoading}
+      submitAnimation={loading_table}
+      logout={logout}
+      justClose={justClose}
+      userId={currentUserId}
+    />
+    )}
+  </div>
   );
 }

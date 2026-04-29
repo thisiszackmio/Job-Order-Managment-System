@@ -10,14 +10,12 @@ import { faChevronLeft, faChevronRight, faEye, faGear } from '@fortawesome/free-
 import Restrict from "../../components/Restrict";
 
 export default function VehicleSlipList(){
-
-  const { currentUserCode } = useUserStateContext();
+  const { currentUserId, currentUserCode } = useUserStateContext();
 
   // Loading
   const [loading, setLoading] = useState(true);
 
-  // Vehicle Data 
-  const [formlist, setFormList] = useState([]);
+  const [pageRestrict, setPageRestrict] = useState(true);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -45,19 +43,33 @@ export default function VehicleSlipList(){
     };
   }, [loading]);
 
-  // Get Data
-  useEffect(() => {
-    axiosClient
-    .get('/allvehicleslip')
-    .then((response) => {
-      const VehicleSlipData = response.data;
+  // Vehicle Data 
+  const [formlist, setFormList] = useState([]);
 
-      setFormList(VehicleSlipData);
+  const fetchVehicleList = async () => {
+    try{
+      const response = await axiosClient.get('/allvehicleslip');
+      const dataVehicle = response.data;
 
-    })
-    .finally(() => {
+      setFormList(dataVehicle);
+
+      if(accessOnly){
+        setPageRestrict(true);
+      }else{
+        setPageRestrict(false);
+      }
+
+    }catch(error){
+      console.error(error);
+    } finally {
       setLoading(false);
-    });
+    }
+  }
+
+  useEffect(() => {
+    if(currentUserId){
+      fetchVehicleList();
+    }
   }, []);
 
   //Search Filter and Pagination
@@ -104,51 +116,54 @@ export default function VehicleSlipList(){
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const AuthorizePerson = codes.includes("AU");
-  const SuperAdmin = codes.includes("HACK");
-  const PortManager = codes.includes("PM");
-  const Access = Admin || GSO || AuthorizePerson || PortManager || SuperAdmin;
+  const roles = ["HACK", "AUS", "AM", "AUV", "PM", "DM", "GSO" ];
+  const accessOnly = roles.some(role => codes.includes(role));
 
   return (
-    <PageComponent title="Request List">
-      {Access ? (
-        <div className="ppa-widget mt-8">
-          <div className="joms-user-info-header text-left"> 
-            Vehicle Slip Request List
-          </div>
-          <div className="px-4 pb-6">
+    pageRestrict ? (
+      <PageComponent title="Request List">
+        {/* Main */}
+        <div className="mt-8">
+          <div className="ppa-widget px-4 pb-6">
+            {/* Header */}
+            <div className="joms-user-info-header text-left"> 
+              Vehicle Slip Request List
+            </div>
 
-            {/* Search Filter */}
-            <div className="mt-2 mb-4 md:flex">
-              {/* Search */}
-              <div className="flex-grow">
-                <input
-                  type="text"
-                  placeholder="Search Here"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-full md:w-96 p-2 border border-gray-300 rounded text-sm"
-                />
-              </div>
-              {/* Count */}
-              <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
-                <div className="text-right text-sm/[17px]">
-                  Total of{" "}
-                  {pageCountUser > 1 ? (
-                    <b>{startIndex} - {endIndex}</b>
-                  ) : (
-                    <b>{filteredList.length}</b>
-                  )}{" "}
-                  out of <b>{filteredList.length}</b> Request list
+            {/* Search */}
+            <div className="pt-3">
+              {/* Search Filter */}
+              <div className="md:flex">
+                {/* Search */}
+                <div className="flex-grow">
+                  <input
+                    type="text"
+                    placeholder="Search Here"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                    disabled={loading}
+                  />
+                </div>
+
+                {/* Count */}
+                <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
+                  <div className="text-right text-sm/[17px]">
+                    Total of{" "}
+                    {pageCountUser > 1 ? (
+                      <b>{startIndex} - {endIndex}</b>
+                    ) : (
+                      <b>{filteredList.length}</b>
+                    )}{" "}
+                    out of <b>{filteredList.length}</b> Request list
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Top Pagination */}
             <div className="mt-6">
-              {displayPaginationUser && (
+              {displayPaginationUser && !loading && (
                 <ReactPaginate
                   previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
                   nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -158,23 +173,14 @@ export default function VehicleSlipList(){
                   pageRangeDisplayed={5}
                   onPageChange={handlePageChange}
                   forcePage={currentPage}
-                  containerClassName="pagination-top"
-                  subContainerClassName="pages pagination"
+                  containerClassName="pagination"
                   activeClassName="active"
-                  pageClassName="page-item"
-                  pageLinkClassName="page-link"
-                  breakClassName="page-item"
-                  breakLinkClassName="page-link"
-                  previousClassName="page-item"
-                  previousLinkClassName="page-link"
-                  nextClassName="page-item"
-                  nextLinkClassName="page-link"
                 />
               )}
             </div>
 
             {/* Table */}
-            <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
+            <div className="ppa-div-table mt-8 pb-3 overflow-x-auto md:overflow-x-visible">
               <table className="ppa-table w-full">
                 <thead>
                   <tr>
@@ -191,14 +197,37 @@ export default function VehicleSlipList(){
                 </thead>
                 <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
                   {loading ? (
-                    <tr>
-                      <td colSpan={9} className="px-2 py-5 text-center ppa-table-body">
-                        <div className="flex justify-center items-center">
-                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                          <span className="loading-table">Loading List</span>
-                        </div>
-                      </td>
-                    </tr>
+                    Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
+                      <tr key={index}>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                      </tr>
+                    ))
                   ):(
                     currentList.length > 0 ? (
                       currentList.map((list)=>(
@@ -240,7 +269,7 @@ export default function VehicleSlipList(){
             </div>
 
             {/* Bottom Pagination */}
-            {displayPaginationUser && (
+            {displayPaginationUser && !loading && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
                 nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -263,13 +292,12 @@ export default function VehicleSlipList(){
                 nextLinkClassName="page-link"
               />
             )}
-
           </div>
         </div>
-      ):(
-        <Restrict />
-      )}
-    </PageComponent>
+      </PageComponent>
+    ):(
+      <Restrict />
+    )
   );
 
 }

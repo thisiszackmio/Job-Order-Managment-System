@@ -2,21 +2,54 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline'
 import axiosClient from '../axios';
-import loading_table from "/default/ring-loading.gif";
-import VehicleSlip from "/default/van.png";
-import repair from "/default/mechanic.png"
+import loading_table from "/default/img/ring-loading.gif";
+import VehicleSlip from "/default/img/van.png";
+import repair from "/default/img/mechanic.png"
 import facilityicon from "/default/schedule.png"
-
+import submitAnimation from '/default/ring-loading.gif';
 import { useUserStateContext } from '../context/ContextProvider';
+import Popup from './Popup';
 
 const TopNav = () =>{
-  const { currentUserId }= useUserStateContext();
+  const { currentUserId, currentUserAvatar, setCurrentUserToken }= useUserStateContext();
+
+  // For Sticky Nav
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        // scrolling down
+        setShowNav(false);
+      } else {
+        // scrolling up
+        setShowNav(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [count, setCount] = useState([]);
 
   const [maintenance, setMaintenance] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState(null);
+
+  // Popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   //Time stamp notification
   function formatTimeDifference(timestamp) {
@@ -90,7 +123,6 @@ const TopNav = () =>{
     }
   },[currentUserId]);
 
-
   // Click the notification
   const OpenLink = (id, redirect_id, type) => {
     axiosClient
@@ -113,11 +145,60 @@ const TopNav = () =>{
       });
   };
 
+  const handleToggle = (index) => {
+    setActiveAccordion(index === activeAccordion ? null : index);
+  };
+
+  // For the Profile
+  function handleProfile(){
+    setActiveAccordion(null);
+    navigate(`/joms/user`);
+  }
+
+  // Logout
+  function handleLogout(){
+    setActiveAccordion(null);
+    setShowPopup(true);
+    setPopupContent('Logout');
+    setPopupMessage(
+      <div>
+        <p className="popup-title">Logout Confirmation</p>
+        <p className="popup-message">Are you sure you want to log out?</p>
+      </div>
+    );
+  }
+
+  function logout(ev){
+    if (ev) ev.preventDefault();
+    setSubmitLoading(true);
+    
+    axiosClient
+      .post('/logout')
+      .then(() => {
+        localStorage.removeItem('USER_ID');
+        localStorage.removeItem('TOKEN');
+        localStorage.removeItem('USER_CODE');
+        localStorage.removeItem('USER_DET');
+        localStorage.removeItem('USER_AVATAR');
+        setCurrentUserToken(null);
+        navigate('/login');
+      });
+  }
+
+  //Close Popup on Error
+  const justClose = () => {
+    setShowPopup(false);
+  }
+
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="flex h-16 items-center justify-between" style={{ position: 'relative', left: '-25px' }}>
+    <div
+      className={`navigation-area fixed z-50 transition-transform duration-300 ${
+        showNav ? "translate-y-0" : "-translate-y-full top-0"
+      }`}
+    >
+      <div className="topnav-area sticky top-0 z-50">
         {/* Notification Icon */}
-        <div className="flex items-center">
+        <div className="notification-area">
           <div className="relative">
             <Menu as="div" className="relative">
 
@@ -126,7 +207,7 @@ const TopNav = () =>{
                 <Menu.Button className="notification-icon">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-7 w-7" aria-hidden="true" />
+                  <BellIcon className="bell-icon" aria-hidden="true" />
                 </Menu.Button>
 
                 {!maintenance && (
@@ -209,7 +290,45 @@ const TopNav = () =>{
             </Menu>
           </div>
         </div>
+
+        {/* Profile */}
+        <div className="profile">
+          <ul>
+            <li className="relative">
+            <img src={currentUserAvatar} className="ppa-display-picture cursor-pointer" alt="" onClick={() => handleToggle(5)} />
+
+            {/* Dropdown Container */}
+            <div className={`profile-dropdown ${activeAccordion === 5 ? "open" : ""}`}>
+              <ul className="profile-menu">
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleProfile}>
+                    Profile
+                  </button>
+                </li>
+
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </li>
+          </ul>
+        </div>
       </div>
+
+      {showPopup && (
+        <Popup 
+          popupContent={popupContent}
+          popupMessage={popupMessage}
+          submitLoading={submitLoading}
+          submitAnimation={submitAnimation}
+          logout={logout}
+          justClose={justClose}
+          userId={currentUserId}
+        />
+      )}
     </div>
   );
 };

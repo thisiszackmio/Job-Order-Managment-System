@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageComponent from "../../components/PageComponent";
 import axiosClient from "../../axios";
 import loading_table from "/default/ring-loading.gif";
-import loadingAnimation from '/default/loading-new.gif';
-import ppalogo from '/default/ppa_logo-st.png';
 import { useUserStateContext } from "../../context/ContextProvider";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,68 +10,40 @@ import { faChevronLeft, faChevronRight, faCircle } from '@fortawesome/free-solid
 import Restrict from "../../components/Restrict";
 
 export default function UserListJLMS(){
-  const { currentUserCode } = useUserStateContext();
+  const { currentUserId, currentUserCode } = useUserStateContext();
 
   // loading Function
   const [loading, setLoading] = useState(true);
-  const [loadingArea, setLoadingArea] = useState(true);
+  const [pageRestrict, setPageRestrict] = useState(true);
 
+  // User List
   const [userList, setUserList] = useState([]);
 
-  // Disable the Scroll on Popup
-  useEffect(() => {
-  
-    // Define the classes to be added/removed
-    const loadingClass = 'loading-show';
+  const fetchUserList = async () => {
+    try {
+      const response = await axiosClient.get(`/showusers`);
+      const dataUserList = response.data;
 
-    // Function to add the class to the body
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
+      setUserList(dataUserList);
 
-    // Function to remove the class from the body
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
+      if(Access) {
+        setPageRestrict(true);
+      } else {
+        setPageRestrict(false);
+      }
 
-    // Add or remove the class based on showPopup state
-    if(loading) {
-      addLoadingClass();
-    }
-    else {
-      removeLoadingClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removeLoadingClass();
-    };
-  }, [loading]);
-
-  // Get User Employee's Data
-  useEffect(() => {  
-    axiosClient
-    .get('/showusers')
-    .then((response) => {
-      const responseData = response.data;
-
-      const mappedData = responseData.map((UserItem) => {
-        return{
-          id: UserItem.id,
-          name: UserItem.name,
-          username: UserItem.username,
-          division: UserItem.division,
-          position: UserItem.position,
-          code_clearance: UserItem.code_clearance,
-          avatar: UserItem.avatar,
-          status: UserItem.status
-        }
-      });
-
-      setUserList(mappedData)
-    })
-    .finally(() => {
+    }catch(error){
+      console.error("Unexpected error:", error);
+    } finally {
       setLoading(false);
-      setLoadingArea(false);
-    });
+    }
+  }
 
-  }, []);
+  useEffect(() => { 
+    if(currentUserId){
+      fetchUserList();
+    }
+  }, [currentUserId]);
 
   //Search Filter and Pagination
   const itemsPerPage = 25;
@@ -98,24 +68,31 @@ export default function UserListJLMS(){
     (currentPage + 1) * itemsPerPage
   );
 
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
+  const handlePageChange = (event) => {
+    const selectedPage = event.selected;
+    setCurrentPage(selectedPage);
   };
 
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("GSO") || codes.includes("DM") || codes.includes("AM") || codes.includes("PM") || codes.includes("HACK");
+  const roles = ["NERD", "AUS"];
+  const Access = roles.some(role => codes.includes(role));
 
   return(
+    !pageRestrict ? (
+      <Restrict />
+    ):(
     <PageComponent title="Employee List">
-
-      {Authorize ? (
-        <div className="font-roboto">
-
+      <div className="ppa-widget request-form px-4 pb-6 mt-8">
+        {/* Header */}
+        <div className="joms-user-info-header text-left"> 
+          Employee's Lists
+        </div>
+        {/* Table */}
+        <div className="mt-4">
           {/* Search Filter */}
-          <div className="mt-5 mb-4 md:flex">
-
+          <div className="mb-4 flex">
             {/* Search */}
             <div className="flex-grow">
               <input
@@ -126,18 +103,15 @@ export default function UserListJLMS(){
                 className="w-96 p-2 border border-gray-300 rounded text-sm"
               />
             </div>
-
             {/* Count */}
             <div className="ml-4" style={{ position: "relative", bottom: "-18px" }}>
               <div className="text-right text-sm/[17px]">
                 Total of {userList.length} user's list
               </div>
             </div>
-
           </div>
-
           {/* Top Pagination */}
-          <div className="mb-3">
+          <div>
             {displayPaginationUser && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
@@ -147,43 +121,34 @@ export default function UserListJLMS(){
                 marginPagesDisplayed={2}
                 pageRangeDisplayed={5}
                 onPageChange={handlePageChange}
+                forcePage={currentPage}
                 containerClassName="pagination"
-                subContainerClassName="pages pagination"
                 activeClassName="active"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
               />
             )}
           </div>
-
-          {/* Table */}
-          <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
+          {/* List */}
+          <div className="ppa-div-table mt-4 pb-3 overflow-x-auto md:overflow-x-visible">
             <table className="ppa-table w-full">
               <thead>
                 <tr className="bg-gray-100">
                   <th className="px-4 py-2 text-center ppa-table-header">ID</th>
                   <th className="px-4 py-2 text-center ppa-table-header">Avatar</th>
-                  <th className="px-4 py-2 text-center ppa-table-header">Name</th>
-                  <th className="px-4 py-2 text-center ppa-table-header">Division</th>
-                  <th className="px-4 py-2 text-center ppa-table-header">Position</th>
-                  <th className="px-4 py-2 text-center ppa-table-header">Username</th>  
-                  <th className="px-4 py-2 text-center ppa-table-header">Clearance</th>
+                  <th className="px-4 py-2 text-left ppa-table-header">Name</th>
+                  <th className="px-4 py-2 text-left ppa-table-header">Division</th>
+                  <th className="px-4 py-2 text-left ppa-table-header">Position</th>
+                  <th className="px-4 py-2 text-left ppa-table-header">Username</th>  
+                  <th className="px-4 py-2 text-left ppa-table-header">Badge</th>
                   <th className="px-4 py-2 text-center ppa-table-header">Status</th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: '#fff' }}>
-                {loadingArea ? (
+              <tbody>
+                {loading ? (
                   <tr>
-                    <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                      <div className="flex justify-center items-center py-4">
+                    <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
+                      <div className="flex justify-center items-center">
                         <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                        <span className="loading-table">Loading Employee List</span>
+                        <span className="loading-table">Loading List</span>
                       </div>
                     </td>
                   </tr>
@@ -193,22 +158,30 @@ export default function UserListJLMS(){
                       <tr key={getData.id}>
                         <td className="px-3 py-2 text-center ppa-table-body">{getData.id}</td>
                         <td className="px-3 py-2 text-center ppa-table-body w-24"><img src={getData.avatar} className="ppa-avatar" alt="" /></td>
-                        <td className="px-3 py-2 text-center ppa-table-body"><Link to={`/joms/userdetails/${getData.id}`}>{getData.name}</Link></td>
-                        <td className="px-3 py-2 text-center ppa-table-body">{getData.division}</td>
-                        <td className="px-3 py-2 text-center ppa-table-body">{getData.position}</td>
-                        <td className="px-3 py-2 text-center ppa-table-body">{getData.username}</td>
-                        <td className="px-3 py-2 text-center ppa-table-body">{getData.code_clearance}</td>
+                        <td className="px-3 py-2 text-left ppa-table-body"><Link to={`/joms/userdetails/${getData.id}`}><strong>{getData.name}</strong></Link></td>
+                        <td className="px-3 py-2 text-left ppa-table-body">{getData.division}</td>
+                        <td className="px-3 py-2 text-left ppa-table-body">{getData.position}</td>
+                        <td className="px-3 py-2 text-left ppa-table-body">{getData.username}</td>
+                        <td className="px-3 py-2 text-left ppa-table-body">
+                          <div className="flex flex-col gap-1">
+                            {getData.code_clearance.split(",").map((code, index) => (
+                              <span key={index} className={`badge badge-${code.trim()}`}>
+                                {code.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
                         <td className="px-3 py-2 text-center ppa-table-body">
-                          {getData.status == 0 && (<FontAwesomeIcon className="user-deleted" title="Deleted" icon={faCircle} />)}
-                          {getData.status == 1 && (<FontAwesomeIcon className="user-active" title="Active" icon={faCircle} />)}
-                          {getData.status == 2 && (<FontAwesomeIcon className="user-need" title="Not Activate" icon={faCircle} />)}
+                          {getData.status == 0 && (<span className="user-deleted" title="Deleted"> Deactivate </span>)}
+                          {getData.status == 1 && (<span className="user-active" title="Active"> Active </span>)}
+                          {getData.status == 2 && (<span className="user-need" title="Not Activate"> Need Activate </span>)}
                         </td>
                       </tr>
                     ))
                   ):(
                     <tr>
-                      <td colSpan={8} className="px-2 py-2 text-center text-sm text-gray-600">
-                        No records found.
+                      <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
+                        No records found
                       </td>
                     </tr>
                   )
@@ -216,8 +189,7 @@ export default function UserListJLMS(){
               </tbody>
             </table>
           </div>
-          
-          {/* Pagination */}
+          {/* Bottom Pagination */}
           {displayPaginationUser && (
             <ReactPaginate
               previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
@@ -227,25 +199,14 @@ export default function UserListJLMS(){
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
               onPageChange={handlePageChange}
+              forcePage={currentPage}
               containerClassName="pagination"
-              subContainerClassName="pages pagination"
               activeClassName="active"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
             />
           )}
-
         </div>
-      ):(
-        <Restrict />
-      )}
-      
+      </div>
     </PageComponent>
+    )
   );
 }

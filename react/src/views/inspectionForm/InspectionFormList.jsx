@@ -10,8 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default function InspectionFormList(){
-
-  const { currentUserCode } = useUserStateContext();
+  const { currentUserId, currentUserCode } = useUserStateContext();
 
   //Date Format 
   function formatDate(dateString) {
@@ -19,25 +18,37 @@ export default function InspectionFormList(){
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
 
-  // Loading
   const [loading, setLoading] = useState(true);
-
-  const [formlist, setFormList] = useState([]);
+  const [pageRestrict, setPageRestrict] = useState(true);
 
   // Get User Employee's Data
-  useEffect(() => {  
-    axiosClient
-    .get('/allinspection')
-    .then((response) => {
-      const InspectionFormList = response.data;
+  const [formlist, setFormList] = useState([]);
 
-      setFormList(InspectionFormList);
+  const fetchInspectionList = async () => {
+    try{
+      const response = await axiosClient.get('/allinspection');
+      const dataInspection = response.data;
 
-    })
-    .finally(() => {
+      setFormList(dataInspection);
+
+      if(accessOnly){
+        setPageRestrict(true);
+      }else{
+        setPageRestrict(false);
+      }
+
+    }catch(error){
+      console.error(error);
+    } finally {
       setLoading(false);
-    });
-  }, []);
+    }
+  }
+
+  useEffect(() => { 
+    if(currentUserId){
+      fetchInspectionList();
+    }
+  }, [currentUserId]);
 
   //Search Filter and Pagination
   const itemsPerPage = 30;
@@ -83,53 +94,54 @@ export default function InspectionFormList(){
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const SuperAdmin = codes.includes("HACK");
-  const DivisionManager = codes.includes("DM");
-  const AssignPersonnel = codes.includes("AP");
-  const PortManager = codes.includes("PM");
-  const Access = Admin || GSO || DivisionManager || SuperAdmin || PortManager || AssignPersonnel;
+  const roles = ["HACK", "AUS", "AM", "AUI", "PM", "DM", "GSO" ];
+  const accessOnly = roles.some(role => codes.includes(role));
 
   return (
-    <PageComponent title="Request List">
-      {Access ? (
-        <div className="ppa-widget mt-8">
-          <div className="joms-user-info-header text-left"> 
-            Pre/Post Repair Inspection Form List
-          </div>
+    pageRestrict ? (
+      <PageComponent title="Request List">
+        {/* Main */}
+        <div className="mt-8">
+          <div className="ppa-widget px-4 pb-6">
+            {/* Header */}
+            <div className="joms-user-info-header text-left"> 
+              Pre/Post Repair Inspection Form List
+            </div>
 
-          <div className="px-4 pb-6">
-            {/* Search Filter */}
-            <div className="md:flex">
-              {/* Search */}
-              <div className="flex-grow">
-                <input
-                  type="text"
-                  placeholder="Search Here"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-full md:w-96 p-2 border border-gray-300 rounded text-sm"
-                />
-              </div>
+            {/* Search */}
+            <div className="pt-3">
+              {/* Search Filter */}
+              <div className="md:flex">
+                {/* Search */}
+                <div className="flex-grow">
+                  <input
+                    type="text"
+                    placeholder="Search Here"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                    disabled={loading}
+                  />
+                </div>
 
-              {/* Count */}
-              <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
-                <div className="text-right text-sm/[17px]">
-                  Total of{" "}
-                  {pageCountUser > 1 ? (
-                    <b>{startIndex} - {endIndex}</b>
-                  ) : (
-                    <b>{filteredList.length}</b>
-                  )}{" "}
-                  out of <b>{filteredList.length}</b> Request list
+                {/* Count */}
+                <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
+                  <div className="text-right text-sm/[17px]">
+                    Total of{" "}
+                    {pageCountUser > 1 ? (
+                      <b>{startIndex} - {endIndex}</b>
+                    ) : (
+                      <b>{filteredList.length}</b>
+                    )}{" "}
+                    out of <b>{filteredList.length}</b> Request list
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Top Pagination */}
             <div className="mt-6">
-              {displayPaginationUser && (
+              {displayPaginationUser && !loading && (
                 <ReactPaginate
                   previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
                   nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -139,23 +151,14 @@ export default function InspectionFormList(){
                   pageRangeDisplayed={5}
                   onPageChange={handlePageChange}
                   forcePage={currentPage}
-                  containerClassName="pagination-top"
-                  subContainerClassName="pages pagination"
+                  containerClassName="pagination"
                   activeClassName="active"
-                  pageClassName="page-item"
-                  pageLinkClassName="page-link"
-                  breakClassName="page-item"
-                  breakLinkClassName="page-link"
-                  previousClassName="page-item"
-                  previousLinkClassName="page-link"
-                  nextClassName="page-item"
-                  nextLinkClassName="page-link"
                 />
               )}
             </div>
 
             {/* Table */}
-            <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
+            <div className="ppa-div-table mt-8 pb-3 overflow-x-auto md:overflow-x-visible">
               <table className="ppa-table w-full">
                 <thead>
                   <tr>
@@ -170,14 +173,31 @@ export default function InspectionFormList(){
                 </thead>
                 <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
                   {loading ? (
-                    <tr>
-                      <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
-                        <div className="flex justify-center items-center">
-                          <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                          <span className="loading-table">Loading List</span>
-                        </div>
-                      </td>
-                    </tr>
+                    Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
+                      <tr key={index}>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                        <td className="p-3 ppa-table-body">
+                          <div className="skeleton h-4"></div>
+                        </td>
+                      </tr>
+                    ))
                   ):(
                     currentList.length > 0 ? (
                       currentList.map((list)=>(
@@ -217,7 +237,7 @@ export default function InspectionFormList(){
             </div>
 
             {/* Bottom Pagination */}
-            {displayPaginationUser && (
+            {displayPaginationUser && !loading && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
                 nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -242,10 +262,10 @@ export default function InspectionFormList(){
             )}
           </div>
         </div>
-      ):(
-        <Restrict />
-      )}
-    </PageComponent>
+      </PageComponent>
+    ):(
+      <Restrict />
+    )
   )
 
 }

@@ -11,6 +11,9 @@ export default function RepairRequestForm(){
 
   const navigate = useNavigate();
 
+  // Loading
+  const [loading, setLoading] = useState(true);
+
   // Date
   const today = new Date().toISOString().split('T')[0];
   const currentDate = new Date().toISOString().split('T')[0];
@@ -21,15 +24,17 @@ export default function RepairRequestForm(){
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
 
+  // Function
+  const [buttonHide, setButtonHide] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
-  const [confirmation, setConfirmation] = useState(false);
-  const [buttonHide, setButtonHide] = useState(false);
-
-  // Values
+  // Variable
   const [propertyNo, setPropertyNo] = useState('');
   const [acquisitionDate, setAcquisitionDate] = useState('');
   const [acquisitionCost, setAcquisitionCost] = useState('');
@@ -40,11 +45,6 @@ export default function RepairRequestForm(){
   const [propertyLocation, setPropertyLocation] = useState('');
   const [ComplainDefect, setComplainDefect] = useState('');
   const [selectedSupervisor, setSelectedSupervisor] = useState({ id: '', name: '' });
-
-  const [inputErrors, setInputErrors] = useState({});
-  const [submitLoading, setSubmitLoading] = useState(false);
-
-  const [supervisor, setSupervisor] = useState([]);
 
   // Disable the Scroll on Popup
   useEffect(() => {
@@ -71,6 +71,7 @@ export default function RepairRequestForm(){
   }, [showPopup]);
 
   // Get Supervisor
+  const [supervisor, setSupervisor] = useState([]);
   useEffect(()=>{
     axiosClient
     .get(`/getsupervisor`)
@@ -85,13 +86,16 @@ export default function RepairRequestForm(){
       })
 
       setSupervisor({supervisorData});
-      //console.log(supervisorData);
+    })
+    .finally(() => {
+      setLoading(false);
     });
   },[]);
 
-  // Confirm Function
+  // Check Form
   function handleConfirm(event){
     event.preventDefault();
+    setSubmitLoading(true);
 
     const formData = {
       form: "Check",
@@ -121,22 +125,31 @@ export default function RepairRequestForm(){
         setPopupMessage(error.response.status);
       }else{
         const responseErrors = error.response.data.errors;
-        setInputErrors(responseErrors);
+        setPopupContent("check-error");
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Error</p>
+            <p className="popup-message">
+              {responseErrors.type_of_property ? "Please enter on Type of Property" : 
+               responseErrors.property_description ? "Please enter on Description" :  
+               responseErrors.location ? "Please enter on Location" :
+               responseErrors.complain ? "Please enter on Complain" :  "Please enter on Supervisor"}
+            </p>
+          </div>
+        );
+        setShowPopup(true);
       }
     })
     .finally(() => {
       setSubmitLoading(false);
     });
-
   }
 
-  // Submit the Form
-  function SubmitInspectionForm(event){
-    event.preventDefault();
+  // Submit Form
+  function submitInspForm(){
+    setSubmitLoading(true);
 
     let remarks = Admin || DivisionManager || PortManager ? 'Waiting for the GSO to fill out the Part B form' : 'Waiting for supervisor approval.' ;
-
-    setSubmitLoading(true);
 
     const formData = {
       form: "Uncheck",
@@ -187,7 +200,7 @@ export default function RepairRequestForm(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    navigate(`/joms/myrequest`);
+    navigate(`/joms/myrequest#inspection`);
   }
 
   const ucode = currentUserCode;
@@ -195,190 +208,50 @@ export default function RepairRequestForm(){
   const Admin = codes.includes("AM");
   const PortManager = codes.includes("PM");
   const DivisionManager = codes.includes("DM");
-  const SuperHacker = codes.includes("NERD");
-  const GSO = codes.includes("GSO");
 
   return (
     <PageComponent title="Request Form">
 
       {/* Form Content */}
-      <div className="ppa-widget mt-8">
-        <div className="joms-user-info-header text-left"> 
-          Request for Pre/Post Inspection Repair
-        </div>
-
-        <div className="pb-2">
-          {confirmation ? (
-          <div className="form-container">
-            <form onSubmit={SubmitInspectionForm}>
-
-                {/* Title */}
-                <div className="pl-4">
-                  <h2 className="req-title"> Part A: To be filled-up by Requesting Party </h2>
-                </div>
-
-                <div className="md:grid md:grid-cols-2">
-
-                  {/* Part A left side */}
-                  <div className="col-span-1 px-4">
-
-                    {/* Date */}
-                    <div className="md:flex items-center mt-6">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Date:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {formatDate(today)}
-                      </div>
-                    </div>
-
-                    {/* Property No */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Property No:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {propertyNo ? propertyNo : "N/A"}
-                      </div>
-                    </div>
-
-                    {/* Acquisition Date */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Acquisition Date:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {acquisitionDate ? formatDate(acquisitionDate) : "N/A"}
-                      </div>
-                    </div>
-
-                    {/* Acquisition Cost */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Acquisition Cost:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {acquisitionCost ? new Intl.NumberFormat('en-PH', {
-                          style: 'currency',
-                          currency: 'PHP'
-                        }).format(acquisitionCost) : "N/A" }
-                      </div>
-                    </div>
-
-                    {/* Brand/Model */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Brand/Model:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {BrandModel ? BrandModel : "N/A"}
-                      </div>
-                    </div>
-
-                    {/* Serial/Engine No */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-48">
-                        <label className="form-title">
-                        Serial/Engine No:
-                        </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {SerialEngineNo ? SerialEngineNo : "N/A"}
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Part A right side */}
-                  <div className="col-span-1 px-4">
-
-                    {/* Type of Property */}
-                    <div className="md:flex items-center mt-2 md:mt-6">
-                      <div className="w-52">
-                        <label className="form-title"> Type of Property: </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {typeOfProperty}
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-52">
-                        <label className="form-title"> Description: </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {propertyDescription}
-                      </div>
-                    </div>
-
-                    {/* Location */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-52">
-                        <label className="form-title"> Location: </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {propertyLocation}
-                      </div>
-                    </div>
-
-                    {/* Supervisor */}
-                    <div className="md:flex items-center mt-2">
-                      <div className="w-52">
-                        <label className="form-title"> Supervisor: </label> 
-                      </div>
-                      <div className="w-full ppa-form-confimation">
-                        {Admin || DivisionManager || PortManager ? currentUserName.name : selectedSupervisor.name}
-                      </div>
-                    </div>
-
-                  </div>
-          
-                </div>
-
-                {/* Complain */}
-                <div className="md:flex items-center mt-2 px-4">
-                  <div className="w-40">
-                    <label className="form-title">
-                    Complain:
-                    </label> 
-                  </div>
-                  <div className="w-full ppa-form-confimation">
-                    {ComplainDefect}
-                  </div>
-                </div>
-
-                {Admin || DivisionManager || PortManager || GSO || SuperHacker ? null : (
-                  <p className="note-form mb-4 px-4"><span> Note: </span> You can still edit the form after it has been submitted. However, once the supervisor approves it, the form will no longer be editable. </p>
-                )}
-
-                {/* Button */}
-                <div className="mt-5 pl-4 mb-6 mobile-btn flex justify-center md:justify-start">
-                
-                {!buttonHide && (
+      <div className="ppa-widget px-4 pb-10 mt-8">
+        <div className="joms-user-info-header text-left"> Request for Pre/Post Inspection Repair </div>
+        {/* Form Area */}
+        <div className="form-container">
+          {/* Title and Button */}
+          <div className="flex justify-between items-center"> 
+            {/* Title */}
+            <div className="px-2">
+              <h2 className="text-base font-bold leading-7 text-gray-900"> 
+                {confirmation ? (
+                  "Part A: To be filled-up by Requesting Party"
+                ):(
+                  "Fill up the Form"
+                )} 
+              </h2>
+              <p className="text-xs font-bold text-red-500">
+                {confirmation ? (
+                  "Please double check your FORM before submitting"
+                ):(
+                  "* - fields that need to be filled out"
+                )} 
+              </p>
+            </div>
+            {/* Button */}
+            <div className="px-2 pb-4 flex justify-start">
+              {confirmation ? (
+                !buttonHide && (
                 <>
-
                   {/* Submit */}
                   <button 
-                    // form="fac_submit"
+                    onClick={() => submitInspForm()}
                     type="submit"
-                    className={`w-full md:w-auto py-2 px-4 text-base ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                    className={`w-auto py-1.5 px-6 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
                       <div className="flex justify-center">
                         <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
+                        <span className="ml-1">Submitting</span>
                       </div>
                     ):(
                       'Confirm'
@@ -387,331 +260,392 @@ export default function RepairRequestForm(){
     
                   {/* Cancel */}
                   {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-base btn-cancel-form">
+                    <button onClick={() => setConfirmation(false)} className="w-auto ml-2 py-1.5 px-6 btn-cancel">
                       Revise
                     </button>
                   )}
                 </>
-                )}
-                </div>
-
-            </form>
-          </div>
-          ):(
-          <div className="form-container">
-            {/* Title */}
-            <div className="px-4">
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-              <p className="text-xs font-bold text-red-500">* - fields that need to be filled out</p>
+                )
+              ):(
+              <>
+                {/* Check Form */}
+                <button 
+                  onClick={handleConfirm} 
+                  className="w-auto py-1.5 px-6 btn-primary">
+                  Submit
+                </button>
+              </>
+              )}
             </div>
+          </div>
 
-            {/* Form */}
-            <div className="md:grid md:grid-cols-2">
+          {/* Field */}
+          <div className="grid grid-cols-2 gap-10 px-2">
+            {/* 1st Column */}
+            <div className="col-span-1">
 
-              {/* 1st Column */}
-              <div className="col-span-1 px-4">
-
-                {/* Date */}
-                <div className="items-center mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_date" className="form-title"> 
-                      Date: 
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input 
-                      type="text" 
-                      name="rep_date" 
-                      id="rep_date" 
-                      value={formatDate(today)} 
-                      className="block w-full ppa-form-field"
-                      disabled
-                    />
-                  </div>
+              {/* Date */}
+              <div className="flex items-center mt-5">
+                <div className="w-52 form-title">
+                  <label htmlFor="rep_date"> 
+                    Date
+                  </label> 
                 </div>
-
-                {/* Property Number */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_property_no" className="form-title"> 
-                      Property Number: 
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rep_property_no"
-                      id="rep_property_no"
-                      autoComplete="rep_property_no"
-                      value={propertyNo}
-                      onChange={ev => setPropertyNo(ev.target.value)}
-                      maxLength={255}
-                      className="block w-full ppa-form-field"
-                    />
-                    {!propertyNo && inputErrors.property_number && (
-                      <p className="form-validation">This form is required</p>
-                    )}
-                  </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    <div className="block w-full ppa-form-confirm h-[40px]">
+                      {formatDate(today)}
+                    </div>
+                  )}
                 </div>
+              </div>
 
-                {/* Acquisition Date */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_acquisition_date" className="form-title">    
-                      Acquisition Date:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="date"
-                      name="rep_acquisition_date"
-                      id="rep_acquisition_date"
-                      value={acquisitionDate}
-                      onChange={ev => setAcquisitionDate(ev.target.value)}
-                      max={currentDate}
-                      className="block w-full ppa-form-field"
-                    />
-                    {!acquisitionDate && inputErrors.acquisition_date && (
-                      <p className="form-validation">This form is required</p>
-                    )}
-                  </div>
+              {/* Property Number */}
+              <div className="flex items-center mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_property_no"> 
+                    Property Number
+                  </label> 
                 </div>
-
-                {/* Acquisition Cost */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_acquisition_cost" className="form-title">
-                      Acquisition Cost:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <div className="relative flex items-center">
-                      <span className="absolute top-4 left-0 flex items-center pl-2 text-gray-600">
-                        ₱
-                      </span>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
                       <input
                         type="text"
-                        name="rep_acquisition_cost"
-                        id="rep_acquisition_cost"
-                        autoComplete="rep_acquisition_cost"
-                        value={acquisitionCost}
-                        onChange={ev => {
-                          const inputVal = ev.target.value;
-                          // Allow only numeric input
-                          if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
-                            setAcquisitionCost(inputVal.replace(/,/g, ''));
-                          }
-                        }}
-                        className="block w-full ppa-form-field cost"
+                        name="rep_property_no"
+                        id="rep_property_no"
+                        autoComplete="rep_property_no"
+                        value={propertyNo}
+                        onChange={ev => setPropertyNo(ev.target.value)}
+                        maxLength={255}
+                        className="block w-full focus:ring-0 ppa-form-field"
                       />
-                    </div>
-                    {!acquisitionCost && inputErrors.acquisition_cost && (
-                      <p className="form-validation">This form is required</p>
-                    )}
-                  </div>
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {propertyNo }
+                      </div>
+                    )
+                  )}
                 </div>
-
-                {/* Brand/Model */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_brand_model" className="form-title">
-                      Brand/Model:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="brand_mrep_brand_model"
-                      id="rep_brand_model"
-                      autoComplete="rep_brand_model"
-                      value={BrandModel}
-                      maxLength={255}
-                      onChange={ev => setBrandModel(ev.target.value)}
-                      className="block w-full ppa-form-field"
-                    />
-                    {!BrandModel && inputErrors.brand_model && (
-                      <p className="form-validation">This form is required</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Serial/Engine No */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-40">
-                    <label htmlFor="rep_serial_engine_no" className="form-title">                  
-                      Serial/Engine No.:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rep_serial_engine_no"
-                      id="rep_serial_engine_no"
-                      autoComplete="rep_serial_engine_no"
-                      value={SerialEngineNo}
-                      maxLength={255}
-                      onChange={ev => setSerialEngineNo(ev.target.value)}
-                      className="block w-full ppa-form-field"
-                    />
-                    {!SerialEngineNo && inputErrors.serial_engine_no && (
-                      <p className="form-validation">This form is required</p>
-                    )}
-                  </div>
-                </div>
-
               </div>
 
-              {/* 2nd Column */}
-              <div className="col-span-1 px-4">
-
-                {/* Type of Property */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Type of Property:
-                      {(!typeOfProperty && inputErrors.type_of_property) ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <select 
-                    name="rep_type_of_property" 
-                    id="rep_type_of_property" 
-                    autoComplete="rep_type_of_property"
-                    value={typeOfProperty}
-                    onChange={ev => {
-                      setTypeOfProperty(ev.target.value);
-                    }}
-                    className={`block w-full ${(inputErrors.type_of_property) ? "ppa-form-error":"ppa-form-field"}`}
-                    >
-                      <option value="" disabled>Select an option</option>
-                      <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                      <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
-                      <option value="Others">Others</option>
-                    </select>
-                  </div>
+              {/* Acquisition Date */}
+              <div className="flex items-center mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_acquisition_date"> 
+                    Acquisition Date
+                  </label> 
                 </div>
-
-                {/* Description */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_description" className="flex form-title">
-                      Description:
-                      {(!propertyDescription && inputErrors.property_description) ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rep_description"
-                      id="rep_description"
-                      value={propertyDescription}
-                      maxLength={255}
-                      onChange={ev => setPropertyDescription(ev.target.value)}
-                      className={`block w-full ${(inputErrors.property_description) ? "ppa-form-error":"ppa-form-field"}`}
-                    />
-                  </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    confirmation ? (
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {acquisitionDate ? formatDate(acquisitionDate) : ""}
+                      </div>
+                    ):(
+                      <input
+                        type="date"
+                        name="rep_acquisition_date"
+                        id="rep_acquisition_date"
+                        value={acquisitionDate}
+                        onChange={ev => setAcquisitionDate(ev.target.value)}
+                        max={currentDate}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    )
+                  )}
                 </div>
+              </div>
 
-                {/* Location */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_location" className="flex form-title">
-                      Location (Div/Section/Unit):
-                      {(!propertyLocation && inputErrors.location) ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="rep_location"
-                      id="rep_location"
-                      value={propertyLocation}
-                      maxLength={255}
-                      onChange={ev => setPropertyLocation(ev.target.value)}
-                      className={`block w-full ${(inputErrors.location) ? "ppa-form-error":"ppa-form-field"}`}
-                    />
-                  </div>
+              {/* Acquisition Cost */}
+              <div className="flex items-center mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_acquisition_cost"> 
+                    Acquisition Cost
+                  </label> 
                 </div>
-
-                {/* Complain / Defect */}
-                <div className="items-center mt-2 md:mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_complain" className="flex form-title">
-                      Complain/Defect:
-                      {(!ComplainDefect && inputErrors.complain) ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                  <textarea
-                    id="rep_complain"
-                    name="rep_complain"
-                    value={ComplainDefect}
-                    style={{ resize: 'none', height: '134px' }}
-                    maxLength={500}
-                    onChange={ev => setComplainDefect(ev.target.value)}
-                    className={`block w-full ${(inputErrors.complain) ? "ppa-form-error":"ppa-form-field"}`}
-                  />
-                  </div>
-                </div>
-
-                {/* Supervisor */}
-                {(Admin || DivisionManager|| PortManager) ? null : (
-                  <div className="items-center mt-2 md:mt-4">
-                    <div className="w-full">
-                      <label htmlFor="rep_type_of_property" className="flex form-title">
-                        Immediate Supervisor:
-                        {(!selectedSupervisor.id && inputErrors.supervisor_id) ? (
-                          <p className="form-validation">This form is required</p>
-                        ):( <p className="form-validation"> * </p> )}
-                      </label> 
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    <div className="relative flex items-center">
+                      <span className="absolute left-0 flex items-center pl-2 text-gray-600">
+                        ₱
+                      </span>
+                      {!confirmation ? (
+                        <input
+                          type="text"
+                          name="rep_acquisition_cost"
+                          id="rep_acquisition_cost"
+                          autoComplete="rep_acquisition_cost"
+                          value={acquisitionCost}
+                          onChange={ev => {
+                            const inputVal = ev.target.value;
+                            // Allow only numeric input
+                            if (/^\d*(\.\d{0,2})?$/.test(inputVal.replace(/,/g, ''))) {
+                              setAcquisitionCost(inputVal.replace(/,/g, ''));
+                            }
+                          }}
+                          className="block w-full cost focus:ring-0 ppa-form-field"
+                        />
+                      ):(
+                        <div className="w-full ppa-form-confirm h-[40px]">
+                          {acquisitionCost}
+                        </div>
+                      )}
                     </div>
-                    <div className="w-full">
-                      <select 
-                      name="rep_supervisor" 
-                      id="rep_supervisor" 
-                      value={selectedSupervisor.id}
-                      onChange={ev => {
-                        const supervisorId = ev.target.value;
-                        const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
-                        
-                        setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
-                      }}
-                      className={`block w-full ${(inputErrors.supervisor_id) ? "ppa-form-error":"ppa-form-field"}`}
-                      >
-                        <option value="" disabled>Select your supervisor</option>
-                        {supervisor?.supervisorData?.map((Data) => (
-                          <option key={Data.id} value={Data.id}>
-                            {Data.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
 
+              {/* Brand/Model */}
+              <div className="flex items-center mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="brand_mrep_brand_model"> 
+                    Brand/Model
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="brand_mrep_brand_model"
+                        id="rep_brand_model"
+                        autoComplete="rep_brand_model"
+                        value={BrandModel}
+                        maxLength={255}
+                        onChange={ev => setBrandModel(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {BrandModel}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Serial/Engine No */}
+              <div className="flex items-center mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_serial_engine_no"> 
+                    Serial/Engine No
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="rep_serial_engine_no"
+                        id="rep_serial_engine_no"
+                        autoComplete="rep_serial_engine_no"
+                        value={SerialEngineNo}
+                        maxLength={255}
+                        onChange={ev => setSerialEngineNo(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {SerialEngineNo}
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
 
             </div>
 
-            {/* Button */}
-            <div className="mt-10 pl-4 pb-4 mobile-btn flex justify-center md:justify-start">
-              {/* Check Form */}
-              <button 
-                onClick={handleConfirm} 
-                className="w-full md:w-auto py-2 px-4 text-base btn-default-form">
-                Submit
-              </button>
+            {/* 2nd Column */}
+            <div className="col-span-1">
+
+              {/* Type of Property */}
+              <div className="flex items-center mt-5">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_type_of_property"> 
+                    Type of Property
+                    <span className="form-validation ml-2"> * </span>
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <select 
+                        name="rep_type_of_property" 
+                        id="rep_type_of_property" 
+                        autoComplete="rep_type_of_property"
+                        value={typeOfProperty}
+                        onChange={ev => {
+                          setTypeOfProperty(ev.target.value);
+                        }}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      >
+                        <option value="" disabled>Select an option</option>
+                        <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
+                        <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    ):(
+                      <div className="block w-full ppa-form-confirm">
+                        {typeOfProperty}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="flex items-stretch mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_description"> 
+                    Description
+                    <span className="form-validation ml-2"> * </span>
+                  </label> 
+                </div>
+                <div className="w-full flex">
+                  {loading ? (
+                    <div className="skeleton-form w-full"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="rep_description"
+                        id="rep_description"
+                        value={propertyDescription}
+                        maxLength={255}
+                        onChange={ev => setPropertyDescription(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm flex items-center">
+                        {propertyDescription}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-stretch mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_location"> 
+                    Location
+                    <span className="form-validation ml-2"> * </span>
+                  </label>
+                </div>
+                <div className="w-full flex">
+                  {loading ? (
+                    <div className="skeleton-form w-full"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="rep_location"
+                        id="rep_location"
+                        value={propertyLocation}
+                        maxLength={255}
+                        onChange={ev => setPropertyLocation(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm flex items-center">
+                        {propertyLocation}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Complain/Defect */}
+              <div className="flex items-stretch mt-2">
+                <div className="w-52 flex form-title">
+                  <label htmlFor="rep_complain"> 
+                    Complain/Defect
+                    <span className="form-validation ml-2"> * </span>
+                  </label>
+                </div>
+                <div className="w-full flex">
+                  {loading ? (
+                    <div className="skeleton-form w-full"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        id="rep_complain"
+                        name="rep_complain"
+                        value={ComplainDefect}
+                        maxLength={500}
+                        onChange={ev => setComplainDefect(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm flex items-center">
+                        {ComplainDefect}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Supervisor */}
+              {(Admin || DivisionManager|| PortManager) ? null : (
+                <div className="flex items-center mt-2">
+                  <div className="w-52 flex form-title">
+                    <label htmlFor="rep_supervisor"> 
+                      Supervisor
+                      <span className="form-validation ml-2"> * </span>
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    {loading ? (
+                      <div className="skeleton-form"></div>
+                    ):(
+                      !confirmation ? (
+                        <select 
+                          name="rep_supervisor" 
+                          id="rep_supervisor" 
+                          value={selectedSupervisor.id}
+                          onChange={ev => {
+                            const supervisorId = ev.target.value;
+                            const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
+                            
+                            setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
+                          }}
+                          className="block w-full focus:ring-0 ppa-form-field"
+                        >
+                          <option value="" disabled>Select your supervisor</option>
+                          {supervisor?.supervisorData?.map((Data) => (
+                            <option key={Data.id} value={Data.id}>
+                              {Data.name}
+                            </option>
+                          ))}
+                        </select>
+                      ):(
+                        <div className="block w-full ppa-form-confirm">
+                          {selectedSupervisor.name}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
-          )}
         </div>
       </div>
 

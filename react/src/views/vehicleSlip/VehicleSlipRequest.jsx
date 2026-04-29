@@ -5,12 +5,16 @@ import axiosClient from "../../axios";
 import { useUserStateContext } from "../../context/ContextProvider";
 import moment from 'moment-timezone';
 import Popup from "../../components/Popup";
+import { useNavigate } from "react-router-dom";
 
 export default function FacilityVenueForm(){
   const { currentUserId, currentUserName, currentUserCode } = useUserStateContext();
 
-  const [vehicleDet, setVehicleDet] = useState([]);
-  const [driver, setDriver] = useState([]);
+  const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
+  const time = moment().tz('Asia/Manila').format('HH:mm');
+  const currentDateTime = moment().tz('Asia/Manila');
+
+  const navigate = useNavigate();
 
   //Date Format 
   function formatDate(dateString) {
@@ -39,17 +43,15 @@ export default function FacilityVenueForm(){
     return formattedTime;
   }
 
-  const today = moment().tz('Asia/Manila').format('YYYY-MM-DD');
-  const time = moment().tz('Asia/Manila').format('HH:mm');
-  const currentDateTime = moment().tz('Asia/Manila');
+  const [loading, setLoading] = useState(true);
 
-  const [confirmation, setConfirmation] = useState(false);
-  const [buttonHide, setButtonHide] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 seconds
 
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
+    return () => clearTimeout(timer);
+  }, []);
 
   //Vehicle Request
   const [selectedTravelType, setSelectedTravelType] = useState('');
@@ -64,42 +66,52 @@ export default function FacilityVenueForm(){
 
   const [inputErrors, setInputErrors] = useState({});
 
-  // Get Vehicle Details
-  const fetchVehicle = () => {
-    axiosClient
-    .get(`/getvehdet`, {
-      params: {
-        date: VRDateArrival,
-        time: VRTimeArrival,
-      },
+  const [vehicleDet, setVehicleDet] = useState([]);
+  const [driver, setDriver] = useState([]);
+
+  const [buttonHide, setButtonHide] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
+
+  // On travel
+  function checkAvailability(){
+    axiosClient.put("/checktsavailability", {
+      date: VRDateArrival,
     })
     .then((response) => {
       const responseData = response.data;
-      setVehicleDet(responseData)    
+      // console.log(responseData.vehicles);
+      
+      setDriver(responseData.drivers);
+      setVehicleDet(responseData.vehicles);
     });
   }
 
-  // Get Driver Details
-  const fetchDriver = () => {
-    axiosClient
-    .get(`/getdriverdet`, {
-      params: {
-        date: VRDateArrival,
-        time: VRTimeArrival,
-      },
-    })
-    .then((response) => {
-      const responseData = response.data;
-      setDriver(responseData)
-    });
-  } 
+  // Check if there is on travel schedule
+  function checkTravelSchedule(){
+    if(GSO || VehicleAuthorize){
+      axiosClient.put("/checktravelschedule")
+      .then(res => {
+        console.log("Travel Schedule:", res.data);
+        // optional: set state here
+        // setSchedule(res.data);
+      })
+      .catch(err => {
+        console.error("Error:", err);
+      });
+    }
+  }
 
   useEffect(() => {
     if(VRDateArrival && VRTimeArrival){
-      fetchVehicle();
-      fetchDriver();
+      checkTravelSchedule();
+      checkAvailability();
     } 
   }, [VRDateArrival, VRTimeArrival]);
+
+  const [confirmation, setConfirmation] = useState(false);
 
   // Confirm Function
   function handleConfirm(event){
@@ -109,7 +121,7 @@ export default function FacilityVenueForm(){
 
     const formData = {
       form: "Check",
-      user_type : GSO || PersonAuthority ? 'authorize' : 'member',
+      user_type : GSO || VehicleAuthorize ? 'authorize' : 'member',
       type_of_slip : selectedTravelType,
       user_id : currentUserId,
       user_name : currentUserName.name,
@@ -121,7 +133,7 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO || PersonAuthority ? 8 : Admin ? 6 : PortManager ? 7 : 9,
+      admin_approval : GSO || VehicleAuthorize ? 8 : Admin ? 6 : PortManager ? 7 : 9,
       remarks : "Check",
     }
 
@@ -162,14 +174,14 @@ export default function FacilityVenueForm(){
     setSubmitLoading(true);
 
     // For the Remarks
-    const remarks = GSO || PersonAuthority ? 
+    const remarks = GSO || VehicleAuthorize ? 
     selectedTravelType == 'within' ? "Waiting for the Admin's Approval" : "Waiting for the Port Manager's Approval" :
     Admin || PortManager ? 'Waiting for the assign vehicle and driver.' :
     "Awaiting the assignment of a vehicle and driver.";
 
     const formData = {
       form: "Uncheck",
-      user_type : GSO || PersonAuthority ? 'authorize' : 'member',
+      user_type : GSO || VehicleAuthorize ? 'authorize' : 'member',
       type_of_slip : selectedTravelType,
       user_id : currentUserId,
       user_name : currentUserName.name,
@@ -181,7 +193,7 @@ export default function FacilityVenueForm(){
       vehicle_type : vehicalName,
       driver_id : pointDriver.did,
       driver : pointDriver.dname,
-      admin_approval : GSO || PersonAuthority ? 8 : Admin ? 6 : PortManager ? 7 : 9,
+      admin_approval : GSO || VehicleAuthorize ? 8 : Admin ? 6 : PortManager ? 7 : 9,
       remarks : remarks,
       notes: VRNote
     }
@@ -221,187 +233,58 @@ export default function FacilityVenueForm(){
   const closePopup = () => {
     setSubmitLoading(false);
     setShowPopup(false);
-    window.location.href = '/joms/myrequest';
+    navigate(`/joms/myrequest#vehicle`);
   }
-
-  // On travel
-  function OnTravel(){
-    axiosClient.put("/checktravelslip", {
-      id: currentUserId,
-      date: today,
-    })
-    .then((response) => {
-      const responseData = response.data;
-      console.log(responseData)    
-    });
-  }
-
-  useEffect(() => {
-    if(currentUserId){
-      OnTravel();
-    }
-  }, [currentUserId]);
 
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
+  // const SuperAdmin = codes.includes("HACK");
   const GSO = codes.includes("GSO");
-  const PersonAuthority = codes.includes("AU");
+  const VehicleAuthorize = codes.includes("AUV");
   const Admin = codes.includes("AM");
   const PortManager = codes.includes("PM");
 
   return(
     <PageComponent title="Request Form">
       {/* Form Content */}
-      <div className="ppa-widget mt-8 pb-6">
+      <div className="ppa-widget px-4 pb-5 mt-10">
         <div className="joms-user-info-header text-left"> Request for Vehicle Slip Request </div>
-
-        <div>
-
-          {confirmation ? (
-          <div className="form-container">
-
+        {/* Form Area */}
+        <div className="form-container">
+          {/* Title and Button */}
+          <div className="flex justify-between items-center"> 
             {/* Title */}
-            <div className="px-4 pt-4">
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Kindly double-check your forms, please. </h2>
-            </div>
-
-            <form id="vehicleslip" onSubmit={SubmitVehicleForm}>
-              <div className="px-4">
-
-                {/* Date */}
-                <div className="md:flex items-center mt-4">
-                  <div className="w-40">
-                    <label className="form-title">
-                    Date:
-                    </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                    {formatDate(today)}
-                  </div>
-                </div>
-
-                {/* Travel Type */}
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Travel Type: </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                  {selectedTravelType == 'within' ? "Within the City" : "Outside the City"}
-                  </div>
-                </div>
-
-                {/* Purpose */}
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Purpose: </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                  {VRPurpose}
-                  </div>
-                </div>
-
-                {/* Place/s to be Visited */}
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Place/s to be Visited: </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                  {VRPlace}
-                  </div>
-                </div>
-
-                {/* Date of Arrival */}
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Date of Arrival: </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                  {formatDate(VRDateArrival)}
-                  </div>
-                </div>
-
-                {/* Time of Arrival */}
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Time of Arrival: </label> 
-                  </div>
-                  <div className="w-full md:w-1/2 ppa-form-preview">
-                  {formatTime(VRTimeArrival)}
-                  </div>
-                </div>
-
-                {(GSO || PersonAuthority) && (
+            <div className="px-2">
+              {confirmation ? (
                 <>
-                  {/* Vehicle Type */}
-                  <div className="md:flex items-center mt-2">
-                    <div className="w-40">
-                      <label className="form-title"> Vehicle Type: </label> 
-                    </div>
-                    <div className="w-full md:w-1/2 ppa-form-preview">
-                    {vehicalName}
-                    </div>
-                  </div>
-
-                  {/* Driver */}
-                  <div className="md:flex items-center mt-2">
-                    <div className="w-40">
-                      <label className="form-title"> Driver: </label> 
-                    </div>
-                    <div className="w-full md:w-1/2 ppa-form-preview">
-                    {pointDriver.dname}
-                    </div>
-                  </div>
+                  <h2 className="text-base font-bold leading-7 text-gray-900"> 
+                    Form Review
+                  </h2>
+                  <p className="text-xs font-bold text-red-500">
+                    Please double check your FORM before submitting
+                  </p>
                 </>
+                ):(
+                  <>
+                    <h2 className="text-base font-bold leading-7 text-gray-900"> 
+                      Fill out the other form
+                    </h2>
+                    <p className="text-xs font-bold text-red-500">
+                      * - fields that need to be filled out
+                    </p>
+                  </>
                 )}
-
-                {/* Passenger/s */}
-                {VRPassenger ? (
-                <div className="md:flex items-center mt-2">
-                  <div className="w-40">
-                    <label className="form-title"> Passenger/s: </label> 
-                  </div>
-                
-                  {/* Render columns based on passenger count */}
-                  <div 
-                    style={{ columnCount: VRPassenger?.split("\n").filter(name => name.trim()).length > 5 ? 2 : 1 }} 
-                    className="w-full md:w-1/2 ppa-form-preview-border"
-                  >
-                    {VRPassenger
-                      ?.split("\n")                   // Split passengers by newline
-                      .filter(name => name.trim())    // Remove empty lines
-                      .map((passenger, index) => (
-                        <div key={index} className="flex mt-1.5">
-                          <div className="w-full ppa-form-preview text-left">
-                            <div className="w-full text-left">
-                              <label> {index + 1}. </label> {passenger}
-                            </div>
-                          </div>
-                        </div>
-                    ))}
-                  </div>
-                </div>
-                ):null}
-
-                {/* Note */}
-                {VRNote ? (
-                  <div className="md:flex items-center mt-2">
-                    <div className="w-40">
-                      <label className="form-title"> Note: </label> 
-                    </div>
-                    <div className="w-full md:w-1/2 ppa-form-preview">
-                    {VRNote}
-                    </div>
-                  </div>
-                ):null}
-
-                {/* Button */}
-                <div className="mt-6 md:mt-10 pb-4 flex justify-center md:justify-start">
-                {!buttonHide && (
+            </div>
+            {/* Button */}
+            <div className="px-2 pb-4 flex justify-start">
+              {confirmation ? (
+                !buttonHide && (
                   <>
                   {/* Submit */}
-                  <button type="submit"
-                    className={`w-full md:w-auto py-2 px-4 text-sm ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
+                  <button 
+                    onClick={SubmitVehicleForm}
+                    className={`w-full md:w-auto py-2 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -416,369 +299,430 @@ export default function FacilityVenueForm(){
 
                     {/* Cancel */}
                     {!submitLoading && (
-                      <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-sm btn-cancel-form">
+                      <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-2 px-4 text-sm btn-cancel">
                         Revise
                       </button>
                     )}
                   </>
-                )}
-                </div>
-
-              </div>
-            </form>
-
-          </div>
-          ):(
-          <div className="form-container">
-
-            {/* Title */}
-            <div className="px-4 pt-4">
-              <h2 className="text-base font-bold leading-7 text-gray-900"> Fill up the Form </h2>
-              <p className="text-xs font-bold text-red-500">* - fields that need to be filled out</p>
+                )
+              ):(
+                <button 
+                  onClick={handleConfirm} 
+                  className="w-auto py-1.5 px-6 text-base btn-primary">
+                  Submit
+                </button>
+              )}
             </div>
+          </div>
 
-            {/* Form */}
-            <div className="md:grid md:grid-cols-2">
+          {/* Field */}
+          <div className="grid grid-cols-2 gap-10 px-2">
+            {/* 1st Column */}
+            <div className="col-span-1">
 
-              {/* 1st Column */}
-              <div className="col-span-1 px-4">
-
-                {/* Date */}
-                <div className="items-center mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="rep_date" className="form-title">
-                      Date:
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="date"
-                      name="vr_date"
-                      id="vr_date"
-                      defaultValue={today}
-                      className="block w-full ppa-form-field"
-                      disabled
-                    />
-                  </div>
+              {/* Date */}
+              <div className="flex items-center mt-6">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Date
+                  </label> 
                 </div>
-
-                {/* Type of Travel */}
-                <div className="items-center mt-2 md:mt-4 font-roboto">
-                  <div className="font-roboto w-full pb-2">
-                    <label htmlFor="rf_request" className="form-title flex">
-                      Type of Travel:
-                      {!selectedTravelType && inputErrors.type_of_slip ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label>
-                  </div>
-                  <div className="w-full flex items-center space-x-10 md:space-x-20">
-
-                    {/* Within City */}
-                    <div className="flex items-center">
-                      <input
-                        id="within-city-checkbox"
-                        type="checkbox"
-                        checked={selectedTravelType === "within"}
-                        onChange={() => setSelectedTravelType("within")}
-                        className="h-6 w-6 text-indigo-900 border-black-500 rounded focus:ring-gray-400"
-                      />
-                      <label
-                        htmlFor="within-city-checkbox"
-                        className="ml-2 text-base leading-6 text-black"
-                      >
-                        Within the City
-                      </label>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    <div className="block w-full ppa-form-confirm h-[40px]">
+                      {formatDate(today)}
                     </div>
-
-                    {/* Outside City */}
-                    <div className="flex items-center">
-                      <input
-                        id="outside-city-checkbox"
-                        type="checkbox"
-                        checked={selectedTravelType === "outside"}
-                        onChange={() => setSelectedTravelType("outside")}
-                        className="h-6 w-6 text-indigo-900 border-black-500 rounded focus:ring-gray-400"
-                      />
-                      <label
-                        htmlFor="outside-city-checkbox"
-                        className="ml-2 text-base leading-6 text-black"
-                      >
-                        Outside the City
-                      </label>
-                    </div>
-                  </div>
+                  )}
                 </div>
-
-                {/* Purpose */}
-                <div className="items-center mt-2 md:mt-4 font-roboto">
-                  <div className="w-full">
-                    <label htmlFor="vr_purpose" className="form-title flex">
-                      Purpose:
-                      {!VRPurpose && inputErrors.purpose ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="vr_purpose"
-                      id="vr_purpose"
-                      autoComplete="vr_purpose"
-                      value={VRPurpose}
-                      onChange={(ev) => {
-                        const input = ev.target.value;
-                        const formatted =
-                          input.charAt(0).toUpperCase() + input.slice(1);
-                          setVRPurpose(formatted);
-                      }}
-                      maxLength={500}
-                      className={`block w-full ${(!VRPurpose && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                    />
-                  </div>
-                </div>
-
-                {/* Place */}
-                <div className="items-center mt-2 md:mt-4 font-roboto">
-                  <div className="w-full">
-                    <label htmlFor="vr_place" className="form-title flex">
-                      Place/s To Be Visited:
-                      {!VRPlace && inputErrors.place_visited ? (
-                        <p className="form-validation">This form is required</p>
-                      ):( <p className="form-validation"> * </p> )}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="vr_place"
-                      id="vr_place"
-                      autoComplete="vr_place"
-                      value={VRPlace}
-                      onChange={(ev) => {
-                        const input = ev.target.value;
-                        const formatted =
-                        input.charAt(0).toUpperCase() + input.slice(1);
-                          setVRPlace(formatted);
-                      }}
-                      className={`block w-full ${(!VRPlace && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                      maxLength={255}
-                    />
-                  </div>
-                </div>
-
-                {/* Date of Arrival */}
-                <div className="items-center mt-2 md:mt-4 font-roboto">
-                  <div className="w-full">
-                    <label htmlFor="vr_datearrival" className="form-title flex">
-                      Date of Arrival:
-                      {!VRDateArrival && inputErrors.date_arrival ? (
-                        <p className="form-validation">This form is required</p>
-                      ):(<p className="form-validation"> * </p>)}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="date"
-                      name="vr_datearrival"
-                      id="vr_datearrival"
-                      value= {VRDateArrival}
-                      onChange={ev => setVRDateArrival(ev.target.value)}
-                      min={today}
-                      className={`block w-full ${(!VRDateArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                    />
-                    <p className="text-gray-500 text-xs">Please enter the date of arrival at your destination.</p>
-                  </div>
-                </div>
-
-                {/* Time of Arrival */}
-                <div className="items-center mt-2 md:mt-4 font-roboto">
-                  <div className="w-full">
-                    <label htmlFor="vr_timearrival" className="form-title flex">
-                      Time of Arrival:
-                      {!VRTimeArrival && inputErrors.time_arrival ? (
-                        <p className="form-validation">This form is required</p>
-                      ):(<p className="form-validation"> * </p>)}
-                    </label> 
-                  </div>
-                  <div className="w-full">
-                    <input
-                      type="time"
-                      name="vr_timearrival"
-                      id="vr_timearrival"
-                      value= {VRTimeArrival}
-                      onChange={ev => setVRTimeArrival(ev.target.value)}
-                      className={`block w-full ${(!VRTimeArrival && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                    />
-                    <p className="text-gray-500 text-xs">Please enter the time of arrival at your destination.</p>
-                  </div>
-                </div>
-
               </div>
 
-              {/* 2nd Column */}
-              <div className="col-span-1 px-4">
-
-                {(GSO || PersonAuthority) && (
-                <>
-                  {/* Vehicle Type */}
-                  <div className="items-center mt-2 md:mt-4">
-                    <div className="w-full">
-                      <label htmlFor="rep_type_of_property" className="form-title flex">
-                        Vehicle Type:
-                        {!vehicalName && inputErrors.vehicle_type && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </label> 
-                    </div>
-                    <div className="w-full">
-                      <select 
-                      name="rep_type_of_property" 
-                      id="rep_type_of_property" 
-                      autoComplete="rep_type_of_property"
-                      value={vehicalName}
-                      onChange={ev => { setVehicleName(ev.target.value); }}
-                      className={`block w-full ${(!vehicalName && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                      disabled={!VRDateArrival || !VRTimeArrival}
-                      >
-                        <option value="" disabled>Vehicle Select</option>
-                        {vehicleDet?.map((vehDet) => (
-                          <option 
-                            key={vehDet.vehicle_id} 
-                            value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
-                            disabled={vehDet.availability == 3 || vehDet.availability == 2 || vehDet.availability == 1}
-                            className={`${vehDet.availability == 3 || vehDet.availability == 2 || vehDet.availability == 1 ? "disable-form":''}`}
-                          >
-                            {vehDet.vehicle_name} - {vehDet.vehicle_plate} {vehDet.availability == 3 ? "(Not Available)": vehDet.availability == 2 ? "(Reserve)": vehDet.availability == 1 ? "(On Travel)" :null}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Driver Details */}
-                  <div className="items-center mt-2 md:mt-4">
-                    <div className="w-48">
-                      <label htmlFor="rep_type_of_property" className="form-title flex">
-                        Driver:
-                        {!pointDriver.did && inputErrors.driver && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </label> 
-                    </div>
-                    <div className="w-full">
-                      <select 
-                        name="rep_type_of_property" 
-                        id="rep_type_of_property" 
-                        autoComplete="rep_type_of_property"
-                        value={pointDriver.did}
-                        onChange={ev => {
-                          const personnelId = parseInt(ev.target.value);
-                          const selectedPersonnel = driver.find(staff => staff.driver_id === personnelId);
-
-                          setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
-                        }}
-                        className={`block w-full ${(!pointDriver.did && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
-                        disabled={!VRDateArrival || !VRTimeArrival}
-                      >
-                        <option value="" disabled>Driver Select</option>
-                        {driver?.map((driverDet) => (
-                          <option 
-                            key={driverDet.driver_id} 
-                            value={driverDet.driver_id}
-                            disabled={driverDet.availability == 3 || driverDet.availability == 2 || driverDet.availability == 1}
-                            className={`${driverDet.availability == 3 || driverDet.availability == 2 || driverDet.availability == 1 ? "disable-form":''}`}
-                          >
-                            {driverDet.driver_name} {driverDet.availability == 3 ? "(Not Available)": driverDet.availability == 2 ? "(Reserve)": driverDet.availability == 1 ? "(On Travel)" :null}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </>  
-                )}
-
-                {/* Passengers */}
-                <div className="mt-2 md:mt-4 font-roboto">
-                  <div className="w-48">
-                    <label htmlFor="vr_passengers" className="form-title">
-                      Passengers:
-                    </label>
-                  </div>
-                  <div className="w-full">
-                    <textarea
-                      id="vr_passengers"
-                      name="vr_passengers"
-                      rows={5}
-                      value={VRPassenger}
-                      onChange={(ev) => {
-                        const formattedValue = ev.target.value
-                          .split('\n')
-                          .map(line =>
-                            line
-                              .split(' ')
-                              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                              .join(' ')
-                          )
-                          .join('\n');
-                    
-                        setVRPassenger(formattedValue);
-                      }}
-                      style={{ resize: 'none' }}
-                      maxLength={1000}
-                      className="block w-full ppa-form-field"
-                      placeholder="Input name of passenger (press 'Enter' for another passenger)"
-                    />
-                    <p className="text-gray-500 text-xs">List each name on a separate line without numbering. If there are no passengers, leave it blank.</p>
-                  </div>
+              {/* Travel Type */}
+              <div className="flex items-center mt-2">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Travel Type
+                  </label> 
                 </div>
-
-                {/* Note */}
-                {selectedTravelType == 'outside' && (
-                  <div className="mt-2 md:mt-4 font-roboto">
-                    <div className="w-48">
-                      <label htmlFor="vr_passengers" className="form-title">
-                        Note:
-                      </label>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                  <>
+                    <div className="flex">
+                      {/* Within City */}
+                      <div className="flex items-center">
+                        <input
+                          id="within-city-checkbox"
+                          type="checkbox"
+                          checked={selectedTravelType === "within"}
+                          onChange={() =>
+                            setSelectedTravelType(prev =>
+                              prev === "within" ? "" : "within"
+                            )
+                          }
+                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                          disabled={confirmation}
+                        />
+                        <label
+                          htmlFor="within-city-checkbox"
+                          className="border-t border-b form-title-choose"
+                        >
+                          Within the City
+                        </label>
+                      </div>
+                      {/* Outside City */}
+                      <div className="flex items-center">
+                        <input
+                          id="outside-city-checkbox"
+                          type="checkbox"
+                          checked={selectedTravelType === "outside"}
+                          onChange={() =>
+                            setSelectedTravelType(prev =>
+                              prev === "outside" ? "" : "outside"
+                            )
+                          }
+                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                          disabled={confirmation}
+                        />
+                        <label
+                          htmlFor="outside-city-checkbox"
+                          className="border-t border-b border-r form-title-choose"
+                        >
+                          Outside the City
+                        </label>
+                      </div>
                     </div>
-                    <div className="w-full">
-                      <textarea
-                        id="vr_notes"
-                        name="vr_notes"
-                        rows={4}
-                        value={VRNote}
+                  </>
+                  )}
+                </div>
+              </div>
+
+              {/* Purpose */}
+              <div className="flex items-center mt-2">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Purpose
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="vr_purpose"
+                        id="vr_purpose"
+                        autoComplete="vr_purpose"
+                        value={VRPurpose}
+                        onChange={(ev) => {
+                          const input = ev.target.value;
+                          const formatted =
+                            input.charAt(0).toUpperCase() + input.slice(1);
+                            setVRPurpose(formatted);
+                        }}
+                        maxLength={500}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                        disabled={confirmation}
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {VRPurpose}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Place */}
+              <div className="flex items-center mt-2">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Place
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="text"
+                        name="vr_place"
+                        id="vr_place"
+                        autoComplete="vr_place"
+                        value={VRPlace}
                         onChange={(ev) => {
                           const input = ev.target.value;
                           const formatted =
                           input.charAt(0).toUpperCase() + input.slice(1);
-                            setVRNote(formatted);
+                            setVRPlace(formatted);
                         }}
-                        style={{ resize: 'none' }}
-                        maxLength={1000}
-                        className="block w-full ppa-form-field"
-                        placeholder="Enter here (leave blank if none)"
+                        maxLength={255}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                        disabled={confirmation}
                       />
-                      <p className="text-gray-500 text-xs">Please enter your suggestions here.</p>
-                    </div>
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {VRPlace}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Date of Arrival */}
+              <div className="flex items-center mt-2">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Date of Arrival
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="date"
+                        name="vr_datearrival"
+                        id="vr_datearrival"
+                        value= {VRDateArrival}
+                        onChange={ev => setVRDateArrival(ev.target.value)}
+                        min={today}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                        disabled={confirmation}
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {formatDate(VRDateArrival)}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+              {!confirmation && (<p className="text-gray-500 text-xs">Please enter the date of arrival at your destination.</p>)}
+
+              {/* Time of Arrival */}
+              <div className="flex items-center mt-2">
+                <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Time of Arrival
+                  </label> 
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form"></div>
+                  ):(
+                    !confirmation ? (
+                      <input
+                        type="time"
+                        name="vr_timearrival"
+                        id="vr_timearrival"
+                        value= {VRTimeArrival}
+                        onChange={ev => setVRTimeArrival(ev.target.value)}
+                        className="block w-full focus:ring-0 ppa-form-field"
+                        disabled={confirmation}
+                      />
+                    ):(
+                      <div className="w-full ppa-form-confirm h-[40px]">
+                        {formatTime(VRTimeArrival)}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+              {!confirmation && (<p className="text-gray-500 text-xs">Please enter the time of arrival at your destination.</p>)}
+
+              {/* Driver and Vehicle Assignment */}
+              {(GSO || VehicleAuthorize) && (
+              <>
+                {/* Vehicle Type */}
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Vehicle Type
+                    </label> 
                   </div>
-                )}
+                  <div className="w-full">
+                    {loading ? (
+                      <div className="skeleton-form"></div>
+                    ):(
+                      !confirmation ? (
+                        <select 
+                          name="rep_type_of_property" 
+                          id="rep_type_of_property" 
+                          autoComplete="rep_type_of_property"
+                          value={vehicalName}
+                          onChange={ev => { setVehicleName(ev.target.value); }}
+                          className={`block w-full focus:ring-0 ${(!vehicalName && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
+                          disabled={!VRDateArrival || !VRTimeArrival}
+                        >
+                          <option value="" disabled>Vehicle Select</option>
+                          {vehicleDet?.map((vehDet) => (
+                            <option
+                              key={vehDet.id} 
+                              value={`${vehDet.vehicle_name} (${vehDet.vehicle_plate})`} 
+                              className={`${vehDet.status == "Reserve" || vehDet.status == "Not Available" || vehDet.status == "On Travel" ? "disable-form":''}`}
+                              disabled={vehDet.status == "Reserve" || vehDet.status == "Not Available" || vehDet.status == "On Travel"}
+                            >
+                              {vehDet.vehicle_name} ({vehDet.vehicle_plate}) {vehDet.status == "Reserve" ? "- Reserve" : vehDet.status == "Not Available" ? "- Not Available" : vehDet.status == "On Travel" ? "- On Travel" : "" }
+                            </option>
+                          ))}
+                        </select>
+                      ):(
+                        <div className="w-full ppa-form-confirm h-[40px]">
+                          {vehicalName}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
 
-              </div>
+                {/* Driver Details */}
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Driver Details
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    {loading ? (
+                      <div className="skeleton-form"></div>
+                    ):(
+                      !confirmation ? (
+                        <select 
+                          name="rep_type_of_property" 
+                          id="rep_type_of_property" 
+                          autoComplete="rep_type_of_property"
+                          value={pointDriver.did}
+                          onChange={ev => {
+                            const personnelId = parseInt(ev.target.value);
+                            const selectedPersonnel = driver.find(staff => staff.driver_id === personnelId);
 
-              {/* Button */}
-              <div className="mt-10 pb-4 px-4 mobile-btn flex justify-center md:justify-start">
-                <button 
-                  onClick={handleConfirm} 
-                  className="w-full md:w-auto py-2 px-4 text-sm btn-default-form">
-                  Submit
-                </button>
-              </div>
-
+                            setPointDriver(selectedPersonnel ? { did: selectedPersonnel.driver_id, dname: selectedPersonnel.driver_name } : { did: '', dname: '' });
+                          }}
+                          className={`block w-full focus:ring-0 ${(!pointDriver.did && inputErrors.purpose) ? "ppa-form-error":"ppa-form-field"}`}
+                          disabled={!VRDateArrival || !VRTimeArrival}
+                        >
+                          <option value="" disabled>Driver Select</option>
+                          {driver?.map((driverDet) => (
+                            <option
+                              key={driverDet.id} 
+                              value={driverDet.id}
+                              className={`${driverDet.status == "Reserve" || driverDet.status == "Not Available" || driverDet.status == "On Travel" ? "disable-form":''}`}
+                              disabled={driverDet.status == "Reserve" || driverDet.status == "Not Available" || driverDet.status == "On Travel"}
+                            >
+                              {driverDet.name} {driverDet.status == "Reserve" ? "- Reserve" : driverDet.status == "Not Available" ? "- Not Available" : driverDet.status == "On Travel" ? "- On Travel" : "" }
+                            </option>
+                          ))}
+                        </select>
+                      ):(
+                        <div className="w-full ppa-form-confirm h-[40px]">
+                          {pointDriver.dname}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+                <p className="text-gray-500 text-xs">Leave it blank if no driver or vehicle has been assigned. Let the assigned personnel or GSO handle the assignment.</p>
+              </>
+              )}
             </div>
 
+            {/* 1st Column */}
+            <div className="col-span-1">
+      
+              {/* Passengers */}
+              <div className="mt-6">
+                <div className="w-[20%] form-title-dorm">
+                  <label htmlFor="male_guest"> Passenger/s </label>
+                </div>
+                <div className="w-full">
+                  {loading ? (
+                    <div className="skeleton-form h-[50px]"></div>
+                  ):(
+                    !confirmation ? (
+                    <textarea
+                    id="vr_passengers"
+                    name="vr_passengers"
+                    rows={5}
+                    value={VRPassenger}
+                    onChange={(ev) => {
+                      const formattedValue = ev.target.value
+                        .split('\n')
+                        .map(line =>
+                          line
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')
+                        )
+                        .join('\n');
+                  
+                      setVRPassenger(formattedValue);
+                    }}
+                    style={{ resize: 'none' }}
+                    maxLength={1000}
+                    className="block w-full focus:ring-0 ppa-form-field-dorm"
+                    />
+                    ):(
+                      VRPassenger?.trim() ? (
+                        VRPassenger.split("\n").map((name, index) => (
+                          <div key={index} className="mt-2 flex ppa-list-form">
+                            <span className="numbering">{`${index + 1}.`}</span>
+                            <div className="naming">
+                              {name}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="mt-2 ppa-list-form">No Male Guest</div>
+                      )
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Note */}
+              {selectedTravelType == 'outside' && (
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                  <label htmlFor="rep_date"> 
+                    Note
+                  </label> 
+                  </div>
+                  <div className="w-full">
+                    {loading ? (
+                      <div className="skeleton-form"></div>
+                    ):(
+                      !confirmation ? (
+                        <input
+                          id="vr_notes"
+                          name="vr_notes"
+                          value={VRNote}
+                          onChange={(ev) => {
+                            const input = ev.target.value;
+                            const formatted =
+                            input.charAt(0).toUpperCase() + input.slice(1);
+                              setVRNote(formatted);
+                          }}
+                          className="block w-full focus:ring-0 ppa-form-field"
+                          disabled={confirmation}
+                        />
+                      ):(
+                        <div className="w-full ppa-form-confirm h-[40px]">
+                          {VRNote}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+            </div>
           </div>
-          )}
 
         </div>
       </div>
@@ -795,5 +739,5 @@ export default function FacilityVenueForm(){
         />
       )}
     </PageComponent>
-  )
+  );
 }

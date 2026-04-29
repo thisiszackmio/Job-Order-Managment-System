@@ -20,7 +20,7 @@ use Jenssegers\Agent\Agent;
 class AuthController extends Controller
 {
     /**
-     * Register the system
+     * Register the system (Add User)
      */
     public function register(RegisterRequest $request) {
         try {
@@ -36,11 +36,6 @@ class AuthController extends Controller
                 if (($dp_extension !== 'png' && $dp_extension !== 'jpeg' && $dp_extension !== 'jpg') || 
                     ($esig_extension !== 'png' && $esig_extension !== 'jpeg' && $esig_extension !== 'jpg')) {
                     return response()->json(['message' => "This is not the format that we want"], 400);
-                }
-
-                // Check if the passwords is are not match
-                if($request->input('password') != $request->input('consfirmPassword')){
-                    return response()->json(['error' => "Passwords do not match"], 422);
                 }
     
                 // Generate a file name
@@ -68,9 +63,11 @@ class AuthController extends Controller
                 Storage::disk('public')->put('displayesig/' . $esig_name, file_get_contents($esig));
 
                 // Logs
+                $authory = $request->input('registrant');
+                $AddUser = $request->input('firstname').' '.$request->input('middlename').'. '.$request->input('lastname');
                 $logs = new LogsModel();
                 $logs->category = 'USER';
-                $logs->message = $request->input('registrant').' has registered '.$request->input('firstname').' '.$request->input('middlename').'. '.$request->input('lastname').' in the system.';
+                $logs->message = $AddUser.' was registered in the system by '.$authory.'.';
                 $logs->save();
 
                 return response()->json([
@@ -111,77 +108,73 @@ class AuthController extends Controller
 
         // Get the user information
         $user = PPAEmployee::where('username', $credentials['username'])->first();
-        $reqCode = $user->code_clearance;
-        $codeClearance = array_map('trim', explode(',', $reqCode));
-        $accessGuard = ["HACK", "SEC"];
+
+        // Check if user exist
+        if(!$user){
+            return response()->json(['error' => 'NotFound'], 404);
+        }
 
         // Check if the user account exists and the password is valid
-        if(!$user || !Hash::check($credentials['password'], $user->password)){
+        if(!Hash::check($credentials['password'], $user->password)){
             return response()->json(['error' => 'Invalid'], 422);
         }
 
-        // Check for the Guard Restriction
-        if($type == 'Guard'){
-            if(!empty(array_intersect($accessGuard, $codeClearance))){
-                echo 'Not Restric';
-            }else{
-                return response()->json(['error' => 'GuardOnly'], 403);
-            }
-        }else{
-
-            // Check if the user is need to change pass
-            if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
-
-            // Check if the user is not active anymore
-            if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
-
-            // Check if the user logs in even the token is active
-            $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
-            $method = $request->input('method');
-
-            if($existingToken && $method === 'login'){
-                return response()->json(['error' => 'TokenExist'], 404);
-            }
-
-            if($existingToken && $method === 'exist'){
-                if ($existingToken) { $existingToken->delete(); }
-            }
-
-            // Create a fresh token
-            $token = $user->createToken('PPA_Token')->plainTextToken;
-
-            // User details
-            $userdata = [
-                'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
-                'firstname' => $user->firstname,
-                'gender' => $user->gender,
-            ];
-
-            // Handle security info
-            $security = PPASecurity::where('user_id', $user->id)->first();
-            if (!$security) {
-                $security = new PPASecurity();
-                $security->user_id = $user->id;
-            }
-
-            $security->browser = $agent->browser();
-
-            if ($security->save()) {
-                // Add to logs
-                $logs = new LogsModel();
-                $logs->category = 'USER';
-                $logs->message = $user->firstname.' '.$user->middlename.'. '. $user->lastname.' has logged into the system ('.$agent->browser().').';
-                $logs->save();
-            }
-
-            return response([
-                'userId' => $user->id,
-                'userDet' => $userdata,
-                'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
-                'code' => $user->code_clearance,
-                'token' => $token
-            ]);
+        // Account Disabled
+        if ($user->status == 0) {
+            return response()->json([
+                'error' => 'AccountDisabled',
+            ], 403);
         }
+
+        // Check if the user is need to change pass
+        if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
+
+        // Check if the user logs in even the token is active
+        $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
+        $method = $request->input('method');
+
+        if($existingToken && $method === 'login'){
+            return response()->json(['error' => 'TokenExist'], 404);
+        }
+
+        if($existingToken && $method === 'exist'){
+            if ($existingToken) { $existingToken->delete(); }
+        }
+
+        // Create a fresh token
+        $token = $user->createToken('PPA_Token')->plainTextToken;
+
+        // User details
+        $userdata = [
+            'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
+            'firstname' => $user->firstname,
+            'gender' => $user->gender,
+        ];
+
+        // Handle security info
+        $security = PPASecurity::where('user_id', $user->id)->first();
+        if (!$security) {
+            $security = new PPASecurity();
+            $security->user_id = $user->id;
+        }
+
+        $security->browser = $agent->browser();
+
+        if ($security->save()) {
+            // Add to logs
+            $logs = new LogsModel();
+            $logs->category = 'USER';
+            $logs->message = $user->firstname.' '.$user->middlename.'. '. $user->lastname.' has logged into the system using '.$agent->browser().'.';
+            $logs->save();
+        }
+
+        return response([
+            'userId' => $user->id,
+            'userDet' => $userdata,
+            'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
+            'code' => $user->code_clearance,
+            'token' => $token
+        ]);
 
         return response()->json(['message' => 'LoginSuccessfull'], 200);
     }

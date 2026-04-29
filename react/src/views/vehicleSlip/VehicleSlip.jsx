@@ -7,7 +7,7 @@ import submitAnimation from '/default/ring-loading.gif';
 import axiosClient from "../../axios";
 import { useReactToPrint } from "react-to-print";
 import Popup from "../../components/Popup";
-import ppa_logo from '/default/ppa_logo.png';
+import ppa_logo from '/default/img/ppa_logo.png';
 import loading_table from "/default/ring-loading.gif";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faFilePdf, faHouse, faGear, faCircleXmark, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';

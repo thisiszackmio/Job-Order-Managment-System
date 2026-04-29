@@ -11,7 +11,7 @@ import Restrict from "../../components/Restrict";
 
 export default function FacilityVenueFormList(){
 
-  const { currentUserCode } = useUserStateContext();
+  const { currentUserCode, currentUserId } = useUserStateContext();
 
   //Date Format 
   function formatDate(dateString) {
@@ -38,52 +38,38 @@ export default function FacilityVenueFormList(){
 
   // Loading
   const [loading, setLoading] = useState(true);
+  const [pageRestrict, setPageRestrict] = useState(true);
 
   const [formlist, setFormList] = useState([]);
 
-  // Get User Employee's Data
-  useEffect(() => {  
-    axiosClient
-    .get('/allfacility')
-    .then((response) => {
-      const FacilityFormList = response.data;
+  const fetchFacilityList = async () => {
+    try{
+      const response = await axiosClient.get('/allfacility');
+      const dataFacility = response.data;
 
-      const mappedData = FacilityFormList.map((dataItem) => {
-        const facilities = [];
+      // console.log(dataFacility);
 
-        if(dataItem.mph == 1){ facilities.push("MPH"); }
-        if(dataItem.conference == 1){ facilities.push("Conference Room"); }
-        if(dataItem.dorm == 1){ facilities.push("Dormitory"); }
-        if(dataItem.other == 1){ facilities.push("Other"); }
-        const resultFacilities = facilities.join(', ');
+      setFormList(dataFacility);
 
-        return{
-          id: dataItem.id,
-          date_request: dataItem.date_request,
-          request_office: dataItem.request_office,
-          title_activity: dataItem.title_activity,
-          date_start: dataItem.date_start,
-          time_start: dataItem.time_start,
-          date_end: dataItem.date_end,
-          time_end: dataItem.time_end,
-          facility: resultFacilities,
-          requestor: dataItem.requestor,
-          remarks: dataItem.remarks,
-        }
-      })
+      if(accessOnly){
+        setPageRestrict(true);
+      }else{
+        setPageRestrict(false);
+      }
 
-      setFormList(mappedData);
-
-    })
-    .catch((error)=>{
-      setShowPopup(true);
-      setPopupContent('error');
-      setPopupMessage(error.response.status);
-    })
-    .finally(() => {
+    }catch(error){
+      console.error(error);
+    } finally {
       setLoading(false);
-    });
-  }, []);
+    }
+  }
+
+  // Get User Employee's Data
+  useEffect(() => { 
+    if(currentUserId){
+      fetchFacilityList();
+    }
+  }, [currentUserId]);
 
   //Search Filter and Pagination
   const itemsPerPage = 30;
@@ -131,16 +117,12 @@ export default function FacilityVenueFormList(){
   // Restrictions Condition
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Admin = codes.includes("AM");
-  const GSO = codes.includes("GSO");
-  const DivisionManager = codes.includes("DM");
-  const SuperAdmin = codes.includes("HACK");
-  const PortManager = codes.includes("PM");
-  const Access = Admin || GSO || DivisionManager || PortManager || SuperAdmin;
+  const roles = ["HACK", "AUS", "AM", "AUF", "PM", "DM", "GSO" ];
+  const accessOnly = roles.some(role => codes.includes(role));
 
   return(
     <PageComponent title="Request List">
-      {Access ? (
+      {!pageRestrict ? (<Restrict />) : (
       <div className="ppa-widget mt-8">
         <div className="joms-user-info-header text-left"> 
           Facility / Venue Form List
@@ -178,7 +160,7 @@ export default function FacilityVenueFormList(){
 
           {/* Top Pagination */}
           <div className="mt-6">
-            {displayPaginationUser && (
+            {displayPaginationUser && !loading && (
               <ReactPaginate
                 previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
                 nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -220,14 +202,34 @@ export default function FacilityVenueFormList(){
               </thead>
               <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
                 {loading ? (
-                  <tr>
-                    <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
-                      <div className="flex justify-center items-center">
-                        <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-                        <span className="loading-table">Loading List</span>
-                      </div>
-                    </td>
-                  </tr>
+                  Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
+                    <tr key={index}>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                    </tr>
+                  ))
                 ):(
                   currentList.length > 0 ? (
                     currentList.map((list)=>(
@@ -256,7 +258,12 @@ export default function FacilityVenueFormList(){
                             `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatDate(list.date_end)} @ ${formatTime(list.time_end)}`
                           )}
                         </td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{list.facility}</td>
+                        <td className="px-4 py-4 text-left ppa-table-body">
+                          {list.mph ? "MPH":null}
+                          {list.conference ? "Conference":null}
+                          {list.dorm ? "Dormitory":null}
+                          {list.other ? "Others":null}
+                        </td>
                         <td className="px-4 py-4 text-left ppa-table-body">{list.requestor}</td>
                         <td className="px-4 py-4 text-left ppa-table-body">{list.remarks}</td>
                       </tr>
@@ -274,7 +281,7 @@ export default function FacilityVenueFormList(){
           </div>
 
           {/* Bottom Pagination */}
-          {displayPaginationUser && (
+          {displayPaginationUser && !loading && (
             <ReactPaginate
               previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
               nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
@@ -300,8 +307,6 @@ export default function FacilityVenueFormList(){
 
         </div>
       </div>
-      ):(
-        <Restrict />
       )}
     </PageComponent>
   );

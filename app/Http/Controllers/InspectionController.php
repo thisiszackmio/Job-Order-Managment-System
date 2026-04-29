@@ -11,6 +11,7 @@ use App\Models\FormTracker;
 use App\Http\Requests\InspectionFormRequest;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InspectionController extends Controller
 {
@@ -46,10 +47,6 @@ class InspectionController extends Controller
                 'id' => $inspectionForm->id,
                 'date_request' => $inspectionForm->created_at,
                 'property_number' => $inspectionForm->property_number,
-                'acquisition_date' => $inspectionForm->acquisition_date,
-                'acquisition_cost' => $inspectionForm->acquisition_cost,
-                'brand_model' => $inspectionForm->brand_model,
-                'serial_engine_no' => $inspectionForm->serial_engine_no,
                 'type' => $inspectionForm->type_of_property,
                 'description' => $inspectionForm->property_description,
                 'location' => $inspectionForm->location,
@@ -60,6 +57,39 @@ class InspectionController extends Controller
         });
 
         return response()->json($inspDet);
+    }
+
+    /**
+     * Generate PDF
+     */
+    public function generateInspectionPDF($id){
+        $inspection = InspectionModel::findOrFail($id);
+
+        // Get all needed employees in one query
+        $employees = PPAEmployee::whereIn('id', [
+            $inspection->user_id,
+            $inspection->supervisor_id,
+            $inspection->personnel_id
+        ])->get()->keyBy('id');
+
+        $requestor = $employees[$inspection->user_id] ?? null;
+        $supervisor = $employees[$inspection->supervisor_id] ?? null;
+        $assign = $employees[$inspection->personnel_id] ?? null;
+
+        // GSO & Admin
+        $gso = PPAEmployee::where('code_clearance', 'LIKE', '%GSO%')->first();
+        $admin = PPAEmployee::where('code_clearance', 'LIKE', '%AM%')->first();
+
+        $pdf = Pdf::loadView('pdf.inspection', compact(
+            'inspection',
+            'requestor',
+            'supervisor',
+            'assign',
+            'gso',
+            'admin'
+        ))->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Inspection-Control-No-$id.pdf");
     }
 
     /**
@@ -75,29 +105,13 @@ class InspectionController extends Controller
             return response()->json(['error' => 'No-Form'], 404);
         }
 
-        // Requestor Esig
-        $RequestorEsigRequest = $SupervisorEsigRequest = PPAEmployee::where('id', $InspectionRequest->user_id)->first();
-        $RequestorEsig = $rootUrl . '/storage/displayesig/' . $RequestorEsigRequest->esign;
-
-        // Supervisor Esig
-        $SupervisorEsigRequest = PPAEmployee::where('id', $InspectionRequest->supervisor_id)->first();
-        $SupervisorEsig = $rootUrl . '/storage/displayesig/' . $SupervisorEsigRequest->esign;
-
-        // Assign Personnel Esig
-        $AssignEsigRequest = PPAEmployee::where('id', $InspectionRequest->personnel_id)->first();
-        $AssignEsig = $AssignEsigRequest && $AssignEsigRequest->esign 
-        ? $rootUrl . '/storage/displayesig/' . $AssignEsigRequest->esign 
-        : null;
-
         // GSO Esig and Name
         $GSOEsigRequest = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
         $GSOName = $GSOEsigRequest->firstname . ' ' . $GSOEsigRequest->middlename. '. ' . $GSOEsigRequest->lastname;
-        $GSOEsig = $rootUrl . '/storage/displayesig/' . $GSOEsigRequest->esign;
 
         // Admin Esig
         $AdminEsigRequest = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first();
         $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
-        $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
         // Prev & Next IDs
         $prevId = InspectionModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
@@ -105,10 +119,8 @@ class InspectionController extends Controller
 
         // Custom form data with limited fields
         $form = [
-            'prev_id' => $prevId,
-            'next_id' => $nextId,
             'id' => $InspectionRequest->id,
-            'date_request' => $InspectionRequest->created_at, 
+            'date_request' => $InspectionRequest->created_at->format('Y-m-d'), 
             'user_id' => $InspectionRequest->user_id,
             'user_name' => $InspectionRequest->user_name,
             'property_number' => $InspectionRequest->property_number,
@@ -120,13 +132,13 @@ class InspectionController extends Controller
             'property_description' => $InspectionRequest->property_description,
             'location' => $InspectionRequest->location,
             'complain' => $InspectionRequest->complain,
-            'date_of_filling' => $InspectionRequest->date_of_filling,
-            'date_of_last_repair' => $InspectionRequest->date_of_last_repair,
+            'date_of_filling' => $InspectionRequest->date_of_filling ? $InspectionRequest->date_of_filling->format('Y-m-d') : null,
+            'date_of_last_repair' => $InspectionRequest->date_of_last_repair ? $InspectionRequest->date_of_last_repair->format('Y-m-d') : null,
             'nature_of_last_repair' => $InspectionRequest->nature_of_last_repair,
-            'before_repair_date' => $InspectionRequest->before_repair_date,
+            'before_repair_date' => $InspectionRequest->before_repair_date ? $InspectionRequest->before_repair_date->format('Y-m-d') : null,
             'findings' => $InspectionRequest->findings,
             'recommendations' => $InspectionRequest->recommendations,
-            'after_reapir_date' => $InspectionRequest->after_reapir_date,
+            'after_reapir_date' => $InspectionRequest->after_reapir_date ? $InspectionRequest->after_reapir_date->format('Y-m-d') : null,
             'remarks' => $InspectionRequest->remarks,
             'personnel_id' => $InspectionRequest->personnel_id,
             'personnel_name' => $InspectionRequest->personnel_name,
@@ -140,15 +152,11 @@ class InspectionController extends Controller
         ];
 
         $respondData = [
+            'prev_id' => $prevId,
+            'next_id' => $nextId,
             'form' => $form,
-            'requestor_esig' => $RequestorEsig,
-            'supervisor_esig' => $SupervisorEsig,
-            'assign_esig' => $AssignEsig,
             'gso_name' => $GSOName,
-            'gso_esig' => $GSOEsig,
             'admin_name' => $AdminName,
-            'admin_esig' => $AdminEsig,
-            'gso_id' => $GSOEsigRequest->id
         ];
 
         return response()->json($respondData);
@@ -238,6 +246,12 @@ class InspectionController extends Controller
      * Update Part A Form
      */
     public function updatePartA(Request $request, $id){
+        $checkValidation = $request->validate([
+            'property_description' => 'required|string',
+            'location' => 'required|string',
+            'complain' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
         $codeClearance = explode(', ', $request->input('code'));
 
@@ -250,9 +264,13 @@ class InspectionController extends Controller
             !in_array("HACK", $codeClearance)) {
                 return response()->json(['message' => 'Closed'], 201);
         } 
-        else if ($InspectionRequest->form_status === 6 && $request->input('user_id') == $InspectionRequest->user_id){
-            return response()->json(['message' => 'Not Editable'], 201);
-        }
+
+        if (($InspectionRequest->form_status === 6 || $InspectionRequest->form_status === 7) && 
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)){
+                return response()->json(['message' => 'UnEdited'], 201);
+            }
+
         else {
             $uPartA = $InspectionRequest->update([
                 'property_number' => $request->input('property_number'),
@@ -261,9 +279,9 @@ class InspectionController extends Controller
                 'brand_model' => $request->input('brand_model'),
                 'serial_engine_no' => $request->input('serial_engine_no'),
                 'type_of_property' => $request->input('type_of_property'),
-                'property_description' => $request->input('property_description'),
-                'location' => $request->input('location'),
-                'complain' => $request->input('complain')
+                'property_description' => $checkValidation['property_description'],
+                'location' => $checkValidation['location'],
+                'complain' => $checkValidation['complain']
             ]);
 
             if($uPartA){
@@ -284,9 +302,9 @@ class InspectionController extends Controller
             } else {
                 return response()->json(['error' => 'There area some missing.'], 406);
             }
-        }
 
-        return response()->json($InspectionRequest);
+            return response()->json($InspectionRequest);
+        }
     }
 
     /**
@@ -695,23 +713,35 @@ class InspectionController extends Controller
      * Update Part B Form 
      */
     public function updatePartB(Request $request, $id){
+        // Validate the Part B Form
+        $validatePartB = $request->validate([
+            'date_of_filling' => 'required|date',
+            'personnel_id' => 'required|numeric',
+            'personnel_name' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
+        $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) {
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) {
             return response()->json(['message' => 'Request is already close'], 409);
-        } else if(in_array($InspectionRequest->form_status, [2, 3, 4, 12, 13]) && $request->input('personnel_id') != $InspectionRequest->personnel_id) {
+        } 
+        
+        if(in_array($InspectionRequest->form_status, [2, 3, 4, 12, 13]) && $request->input('personnel_id') != $InspectionRequest->personnel_id) {
             return response()->json(['message' => 'Cannot Update'], 408);
         } else {
             $uPartB = $InspectionRequest->update([
-                'date_of_filling' => $request->input('date_of_filling'),
+                'date_of_filling' => $validatePartB['date_of_filling'],
                 'date_of_last_repair' => $request->input('date_of_last_repair'),
                 'nature_of_last_repair' => $request->input('nature_of_last_repair'),
-                'personnel_id' => $request->input('personnel_id'),
-                'personnel_name' => $request->input('personnel_name')
+                'personnel_id' => $validatePartB['personnel_id'],
+                'personnel_name' => $validatePartB['personnel_name']
             ]);
 
             if($uPartB){
@@ -759,7 +789,11 @@ class InspectionController extends Controller
         }
 
         // Update Approve
-        $ApproveRequest->form_status = 4;
+        $ApproveRequest->form_status = (
+            $ApproveRequest->date_of_filling &&
+            $ApproveRequest->before_repair_date &&
+            $ApproveRequest->after_reapir_date
+        ) ? 2 : 4;
         $ApproveRequest->form_remarks = "This form was approved by the admin manager.";
 
         // Condition Area
@@ -975,12 +1009,15 @@ class InspectionController extends Controller
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
+        $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) { 
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) { 
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
 
@@ -1157,12 +1194,15 @@ class InspectionController extends Controller
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
-
+        $codeClearance = explode(', ', $request->input('code'));
+        
         if (!$InspectionRequest) {
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) { 
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) { 
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
 
@@ -1226,9 +1266,14 @@ class InspectionController extends Controller
         $twentyFourHoursAgo = Carbon::now()->subHours(24);
 
         $ApproveRequest = InspectionModel::where('id', $id)
-                                        ->where('form_status', 2)
-                                        ->where('updated_at', '<', $twentyFourHoursAgo)
-                                        ->first();
+            ->whereIn('form_status', [2, 4])
+            ->where('updated_at', '<', $twentyFourHoursAgo)
+            ->whereNotNull([
+                'date_of_filling',
+                'before_repair_date',
+                'after_reapir_date'
+            ])
+            ->first();
 
         if ($ApproveRequest) {
             // Update the record
@@ -1259,7 +1304,7 @@ class InspectionController extends Controller
         
         }
 
-        return response()->json(['message' => 'Form is finished and closed'], 200);
+        // return response()->json(['message' => 'Form is finished and closed'], 200);
     }
 
     /**

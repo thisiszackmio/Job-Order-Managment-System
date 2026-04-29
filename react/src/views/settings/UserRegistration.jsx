@@ -9,7 +9,6 @@ import Popup from "../../components/Popup";
 import Restrict from "../../components/Restrict";
 
 export default function UserRegistrationJLMS(){
-
   const { currentUserCode, currentUserName } = useUserStateContext();
 
   // Popup
@@ -39,6 +38,22 @@ export default function UserRegistrationJLMS(){
     };
   }, [showPopup]);
 
+  // Capitalize the first letter
+  const capitalizeFirstLetter = (value) => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
+
+  // Page Restriction
+  const [pageRestrict, setPageRestrict] = useState(true); 
+  useEffect(() => {
+    if(!Access) {
+      setPageRestrict(false);
+    }
+  },[]);
+
+  const [inputErrors, setInputErrors] = useState({});
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   // Variable
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -53,12 +68,11 @@ export default function UserRegistrationJLMS(){
   const [getusername, setUsername] = useState('');
   const [getpassword, setPassword] = useState('');
   const [passwordCorfirmation, setPasswordConfirmation] = useState('');
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [selectedRoles, setSelectedRoles] = useState('');
 
-  // Capitalize the first letter
-  const capitalizeFirstLetter = (value) => {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [passwordNotMatch, setPasswordNotMatch] = useState(false);
 
   // Get The Avatar Image
   const handleAvatarChange = (e) => {
@@ -88,27 +102,10 @@ export default function UserRegistrationJLMS(){
     });
   };
 
-  // Function
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [passwordNotMatch, setPasswordNotMatch] = useState('');
-  const [inputErrors, setInputErrors] = useState({});
-
-  // Dev Error Text
-  const DevErrorText = (
-    <div>
-      <p className="popup-title">Something Wrong!</p>
-      <p className="popup-message">There was a problem, please contact the developer. (Error 500)</p>
-    </div>
-  );
-
   // Submit the Form
   function onSubmit(e){
     e.preventDefault();
     setSubmitLoading(true);
-
-    //const remarks = `${currentUser.fname} ${currentUser.mname}. ${currentUser.lname} has registered ${fname} ${mname}. ${lname}'s account`;
 
     const formData = new FormData();
     formData.append("firstname", firstName);
@@ -122,46 +119,45 @@ export default function UserRegistrationJLMS(){
     formData.append("avatar", uploadAvatar);
     formData.append("username", getusername);
     formData.append("password", getpassword);
-    formData.append("consfirmPassword", passwordCorfirmation);
     formData.append("status", 2);
     formData.append("registrant", currentUserName.name);
-
-    // Axios Client
-    axiosClient.post("/register", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        "Custom-Header": "value"
-      },
-    })
-    .then(() => {
-      setShowPopup(true);
-      setPopupContent('success');
-      setPopupMessage(
-        <div>
-          <p className="popup-title">Register Complete!</p>
-          <p className="popup-message">The new user has been added to the database.</p>
-        </div>
-      );
-    })
-    .catch((error)=>{
-      if (error.response.status === 500) {
+    
+    if(getpassword == passwordCorfirmation) { 
+      // Axios Client
+      axiosClient.post("/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Custom-Header": "value"
+        },
+      })
+      .then(() => {
         setShowPopup(true);
-        setPopupContent('error');
-        setPopupMessage(DevErrorText);
-      }else{
-        const responseErrors = error.response.data.errors;
-        const passwordErrors = error.response.data.error;
-        setInputErrors(responseErrors);x
-        setPasswordNotMatch(passwordErrors);
-      }
-    })
-    .finally(() => {
-      setSubmitLoading(false);
-    });
-
+        setPopupContent('success');
+        setPopupMessage(
+          <div>
+            <p className="popup-title">Register Complete!</p>
+            <p className="popup-message">The new user has been added to the database.</p>
+          </div>
+        );
+      })
+      .catch((error)=>{
+        if (error.response.status === 500) {
+          setShowPopup(true);
+          setPopupContent('error');
+          setPopupMessage(error.response.status);
+        }else{
+          const responseErrors = error.response.data.errors;
+          setInputErrors(responseErrors);
+        }
+      })
+      .finally(() => {
+        setSubmitLoading(false);
+      }); 
+    } else {
+      setPasswordNotMatch(true);
+    }
   }
 
-  // Popup Button Function
   //Close Popup on Error
   const justClose = () => {
     setShowPopup(false);
@@ -173,88 +169,28 @@ export default function UserRegistrationJLMS(){
     setShowPopup(false);
     window.location.href = '/joms/userlist';
   }
-
-  // Restrictions Condition
+  
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const Authorize = codes.includes("HACK");
-  const HacKer = codes.includes("NERD");
-
+  const roles = ["NERD", "AUS"];
+  const Access = roles.some(role => codes.includes(role));
   return(
+    !pageRestrict ? (<Restrict />):(
     <PageComponent title="Add Employee">
-
-      {/* Main Content */}
-      {Authorize ? (
-      <>
-        <div className="ppa-widget mt-8">
-          <div className="joms-user-info-header text-left"> 
-            Input Employee Details
-          </div>
-
-          <div className="p-4 form-container">
-
-            {/* Form */}
-            <form onSubmit={onSubmit} action="#" method="POST" encType="multipart/form-data">
-            
-              <div className="md:grid md:grid-cols-2">
-
-                {/* 1st Column */}
-                <div className="col-span-1">
-
-                  {/* Name Surname */}
-                  <div className="md:flex items-center">
-                    <div className="w-40">
-                      <label htmlFor="ppd_name" className="form-title"> Name: </label> 
-                    </div>
-
-                    <div className="w-full flex">
-                      <div className="w-full">
-                        <input
-                          id="ppa-lname"
-                          name="ppa-lname"
-                          type="text"
-                          value={lastName}
-                          onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
-                          placeholder="Surname"
-                          className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form-field"}`}
-                        />
-                      </div>
-                    </div>
-                  </div> 
-
-                  {/* Name First Name */}
-                  <div className="md:flex items-center">
-                    <div className="w-40"></div>
-                    <div className="w-full flex">
-                      <div className="w-full">
-                        <input
-                          id="ppa-fname"
-                          name="ppa-fname"
-                          type="text"
-                          value={firstName}
-                          onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
-                          placeholder="First Name"
-                          className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form-field"}`}
-                        />
-                      </div>
-                    </div>
-                  </div> 
-
-                  {/* Name Middle Initial */}
-                  <div className="md:flex items-center">
-                    <div className="w-40"></div>
-                    <div className="w-full flex">
-                      <div className="w-full">
-                        <input
-                          id="ppa-mname"
-                          name="ppa-mname"
-                          type="text"
-                          value={middleName}
-                          onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
-                          maxLength={2}
-                          placeholder="Middle Initial (e.g. A , Ll)"
-                          className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form-field"}`}
-                        />
+      <div className="ppa-widget px-4 pb-6 mt-8">
+        <div className="joms-user-info-header text-left"> Add User Details </div>
+        {/* Form */}
+        <div className="form-container">
+          <form onSubmit={onSubmit} action="#" method="POST" encType="multipart/form-data">
+            <div className="grid grid-cols-2">
+              {/* 1st Column */}
+              <div className="col-span-1 px-4">
+                {/* Name */}
+                <div className="items-center mt-4">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Name: 
+                      <div className="ml-2">
                         {!lastName && !firstName && !middleName && inputErrors.lastname && inputErrors.firstname && inputErrors.middlename ? (
                           <p className="form-validation">Please Input the given name</p>
                         ):!lastName && inputErrors && inputErrors.lastname ? (
@@ -264,119 +200,170 @@ export default function UserRegistrationJLMS(){
                         ):!middleName && inputErrors && inputErrors.middlename ? (
                           <p className="form-validation">Middle initial is required</p>
                         ):null}
-
                       </div>
-                    </div>
+                    </label> 
                   </div>
-
-                  {/* Gender */}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="rep_property_no" className="form-title">
-                        Gender:
-                      </label> 
-                    </div>
-                    <div className="w-full">
-                      <select 
-                        name="gender" 
-                        id="gender"
-                        value={gender}
-                        onChange={ev => setGender(ev.target.value)}
-                        className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form-field"}`}
-                      >
-                        <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                      </select>
-                      {!gender && inputErrors && inputErrors.gender && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </div>
-                  </div> 
-
-                  {/* Position */}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="ppa-position" className="form-title">
-                        Position:
-                      </label> 
-                    </div>
-                    <div className="w-full">
+                  <div className="w-full flex gap-2">
+                    {/* First Name */}
+                    <div className="w-[40%]">
                       <input
-                        id="ppa-position"
-                        name="ppa-position"
                         type="text"
-                        value={position}
-                        onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
-                        placeholder="Division Manager A"
-                        className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form-field"}`}
+                        className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form-field"}`}
+                        value={firstName}
+                        onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="First Name"
                       />
-                      {!position && inputErrors && inputErrors.position && (
-                        <p className="form-validation">This form is required</p>
-                      )}
                     </div>
-                  </div>
-
-                  {/* Division */}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="ppa-division" className="form-title">
-                        Division:
-                      </label> 
-                    </div>
-                    <div className="w-full">
-                      <select 
-                        name="ppa-division" 
-                        id="ppa-division"
-                        value={division}
-                        onChange={ev => setDivision(ev.target.value)}
-                        className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form-field"}`}
-                      >
-                        <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
-                        <option value="Administrative Division">Administrative Division</option>
-                        <option value="Finance Division">Finance Division</option>
-                        <option value="Office of the Port Manager">Office of the Port Manager</option>
-                        <option value="Port Service Division">Port Service Division</option>
-                        <option value="Port Police Division">Port Police Division</option>
-                        <option value="Engineering Service Division">Engineering Service Division</option>
-                        <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
-                      </select>
-                      {!division && inputErrors && inputErrors.division && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Username */}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="ppa-username" className="form-title">
-                        Username:
-                      </label> 
-                    </div>
-                    <div className="w-full">
+                    {/* Middle Initial */}
+                    <div className="w-[20%]">
                       <input
+                        type="text"
+                        className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form-field"}`}
+                        value={middleName}
+                        onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="M.I"
+                        maxLength={2}
+                      />
+                    </div>
+                    {/* Last Name */}
+                    <div className="w-[40%]">
+                      <input
+                        type="text"
+                        className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form-field"}`}
+                        value={lastName}
+                        onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="Last Name"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-1">Please enter the middle initial without a dot.</p>
+                </div>
+
+                {/* Gender */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Gender: 
+                      <div className="ml-2">
+                        {!gender && inputErrors && inputErrors.gender && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <select 
+                      name="gender" 
+                      id="gender"
+                      value={gender}
+                      onChange={ev => setGender(ev.target.value)}
+                      className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form-field"}`}
+                    >
+                      <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+                
+                {/* Position */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Position: 
+                      <div className="ml-2">
+                        {!position && inputErrors && inputErrors.position && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <input
+                      id="ppa-position"
+                      name="ppa-position"
+                      type="text"
+                      value={position}
+                      onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
+                      placeholder="Division Manager A"
+                      className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form-field"}`}
+                    />
+                  </div>
+                </div>
+
+                {/* Division */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Division: 
+                      <div className="ml-2">
+                        {!division && inputErrors && inputErrors.division && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <select 
+                      name="ppa-division" 
+                      id="ppa-division"
+                      value={division}
+                      onChange={ev => setDivision(ev.target.value)}
+                      className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form-field"}`}
+                    >
+                      <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
+                      <option value="Administrative Division">Administrative Division</option>
+                      <option value="Finance Division">Finance Division</option>
+                      <option value="Office of the Port Manager">Office of the Port Manager</option>
+                      <option value="Port Service Division">Port Service Division</option>
+                      <option value="Port Police Division">Port Police Division</option>
+                      <option value="Engineering Service Division">Engineering Service Division</option>
+                      <option value="Terminal Management Office - Tubod">Terminal Management Office - Tubod</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Username */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Username: 
+                      <div className="ml-2">
+                        {!getusername && inputErrors && inputErrors.username && (
+                          <p className="form-validation">This form is required</p>
+                        )}
+                      </div>
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    <input
                         id="ppa-username"
                         name="ppa-username"
                         type="text"
                         value={getusername}
                         onChange={ev => setUsername(ev.target.value)}
                         className={`block w-full ${(!getusername && inputErrors.username) ? "ppa-form-error":"ppa-form-field"}`}
-                        autoComplete="new-username"
+                        placeholder="Input username"
                       />
-                      {!getusername && inputErrors && inputErrors.username && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </div>
                   </div>
+                </div>
 
-                  {/* Password */}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="password" className="form-title">
-                        Password:
-                      </label> 
-                    </div>
+                {/* Password */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                    <label htmlFor="rep_type_of_property" className="flex form-title">
+                      Password: 
+                      <div className="ml-2">
+                        {!getpassword && inputErrors && inputErrors.password ? (
+                          <p className="form-validation">This form is required</p>
+                        ): passwordNotMatch ? (
+                          <p className="form-validation">Password does not match</p>
+                        ):null}
+                      </div>
+                    </label> 
+                  </div>
+                  <div className="w-full relative">
+                    {/* Password */}
                     <div className="w-full relative">
                       <input
                         id="password"
@@ -385,7 +372,7 @@ export default function UserRegistrationJLMS(){
                         value={getpassword}
                         onChange={ev => setPassword(ev.target.value)}
                         className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form-field"}`}
-                        autoComplete="new-password"
+                        placeholder="Input Password"
                       />
                       <button
                         type="button"
@@ -394,28 +381,17 @@ export default function UserRegistrationJLMS(){
                       >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                       </button>
-                      {!getpassword && inputErrors && inputErrors.password && (
-                        <p className="form-validation">This form is required</p>
-                      )}
                     </div>
-                  </div>
-
-                  {/* Password Confirmation*/}
-                  <div className="md:flex items-center mt-2 md:mt-0">
-                    <div className="w-40">
-                      <label htmlFor="rep_property_no" className="form-title">
-                        Repeat Password:
-                      </label> 
-                    </div>
+                    {/* Confirm Password */}
                     <div className="w-full relative">
                       <input
                         id="password"
                         name="password"
                         type={showPasswordConfirm ? 'text' : 'password'}
-                        autoComplete="position"
                         value={passwordCorfirmation}
                         onChange={ev => setPasswordConfirmation(ev.target.value)}
-                        className="block w-full ppa-form-field input-placeholder"
+                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form-field"}`}
+                        placeholder="Confirm Password"
                       />
                       <button
                         type="button"
@@ -424,293 +400,293 @@ export default function UserRegistrationJLMS(){
                       >
                         <FontAwesomeIcon icon={showPasswordConfirm ? faEyeSlash : faEye} />
                       </button>
-                      {passwordNotMatch && (
-                        <p className="form-validation">{passwordNotMatch}</p>
-                      )}
                     </div>
                   </div>
-
+                  <p className="text-gray-500 text-xs mt-1">Password must contain, At least one uppercase letter, One number, One symbol, And be at least 8 characters long</p>
                 </div>
 
-                {/* 2nd Column */}
-                <div className="col-span-1 md:pl-10 mt-2 md:mt-0">
-
-                  {/* Avatar */}
-                  <div className="items-center">
-                    <div className="w-36">
-                    <label htmlFor="ppa-avatar" className="form-title">
-                        Upload Avatar:
-                      </label> 
-                    </div>
-
-                    <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                      <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                        </svg>
-                        <div className="mt-3 text-sm leading-6 text-gray-600">
-                          <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload your new avatar here</span>
-                            <input 
-                              id="ppa-avatar" 
-                              name="ppa-avatar" 
-                              type="file" 
-                              accept=".png, .jpg, .jpeg"
-                              className="sr-only" 
-                              onChange={handleAvatarChange}  
-                            />
-                          </label>
-                        </div>
-                        <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
-                        {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
+                {/* Avatar */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                      <label htmlFor="ppa-avatar" className="flex form-title">
+                      Upload Avatar:
+                      <div className="ml-2">
                         {!uploadedAvatarName && inputErrors && inputErrors.avatar && (
                           <p className="form-validation">This form is required</p>
                         )}
                       </div>
-                    </div>
+                    </label> 
                   </div>
 
-                  {/* Esig */}
-                  <div className="items-center mt-2">
-                    <div className="w-36">
-                    <label htmlFor="ppa-esignature" className="form-title">
-                        Upload Esig:
-                      </label> 
-                    </div>
-
-                    <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
-                      <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
-                        </svg>
-                        <div className="mt-3 text-sm leading-6 text-gray-600">
-                          <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload your new esig here</span>
-                            <input 
-                              id="ppa-esignature" 
-                              name="ppa-esignature" 
-                              type="file" 
-                              accept=".png"
-                              className="sr-only" 
-                              onChange={handleEsigChange}  
-                            />
-                          </label>
-                        </div>
-                        <p className="pl-1 text-sm">PNG only up to 2MB</p>
-                        {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
-                        {!uploadedEsigName && inputErrors && inputErrors.esig && (
-                          <p className="form-validation">This form is required</p>
-                        )}
+                  <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                    <div className="text-center">
+                      <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                      </svg>
+                      <div className="mt-3 text-sm leading-6 text-gray-600">
+                        <label htmlFor="ppa-avatar" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                          <span>Upload your new avatar here</span>
+                          <input 
+                            id="ppa-avatar" 
+                            name="ppa-avatar" 
+                            type="file" 
+                            accept=".png, .jpg, .jpeg"
+                            className="sr-only" 
+                            onChange={handleAvatarChange}  
+                          />
+                        </label>
                       </div>
+                      <p className="pl-1 text-sm">PNG, JPG and JPEG only up to 2MB</p>
+                      {uploadedAvatarName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedAvatarName}</label> }
                     </div>
                   </div>
+                </div>
 
-                  {/* Code Clearance */}
-                  <div className="items-center mt-2">
-
-                    <div className="font-roboto">
-                      <label htmlFor="rf_request" className="form-title">
-                        Code Clearance:
-                      </label> 
-                    </div>
-
-                    <div className="md:grid md:grid-cols-2">
-
-                      {/* 1st Column */}
-                      <div className="col-span-1">
-
-                        {/* For PM - Port Manager */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="pm-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('PM')}
-                              onChange={(e) => handleCheckboxChange(e, 'PM')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Port Manager (PM)
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* For AM - Admin Manager */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="am-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('AM')}
-                              onChange={(e) => handleCheckboxChange(e, 'AM')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="am-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Admin Manager (AM)
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* For DM - Division Manager */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="dm-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('DM')}
-                              onChange={(e) => handleCheckboxChange(e, 'DM')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="dm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Division Manager (DM)
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* For GSO - General Service Officer */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="gso-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('GSO')}
-                              onChange={(e) => handleCheckboxChange(e, 'GSO')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="gso-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              General Service Officer (GSO)
-                            </label> 
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* 2nd Column */}
-                      <div className="col-span-1">
-
-                        {/* for SuperSuper Admin*/}
-                        {HacKer && (
-                          <div className="relative flex items-center font-roboto mt-2">
-                            <div className="flex items-center h-5">
-                              <input
-                                id="pm-checkbox"
-                                type="checkbox"
-                                checked={selectedRoles.includes('NERD')}
-                                onChange={(e) => handleCheckboxChange(e, 'NERD')}
-                                className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <label htmlFor="pm-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                                SuperHacker
-                              </label> 
-                            </div>
-                          </div>
-                        )}
-
-                        {/* For HACK - IT Superadmin */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="hack-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('HACK')}
-                              onChange={(e) => handleCheckboxChange(e, 'HACK')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="hack-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              IT People (HACK)
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* For MEM - Members (COS and Regular) */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mem-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('MEM')}
-                              onChange={(e) => handleCheckboxChange(e, 'MEM')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Members (MEM)
-                            </label> 
-                          </div>
-                        </div>
-
-                        {/* For MEM - Members (COS and Regular) */}
-                        <div className="relative flex items-center font-roboto mt-2">
-                          <div className="flex items-center h-5">
-                            <input
-                              id="mem-checkbox"
-                              type="checkbox"
-                              checked={selectedRoles.includes('SEC')}
-                              onChange={(e) => handleCheckboxChange(e, 'SEC')}
-                              className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <label htmlFor="mem-checkbox" className="block text-base font-medium leading-6 text-gray-900">
-                              Security (SEC)
-                            </label> 
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {inputErrors && inputErrors.code_clearance && (
+                {/* Esig */}
+                <div className="items-center mt-2">
+                  <div className="w-full">
+                  <label htmlFor="ppa-esignature" className="flex form-title">
+                    Upload Esig:
+                    <div className="ml-2">
+                      {!uploadedEsigName && inputErrors && inputErrors.esig && (
                         <p className="form-validation">This form is required</p>
                       )}
-
                     </div>
-
+                  </label> 
                   </div>
 
-                </div>
-
-                {/* Button */}
-                <div className="mt-8 md:mt-10">
-                  {/* Submit */}
-                  <button 
-                    type="submit"
-                    className={`w-full md:w-auto py-2 px-4 ${ submitLoading ? 'process-btn-form' : 'btn-default-form' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
+                  <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
+                    <div className="text-center">
+                      <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
+                      </svg>
+                      <div className="mt-3 text-sm leading-6 text-gray-600">
+                        <label htmlFor="ppa-esignature" className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                          <span>Upload your new esig here</span>
+                          <input 
+                            id="ppa-esignature" 
+                            name="ppa-esignature" 
+                            type="file" 
+                            accept=".png"
+                            className="sr-only" 
+                            onChange={handleEsigChange}  
+                          />
+                        </label>
                       </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
+                      <p className="pl-1 text-sm">PNG only up to 2MB</p>
+                      {uploadedEsigName &&  <label for="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">File Name: {uploadedEsigName}</label> }
+                    </div>
+                  </div>
                 </div>
-
               </div>
 
-            </form>
-
-          </div>
+              {/* 2nd Column */}
+              <div className="col-span-1 px-4">
+                {/* Badge */}
+                <div className="items-center mt-2">
+                  <div className="font-roboto">
+                    <label htmlFor="rf_request" className="form-title">
+                      Badge:
+                    </label> 
+                  </div>
+                  <div className="w-full">
+                    {/* PM */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('PM')}
+                          onChange={(e) => handleCheckboxChange(e, 'PM')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          PM <span className="checkbox-description">- Port Manager access; can view the Form List and Employee List only.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* DM */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('DM')}
+                          onChange={(e) => handleCheckboxChange(e, 'DM')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          DM <span className="checkbox-description">- Division Manager access; can view the Form List and Employee List</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* AM */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('AM')}
+                          onChange={(e) => handleCheckboxChange(e, 'AM')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          AM <span className="checkbox-description">- Admin Manager access; can approve all forms.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* GSO */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('GSO')}
+                          onChange={(e) => handleCheckboxChange(e, 'GSO')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          GSO <span className="checkbox-description">- General Services Officer access; can manage all forms, including editing and closing forms, and handle driver and vehicle assignments.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* AUS */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('AUS')}
+                          onChange={(e) => handleCheckboxChange(e, 'AUS')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          AUS <span className="checkbox-description">- IT Access – Full system control with some restrictions.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* AUI */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('AUI')}
+                          onChange={(e) => handleCheckboxChange(e, 'AUI')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          AUI <span className="checkbox-description">- Authorized Personnel for Inspection and Repair Forms only.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* AUF */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('AUF')}
+                          onChange={(e) => handleCheckboxChange(e, 'AUF')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          AUF <span className="checkbox-description">- Authorized Personnel for Facility Request Forms only.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* AUV */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('AUV')}
+                          onChange={(e) => handleCheckboxChange(e, 'AUV')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          AUV <span className="checkbox-description">- Authorized Personnel for Vehicle Slip Forms, including vehicle and driver assignments.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* SEC */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('SEC')}
+                          onChange={(e) => handleCheckboxChange(e, 'SEC')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          SEC <span className="checkbox-description">- Security Personnel access; can manage Vehicle Slip and Locator Slip forms.</span>
+                        </label> 
+                      </div>
+                    </div>
+                    {/* MEM */}
+                    <div className="relative flex items-center mt-2">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="pm-checkbox"
+                          type="checkbox"
+                          checked={selectedRoles.includes('MEM')}
+                          onChange={(e) => handleCheckboxChange(e, 'MEM')}
+                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <label htmlFor="pm-checkbox" className="checkbox-name">
+                          MEM <span className="checkbox-description">- Default system badge for regular users.</span>
+                        </label> 
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-1">Please ensure that the correct badge is selected.</p>
+                </div>
+              </div>
+            </div>
+      
+            {/* Button */}
+            <div className="mt-8 md:mt-10">
+              {/* Submit */}
+              <button 
+                type="submit"
+                className={`w-full md:w-auto py-2 px-4 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-1">Loading</span>
+                  </div>
+                ):(
+                  'Submit'
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-      </>
-      ):(
-      <Restrict />
-      )}
+      </div>
 
       {/* Popup */}
       {showPopup && (
@@ -720,8 +696,8 @@ export default function UserRegistrationJLMS(){
           justClose={justClose}
           closePopup={closePopup}
         />
-
       )}
     </PageComponent>
+    )
   );
 }

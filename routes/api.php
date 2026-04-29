@@ -11,6 +11,7 @@ use App\Http\Controllers\JOMSDashboardController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ServerStatusController;
 use App\Http\Controllers\LocatorSlipController;
+use App\Http\Controllers\TravelDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\LogsModel;
@@ -59,7 +60,8 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/pendingrequest/{id}', [JOMSDashboardController::class, 'PendingRequest']);
   Route::get('/pendingrequestcount/{id}', [JOMSDashboardController::class, 'PendingRequestCount']);
   Route::get('/formtracking/{id}', [JOMSDashboardController::class, 'FormTracking']);
-  Route::get('/requestedpersonnel', [JOMSDashboardController::class, 'getPersonnelRequest']);
+  Route::get('/requestgraph', [JOMSDashboardController::class, 'RequestGraph']);
+  Route::get('/mostreq', [JOMSDashboardController::class, 'MostReqPersonnel']);
 
   // --- Check Code Clearance --- //
   Route::get('/checkcc/{id}', [UserController::class, 'checkCode']);
@@ -68,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/teams', [AnnounceController::class, 'teamList']);
 
   // --- Notification --- //
-  Route::put('/read/{id}', [NotificationController::class, 'readNotifications']);
+  Route::put('/read/{id}', [NotificationController::class, 'readNotification']);
   Route::put('/unread/{id}', [NotificationController::class, 'updateOldNotifications']);
 
   // --- Announcement --- //
@@ -90,21 +92,38 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/getsupervisor', [UserController::class, 'getSupervisor']); // Get supervisor details
   Route::get('/getgso', [UserController::class, 'getGSO']); // Get GSO details
   Route::get('/getsecurity/{id}', [UserController::class, 'getSecurity']);
-  Route::delete('/deletesecurity/{id}', [UserController::class, 'deleteSecurity']);
+  Route::put('/reactivate/{id}', [UserController::class, 'reactivateEmployee']);
+
+  // --- JOMS (Travel Details) --- //
+  Route::get('/displaydrivers', [TravelDetailController::class, 'showDrivers']);
+  Route::get('/displayassignpersonnel', [TravelDetailController::class, 'showPersonnel']);
+  Route::get('/getdriverspersonnel', [TravelDetailController::class, 'showDriversPersonnels']);
+  Route::get('/getassignpersonnel', [TravelDetailController::class, 'showAssignPersonnels']);
+  Route::get('/showvehdet', [TravelDetailController::class, 'getVehicleDetails']);
+  Route::get('/checktravelactivity', [TravelDetailController::class, 'CheckTravelActivity']);
+  Route::post('/sumbmitdrivers', [TravelDetailController::class, 'addDriverPersonnels']);
+  Route::post('/sumbmitassignpersonnel', [TravelDetailController::class, 'addAssignPersonnels']);
+  Route::post('/submitvehtype', [TravelDetailController::class, 'storeVehicleDetails']);
+  Route::put('/notavaildriver/{id}', [TravelDetailController::class, 'notavailDriver']);
+  Route::put('/availdriver/{id}', [TravelDetailController::class, 'availDriver']);
+  Route::put('/notavailvehicle/{id}', [TravelDetailController::class, 'notavailableVehicle']);
+  Route::put('/editvehicle/{id}', [TravelDetailController::class, 'editVehicle']);
+  Route::put('/availvehicle/{id}', [TravelDetailController::class, 'availableVehicle']);
+  Route::put('/checktsavailability', [TravelDetailController::class, 'CheckDriverAvailability']);
+  Route::put('/arriveTravel/{id}', [TravelDetailController::class, 'arriveTravel']);
+  Route::put('/checktravelschedule', [TravelDetailController::class, 'checkTravelSchedule']);
+  Route::delete('/removepersonnel/{id}', [TravelDetailController::class, 'removePersonnel']);
+  Route::delete('/removeassignpersonnel/{id}', [TravelDetailController::class, 'removeAssignPersonnel']);
+  Route::delete('/deletevehdet/{id}', [TravelDetailController::class, 'removeVehicleDetails']);
 
   // --- Assign Personnel --- //
-  Route::post('/assignpersonnel', [UserController::class, 'storePersonnel']); // Assign Personnel
-  Route::delete('/removepersonnel/{id}', [UserController::class, 'removePersonnel']); // Remove personnel on list
-  Route::put('/notvailpersonnel/{id}', [UserController::class, 'notavailPersonnel']); // Remove personnel on list
-  Route::get('/showpersonnel', [UserController::class, 'showPersonnel']); // Show personnel Detail on Personnel Page
-  Route::put('/availpersonnel/{id}', [UserController::class, 'availablePersonnel']);
-  Route::get('/getpersonnel', [UserController::class, 'getPersonnel']); // Select personnel during assignment
   Route::get('/displaypersonnel/{id}', [UserController::class, 'displayPersonnel']); // Display personnel on select tag on Part B
 
   // --- JOMS (My Request) --- //
   Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
 
   // --- JOMS Inspection Request --- //
+  Route::get('/inspection/pdf/{id}', [InspectionController::class, 'generateInspectionPDF']);
   Route::get('/allinspection', [InspectionController::class, 'index']);
   Route::get('/showinsprequest/{id}', [InspectionController::class, 'showInspectionForm']);
   Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']);
@@ -118,11 +137,11 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/updateinsprequestpartc/{id}', [InspectionController::class, 'updatePartC']);
   Route::put('/submitinsprequestpartd/{id}', [InspectionController::class, 'submitPartD']);
   Route::put('/updateinsprequestpartd/{id}', [InspectionController::class, 'updatePartD']);
-  Route::get('/idleinspectionrequest/{id}', [InspectionController::class, 'personnelIdle']);
   Route::get('/closeinspectionrequest/{id}', [InspectionController::class, 'closeRequest']);
   Route::put('/cancelinspectionrequest/{id}', [InspectionController::class, 'cancelRequest']);
 
   // --- JOMS Facility / Venue Request --- //
+  Route::get('/facility/pdf/{id}', [FacilityVenueController::class, 'generateFacilityPDF']);
   Route::post('/checkavailability', [FacilityVenueController::class, 'checkAvailability']); // Check the availability
   Route::post('/submitfacrequest', [FacilityVenueController::class, 'storeFacilityRequest']); // Submit the request
   Route::put('/editfacrequest/{id}', [FacilityVenueController::class, 'editFacilityRequest']);
@@ -139,7 +158,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- JOMS Vehicle Slip Request --- //
   Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
-  Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
+  // Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
   Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
   Route::get('/allvehicleslip', [VehicleSlipController::class, 'index']);
   Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
@@ -148,13 +167,12 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::put('/admindecline/{id}', [VehicleSlipController::class, 'submitAdminDeclineRequest']);
   Route::get('/getvehdet', [VehicleSlipController::class, 'getVehicleDetails']);
   Route::get('/getdriverdet', [VehicleSlipController::class, 'getDriverDetails']);
-  Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
+  // Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
   Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
-  Route::put('/availvehicle/{id}', [VehicleSlipController::class, 'availableVehicle']);
-  Route::put('/notavailvehicle/{id}', [VehicleSlipController::class, 'notavailableVehicle']);
-  Route::put('/checktravelslip', [VehicleSlipController::class, 'CheckTravelSlip']);
-  Route::put('/editvehicle/{id}', [VehicleSlipController::class, 'editVehicle']);
-  Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
+  // Route::put('/notavailvehicle/{id}', [VehicleSlipController::class, 'notavailableVehicle']);
+  // 
+  // 
+  // Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
   Route::get('/closevehicle/{id}', [VehicleSlipController::class, 'closeRequest']);
 });
 
@@ -166,7 +184,9 @@ Route::put('/updateuser', [AuthController::class, 'updateUser']);
 
 // --- Logs --- //
 Route::get('/getlogs', [LogsController::class, 'dashboardLogs']);
+Route::get('/datelogs', [LogsController::class, 'datelogs']);
 Route::post('/showlogs', [LogsController::class, 'showLogs']);
 
 // --- Test --- //
 Route::get('/getlocreq/{id}', [LocatorSlipController::class, 'getRequestor']);
+// Route::get('/inspection/download/{id}', [InspectionController::class, 'ForcePDF']);

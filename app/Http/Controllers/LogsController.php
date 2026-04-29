@@ -7,16 +7,22 @@ use Illuminate\Http\Request;
 
 class LogsController extends Controller
 {
+    /**
+     *  Dashboard Logs
+     */
     public function dashboardLogs(){
         $startDate = Carbon::today()->startOfDay();
         $endDate = Carbon::today()->endOfDay();
 
         // Retrieve logs within the current month
-        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->take(10)->get();
 
         return response()->json($logs);
     }
 
+    /**
+     *  Show Logs based on Date
+     */
     public function showLogs(Request $request){
 
         // Get Date
@@ -28,6 +34,20 @@ class LogsController extends Controller
         $endDate = Carbon::createFromFormat('Y-m-d', $getEndDate);
 
         // Retrieve logs within the selected date range
+        $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+
+        return response()->json($logs);
+    }
+
+    /**
+     *  Date Logs
+     */
+    public function datelogs(Request $request){
+
+        $startDate = Carbon::today()->startOfDay();
+        $endDate = Carbon::today()->endOfDay();
+
+        // Retrieve logs within the current month
         $logs = LogsModel::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
 
         return response()->json($logs);

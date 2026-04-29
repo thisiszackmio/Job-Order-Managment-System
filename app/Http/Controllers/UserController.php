@@ -7,14 +7,15 @@ use App\Models\InspectionModel;
 use App\Models\FacilityVenueModel;
 use App\Models\VehicleSlipModel;
 use App\Models\LogsModel;
-use App\Models\AssignPersonnelModel;
 use App\Models\NotificationModel;
+use App\Models\AssignPersonnelModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Models\PPASecurity;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
@@ -22,9 +23,10 @@ class UserController extends Controller
     /**
      * User's Status Code
      * 
-     * 0 - Not Active / Deactivate
-     * 1 - Active
+     * 0 - Delete User
+     * 1 - Active Account
      * 2 - Change Password
+     * 
      */
 
     /**
@@ -163,7 +165,7 @@ class UserController extends Controller
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
-            $logs->message = $request->input('authority').' updated the details of '.$validateData['firstname'].' '.$validateData['middlename'].'. '.$validateData['lastname'].'.';
+            $logs->message = $request->input('authority').' updated '.$validateData['firstname'].' '.$validateData['middlename'].'. '.$validateData['lastname']."'s details.";
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -209,7 +211,7 @@ class UserController extends Controller
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
-            $logs->message = $request->input('authority').' updated the code clearance of '.$request->input('name').'.';
+            $logs->message = $request->input('authority').' updated '.$request->input('name')."'s badge.";
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -227,7 +229,6 @@ class UserController extends Controller
         // Validate the avatar file
         $validateAvatar = $request->validate([
             'avatar' => [
-                'nullable', 
                 'file', 
                 'mimes:png,jpeg,jpg',
                 'max:2048'
@@ -267,7 +268,7 @@ class UserController extends Controller
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
-            $logs->message = $request->input('authority').' updated the avatar of '.$request->input('name').'.';
+            $logs->message = $request->input('authority').' updated '.$request->input('name')."'s avatar.";
             $logs->save();
 
             return response()->json(['message' => 'Avatar updated successfully'], 200);
@@ -283,7 +284,6 @@ class UserController extends Controller
         // Validate the avatar file
         $validateAvatar = $request->validate([
             'esig' => [
-                'nullable', 
                 'file', 
                 'mimes:png,jpeg,jpg',
                 'max:2048'
@@ -320,7 +320,7 @@ class UserController extends Controller
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
-            $logs->message = $request->input('authority').' updated the esignature of '.$request->input('name').'.';
+            $logs->message = $request->input('authority').' updated '.$request->input('name')."'s esignature.";
             $logs->save();
     
             return response()->json(['message' => 'Avatar updated successfully'], 200);
@@ -358,10 +358,13 @@ class UserController extends Controller
 
         if($updatePWD){
 
+            // Remove Token
+            $existingToken = PersonalAccessToken::where('tokenable_id', $getUser->id)->delete();
+
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
-            $logs->message = $request->input('authority').' updated the account of '.$request->input('name');
+            $logs->message = $request->input('authority').' updated '.$request->input('name')."'s account.";
             $logs->save();
 
             return response()->json(['message' => 'User details updated successfully.'], 200);
@@ -388,7 +391,31 @@ class UserController extends Controller
         // Logs
         $logs = new LogsModel();
         $logs->category = 'USER';
-        $logs->message = $request->input('authority').' removed '.$request->input('name').' from the system.';
+        $logs->message = $request->input('authority').' deactivate '.$request->input('name').' from the system.';
+        $logs->save();
+
+        return response()->json(['message' => 'Remove successfully'], 200);
+    }
+
+    /**
+     * Reactivate Account
+     */
+    public function reactivateEmployee(Request $request, $id){
+
+        // Find the user by ID
+        $getUser = PPAEmployee::find($id);
+
+        if (!$getUser) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $getUser->status = 1;
+        $getUser->save();
+
+        // Logs
+        $logs = new LogsModel();
+        $logs->category = 'USER';
+        $logs->message = $request->input('authority').' reactivate '.$request->input('name').' from the system.';
         $logs->save();
 
         return response()->json(['message' => 'Remove successfully'], 200);
@@ -472,31 +499,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show Assigned Personnel
-     */
-    public function showPersonnel(){
-
-        // Get all assigned personnel data
-        $assignedPersonnel = AssignPersonnelModel::all();
-
-        // Extract pers onnel IDs
-        $personnelIds = $assignedPersonnel->pluck('personnel_id');
-
-        // Map personnel information along with the inspection count
-        $result = $assignedPersonnel->map(function ($personnel) {
-        
-            return [
-                'personnel_id' => $personnel->id,
-                'personnel_name' => $personnel->personnel_name,
-                'assignment' => $personnel->assignment,
-                'status' => $personnel->status,
-            ];
-        });
-
-        return response()->json($result);
-    }
-
-    /**
      * Display Assigned Personnel on select tag (PART B)
      */
     public function displayPersonnel($id){
@@ -534,181 +536,6 @@ class UserController extends Controller
         });
 
         return response()->json($result);
-    }
-
-    /**
-     * Get Personnel
-     */
-    public function getPersonnel(){
-        
-        $data = AssignPersonnelModel::all();
-        $getIds = $data->pluck('personnel_id');
-
-        $employee = PPAEmployee::queryUserExcept($getIds)->whereNotIn('code_clearance', ['AM, MEM', 'PM, MEM', 'DM, MEM', 'GSO, MEM']);
-
-        $userData = $employee->map(function ($user){
-            return [
-                'id' => $user->id,
-                'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname
-            ];
-        })->values()->all();
-        
-        return response()->json($userData);
-    }
-
-    /**
-     * Assign Personnel
-     */
-    public function storePersonnel(Request $request){
-
-        //Validate
-        $personnelData = $request->validate([
-            'personnel_id' => 'required|numeric',
-            'personnel_name' => 'required|string',
-            'assignment' => 'required|string',
-            'status' => 'required|numeric'
-        ]);
-
-        $deploymentData = AssignPersonnelModel::create($personnelData);
-
-        if (!$deploymentData) {
-            return response()->json(['error' => 'Data Error'], 500);
-        } else {
-                // Find the Personnel ID for adding 'AP' on Code Clearance
-                $findPersonnel = PPAEmployee::find($personnelData['personnel_id']);
-
-                $currentClearances = explode(', ', $findPersonnel->code_clearance); // Convert to array
-
-                // Add 'AP' to the array if it's not already present
-                if (!in_array('AP', $currentClearances)) {
-                    $currentClearances[] = 'AP';
-                }
-
-                // Convert back to a comma-separated string
-                $updatedClearances = implode(', ', $currentClearances);
-
-                // Save the updated clearances back to the model
-                $findPersonnel->code_clearance = $updatedClearances;
-
-                if($findPersonnel->save()) {
-                    // Creating logs
-                    $logs = new LogsModel();
-                    $logs->category = 'PERSONNEL';
-                    $logs->message = $personnelData['personnel_name'].' has been assigned to the '.$personnelData['assignment'].' list.';
-                    $logs->save();
-                }
-
-            }
-
-        return response()->json(['message' => 'Deployment data created successfully'], 200);
-    }
-
-    /**
-     * Set Personnel to Not Available
-     */
-    public function notavailPersonnel(Request $request, $id){
-        // Find the personnel assignment
-        $data = AssignPersonnelModel::find($id);
-
-        // Data not found
-        if (!$data){
-            return response()->json(['message' => 'Personnel not found'], 404);
-        }
-
-        // Update the status
-        $data->status = 3;
-        $data->date_assigned = null;
-
-        if($data->save()){
-            // Creating logs only if both operations are successful
-            $logs = new LogsModel();
-            $logs->category = 'PERSONNEL';
-            $logs->message = $request->input('authority').' has set '.$data->personnel_name.' to not available.';
-            $logs->save();
-        }
-
-        return response()->json(['message' => 'Personnel Available.'], 200);
-    }
-
-    /**
-     * Remove Assign Personnel
-     */
-    public function removePersonnel(Request $request, $id) {
-        // Find the personnel assignment
-        $data = AssignPersonnelModel::find($id);
-
-        // Data not found
-        if (!$data){
-            return response()->json(['message' => 'Personnel not found'], 404);
-        }
-
-        // Find the associated personnel
-        $findPersonnel = PPAEmployee::find($data->personnel_id);
-
-        // Personnel data not found
-        if(!$findPersonnel) {
-            return response()->json(['message' => 'Associated personnel not found.'], 404);
-        }
-
-        // Update the code clearance by removing 'AP'
-        $currentClearances = explode(',', $findPersonnel->code_clearance); // Convert to array
-
-        // Trim each clearance value to avoid spaces issues
-        $currentClearances = array_map('trim', $currentClearances);
-
-        // Remove 'AP' from the array
-        $currentClearances = array_filter($currentClearances, function($clearance) {
-            return $clearance !== 'AP';
-        });
-    
-        // Convert back to a comma-separated string
-        $updatedClearances = implode(', ', $currentClearances);
-        $findPersonnel->code_clearance = $updatedClearances;
-    
-        if (!$findPersonnel->save()) {
-            return response()->json(['message' => 'Failed to update code clearance.'], 500);
-        }
-    
-        // Delete the personnel assignment
-        $deleted = $data->delete();
-    
-        if(!$deleted) {
-            return response()->json(['message' => 'Failed to delete personnel'], 500);
-        }
-
-        // Creating logs only if both operations are successful
-        $logs = new LogsModel();
-        $logs->category = 'Personnel';
-        $logs->message = $request->input('authority').' has removed one of the assigned personnel from the list.';
-        $logs->save();
-    
-        return response()->json(['message' => 'Personnel deleted and code clearance updated successfully.'], 200);
-    }
-
-    /**
-     * Set to Available Assign Personnel
-     */
-    public function availablePersonnel(Request $request, $id){
-        // Find the personnel assignment
-        $data = AssignPersonnelModel::find($id);
-
-        // Data not found
-        if (!$data){
-            return response()->json(['message' => 'Personnel not found'], 404);
-        }
-
-        // Update the status
-        $data->status = 2;
-
-        if($data->save()){
-            // Creating logs only if both operations are successful
-            $logs = new LogsModel();
-            $logs->category = 'PERSONNEL';
-            $logs->message = $request->input('authority').' has set '.$data->personnel_name.' to available.';
-            $logs->save();
-        }
-
-        return response()->json(['message' => 'Personnel Available.'], 200);
     }
 
     // ---------- For the Security ---------- //

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Restrict(){
   return(
-    <div className="font-roboto items-center justify-center flex flex-col" >
+    <div className="font-roboto items-center justify-center flex flex-col restric-page" >
       <div className="container-fluid flex flex-col items-center text-center mt-20">
         {/* Image Section */}
         <img
@@ -18,7 +18,7 @@ export default function Restrict(){
             You cannot access this page because it is restricted.
           </p>
           <Link to={'/joms'}>
-            <button className="btn-default py-2 px-4 mt-4" title="View Request">
+            <button className="btn-primary py-4 px-8 mt-4" title="View Request">
               Back to Dashboard
             </button>
           </Link>

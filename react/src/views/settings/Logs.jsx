@@ -172,7 +172,7 @@ export default function Logs() {
       {!isMobile ? (
       <>
         {/* Main */}
-        <div className="ppa-widget mt-8">
+        <div className="ppa-widget mt-8 px-4">
           <div className="joms-user-info-header text-left"> 
             Log Details
           </div>
@@ -182,8 +182,8 @@ export default function Logs() {
             <div className="flex items-end justify-center gap-4 mt-4 mb-4">
 
               {/* From Date */}
-              <div>
-                <label htmlFor="from_date" className="form-title block mb-1">
+              <div className='flex items-center jusify-center'>
+                <label htmlFor="from_date" className="form-title block">
                   From:
                 </label>
                 <input 
@@ -197,8 +197,8 @@ export default function Logs() {
               </div>
 
               {/* To Date */}
-              <div>
-                <label htmlFor="to_date" className="form-title block mb-1">
+              <div className='flex items-center jusify-center'>
+                <label htmlFor="to_date" className="form-title block">
                   To:
                 </label>
                 <input 
@@ -214,21 +214,21 @@ export default function Logs() {
 
               {/* Go Button */}
               {submitButton && (
-                <div>
-                  <div className="h-[22px]"></div>
+                <div className='flex justify-start'>
                   {submitButton ? (
                   <>
                     <button 
                       type="submit"
-                      onClick={getLogsInfo}
-                      className="btn-default-form h-[42px]"
+                      className={`w-auto py-1.5 px-4 text-sm btn-secondary }`}
+                      // className="btn-default-form h-[42px]"
                     >
                       Go
                     </button>
 
                     {logsFunction ? (
                       <button type="button" onClick={handleButtonClick}
-                        className={`btn-pdf h-[42px] ml-3 ${ submitLoading && 'btn-genpdf'}`}
+                        className={`w-auto py-1.5 px-4 text-sm ${ submitLoading && 'btn-process' }`}
+                        // className={`btn-pdf h-[42px] ml-3 ${ submitLoading && 'btn-genpdf'}`}
                         disabled={submitLoading}
                       >
                         {submitLoading ? (

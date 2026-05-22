@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useMatches, useNavigate } from "react-router-dom";
 import { BellIcon } from '@heroicons/react/24/outline'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faClipboard, faUsers, faFileLines, faBars, faTachometerAlt, faUserPlus, faAddressBook, faVanShuttle, faUserGear } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faClipboard, faUsers, faFileLines, faBars, faTachometerAlt, faUserPlus, faAddressBook, faVanShuttle, faUserGear, faGears, faGear, faList } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import Footer from "./Footer";
 import ppalogomini from '/default/img/logo-no-words.png';
@@ -599,6 +599,55 @@ export default function JOMSLayout() {
               </Link>
             </li>
           )}
+
+          {/* Superadmin Settings */}
+          {SuperAdmin && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/settings" ||
+                location.pathname === "/joms/logs"  ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(4)} >
+                <FontAwesomeIcon icon={faGears} className="ppa-icon" />
+                <span className="sidebar-text">Settings</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 4 ? "rotate" : ""}`}
+                  />
+                )}
+              </div>
+            </li>
+          )}
+
+          {/* For Settings Section */}
+          <section className={`accordion-content ${activeAccordion === 4 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <li className="mt-2">
+              <Link to="/joms/settings"
+                className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/settings" ? "sub-active" : "not-active"}`}
+              >
+                <FontAwesomeIcon icon={faGear} className="ppa-icon" />
+                <span className="submenu-text">General Settings</span>
+              </Link>
+            </li>
+
+            <li className="mt-2">
+              <Link to="/joms/logs"
+                className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/logs" ? "sub-active" : "not-active"}`}
+              >
+                <FontAwesomeIcon icon={faList} className="ppa-icon" />
+                <span className="submenu-text">Logs</span>
+              </Link>
+            </li>
+          </section>
+
         </ul>
       </div>
     </aside>

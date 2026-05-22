@@ -81,6 +81,8 @@ Route::middleware('auth:sanctum')->group(function(){
 
   // --- User Employee Details --- //
   Route::post('/register', [AuthController::class, 'register']); // Register Personnel
+  Route::post('/generateid/{id}', [UserController::class, 'generateID']);
+  Route::put('/permamentdeleteuser', [UserController::class, 'DeleteUser']);
   Route::put('/updatedetail/{id}', [UserController::class, 'updateEmployeeDetail']); // Update Employee Details
   Route::put('/updatecc/{id}', [UserController::class, 'updateEmployeeCodeClearance']); // Update Employee Code Clearance
   Route::put('/updateaavatar/{id}', [UserController::class, 'updateEmployeeAvatar']); // Update Employee Avatar
@@ -120,7 +122,9 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/displaypersonnel/{id}', [UserController::class, 'displayPersonnel']); // Display personnel on select tag on Part B
 
   // --- JOMS (My Request) --- //
-  Route::get('/jomsmyrequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']); // Show my Request
+  Route::get('/jomsmyinsprequest/{id}', [UserController::class, 'GetMyInspRequestJOMS']);
+  Route::get('/jomsmyfacrequest/{id}', [UserController::class, 'GetMyFacilityRequestJOMS']);
+  Route::get('/jomsmyvehrequest/{id}', [UserController::class, 'GetMyVehicleRequestJOMS']);
 
   // --- JOMS Inspection Request --- //
   Route::get('/inspection/pdf/{id}', [InspectionController::class, 'generateInspectionPDF']);
@@ -157,22 +161,18 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::get('/allfacility', [FacilityVenueController::class, 'index']); // Show All Details
 
   // --- JOMS Vehicle Slip Request --- //
+  Route::post('/checkvehreq', [VehicleSlipController::class, 'checkForm']);
   Route::post('/submitvehrequest', [VehicleSlipController::class, 'storeVehicleSlip']);
-  // Route::post('/submitvehtype', [VehicleSlipController::class, 'storeVehicleDetails']);
   Route::put('/updatevehicleslip/{id}', [VehicleSlipController::class, 'UpdateVehicleSlip']);
-  Route::get('/allvehicleslip', [VehicleSlipController::class, 'index']);
-  Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
+  Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
   Route::put('/storevehinfo/{id}', [VehicleSlipController::class, 'storeVehicleInformation']);
   Route::put('/vehreqapprove/{id}', [VehicleSlipController::class, 'approveRequest']);
   Route::put('/admindecline/{id}', [VehicleSlipController::class, 'submitAdminDeclineRequest']);
+  Route::get('/allvehicleslip', [VehicleSlipController::class, 'VehicleList']);
+  Route::get('/showvehrequest/{id}', [VehicleSlipController::class, 'showForm']);
+  Route::get('/vehicle/pdf/{id}', [VehicleSlipController::class, 'generateVehiclePDF']);
   Route::get('/getvehdet', [VehicleSlipController::class, 'getVehicleDetails']);
   Route::get('/getdriverdet', [VehicleSlipController::class, 'getDriverDetails']);
-  // Route::get('/showvehdet', [VehicleSlipController::class, 'showVehicleDetails']);
-  Route::put('/cancelrequest/{id}', [VehicleSlipController::class, 'cancelFormRequest']);
-  // Route::put('/notavailvehicle/{id}', [VehicleSlipController::class, 'notavailableVehicle']);
-  // 
-  // 
-  // Route::delete('/deletevehdet/{id}', [VehicleSlipController::class, 'removeVehicleDetails']);
   Route::get('/closevehicle/{id}', [VehicleSlipController::class, 'closeRequest']);
 });
 

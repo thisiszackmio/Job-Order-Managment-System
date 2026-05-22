@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Models\PPASecurity;
 use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -28,6 +29,30 @@ class UserController extends Controller
      * 2 - Change Password
      * 
      */
+
+    /**
+     * Generate ID (This is temporary only)
+     */
+    public function generateID($id){
+        $prefix = 'JOMS';
+        $year = Carbon::now()->year;
+
+        $getUserId = PPAEmployee::find($id);
+        
+        if(!$getUserId->userId){
+            $getID = $getUserId->id;
+            $formatNumber = sprintf('%05d', $getID);
+
+            $generateUserId = $prefix."-".$year.$formatNumber;
+
+            // Update Data
+            $generateID = $getUserId->update([
+                'userId' => $generateUserId,
+            ]);
+        }
+
+        return response()->json(['message' => 'Generate ID Successfully'], 200);
+    }
 
     /**
      * Check the User's Code Clearance
@@ -43,28 +68,74 @@ class UserController extends Controller
     /**
      * Show all User Employee's Data
      */
-    public function showEmployee(){
+    public function showEmployee(Request $request){
+        $page = $request->input('user_page', 1);
+        $search = $request->input('search');
+
         // Root URL
         $rootUrl = URL::to('/');
 
-        $data = PPAEmployee::all();
+        // Query
+        $query = PPAEmployee::query();
 
-        $userData = [];
+        // Search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
 
-        foreach ($data as $user){
-            $userData[] = [
+                $q->where('firstname', 'LIKE', "%{$search}%")
+                ->orWhere('middlename', 'LIKE', "%{$search}%")
+                ->orWhere('lastname', 'LIKE', "%{$search}%")
+                ->orWhere('username', 'LIKE', "%{$search}%")
+                ->orWhere('division', 'LIKE', "%{$search}%")
+                ->orWhere('position', 'LIKE', "%{$search}%")
+                ->orWhere('code_clearance', 'LIKE', "%{$search}%");
+
+            });
+        }
+
+        // Arrange by Clearance Priority
+        $query->orderByRaw("
+            CASE
+                WHEN code_clearance LIKE '%PM%' THEN 1
+                WHEN code_clearance LIKE '%AM%' THEN 2
+                WHEN code_clearance LIKE '%DM%' THEN 3
+                WHEN code_clearance LIKE '%GSO%' THEN 4
+                WHEN code_clearance LIKE '%HACK%' THEN 5
+                WHEN code_clearance LIKE '%AUS%' THEN 6
+                ELSE 7
+            END
+        ");
+
+        // Latest
+        $query->orderBy('lastname', 'asc');
+
+        // Pagination
+        $employees = $query->paginate(
+            25,
+            ['*'],
+            'page',
+            $page
+        );
+
+        // Transform Data
+        $employees->getCollection()->transform(function ($user) use ($rootUrl) {
+
+            return [
                 'id' => $user->id,
-                'name' => strtoupper($user->lastname). ", ".$user->firstname. " ".$user->middlename. ".",
+                'joms_id' => $user->userId,
+                'name' => strtoupper($user->lastname) . ", " .
+                        $user->firstname . " " .
+                        $user->middlename . ".",
                 'username' => $user->username,
                 'division' => $user->division,
                 'position' => $user->position,
                 'code_clearance' => $user->code_clearance,
-                'avatar' =>  $rootUrl . '/storage/displaypicture/' . $user->avatar,
+                'avatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
                 'status' => $user->status,
             ];
-        }
-        
-        return response()->json($userData);
+        });
+
+        return response()->json($employees);
     }
 
     /**
@@ -125,7 +196,9 @@ class UserController extends Controller
             'code_clearance' => $data->code_clearance,
             'avatar' =>  $rootUrl . '/storage/displaypicture/' . $data->avatar,
             'esig' => $rootUrl . '/storage/displayesig/' . $data->esign,
+            'userId' => $data->userId,
             'status' => $data->status,
+            'expire' => $data->updated_at,
         ];
 
         return response()->json($userData);
@@ -139,7 +212,7 @@ class UserController extends Controller
         //Validate
         $validateData = $request->validate([
             'firstname' => 'required|string',
-            'middlename' => 'required|string',
+            'middlename' => 'nullable|string',
             'lastname' => 'required|string',
             'position' => 'required|string',
             'division' => 'required|string',
@@ -208,6 +281,9 @@ class UserController extends Controller
         ]);
 
         if($updateCC){
+            // Remove Token
+            $existingToken = PersonalAccessToken::where('tokenable_id', $getUser->id)->delete();
+
             // Logs
             $logs = new LogsModel();
             $logs->category = 'USER';
@@ -422,83 +498,6 @@ class UserController extends Controller
     }
 
     /**
-     * Get User's Request Form on JOMS
-     */
-    public function GetMyInspRequestJOMS($id){
-
-        // For Inspection Form
-        $getInspectionFormData = InspectionModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
-
-        $inspDet = $getInspectionFormData->map(function ($inspectionForm) {
-            return[
-                'repair_id' => $inspectionForm->id,
-                'repair_date_request' => $inspectionForm->created_at,
-                'repair_property_number' => $inspectionForm->property_number,
-                'repair_type' => $inspectionForm->type_of_property,
-                'repair_description' => $inspectionForm->property_description,
-                'repair_complain' => $inspectionForm->complain,
-                'repair_supervisor_name' => $inspectionForm->supervisor_name,
-                'repair_remarks' => $inspectionForm->form_remarks
-            ];
-        });
-
-        // For Facility Form
-        $getFacilityFormData = FacilityVenueModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
-
-        $facDet = $getFacilityFormData->map(function ($facilityForm) {
-            return[
-                'fac_id' => $facilityForm->id,
-                'fac_date_request' => $facilityForm->created_at,
-                'fac_request_office' => $facilityForm->	request_office,
-                'fac_title_of_activity' => $facilityForm->title_of_activity,
-                'fac_date_start' => $facilityForm->date_start,
-                'fac_time_start' => $facilityForm->time_start,
-                'fac_date_end' => $facilityForm->date_end,
-                'fac_time_end' => $facilityForm->time_end,
-                'mph' => $facilityForm->mph,
-                'conference' => $facilityForm->conference,
-                'dorm' => $facilityForm->dorm,
-                'other' => $facilityForm->other,
-                'fac_remarks' => $facilityForm->remarks,
-            ];
-        });
-
-        // For Vehicle Slip
-        $getVehicleSlipData = VehicleSlipModel::where('user_id', $id)->orderBy('created_at', 'desc')->get();
-
-        $vehDet = $getVehicleSlipData->map(function ($vehicleForm) {
-            $passengerArray = ($vehicleForm->passengers && $vehicleForm->passengers !== 'None') 
-                ? explode("\n", $vehicleForm->passengers) 
-                : [];
-            $passengerCount = count($passengerArray);
-
-            return[
-                'veh_id' => $vehicleForm->id,
-                'veh_date_req' => $vehicleForm->created_at,
-                'veh_purpose' => $vehicleForm->purpose,
-                'veh_place' => $vehicleForm->place_visited,
-                'veh_date' => $vehicleForm->date_arrival,
-                'veh_time' => $vehicleForm->time_arrival,
-                'veh_vehicle' => $vehicleForm->vehicle_type,
-                'veh_driver' => $vehicleForm->driver,
-                'veh_passengers' => $passengerCount,
-                'status' => $vehicleForm->admin_approval,
-                'remarks' => $vehicleForm->remarks
-            ];
-        });
-
-        $responseData = [
-            'inspection' => $inspDet->isEmpty() ? null : $inspDet,
-            'facility' => $facDet->isEmpty() ? null : $facDet,
-            'vehicle' => $vehDet->isEmpty() ? null : $vehDet,
-        ];
-        
-
-        return response()->json($responseData);
-
-    }
-
-    /**
      * Display Assigned Personnel on select tag (PART B)
      */
     public function displayPersonnel($id){
@@ -582,5 +581,181 @@ class UserController extends Controller
         return response()->json(['success' => $data > 0, 'deleted_rows' => $data]);
     }
 
+    // Delete User
+    public function DeleteUser(){
+        $now = Carbon::now();
 
+        $ninetyDaysAgo = $now->copy()->subDays(90);
+
+        // Auto delete older than 90 days
+        PPAEmployee::where('status', 0)
+            ->where('updated_at', '<', $ninetyDaysAgo)
+            ->delete();
+    }
+
+    // --- For the My Request Page --- //
+    public function GetMyInspRequestJOMS(Request $request, $id){
+        $inspectionPage = $request->input('inspection_page', 1);
+
+        $search = $request->input('search');
+
+        $query = InspectionModel::where('user_id', $id);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('property_number', 'LIKE', "%{$search}%")
+                ->orWhere('type_of_property', 'LIKE', "%{$search}%")
+                ->orWhere('property_description', 'LIKE', "%{$search}%")
+                ->orWhere('complain', 'LIKE', "%{$search}%")
+                ->orWhere('supervisor_name', 'LIKE', "%{$search}%")
+                ->orWhere('form_remarks', 'LIKE', "%{$search}%")
+                ->orWhereRaw("DATE_FORMAT(created_at, '%M %e, %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        $inspectionData = $query
+        ->orderBy('created_at', 'desc')
+        ->paginate(
+            10,
+            ['*'],
+            'inspection_page',
+            $inspectionPage
+        );
+
+        $inspectionData->getCollection()->transform(
+            function ($inspectionForm) use ($search) {
+
+            $formattedDate =
+                \Carbon\Carbon::parse(
+                    $inspectionForm->created_at
+                )->format('F j, Y');
+
+            return [
+                'repair_id' => $inspectionForm->id,
+                'repair_date_request' => $formattedDate,
+                'repair_property_number' => $inspectionForm->property_number,
+                'repair_type' => $inspectionForm->type_of_property,
+                'repair_description' => $inspectionForm->property_description,
+                'repair_complain' => $inspectionForm->complain,
+                'repair_supervisor_name' => $inspectionForm->supervisor_name,
+                'repair_remarks' => $inspectionForm->form_remarks
+            ];
+        });
+
+        return response()->json($inspectionData);
+    }
+
+    public function GetMyFacilityRequestJOMS(Request $request, $id){
+        $facilityPage = $request->input('facility_page', 1);
+
+        $search = $request->input('search');
+
+        $query = FacilityVenueModel::where('user_id', $id);
+
+        if ($search) {
+
+            $query->where(function ($q) use ($search) {
+                $q->where('request_office', 'LIKE', "%{$search}%")
+                ->orWhere('title_of_activity', 'LIKE', "%{$search}%")
+                ->orWhere('remarks', 'LIKE', "%{$search}%")
+                // SEARCH DATE
+                ->orWhereRaw("DATE_FORMAT(created_at, '%M %e, %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        $facilityData = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(
+                10,
+                ['*'],
+                'facility_page',
+                $facilityPage
+            );
+
+        $facilityData->getCollection()->transform(
+            function ($facilityForm) {
+
+            return [
+
+                'fac_id' =>
+                    $facilityForm->id,
+
+                'fac_date_request' =>
+                    \Carbon\Carbon::parse(
+                        $facilityForm->created_at
+                    )->format('F j, Y'),
+                'fac_request_office' => $facilityForm->request_office,
+                'fac_title_of_activity' => $facilityForm->title_of_activity,
+                'fac_date_start' => $facilityForm->date_start,
+                'fac_time_start' => $facilityForm->time_start,
+                'fac_date_end' => $facilityForm->date_end,
+                'fac_time_end' => $facilityForm->time_end,
+                'mph' => $facilityForm->mph,
+                'conference' => $facilityForm->conference,
+                'dorm' => $facilityForm->dorm,
+                'other' => $facilityForm->other,
+                'fac_remarks' => $facilityForm->remarks,
+
+            ];
+        });
+
+        return response()->json($facilityData);
+    }
+
+    public function GetMyVehicleRequestJOMS(Request $request, $id){
+        $vehiclePage = $request->input('vehicle_page', 1);
+
+        $search = $request->input('search');
+
+        $query = VehicleSlipModel::where('user_id', $id);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('purpose', 'LIKE', "%{$search}%")
+                ->orWhere('place_visited', 'LIKE', "%{$search}%")
+                ->orWhere('vehicle_type', 'LIKE', "%{$search}%")
+                ->orWhere('driver', 'LIKE', "%{$search}%")
+                ->orWhere('remarks', 'LIKE', "%{$search}%")
+                // SEARCH DATE
+                ->orWhereRaw("DATE_FORMAT(created_at, '%M %e, %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        $vehicleData = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(
+                10,
+                ['*'],
+                'vehicle_page',
+                $vehiclePage
+            );
+
+        $vehicleData->getCollection()->transform(
+            function ($vehicleForm) {
+
+            $passengerArray = (
+                $vehicleForm->passengers &&
+                $vehicleForm->passengers !== 'None'
+            )
+            
+            ? explode("\n", $vehicleForm->passengers) : [];
+            $passengerCount = count($passengerArray);
+
+            return [
+                'veh_id' => $vehicleForm->id,
+                'veh_date_req' => \Carbon\Carbon::parse($vehicleForm->created_at)->format('F j, Y'),
+                'veh_purpose' => $vehicleForm->purpose,
+                'veh_place' => $vehicleForm->place_visited,
+                'veh_date' => $vehicleForm->date_arrival,
+                'veh_time' => $vehicleForm->time_arrival,
+                'veh_vehicle' => $vehicleForm->vehicle_type,
+                'veh_driver' => $vehicleForm->driver,
+                'veh_passengers' => $passengerCount,
+                'status' => $vehicleForm->admin_approval,
+                'remarks' => $vehicleForm->remarks
+            ];
+        });
+
+        return response()->json($vehicleData);
+    }
 }

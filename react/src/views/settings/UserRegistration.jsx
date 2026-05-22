@@ -51,7 +51,6 @@ export default function UserRegistrationJLMS(){
     }
   },[]);
 
-  const [inputErrors, setInputErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // Variable
@@ -68,7 +67,7 @@ export default function UserRegistrationJLMS(){
   const [getusername, setUsername] = useState('');
   const [getpassword, setPassword] = useState('');
   const [passwordCorfirmation, setPasswordConfirmation] = useState('');
-  const [selectedRoles, setSelectedRoles] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState([]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
@@ -76,17 +75,102 @@ export default function UserRegistrationJLMS(){
 
   // Get The Avatar Image
   const handleAvatarChange = (e) => {
-    const selectedAvatarFile = e.target.files[0];
-    setUploadAvatarName(selectedAvatarFile.name);
-    setUploadAvatar(selectedAvatarFile);
-  }
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    // 2MB limit
+    const maxSize = 2 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      setShowPopup(true);
+      setPopupContent("check-error");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">File Too Large</p>
+          <p className="popup-message">
+            Avatar must not exceed 2MB.
+          </p>
+        </div>
+      );
+
+      // reset input
+      e.target.value = "";
+      return;
+    }
+
+    // Optional: validate file type
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!allowedTypes.includes(file.type)) {
+      setShowPopup(true);
+      setPopupContent("check-error");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Invalid File</p>
+          <p className="popup-message">
+            Only PNG, JPG, and JPEG are allowed.
+          </p>
+        </div>
+      );
+
+      e.target.value = "";
+      return;
+    }
+
+    // If valid
+    setUploadAvatarName(file.name);
+    setUploadAvatar(file);
+  };
 
   // Get The Esig Image
   const handleEsigChange = (e) => {
-    const selectedEsigFile = e.target.files[0];
-    setUploadedEsigName(selectedEsigFile.name);
-    setUploadEsig(selectedEsigFile);
-  }
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/png"];
+
+    if (!allowedTypes.includes(file.type)) {
+      setShowPopup(true);
+      setPopupContent("check-error");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Invalid File</p>
+          <p className="popup-message">
+            Only PNG is allowed.
+          </p>
+        </div>
+      );
+
+      e.target.value = "";
+      return;
+    }
+
+    // 2MB limit
+    const maxSize = 2 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      setShowPopup(true);
+      setPopupContent("check-error");
+      setPopupMessage(
+        <div>
+          <p className="popup-title">File Too Large</p>
+          <p className="popup-message">
+            E-signature must not exceed 2MB.
+          </p>
+        </div>
+      );
+
+      e.target.value = "";
+      return;
+    }
+
+    // If valid
+    setUploadedEsigName(file.name);
+    setUploadEsig(file);
+  };
 
   // Code Clearance
   const handleCheckboxChange = (e, role) => {
@@ -121,40 +205,89 @@ export default function UserRegistrationJLMS(){
     formData.append("password", getpassword);
     formData.append("status", 2);
     formData.append("registrant", currentUserName.name);
-    
-    if(getpassword == passwordCorfirmation) { 
-      // Axios Client
-      axiosClient.post("/register", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Custom-Header": "value"
-        },
-      })
-      .then(() => {
+
+    if(!selectedRoles.length){
+      setShowPopup(true);
+      setPopupContent('check-error');
+      setPopupMessage(
+        <div>
+          <p className="popup-title">Error</p>
+          <p className="popup-message">Please select a badge</p>
+        </div>
+      );
+      setSubmitLoading(false);
+    }else{
+      if(getpassword == passwordCorfirmation) { 
+        // Axios Client
+        axiosClient.post("/register", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Custom-Header": "value"
+          },
+        })
+        .then(() => {
+          setShowPopup(true);
+          setPopupContent('success');
+          setPopupMessage(
+            <div>
+              <p className="popup-title">Register Complete!</p>
+              <p className="popup-message">The new user has been added to the database.</p>
+            </div>
+          );
+        })
+        .catch((error)=>{
+          if (error.response.status === 500) {
+            setShowPopup(true);
+            setPopupContent('error');
+            setPopupMessage(error.response.status);
+          }else if(error.response.status === 409){
+            setPopupContent("check-error");
+            setPopupMessage(
+              <div>
+                <p className="popup-title">Error</p>
+                <p className="popup-message">
+                  Username exists
+                </p>
+              </div>
+            );
+            setShowPopup(true);
+          }else{
+            const responseErrors = error.response.data.errors;
+            setPopupContent("check-error");
+            setPopupMessage(
+              <div>
+                <p className="popup-title">Error</p>
+                <p className="popup-message">
+                  {responseErrors.firstname ? "Please enter First name" : 
+                  responseErrors.lastname ? "Please enter Last name"  :
+                  responseErrors.gender ? "Please enter Gender"  :
+                  responseErrors.position ? "Please enter Position"  :
+                  responseErrors.division ? "Please enter Division"  :
+                  responseErrors.username ? "Please enter Username "  :
+                  responseErrors.password ? "Please enter Password "  :
+                  responseErrors.avatar ? "Please enter Avatar "  :
+                  responseErrors.esig ? "Please enter Esig "  :  null
+                  }
+                </p>
+              </div>
+            );
+            setShowPopup(true);
+          }
+        })
+        .finally(() => {
+          setSubmitLoading(false);
+        }); 
+      } else {
         setShowPopup(true);
-        setPopupContent('success');
+        setPopupContent('check-error');
         setPopupMessage(
           <div>
-            <p className="popup-title">Register Complete!</p>
-            <p className="popup-message">The new user has been added to the database.</p>
+            <p className="popup-title">Error</p>
+            <p className="popup-message">Confirm password not match</p>
           </div>
         );
-      })
-      .catch((error)=>{
-        if (error.response.status === 500) {
-          setShowPopup(true);
-          setPopupContent('error');
-          setPopupMessage(error.response.status);
-        }else{
-          const responseErrors = error.response.data.errors;
-          setInputErrors(responseErrors);
-        }
-      })
-      .finally(() => {
         setSubmitLoading(false);
-      }); 
-    } else {
-      setPasswordNotMatch(true);
+      }
     }
   }
 
@@ -172,7 +305,7 @@ export default function UserRegistrationJLMS(){
   
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
-  const roles = ["NERD", "AUS"];
+  const roles = ["HACK", "AUS"];
   const Access = roles.some(role => codes.includes(role));
   return(
     !pageRestrict ? (<Restrict />):(
@@ -186,96 +319,104 @@ export default function UserRegistrationJLMS(){
               {/* 1st Column */}
               <div className="col-span-1 px-4">
                 {/* Name */}
-                <div className="items-center mt-4">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Name: 
-                      <div className="ml-2">
-                        {!lastName && !firstName && !middleName && inputErrors.lastname && inputErrors.firstname && inputErrors.middlename ? (
-                          <p className="form-validation">Please Input the given name</p>
-                        ):!lastName && inputErrors && inputErrors.lastname ? (
-                          <p className="form-validation">Last name is empty</p>
-                        ):!firstName && inputErrors && inputErrors.firstname ? (
-                          <p className="form-validation">First name is empty</p>
-                        ):!middleName && inputErrors && inputErrors.middlename ? (
-                          <p className="form-validation">Middle initial is required</p>
-                        ):null}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Name
                     </label> 
                   </div>
-                  <div className="w-full flex gap-2">
-                    {/* First Name */}
-                    <div className="w-[40%]">
-                      <input
-                        type="text"
-                        className={`block w-full ${(!firstName && inputErrors.firstname) ? "ppa-form-error":"ppa-form-field"}`}
-                        value={firstName}
-                        onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
-                        placeholder="First Name"
-                      />
-                    </div>
-                    {/* Middle Initial */}
-                    <div className="w-[20%]">
-                      <input
-                        type="text"
-                        className={`block w-full ${(!middleName && inputErrors.middlename) ? "ppa-form-error":"ppa-form-field"}`}
-                        value={middleName}
-                        onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
-                        placeholder="M.I"
-                        maxLength={2}
-                      />
-                    </div>
-                    {/* Last Name */}
-                    <div className="w-[40%]">
-                      <input
-                        type="text"
-                        className={`block w-full ${(!lastName && inputErrors.lastname) ? "ppa-form-error":"ppa-form-field"}`}
-                        value={lastName}
-                        onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
-                        placeholder="Last Name"
-                      />
+                  <div className="w-full">
+                    <div className="flex">
+                      <div className="w-[45%]">
+                        <input
+                          type="text"
+                          className="focus:ring-0 w-full form-fields h-[40px] border"
+                          value={firstName}
+                          onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
+                          placeholder="First Name"
+                        />
+                      </div>
+                      <div className="w-[10%]">
+                        <input
+                          type="text"
+                          className="focus:ring-0 block w-full form-fields border-t border-b h-[40px]"
+                          value={middleName}
+                          onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
+                          placeholder="M.I"
+                          maxLength={2}
+                        />
+                      </div>
+                      <div className="w-[45%]">
+                        <input
+                          type="text"
+                          className="focus:ring-0 block w-full form-fields-last"
+                          value={lastName}
+                          onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
+                          placeholder="Last Name"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <p className="text-gray-500 text-xs mt-1">Please enter the middle initial without a dot.</p>
                 </div>
 
                 {/* Gender */}
-                <div className="items-center mt-2">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Gender: 
-                      <div className="ml-2">
-                        {!gender && inputErrors && inputErrors.gender && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Gender
                     </label> 
                   </div>
                   <div className="w-full">
-                    <select 
-                      name="gender" 
-                      id="gender"
-                      value={gender}
-                      onChange={ev => setGender(ev.target.value)}
-                      className={`block w-full ${(!gender && inputErrors.gender) ? "ppa-form-error":"ppa-form-field"}`}
-                    >
-                      <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
+                    <div className="flex">
+                      {/* Male */}
+                      <div className="flex items-center">
+                        <input
+                          id="within-city-checkbox"
+                          type="checkbox"
+                          checked={gender === "Male"}
+                          onChange={() =>
+                            setGender(prev =>
+                              prev === "Male" ? "" : "Male"
+                            )
+                          }
+                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                        />
+                        <label
+                          htmlFor="within-city-checkbox"
+                          className="border-t border-b form-title-choose"
+                        >
+                          Male
+                        </label>
+                      </div>
+                      {/* Female */}
+                      <div className="flex items-center">
+                        <input
+                          id="outside-city-checkbox"
+                          type="checkbox"
+                          checked={gender === "Female"}
+                          onChange={() =>
+                            setGender(prev =>
+                              prev === "Female" ? "" : "Female"
+                            )
+                          }
+                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                        />
+                        <label
+                          htmlFor="outside-city-checkbox"
+                          className="border-t border-b border-r form-title-choose"
+                        >
+                          Female
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
                 {/* Position */}
-                <div className="items-center mt-2">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Position: 
-                      <div className="ml-2">
-                        {!position && inputErrors && inputErrors.position && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Position
                     </label> 
                   </div>
                   <div className="w-full">
@@ -285,22 +426,17 @@ export default function UserRegistrationJLMS(){
                       type="text"
                       value={position}
                       onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
-                      placeholder="Division Manager A"
-                      className={`block w-full ${(!position && inputErrors.position) ? "ppa-form-error":"ppa-form-field"}`}
+                      placeholder="Enter your position"
+                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
                     />
                   </div>
                 </div>
 
                 {/* Division */}
-                <div className="items-center mt-2">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Division: 
-                      <div className="ml-2">
-                        {!division && inputErrors && inputErrors.division && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Division
                     </label> 
                   </div>
                   <div className="w-full">
@@ -309,7 +445,7 @@ export default function UserRegistrationJLMS(){
                       id="ppa-division"
                       value={division}
                       onChange={ev => setDivision(ev.target.value)}
-                      className={`block w-full ${(!division && inputErrors.division) ? "ppa-form-error":"ppa-form-field"}`}
+                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
                     >
                       <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
                       <option value="Administrative Division">Administrative Division</option>
@@ -324,100 +460,86 @@ export default function UserRegistrationJLMS(){
                 </div>
 
                 {/* Username */}
-                <div className="items-center mt-2">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Username: 
-                      <div className="ml-2">
-                        {!getusername && inputErrors && inputErrors.username && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Username
                     </label> 
                   </div>
                   <div className="w-full">
                     <input
-                        id="ppa-username"
-                        name="ppa-username"
-                        type="text"
-                        value={getusername}
-                        onChange={ev => setUsername(ev.target.value)}
-                        className={`block w-full ${(!getusername && inputErrors.username) ? "ppa-form-error":"ppa-form-field"}`}
-                        placeholder="Input username"
-                      />
+                      id="ppa-username"
+                      name="ppa-username"
+                      type="text"
+                      value={getusername}
+                      onChange={ev => setUsername(ev.target.value)}
+                      placeholder="Enter your username"
+                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                    />
                   </div>
                 </div>
 
                 {/* Password */}
-                <div className="items-center mt-2">
-                  <div className="w-full">
-                    <label htmlFor="rep_type_of_property" className="flex form-title">
-                      Password: 
-                      <div className="ml-2">
-                        {!getpassword && inputErrors && inputErrors.password ? (
-                          <p className="form-validation">This form is required</p>
-                        ): passwordNotMatch ? (
-                          <p className="form-validation">Password does not match</p>
-                        ):null}
-                      </div>
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Password
                     </label> 
                   </div>
                   <div className="w-full relative">
-                    {/* Password */}
-                    <div className="w-full relative">
-                      <input
-                        id="password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={getpassword}
-                        onChange={ev => setPassword(ev.target.value)}
-                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form-field"}`}
-                        placeholder="Input Password"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                      </button>
-                    </div>
-                    {/* Confirm Password */}
-                    <div className="w-full relative">
-                      <input
-                        id="password"
-                        name="password"
-                        type={showPasswordConfirm ? 'text' : 'password'}
-                        value={passwordCorfirmation}
-                        onChange={ev => setPasswordConfirmation(ev.target.value)}
-                        className={`block w-full ${(!getpassword && inputErrors.password) ? "ppa-form-error":"ppa-form-field"}`}
-                        placeholder="Confirm Password"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
-                        onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                      >
-                        <FontAwesomeIcon icon={showPasswordConfirm ? faEyeSlash : faEye} />
-                      </button>
-                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={getpassword}
+                      onChange={ev => setPassword(ev.target.value)}
+                      placeholder="Enter your password"
+                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    </button>
                   </div>
-                  <p className="text-gray-500 text-xs mt-1">Password must contain, At least one uppercase letter, One number, One symbol, And be at least 8 characters long</p>
+                </div>
+
+                {/* Confirm Password */}
+                <div className="flex items-center mt-2">
+                  <div className="w-56 form-title">
+                    <label htmlFor="rep_date"> 
+                      Confirm Password
+                    </label> 
+                  </div>
+                  <div className="w-full relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPasswordConfirm ? 'text' : 'password'}
+                      value={passwordCorfirmation}
+                      onChange={ev => setPasswordConfirmation(ev.target.value)}
+                      placeholder="Re-enter the password"
+                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bottom-0 px-3 h-full icon-form"
+                      onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    >
+                      <FontAwesomeIcon icon={showPasswordConfirm ? faEyeSlash : faEye} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Avatar */}
                 <div className="items-center mt-2">
-                  <div className="w-full">
-                      <label htmlFor="ppa-avatar" className="flex form-title">
-                      Upload Avatar:
-                      <div className="ml-2">
-                        {!uploadedAvatarName && inputErrors && inputErrors.avatar && (
-                          <p className="form-validation">This form is required</p>
-                        )}
-                      </div>
+                  <div className="w-20 form-title-separate">
+                    <label htmlFor="rep_date"> 
+                      Avatar
                     </label> 
                   </div>
-
                   <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
                     <div className="text-center">
                       <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -444,17 +566,11 @@ export default function UserRegistrationJLMS(){
 
                 {/* Esig */}
                 <div className="items-center mt-2">
-                  <div className="w-full">
-                  <label htmlFor="ppa-esignature" className="flex form-title">
-                    Upload Esig:
-                    <div className="ml-2">
-                      {!uploadedEsigName && inputErrors && inputErrors.esig && (
-                        <p className="form-validation">This form is required</p>
-                      )}
-                    </div>
-                  </label> 
+                  <div className="w-32 form-title-separate">
+                    <label htmlFor="rep_date"> 
+                      E-signature
+                    </label> 
                   </div>
-
                   <div className="mt-2 w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-1">
                     <div className="text-center">
                       <svg className="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -478,15 +594,16 @@ export default function UserRegistrationJLMS(){
                     </div>
                   </div>
                 </div>
+
               </div>
 
               {/* 2nd Column */}
               <div className="col-span-1 px-4">
                 {/* Badge */}
                 <div className="items-center mt-2">
-                  <div className="font-roboto">
-                    <label htmlFor="rf_request" className="form-title">
-                      Badge:
+                  <div className="w-24 form-title-separate">
+                    <label htmlFor="rep_date"> 
+                      Badge
                     </label> 
                   </div>
                   <div className="w-full">
@@ -498,7 +615,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('PM')}
                           onChange={(e) => handleCheckboxChange(e, 'PM')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -515,7 +632,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('DM')}
                           onChange={(e) => handleCheckboxChange(e, 'DM')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -532,7 +649,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('AM')}
                           onChange={(e) => handleCheckboxChange(e, 'AM')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -549,7 +666,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('GSO')}
                           onChange={(e) => handleCheckboxChange(e, 'GSO')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -566,7 +683,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('AUS')}
                           onChange={(e) => handleCheckboxChange(e, 'AUS')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -583,7 +700,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('AUI')}
                           onChange={(e) => handleCheckboxChange(e, 'AUI')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -600,7 +717,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('AUF')}
                           onChange={(e) => handleCheckboxChange(e, 'AUF')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -617,7 +734,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('AUV')}
                           onChange={(e) => handleCheckboxChange(e, 'AUV')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -634,7 +751,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('SEC')}
                           onChange={(e) => handleCheckboxChange(e, 'SEC')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -651,7 +768,7 @@ export default function UserRegistrationJLMS(){
                           type="checkbox"
                           checked={selectedRoles.includes('MEM')}
                           onChange={(e) => handleCheckboxChange(e, 'MEM')}
-                          className="focus:ring-gray-400 h-6 w-6 border-black-500 rounded"
+                          className="focus:ring-0 h-[25px] w-[25px] form-check checked"
                         />
                       </div>
                       <div className="ml-3">
@@ -671,7 +788,7 @@ export default function UserRegistrationJLMS(){
               {/* Submit */}
               <button 
                 type="submit"
-                className={`w-full md:w-auto py-2 px-4 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                className={`w-full md:w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                 disabled={submitLoading}
               >
                 {submitLoading ? (

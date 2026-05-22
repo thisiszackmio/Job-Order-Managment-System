@@ -650,6 +650,7 @@ class TravelDetailController extends Controller
         $today = Carbon::today();
 
         $vehicleSlip = VehicleSlipModel::whereDate('date_arrival', '>=', $today)
+            ->whereIn('admin_approval', [1, 2])
             ->orderBy('date_arrival', 'asc')
             ->get();
 
@@ -734,7 +735,7 @@ class TravelDetailController extends Controller
         $today = Carbon::today();
 
         // Check if there is schedule form today
-        $vehicleData = VehicleSlipModel::whereDate('date_arrival', $today)->get();
+        $vehicleData = VehicleSlipModel::whereDate('date_arrival', $today)->whereIn('admin_approval', [1, 2])->get();
 
         foreach ($vehicleData as $item) {
 

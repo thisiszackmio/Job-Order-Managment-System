@@ -13,105 +13,43 @@ export default function VehicleSlipList(){
   const { currentUserId, currentUserCode } = useUserStateContext();
 
   // Loading
-  const [loading, setLoading] = useState(true);
+  const [loadingList, setLoadingList] = useState(true);
 
   const [pageRestrict, setPageRestrict] = useState(true);
 
-  // Disable the Scroll on Popup
-  useEffect(() => {
-  
-    // Define the classes to be added/removed
-    const loadingClass = 'loading-show';
+  const [vehicleData, setVehicleData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [search, setSearch] = useState('');
 
-    // Function to add the class to the body
-    const addLoadingClass = () => document.body.classList.add(loadingClass);
+  const fetchVehicleData = async (page = 1, searchValue = search) => {
+  try {
+    setLoadingList(true);
 
-    // Function to remove the class from the body
-    const removeLoadingClass = () => document.body.classList.remove(loadingClass);
-
-    // Add or remove the class based on showPopup state
-    if(loading) {
-      addLoadingClass();
-    }
-    else {
-      removeLoadingClass();
-    }
-
-    // Cleanup function to remove the class when the component is unmounted or showPopup changes
-    return () => {
-      removeLoadingClass();
-    };
-  }, [loading]);
-
-  // Vehicle Data 
-  const [formlist, setFormList] = useState([]);
-
-  const fetchVehicleList = async () => {
-    try{
-      const response = await axiosClient.get('/allvehicleslip');
-      const dataVehicle = response.data;
-
-      setFormList(dataVehicle);
-
-      if(accessOnly){
-        setPageRestrict(true);
-      }else{
-        setPageRestrict(false);
-      }
-
-    }catch(error){
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if(currentUserId){
-      fetchVehicleList();
-    }
-  }, []);
-
-  //Search Filter and Pagination
-  const itemsPerPage = 30;
-  const [currentPage, setCurrentPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(0); // Reset page when searching
-  };
-
-  const filteredList = formlist.filter((list) => {
-    const requestor = list.requestor?.toLowerCase() || '';
-    const driver = list.driver?.toLowerCase() || '';
-    const vehicle_type = list.vehicle_type?.toLowerCase() || '';
-    const date_request = list.date_request?.toLowerCase() || '';
-    const search = searchTerm.toLowerCase();
-  
-    return (
-      requestor.includes(search) ||
-      driver.includes(search) ||
-      vehicle_type.includes(search) ||
-      date_request.includes(search)
+    const res = await axiosClient.get(
+      `/allvehicleslip?page=${page}&search=${searchValue}`
     );
-  });
 
-  const pageCountUser = Math.ceil(filteredList.length / itemsPerPage);
-  const displayPaginationUser = pageCountUser > 1;
+    setVehicleData(res.data.data);
+    setCurrentPage(res.data.current_page);
+    setLastPage(res.data.last_page);
 
-  // Calculate range for display
-  const startIndex = currentPage * itemsPerPage + 1;
-  const endIndex = Math.min((currentPage + 1) * itemsPerPage, filteredList.length);
+    if(accessOnly){
+      setPageRestrict(true);
+    }else{
+      setPageRestrict(false);
+    }
 
-  const currentList = filteredList.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingList(false);
+  }
+};
 
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
+  useEffect(() => {
+    fetchVehicleData();
+  }, []);
 
   // Restrictions Condition
   const ucode = currentUserCode;
@@ -120,183 +58,192 @@ export default function VehicleSlipList(){
   const accessOnly = roles.some(role => codes.includes(role));
 
   return (
-    pageRestrict ? (
-      <PageComponent title="Request List">
-        {/* Main */}
-        <div className="mt-8">
-          <div className="ppa-widget px-4 pb-6">
-            {/* Header */}
-            <div className="joms-user-info-header text-left"> 
-              Vehicle Slip Request List
-            </div>
+    !pageRestrict ? (<Restrict />):
+    (
+    <PageComponent title="Request List">
+      {/* Main */}
+      <div className="mt-8">
+        <div className="ppa-widget px-4 pb-6">
+          {/* Header */}
+          <div className="joms-user-info-header text-left"> 
+            Vehicle Slip Request List
+          </div>
 
-            {/* Search */}
-            <div className="pt-3">
-              {/* Search Filter */}
-              <div className="md:flex">
-                {/* Search */}
-                <div className="flex-grow">
-                  <input
-                    type="text"
-                    placeholder="Search Here"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
-                    disabled={loading}
-                  />
-                </div>
+          {/* Top */}
+          <div className="pt-3">
+            <div className="flex w-full justify-between items-center">
 
-                {/* Count */}
-                <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
-                  <div className="text-right text-sm/[17px]">
-                    Total of{" "}
-                    {pageCountUser > 1 ? (
-                      <b>{startIndex} - {endIndex}</b>
-                    ) : (
-                      <b>{filteredList.length}</b>
-                    )}{" "}
-                    out of <b>{filteredList.length}</b> Request list
-                  </div>
-                </div>
+              {/* Search (LEFT) */}
+              <input
+                type="text"
+                placeholder="Search vehicle, driver, purpose..."
+                value={search}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearch(value);
+                  fetchVehicleData(1, value);
+                }}
+                className="block w-1/4 focus:ring-0 ppa-form-field-en"
+              />
+
+              {/* Page Count (RIGHT) */}
+              <div className="text-sm text-right">
+                Page {currentPage} of {lastPage}
               </div>
-            </div>
 
-            {/* Top Pagination */}
-            <div className="mt-6">
-              {displayPaginationUser && !loading && (
-                <ReactPaginate
-                  previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                  nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                  breakLabel="..."
-                  pageCount={pageCountUser}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  onPageChange={handlePageChange}
-                  forcePage={currentPage}
-                  containerClassName="pagination"
-                  activeClassName="active"
+            </div>
+          </div>
+
+          {/* Pagination Top */}
+          {lastPage > 1 && (
+            <div className="flex gap-2 mt-4">
+              {/* Prev */}
+              <button
+                disabled={currentPage === 1}
+                onClick={() => fetchVehicleData(currentPage - 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Prev"
+                  icon={faChevronLeft}
                 />
-              )}
-            </div>
+              </button>
 
-            {/* Table */}
-            <div className="ppa-div-table mt-8 pb-3 overflow-x-auto md:overflow-x-visible">
-              <table className="ppa-table w-full">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Place Visited</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Arrival</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Time Arrival</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Driver</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Vehicle</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Requestor</th>
-                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
-                  {loading ? (
-                    Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
-                      <tr key={index}>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
+              {/* Next */}
+              <button
+                disabled={currentPage === lastPage}
+                onClick={() => fetchVehicleData(currentPage + 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Next"
+                  icon={faChevronRight}
+                />
+              </button>
+            </div>
+          )}
+
+          {/* Table */}
+          <div className="ppa-div-table mt-4 overflow-x-auto md:overflow-x-visible">
+            <table className="ppa-table w-full">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                  <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Place Visited</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Arrival</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Time Arrival</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Driver</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Vehicle</th>
+                  <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Requestor</th>
+                  <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
+                </tr>
+              </thead>
+              <tbody className="ppa-tbody">
+                {loadingList ? (
+                  Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
+                    <tr key={index}>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                      <td className="p-3 ppa-table-body">
+                        <div className="skeleton h-4"></div>
+                      </td>
+                    </tr>
+                  ))
+                ):(
+                  vehicleData.length > 0 ? (
+                    vehicleData.map((list) => (
+                      <tr key={list.id}>
+                        <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
+                          <Link
+                            to={`/joms/vehicle/form/${list.id}`}
+                            className="group flex justify-center items-center"
+                          >
+                            {/* Initially show the ID */}
+                            <span className="group-hover:hidden">{list.id}</span>
+
+                            {/* Show the View Icon on hover */}
+                            <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                              <FontAwesomeIcon icon={faEye} />
+                            </span>
+                          </Link>
                         </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="p-3 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.date_request}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.place_visited}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.date_arrival}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.time_arrival}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.driver ? list.driver : "None"}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.vehicle_type ? list.vehicle_type : "None"}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.requestor}</td>
+                        <td className="px-4 py-2 text-left ppa-table-body">{list.remarks}</td>
                       </tr>
                     ))
                   ):(
-                    currentList.length > 0 ? (
-                      currentList.map((list)=>(
-                        <tr key={list.id}>
-                          <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
-                            <Link
-                              to={`/joms/vehicle/form/${list.id}`}
-                              className="group flex justify-center items-center"
-                            >
-                              {/* Initially show the ID */}
-                              <span className="group-hover:hidden">{list.id}</span>
-  
-                              {/* Show the View Icon on hover */}
-                              <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
-                                <FontAwesomeIcon icon={faEye} />
-                              </span>
-                            </Link>
-                          </td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.date_request}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.place_visited}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.date_arrival}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.time_arrival}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.driver ? list.driver : "None"}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.vehicle_type ? list.vehicle_type : "None"}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.requestor}</td>
-                          <td className="px-4 py-2 text-left ppa-table-body">{list.remarks}</td>
-                        </tr>
-                      ))
-                    ):(
-                      <tr>
-                        <td colSpan={9} className="px-2 py-5 text-center ppa-table-body">
-                          No records found
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Bottom Pagination */}
-            {displayPaginationUser && !loading && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={pageCountUser}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={handlePageChange}
-                forcePage={currentPage}
-                containerClassName="pagination"
-                subContainerClassName="pages pagination"
-                activeClassName="active"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-              />
-            )}
+                    <tr>
+                      <td colSpan={9} className="px-2 py-5 text-center ppa-table-body">
+                        No records found
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
           </div>
+
+          {/* Pagination Bottom */}
+          {lastPage > 1 && (
+            <div className="flex gap-2 mt-4">
+              {/* Prev */}
+              <button
+                disabled={currentPage === 1}
+                onClick={() => fetchVehicleData(currentPage - 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Prev"
+                  icon={faChevronLeft}
+                />
+              </button>
+
+              {/* Next */}
+              <button
+                disabled={currentPage === lastPage}
+                onClick={() => fetchVehicleData(currentPage + 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Next"
+                  icon={faChevronRight}
+                />
+              </button>
+            </div>
+          )}
+
         </div>
-      </PageComponent>
-    ):(
-      <Restrict />
+      </div>
+    </PageComponent>
     )
   );
 

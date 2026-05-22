@@ -547,7 +547,7 @@ export default function FacilityVenueForm(){
                   <button 
                     onClick={SubmitFacilityForm} 
                     type="submit"
-                    className={`w-full md:w-auto py-1.5 px-4 text-base ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    className={`w-full md:w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -562,7 +562,7 @@ export default function FacilityVenueForm(){
 
                   {/* Cancel */}
                   {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-1.5 px-4 text-base btn-cancel">
+                    <button onClick={() => setConfirmation(false)} className="w-full md:w-auto ml-2 py-1.5 px-4 text-sm btn-cancel">
                       Revise
                     </button>
                   )}
@@ -572,12 +572,12 @@ export default function FacilityVenueForm(){
                   {/* Check Form */}
                   <button 
                     onClick={handleConfirm} 
-                    className="w-full md:w-auto py-1.5 px-4 text-base btn-secondary">
+                    className="w-full md:w-auto py-1.5 px-4 text-sm btn-secondary">
                     Submit
                   </button>
 
                   {/* Cancel */}
-                  <button onClick={handleCancel} className="w-full md:w-auto ml-2 py-1.5 px-4 text-base btn-cancel">
+                  <button onClick={handleCancel} className="w-full md:w-auto ml-2 py-1.5 px-4 text-sm btn-cancel">
                     Cancel
                   </button>
                 </>
@@ -588,7 +588,7 @@ export default function FacilityVenueForm(){
                 <button 
                   type="submit"
                   onClick={checkAvailability}
-                  className={`w-full md:w-auto py-1.5 px-4 text-base ${ submitLoading ? 'btn-process' : 'btn-primary' }`}
+                  className={`w-full md:w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-primary' }`}
                   disabled={submitLoading}
                 >
                   {submitLoading ? (

@@ -12,7 +12,9 @@ export default function MyRequest(){
   const { currentUserId } = useUserStateContext();
 
   // Loading
-  const [loading, setLoading] = useState(true);
+  const [loadingInsp, setLoadingInsp] = useState(true);
+  const [loadingFac, setLoadingFac] = useState(true);
+  const [loadingVeh, setLoadingVeh] = useState(true);
 
   //Date Format 
   function formatDate(dateString) {
@@ -54,25 +56,71 @@ export default function MyRequest(){
 
   // --- Inspection Data --- //
   const [inspectionForm, getInspectionForm] = useState([]);
-  const [facilityForm, getFacilityForm] = useState([]);
-  const [vehicleForm, getVehicleForm] = useState([]);
+  const [currentInspPage, setCurrentInspPage] = useState(1);
+  const [lastInspPage, setLastInspPage] = useState(1);
+  const [searchInsp, setSearchInsp] = useState('');
 
-  const fetchInspection = async () => {
+  const fetchInspection = async (page = 1, searchValue = searchInsp) => {
     try {
-      const response = await axiosClient.get(`/jomsmyrequest/${currentUserId}`);
-      const responseForm = response.data;
+      setLoadingInsp(true);
+      
+      const InspRes = await axiosClient.get(`/jomsmyinsprequest/${currentUserId}?inspection_page=${page}&search=${searchValue}`);
 
-      console.log(responseForm.inspection);
-      if(responseForm){
-        getInspectionForm(responseForm.inspection);
-        getFacilityForm(responseForm.facility);
-        getVehicleForm(responseForm.vehicle)
-      }
+      // console.log(InspRes.data.last_page);
+      getInspectionForm(InspRes.data.data);
+      setCurrentInspPage(InspRes.data.current_page);
+      setLastInspPage(InspRes.data.last_page);
 
     } catch(error){
       console.error(error);
     } finally {
-      setLoading(false);
+      setLoadingInsp(false);
+    }
+  }
+
+  // --- Facility Data --- // 
+  const [facilityForm, getFacilityForm] = useState([]);
+  const [currentFacPage, setCurrentFacPage] = useState(1);
+  const [lastFacPage, setLastFacPage] = useState(1);
+  const [searchFac, setSearchFac] = useState('');
+
+  const fetchFacility = async (page = 1, searchValue = searchFac) => {
+    try {
+      setLoadingFac(true);
+      const FacRes = await axiosClient.get(`/jomsmyfacrequest/${currentUserId}?facility_page=${page}&search=${searchValue}`);
+
+      // console.log(FacRes.data.last_page);
+      getFacilityForm(FacRes.data.data);
+      setCurrentFacPage(FacRes.data.current_page);
+      setLastFacPage(FacRes.data.last_page);
+
+    } catch(error){
+      console.error(error);
+    } finally {
+      setLoadingFac(false);
+    }
+  }
+  
+  // --- Vehicle Data --- // 
+  const [vehicleForm, getVehicleForm] = useState([]);
+  const [currentVehPage, setCurrentVehPage] = useState(1);
+  const [lastVehPage, setLastVehPage] = useState(1);
+  const [searchVeh, setSearchVeh] = useState('');
+
+  const fetchVehicle = async (page = 1, searchValue = searchVeh) => {
+    try {
+      setLoadingVeh(true);
+      const VehRes = await axiosClient.get(`/jomsmyvehrequest/${currentUserId}?facility_page=${page}&search=${searchValue}`);
+
+      // console.log(VehRes.data.data);
+      getVehicleForm(VehRes.data.data);
+      setCurrentVehPage(VehRes.data.current_page);
+      setLastVehPage(VehRes.data.last_page);
+
+    } catch(error){
+      console.error(error);
+    } finally {
+      setLoadingVeh(false);
     }
   }
 
@@ -80,39 +128,26 @@ export default function MyRequest(){
   useEffect(() => {
     if (currentUserId) {
       fetchInspection();
+      fetchFacility();
+      fetchVehicle();
     }
   }, [currentUserId]);
 
-  // For pagination
-  const ListPerPage = 10;
+  // For search in Inspection
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchInspection(1, searchInsp);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [searchInsp]);
 
-  // Inspection pagination
-  const [inspPage, setInspPage] = useState(0);
-  // Facility pagination
-  const [facPage, setFacPage] = useState(0);
-  // Vehicle pagination
-  const [vehPage, setVehPage] = useState(0);
-
-  // Inspection
-  const paginatedInspection = inspectionForm?.slice(
-    inspPage * ListPerPage,
-    (inspPage + 1) * ListPerPage
-  );
-  // Facility
-  const paginatedFacility = facilityForm?.slice(
-    facPage * ListPerPage,
-    (facPage + 1) * ListPerPage
-  );
-  // Vehicle
-  const paginatedVehicle = vehicleForm?.slice(
-    vehPage * ListPerPage,
-    (vehPage + 1) * ListPerPage
-  );
-
-  // Inspection count
-  const inspPageCount = Math.ceil((inspectionForm?.length || 0) / ListPerPage);
-  const facPageCount  = Math.ceil((facilityForm?.length || 0) / ListPerPage);
-  const vehPageCount  = Math.ceil((vehicleForm?.length || 0) / ListPerPage);
+  // For search in Facility
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchFacility(1, searchFac);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [searchFac]);
 
   return(
     <PageComponent title="My Request">
@@ -138,263 +173,376 @@ export default function MyRequest(){
 
         {/* Inspection Tab */}
         {activeTab === "inspection" && ( 
-        <div className="bg-white tab-container">
-          <div className="mt-10 mb-3 ml-2">
-            {inspPageCount > 1 && !loading && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={inspPageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={({ selected }) => setInspPage(selected)}
-                forcePage={inspPage}
-                containerClassName="pagination"
-                activeClassName="active"
-              />
-            )}
-          </div>
-          {/* Table */}
-          <div>
-            <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
-              <table className="ppa-table w-full">
-                <thead>
-                  <tr>
-                    <th className="px-2 md:px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
-                    <th className="px-2 md:px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
-                    <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Type of Property</th>
-                    <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Description</th>
-                    <th className="px-2 md:px-4 py-2 w-[20%] text-left ppa-table-header">Complain/Defect</th>
-                    <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Approver</th>
-                    <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
-                      <tr key={index}>
-                        <td className="px-2 py-4 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                      </tr>
-                    ))
-                  ):(
-                    paginatedInspection && paginatedInspection?.length > 0 ? (
-                      paginatedInspection.map(getInspData => (
-                        <tr key={getInspData.repair_id}>
-                          <td className="px-2 py-2 md:px-4 md:py-4 w-[5%] font-bold text-center ppa-table-body-id">
-                            <Link 
-                              to={`/joms/inspection/form/${getInspData.repair_id}`} 
-                              className="group flex justify-center items-center"
-                            >
-                              {/* Initially show the ID */}
-                              <span className="group-hover:hidden">{getInspData.repair_id}</span>
-                              
-                              {/* Show the View Icon on hover */}
-                              <span className="hidden group-hover:inline-flex items-center">
-                                <FontAwesomeIcon icon={faEye} />
-                              </span>
-                            </Link>
+          <div className="bg-white tab-container">
+            <div className="mt-10 mb-3 ml-2 px-2">
+              {/* Top */}
+              <div className="pt-3">
+                <div className="flex w-full justify-between items-center">
+
+                  {/* Search (LEFT) */}
+                  <input
+                    type="text"
+                    placeholder="Search here ..."
+                    value={searchInsp}
+                    onChange={(e) =>
+                      setSearchInsp(e.target.value)
+                    }
+                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                  />
+
+                  {/* Page Count (RIGHT) */}
+                  <div className="text-sm text-right px-2">
+                    Page {currentInspPage} of {lastInspPage}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Pagination Top */}
+              {lastInspPage > 1 && (
+                <div className="flex gap-2 mt-4">
+                  {/* Prev */}
+                  <button
+                    disabled={currentInspPage === 1}
+                    onClick={() => fetchInspection(currentInspPage - 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Prev"
+                      icon={faChevronLeft}
+                    />
+                  </button>
+
+                  {/* Next */}
+                  <button
+                    disabled={currentInspPage === lastInspPage}
+                    onClick={() => fetchInspection(currentInspPage + 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Next"
+                      icon={faChevronRight}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+            {/* Table */}
+            <div>
+              <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
+                <table className="ppa-table w-full">
+                  <thead>
+                    <tr>
+                      <th className="px-2 md:px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                      <th className="px-2 md:px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                      <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Type of Property</th>
+                      <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Description</th>
+                      <th className="px-2 md:px-4 py-2 w-[20%] text-left ppa-table-header">Complain/Defect</th>
+                      <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Approver</th>
+                      <th className="px-2 md:px-4 py-2 w-[15%] text-left ppa-table-header">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingInsp ? (
+                      Array.from({ length: 10 }).map((_, index) => (  // 5 skeleton rows
+                        <tr key={index}>
+                          <td className="px-2 py-4 ppa-table-body">
+                            <div className="skeleton h-4"></div>
                           </td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[10%] text-left ppa-table-body">{formatDate(getInspData.repair_date_request)}</td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_type}</td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_description}</td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[20%] text-left ppa-table-body">{getInspData.repair_complain}</td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_supervisor_name}</td>
-                          <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_remarks}</td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
                         </tr>
                       ))
                     ):(
-                      <tr>
-                        <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
-                          No records found
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
+                      inspectionForm && inspectionForm?.length > 0 ? (
+                        inspectionForm.map(getInspData => (
+                          <tr key={getInspData.repair_id}>
+                            <td className="px-2 py-2 md:px-4 md:py-4 w-[5%] font-bold text-center ppa-table-body-id">
+                              <Link 
+                                to={`/joms/inspection/form/${getInspData.repair_id}`} 
+                                className="group flex justify-center items-center"
+                              >
+                                {/* Initially show the ID */}
+                                <span className="group-hover:hidden">{getInspData.repair_id}</span>
+                                
+                                {/* Show the View Icon on hover */}
+                                <span className="hidden group-hover:inline-flex items-center">
+                                  <FontAwesomeIcon icon={faEye} />
+                                </span>
+                              </Link>
+                            </td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[10%] text-left ppa-table-body">{formatDate(getInspData.repair_date_request)}</td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_type}</td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_description}</td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[20%] text-left ppa-table-body">{getInspData.repair_complain}</td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_supervisor_name}</td>
+                            <td className="px-2 py-2 md:px-4 md:py-2 w-[15%] text-left ppa-table-body">{getInspData.repair_remarks}</td>
+                          </tr>
+                        ))
+                      ):(
+                        <tr>
+                          <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
+                            No records found
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* Facility Tab */}
         {activeTab === "facility" && (
-        <div className="bg-white tab-container">
-          <div className="mt-10 mb-3 ml-2">
-            {facPageCount > 1 && !loading && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={facPageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={({ selected }) => setFacPage(selected)}
-                forcePage={facPage}
-                containerClassName="pagination"
-                activeClassName="active"
-              />
-            )}
-          </div>
-          {/* Table */}
-          <div>
-            <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
-              <table className="ppa-table w-full">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Request Office</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Activity</th>
-                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Date</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Facility/Venue</th>
-                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
-                      <tr key={index}>
-                        <td className="px-2 py-4 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                        <td className="px-2 py-2 ppa-table-body">
-                          <div className="skeleton h-4"></div>
-                        </td>
-                      </tr>
-                    ))
-                  ):(
-                    paginatedFacility && paginatedFacility.length > 0 ? (
-                      paginatedFacility.map(getFacData => (
-                        <tr key={getFacData.fac_id}>
-                          <td className="px-4 py-4 w-[5%] font-bold text-center ppa-table-body-id">
-                            <Link 
-                              to={`/joms/facilityvenue/form/${getFacData.fac_id}`} 
-                              className="group flex justify-center items-center"
-                            >
-                              {/* Initially show the ID */}
-                              <span className="group-hover:hidden">{getFacData.fac_id}</span>
-                              
-                              {/* Show the View Icon on hover */}
-                              <span className="hidden group-hover:inline-flex items-center">
-                                <FontAwesomeIcon icon={faEye} />
-                              </span>
-                            </Link>
+          <div className="bg-white tab-container">
+            <div className="mt-10 mb-3 ml-2 px-2">
+              {/* Top */}
+              <div className="pt-3">
+                <div className="flex w-full justify-between items-center">
+
+                  {/* Search (LEFT) */}
+                  <input
+                    type="text"
+                    placeholder="Search here ..."
+                    value={searchFac}
+                    onChange={(e) =>
+                      setSearchFac(e.target.value)
+                    }
+                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                  />
+
+                  {/* Page Count (RIGHT) */}
+                  <div className="text-sm text-right">
+                    Page {currentFacPage} of {lastFacPage}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Pagination Top */}
+              {lastFacPage > 1 && (
+                <div className="flex gap-2 mt-4">
+                  {/* Prev */}
+                  <button
+                    disabled={currentFacPage === 1}
+                    onClick={() => fetchFacility(currentFacPage - 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Prev"
+                      icon={faChevronLeft}
+                    />
+                  </button>
+
+                  {/* Next */}
+                  <button
+                    disabled={currentFacPage === lastFacPage}
+                    onClick={() => fetchFacility(currentFacPage + 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Next"
+                      icon={faChevronRight}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Table */}
+            <div>
+              <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
+                <table className="ppa-table w-full">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                      <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Request Office</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Activity</th>
+                      <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Date</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Facility/Venue</th>
+                      <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingFac ? (
+                      Array.from({ length: 10 }).map((_, index) => (  // 5 skeleton rows
+                        <tr key={index}>
+                          <td className="px-2 py-4 ppa-table-body">
+                            <div className="skeleton h-4"></div>
                           </td>
-                          <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{formatDate(getFacData.fac_date_request)}</td>
-                          <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getFacData.fac_request_office}</td>
-                          <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getFacData.fac_title_of_activity}</td>
-                          <td className="px-4 py-2 w-[20%] text-left ppa-table-body">
-                            {formatDate(getFacData?.fac_date_start) ===
-                            formatDate(getFacData?.fac_date_end) ? (
-                              `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
-                                getFacData.fac_time_start
-                              )} to ${formatTime(getFacData.fac_time_end)}`
-                            ) : (
-                              `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
-                                getFacData.fac_time_start
-                              )} to ${formatDate(getFacData.fac_date_end)} @ ${formatTime(
-                                getFacData.fac_time_end
-                              )}`
-                            )}
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
                           </td>
-                          <td className="px-4 py-2 w-[15%] text-left ppa-table-body">
-                            {getFacData.mph ? "Multi-Purpose Hall" : null}
-                            {getFacData.conference ? "Conference" : null}
-                            {getFacData.dorm ? "Dormitory" : null}
-                            {getFacData.other ? "Other" : null}
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
                           </td>
-                          <td className="px-4 py-2 w-[25%] text-left ppa-table-body">{getFacData.fac_remarks}</td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
+                          <td className="px-2 py-2 ppa-table-body">
+                            <div className="skeleton h-4"></div>
+                          </td>
                         </tr>
                       ))
                     ):(
-                      <tr>
-                        <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
-                          No records found
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
+                      facilityForm && facilityForm?.length > 0 ? (
+                        facilityForm.map(getFacData => (
+                          <tr key={getFacData.fac_id}>
+                            <td className="px-4 py-4 w-[5%] font-bold text-center ppa-table-body-id">
+                              <Link 
+                                to={`/joms/facilityvenue/form/${getFacData.fac_id}`} 
+                                className="group flex justify-center items-center"
+                              >
+                                {/* Initially show the ID */}
+                                <span className="group-hover:hidden">{getFacData.fac_id}</span>
+                                
+                                {/* Show the View Icon on hover */}
+                                <span className="hidden group-hover:inline-flex items-center">
+                                  <FontAwesomeIcon icon={faEye} />
+                                </span>
+                              </Link>
+                            </td>
+                            <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{formatDate(getFacData.fac_date_request)}</td>
+                            <td className="px-4 py-2 w-[10%] text-left ppa-table-body">{getFacData.fac_request_office}</td>
+                            <td className="px-4 py-2 w-[15%] text-left ppa-table-body">{getFacData.fac_title_of_activity}</td>
+                            <td className="px-4 py-2 w-[20%] text-left ppa-table-body">
+                              {formatDate(getFacData?.fac_date_start) ===
+                              formatDate(getFacData?.fac_date_end) ? (
+                                `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
+                                  getFacData.fac_time_start
+                                )} to ${formatTime(getFacData.fac_time_end)}`
+                              ) : (
+                                `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
+                                  getFacData.fac_time_start
+                                )} to ${formatDate(getFacData.fac_date_end)} @ ${formatTime(
+                                  getFacData.fac_time_end
+                                )}`
+                              )}
+                            </td>
+                            <td className="px-4 py-2 w-[15%] text-left ppa-table-body">
+                              {getFacData.mph ? "Multi-Purpose Hall" : null}
+                              {getFacData.conference ? "Conference" : null}
+                              {getFacData.dorm ? "Dormitory" : null}
+                              {getFacData.other ? "Other" : null}
+                            </td>
+                            <td className="px-4 py-2 w-[25%] text-left ppa-table-body">{getFacData.fac_remarks}</td>
+                          </tr>
+                        ))
+                      ):(
+                        <tr>
+                          <td colSpan={7} className="px-2 py-5 text-center ppa-table-body">
+                            No records found
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* Inspection Tab */}
         {activeTab === "vehicle" && (
-        <div className="bg-white tab-container">
-          <div className="mt-10 mb-3 ml-2">
-            {vehPageCount > 1 && !loading && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={vehPageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={({ selected }) => setVehPage(selected)}
-                forcePage={vehPage}
-                containerClassName="pagination"
-                activeClassName="active"
-              />
-          )}
-          </div>
-          {/* Table */}
-          <div>
-            <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
-              <table className="ppa-table w-full">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
-                    <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Purpose</th>
-                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Arrival</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Vehicle</th>
-                    <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Driver</th>
-                    <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
+          <div className="bg-white tab-container">
+            <div className="mt-10 mb-3 ml-2 px-2">
+              {/* Top */}
+              <div className="pt-3">
+                <div className="flex w-full justify-between items-center">
+
+                  {/* Search (LEFT) */}
+                  <input
+                    type="text"
+                    placeholder="Search here ..."
+                    value={searchVeh}
+                    onChange={(e) =>
+                      setSearchVeh(e.target.value)
+                    }
+                    className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                  />
+
+                  {/* Page Count (RIGHT) */}
+                  <div className="text-sm text-right">
+                    Page {currentVehPage} of {lastVehPage}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Pagination Top */}
+              {lastVehPage > 1 && (
+                <div className="flex gap-2 mt-4">
+                  {/* Prev */}
+                  <button
+                    disabled={currentVehPage === 1}
+                    onClick={() => fetchVehicle(currentVehPage - 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Prev"
+                      icon={faChevronLeft}
+                    />
+                  </button>
+
+                  {/* Next */}
+                  <button
+                    disabled={currentVehPage === lastVehPage}
+                    onClick={() => fetchVehicle(currentVehPage + 1)}
+                    className="px-2 py-1 ppa-add-form text-sm"
+                  >
+                    <FontAwesomeIcon
+                      title="Next"
+                      icon={faChevronRight}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Table */}
+            <div>
+              <div className="pb-4 px-4 ppa-div-table overflow-x-auto md:overflow-x-visible">
+                <table className="ppa-table w-full">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 w-[5%] text-center ppa-table-header">#</th>
+                      <th className="px-4 py-2 w-[10%] text-left ppa-table-header">Date Request</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Purpose</th>
+                      <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Arrival</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Vehicle</th>
+                      <th className="px-4 py-2 w-[15%] text-left ppa-table-header">Driver</th>
+                      <th className="px-4 py-2 w-[20%] text-left ppa-table-header">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {loadingVeh ? (
+                    Array.from({ length: 10 }).map((_, index) => (  // 5 skeleton rows
                       <tr key={index}>
                         <td className="px-2 py-4 ppa-table-body">
                           <div className="skeleton h-4"></div>
@@ -420,8 +568,8 @@ export default function MyRequest(){
                       </tr>
                     ))
                   ):(
-                    paginatedVehicle && paginatedVehicle?.length > 0 ? (
-                      paginatedVehicle.map(getVehData => (
+                    vehicleForm && vehicleForm?.length > 0 ? (
+                      vehicleForm.map(getVehData => (
                         <tr key={getVehData.veh_id}>
                           <td className="px-4 py-2 font-bold text-center ppa-table-body-id">
                             <Link 
@@ -453,12 +601,13 @@ export default function MyRequest(){
                       </tr>
                     )
                   )}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
         )}
+        
       </div>
     </PageComponent>
   );

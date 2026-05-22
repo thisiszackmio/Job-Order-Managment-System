@@ -41,15 +41,20 @@ export default function FacilityVenueFormList(){
   const [pageRestrict, setPageRestrict] = useState(true);
 
   const [formlist, setFormList] = useState([]);
+  const [currentFacPage, setCurrentFacPage] = useState(1);
+  const [lastFacPage, setLastFacPage] = useState(1);
+  const [searchFac, setSearchFac] = useState('');
 
-  const fetchFacilityList = async () => {
+  const fetchFacilityList = async (page = 1, searchValue = searchFac) => {
     try{
-      const response = await axiosClient.get('/allfacility');
-      const dataFacility = response.data;
+      setLoading(true);
+      
+      const FacRes = await axiosClient.get(`/allfacility?facility_page=${page}&search=${searchValue}`);
 
-      // console.log(dataFacility);
-
-      setFormList(dataFacility);
+      // console.log(FacRes.data.data);
+      setFormList(FacRes.data.data);
+      setCurrentFacPage(FacRes.data.current_page);
+      setLastFacPage(FacRes.data.last_page);
 
       if(accessOnly){
         setPageRestrict(true);
@@ -71,48 +76,13 @@ export default function FacilityVenueFormList(){
     }
   }, [currentUserId]);
 
-  //Search Filter and Pagination
-  const itemsPerPage = 30;
-  const [currentPage, setCurrentPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(0); // Reset page when searching
-  };
-
-  const filteredList = formlist.filter((list) => {
-    const dateRequest = formatDate(list.date_request)?.toLowerCase() || '';
-    const request_office = list.request_office?.toLowerCase() || '';
-    const title_activity = list.title_activity?.toLowerCase() || '';
-    const requestor = list.requestor?.toLowerCase() || '';
-    const facility = list.facility?.toLowerCase() || '';
-    const search = searchTerm.toLowerCase();
-  
-    return (
-      dateRequest.includes(search) ||
-      requestor.includes(search) ||
-      request_office.includes(search) ||
-      facility.includes(search) ||
-      title_activity.includes(search)
-    );
-  });
-
-  const pageCountUser = Math.ceil(filteredList.length / itemsPerPage);
-  const displayPaginationUser = pageCountUser > 1;
-
-  // Calculate range for display
-  const startIndex = currentPage * itemsPerPage + 1;
-  const endIndex = Math.min((currentPage + 1) * itemsPerPage, filteredList.length);
-
-  const currentList = filteredList.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
+  // For search in Facility
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchFacilityList(1, searchFac);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [searchFac]);
 
   // Restrictions Condition
   const ucode = currentUserCode;
@@ -123,67 +93,63 @@ export default function FacilityVenueFormList(){
   return(
     <PageComponent title="Request List">
       {!pageRestrict ? (<Restrict />) : (
-      <div className="ppa-widget mt-8">
-        <div className="joms-user-info-header text-left"> 
-          Facility / Venue Form List
-        </div>
-        <div className="px-4 pb-6">
+      <div className="mt-8">
+        <div className="ppa-widget px-4 pb-6">
+          <div className="joms-user-info-header text-left"> 
+            Facility / Venue Form List
+          </div>
 
-          {/* Search Filter */}
-          <div className="md:flex">
+          {/* Top */}
+          <div className="pt-3">
+            <div className="flex w-full justify-between items-center">
 
-            {/* Search */}
-            <div className="flex-grow">
+              {/* Search (LEFT) */}
               <input
                 type="text"
-                placeholder="Search Here"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full md:w-96 p-2 border border-gray-300 rounded text-sm"
+                placeholder="Search here ..."
+                value={searchFac}
+                onChange={(e) =>
+                  setSearchFac(e.target.value)
+                }
+                className="block w-1/4 focus:ring-0 ppa-form-field-en"
               />
-            </div>
 
-            {/* Count */}
-            <div className="md:ml-4" style={{ position: "relative", bottom: "-18px" }}>
-              <div className="text-right text-sm/[17px]">
-                Total of{" "}
-                {pageCountUser > 1 ? (
-                  <b>{startIndex} - {endIndex}</b>
-                ) : (
-                  <b>{filteredList.length}</b>
-                )}{" "}
-                out of <b>{filteredList.length}</b> Request list
+              {/* Page Count (RIGHT) */}
+              <div className="text-sm text-right">
+                Page {currentFacPage} of {lastFacPage}
               </div>
+
             </div>
-
           </div>
 
-          {/* Top Pagination */}
-          <div className="mt-6">
-            {displayPaginationUser && !loading && (
-              <ReactPaginate
-                previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                breakLabel="..."
-                pageCount={pageCountUser}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={handlePageChange}
-                forcePage={currentPage}
-                containerClassName="pagination-top"
-                subContainerClassName="pages pagination"
-                activeClassName="active"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-              />
-            )}
-          </div>
+          {/* Pagination Top */}
+          {lastFacPage > 1 && (
+            <div className="flex gap-2 mt-4">
+              {/* Prev */}
+              <button
+                disabled={currentFacPage === 1}
+                onClick={() => fetchFacilityList(currentFacPage - 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Prev"
+                  icon={faChevronLeft}
+                />
+              </button>
+
+              {/* Next */}
+              <button
+                disabled={currentFacPage === lastFacPage}
+                onClick={() => fetchFacilityList(currentFacPage + 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Next"
+                  icon={faChevronRight}
+                />
+              </button>
+            </div>
+          )}
 
           {/* Table */}
           <div className="ppa-div-table overflow-x-auto md:overflow-x-visible">
@@ -201,108 +167,112 @@ export default function FacilityVenueFormList(){
                 </tr>
               </thead>
               <tbody className="ppa-tbody" style={{ backgroundColor: '#fff' }}>
-                {loading ? (
-                  Array.from({ length: 30 }).map((_, index) => (  // 5 skeleton rows
-                    <tr key={index}>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
+              {loading ? (
+                Array.from({ length: 25 }).map((_, index) => (  // 5 skeleton rows
+                  <tr key={index}>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                    <td className="p-3 ppa-table-body">
+                      <div className="skeleton h-4"></div>
+                    </td>
+                  </tr>
+                ))
+              ):(
+                formlist.length > 0 ? (
+                  formlist.map((list)=>(
+                    <tr key={list.id}>
+                      <td className="px-4 py-4 font-bold text-center ppa-table-body-id">
+                        <Link
+                          to={`/joms/facilityvenue/form/${list.fac_id}`}
+                          className="group flex justify-center items-center"
+                        >
+                          {/* Initially show the ID */}
+                          <span className="group-hover:hidden">{list.fac_id}</span>
+
+                          {/* Show the View Icon on hover */}
+                          <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
+                            <FontAwesomeIcon icon={faEye} />
+                          </span>
+                        </Link>
                       </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
+                      <td className="px-4 py-4 text-left ppa-table-body">{formatDate(list.fac_date_request)}</td>
+                      <td className="px-4 py-4 text-left ppa-table-body">{list.fac_request_office}</td>
+                      <td className="px-4 py-4 text-left ppa-table-body">{list.fac_title_of_activity}</td>
+                      <td className="px-4 py-4 text-left ppa-table-body">
+                        {list.fac_date_start === list.fac_date_end ? (
+                          `${formatDate(list.fac_date_start)} @ ${formatTime(list.fac_time_start)} to ${formatTime(list.fac_time_end)}`
+                        ):(
+                          `${formatDate(list.fac_date_start)} @ ${formatTime(list.fac_time_start)} to ${formatDate(list.fac_date_end)} @ ${formatTime(list.fac_time_end)}`
+                        )}
                       </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
+                      <td className="px-4 py-4 text-left ppa-table-body">
+                        {list.mph ? "MPH":null}
+                        {list.conference ? "Conference":null}
+                        {list.dorm ? "Dormitory":null}
+                        {list.other ? "Others":null}
                       </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
-                      </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
-                      </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
-                      </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
-                      </td>
-                      <td className="p-3 ppa-table-body">
-                        <div className="skeleton h-4"></div>
-                      </td>
+                      <td className="px-4 py-4 text-left ppa-table-body">{list.fac_requestor}</td>
+                      <td className="px-4 py-4 text-left ppa-table-body">{list.fac_remarks}</td>
                     </tr>
                   ))
                 ):(
-                  currentList.length > 0 ? (
-                    currentList.map((list)=>(
-                      <tr key={list.id}>
-                        <td className="px-4 py-4 font-bold text-center ppa-table-body-id">
-                          <Link
-                            to={`/joms/facilityvenue/form/${list.id}`}
-                            className="group flex justify-center items-center"
-                          >
-                            {/* Initially show the ID */}
-                            <span className="group-hover:hidden">{list.id}</span>
-
-                            {/* Show the View Icon on hover */}
-                            <span className="hidden group-hover:inline-flex items-center text-black rounded-md">
-                              <FontAwesomeIcon icon={faEye} />
-                            </span>
-                          </Link>
-                        </td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{formatDate(list.date_request)}</td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{list.request_office}</td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{list.title_activity}</td>
-                        <td className="px-4 py-4 text-left ppa-table-body">
-                          {list.date_start === list.date_end ? (
-                            `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatTime(list.time_end)}`
-                          ):(
-                            `${formatDate(list.date_start)} @ ${formatTime(list.time_start)} to ${formatDate(list.date_end)} @ ${formatTime(list.time_end)}`
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-left ppa-table-body">
-                          {list.mph ? "MPH":null}
-                          {list.conference ? "Conference":null}
-                          {list.dorm ? "Dormitory":null}
-                          {list.other ? "Others":null}
-                        </td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{list.requestor}</td>
-                        <td className="px-4 py-4 text-left ppa-table-body">{list.remarks}</td>
-                      </tr>
-                    ))
-                  ):(
-                    <tr>
-                      <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
-                        No records found
-                      </td>
-                    </tr>
-                  )
-                )}
+                  <tr>
+                    <td colSpan={8} className="px-2 py-5 text-center ppa-table-body">
+                      No records found
+                    </td>
+                  </tr>
+                )
+              )}
               </tbody>
             </table>
           </div>
 
-          {/* Bottom Pagination */}
-          {displayPaginationUser && !loading && (
-            <ReactPaginate
-              previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-              nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-              breakLabel="..."
-              pageCount={pageCountUser}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageChange}
-              forcePage={currentPage}
-              containerClassName="pagination"
-              subContainerClassName="pages pagination"
-              activeClassName="active"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-            />
+          {/* Pagination Bottom */}
+          {lastFacPage > 1 && (
+            <div className="flex gap-2 mt-4">
+              {/* Prev */}
+              <button
+                disabled={currentFacPage === 1}
+                onClick={() => fetchFacilityList(currentFacPage - 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Prev"
+                  icon={faChevronLeft}
+                />
+              </button>
+
+              {/* Next */}
+              <button
+                disabled={currentFacPage === lastFacPage}
+                onClick={() => fetchFacilityList(currentFacPage + 1)}
+                className="px-2 py-1 ppa-add-form text-sm"
+              >
+                <FontAwesomeIcon
+                  title="Next"
+                  icon={faChevronRight}
+                />
+              </button>
+            </div>
           )}
 
         </div>

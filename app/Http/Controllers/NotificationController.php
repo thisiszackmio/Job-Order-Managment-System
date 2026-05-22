@@ -15,9 +15,8 @@ class NotificationController extends Controller
      /**
      *  Legend
      *  
-     *  0 - Deleted Notification
-     *  1 - Read Notifications
-     *  2 - Unread Notifications
+     *  0 - unread
+     *  1 - read
      * 
      */
 
@@ -26,28 +25,28 @@ class NotificationController extends Controller
 
         $now = Carbon::now();
         $oneWeekAgo = $now->copy()->subDays(7);
+        $eightDays = $now->copy()->subDays(8);
         $sixtyDaysAgo = $now->copy()->subDays(60);
 
         // Auto delete older than 60 days
-        NotificationModel::where('status', 0)
+        NotificationModel::whereIn('status', [0, 1])
             ->where('created_at', '<', $sixtyDaysAgo)
             ->delete();
 
-        // Auto archive older than 7 days
-        NotificationModel::where('receiver_id', $id)
-            ->where('created_at', '<', $oneWeekAgo)
-            ->whereIn('status', [1,2,4])
-            ->update(['status' => 0]);
-
         // Get latest notifications (limit 20 for performance)
         $notifications = NotificationModel::where('receiver_id', $id)
-            ->whereIn('status', [1, 2, 4])
+            ->whereIn('status', [0, 1])
             ->latest()
             ->get();
 
+        // Set to read the notifications after 8 days
+        NotificationModel::where('status', 0)
+            ->where('created_at', '<', $sixtyDaysAgo)
+            ->update(['status' => 1]);
+
         // Count unread THIS WEEK only
         $unreadCount = NotificationModel::where('receiver_id', $id)
-            ->whereIn('status', [2, 4])
+            ->where('status', 0)
             ->where('created_at', '>=', $oneWeekAgo)
             ->count();
 

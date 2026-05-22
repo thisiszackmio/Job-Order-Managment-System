@@ -178,7 +178,7 @@ export default function FacilityForm(){
 
     if(GSO || facData?.user_id == currentUserId || SuperHacker){
       axiosClient
-      .get(`/closeinspectionrequest/${id}`)
+      .get(`/closefacility/${id}`)
       .then(response => {
         console.log(response.data.message); // Show success message
       })
@@ -488,18 +488,6 @@ export default function FacilityForm(){
     .finally(() => {
       setSubmitLoading(false);
     });
-  }
-
-  // Cancel Form
-  function DeleteFormRequest(id){
-
-  }
-
-  // Enable Decline Reason
-  function submitAdminDecline(event){
-    event.preventDefault();
-
-    
   }
 
   // Variable
@@ -1041,7 +1029,7 @@ export default function FacilityForm(){
                     <button 
                       type="submit"
                       onClick={editFacilityForm}
-                      className={`py-2 px-3 text-sm ${submitLoading ? 'btn-process' : 'btn-secondary'}`}
+                      className={`py-1.5 px-3 text-sm ${submitLoading ? 'btn-process' : 'btn-secondary'}`}
                       disabled={submitLoading}
                     >
                       {submitLoading ? (
@@ -1061,7 +1049,7 @@ export default function FacilityForm(){
                           setEnableForm(false);
                           handleDefaultForm();
                         }} 
-                        className="py-2 px-4 btn-cancel text-sm"
+                        className="py-1.5 px-4 btn-cancel text-sm"
                       >
                         Cancel
                       </button>
@@ -1108,17 +1096,17 @@ export default function FacilityForm(){
                 {/* Admin (For Decline) */}
                 {Admin && (
                   (facData?.admin_approval == 7 || facData?.admin_approval == 5) && (
-                    !buttonHide && enableAdminDecline && (
+                    !buttonHide && enableAdminDecline && declineReason && (
                       <>
                         {/* For the Decline */}
 
                         {/* Confirmation */}
-                        <button onClick={() => handleAdminDeclineConfirmation()} className="py-2 px-4 text-sm btn-secondary">
+                        <button onClick={() => handleAdminDeclineConfirmation()} className="py-1.5 px-4 text-sm btn-secondary">
                           Submit
                         </button>
                         {/* Cancel */}
                         {!submitLoading && (
-                          <button onClick={() => { setEnableAdminDecline(false); setDeclineReason(''); }} className="ml-2 py-2 px-4 text-sm btn-cancel">
+                          <button onClick={() => { setEnableAdminDecline(false); setDeclineReason(''); }} className="ml-2 py-1.5 px-4 text-sm btn-cancel">
                             Cancel
                           </button>
                         )}

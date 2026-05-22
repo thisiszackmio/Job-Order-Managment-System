@@ -245,7 +245,7 @@ export default function RepairRequestForm(){
                   <button 
                     onClick={() => submitInspForm()}
                     type="submit"
-                    className={`w-auto py-1.5 px-6 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    className={`w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                     disabled={submitLoading}
                   >
                     {submitLoading ? (
@@ -260,7 +260,7 @@ export default function RepairRequestForm(){
     
                   {/* Cancel */}
                   {!submitLoading && (
-                    <button onClick={() => setConfirmation(false)} className="w-auto ml-2 py-1.5 px-6 btn-cancel">
+                    <button onClick={() => setConfirmation(false)} className="w-auto ml-2 py-1.5 text-sm px-4 btn-cancel">
                       Revise
                     </button>
                   )}
@@ -271,8 +271,18 @@ export default function RepairRequestForm(){
                 {/* Check Form */}
                 <button 
                   onClick={handleConfirm} 
-                  className="w-auto py-1.5 px-6 btn-primary">
-                  Submit
+                  type="submit"
+                  className={`w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? (
+                    <div className="flex justify-center">
+                      <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                      <span className="ml-1">Submitting</span>
+                    </div>
+                  ):(
+                    'Submit'
+                  )}
                 </button>
               </>
               )}

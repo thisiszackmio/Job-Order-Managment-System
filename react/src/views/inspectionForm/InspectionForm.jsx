@@ -1153,16 +1153,16 @@ export default function InspectionForm(){
                     </>
                     ):null}
 
-                    {/* Generate PDF */}
+                    {/* Generate PDF inspectionData?.user_id === currentUserId*/}
                     {!isMobile && (
                     <>
                       {/* For GSO and SuperAdmin */}
-                      {![0, 7].includes(inspectionData?.form?.form_status) && (GSO || SuperHacker || AuthorityAccess) && (
+                      {![0, 7].includes(inspectionData?.form_status) && (GSO || SuperHacker || AuthorityAccess) && (
                         <FontAwesomeIcon onClick={loadPDF} className="icon-edit-form" title="Get PDF" icon={faFilePdf} />
                       )}
 
                       {/* For Regular Requestor */}
-                      {[1, 2].includes(inspectionData?.form?.form_status) && inspectionData?.user_id == currentUserId && !SuperHacker && !GSO && (
+                      {[1, 2].includes(inspectionData?.form_status) && inspectionData?.user_id == currentUserId && !SuperHacker && !GSO && (
                         <FontAwesomeIcon onClick={loadPDF} className="icon-edit-form" title="Get PDF" icon={faFilePdf} />
                       )}
                     </>
@@ -1172,17 +1172,17 @@ export default function InspectionForm(){
                     {DivisionManager && currentUserId == inspectionData?.supervisor_id && inspectionData?.form_status == 11 && (
                       enableSupDecline ? (
                       <>
-                        <button onClick={() => handleSupDeclineConfirmation()} className="w-full md:auto py-2 px-4 text-sm btn-secondary"> Submit </button>
-                        <button onClick={() => { setEnableSupDecline(false); setReason(''); setReasonError(false); }} className="w-full md:auto py-2 px-4 text-sm btn-cancel"> Cancel </button>
+                        <button onClick={() => handleSupDeclineConfirmation()} className="w-full md:auto py-1.5 px-4 text-sm btn-secondary"> Submit </button>
+                        <button onClick={() => { setEnableSupDecline(false); setReason(''); setReasonError(false); }} className="w-full md:auto py-1.5 px-4 text-sm btn-cancel"> Cancel </button>
                       </>
                       ):(
                         !submitLoading && !buttonHide && (
                           <>
                             {/* Approve */}
-                            <button onClick={() => handleSupApprovalConfirmation()} className="w-full md:auto py-2 px-4 text-sm btn-secondary"> Approve </button>
+                            <button onClick={() => handleSupApprovalConfirmation()} className="w-full md:auto py-1.5 px-4 text-sm btn-secondary"> Approve </button>
                             {/* Decline */}
                             {!inspectionData?.form?.before_repair_date && !inspectionData?.form?.after_reapir_date && (
-                              <button onClick={() => setEnableSupDecline(true)} className="w-full md:auto py-2 px-4 text-sm btn-cancel"> Decline </button>
+                              <button onClick={() => setEnableSupDecline(true)} className="w-full md:auto py-1.5 px-4 text-sm btn-cancel"> Decline </button>
                             )}
                           </>
                         )
@@ -1195,7 +1195,7 @@ export default function InspectionForm(){
                         !submitLoading && !buttonHide && (
                           <button
                             onClick={() => handleAdminApprovalConfirmation()} 
-                            className="w-full md:w-auto py-2 px-4 text-sm btn-secondary"
+                            className="w-full md:w-auto py-1.5 px-4 text-sm btn-secondary"
                           >
                             Approve
                           </button>
@@ -1271,7 +1271,7 @@ export default function InspectionForm(){
                       </div>
                     </div>
                   </div>
-
+                  {inspectionData?.form?.form_status}
                   {/* Part A */}
                   <div className="pb-6 mt-6 border-b border-gray-300">
                     {/* Caption */}
@@ -1287,7 +1287,7 @@ export default function InspectionForm(){
                               <button 
                                 type="submit"
                                 onClick={() => UpdatePartA()}
-                                className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                                className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                                 disabled={submitLoading}
                               >
                                 {submitLoading ? (
@@ -1307,7 +1307,7 @@ export default function InspectionForm(){
                                     setUpdateDescription(inspectionData?.property_description);
                                     setUpdateLocation(inspectionData?.location);
                                     setUpdateComplain(inspectionData?.complain);
-                                  }} className="w-full py-1 px-4 text-sm btn-cancel">
+                                  }} className="w-full py-1.5 px-4 text-sm btn-cancel">
                                   Cancel
                                 </button>
                               )}
@@ -1758,7 +1758,7 @@ export default function InspectionForm(){
                             {(lastfilledDate || natureRepair) ? (
                               <button type="submit"
                                 onClick={() => SubmitPartB()}
-                                className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                                className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                                 disabled={submitLoading}
                               >
                               {submitLoading ? (
@@ -1773,7 +1773,7 @@ export default function InspectionForm(){
                             ):(
                               <button type="submit"
                                 onClick={() => handleGSOSubmitConfirmation()} 
-                                className="w-full md:w-auto py-1 px-4 text-sm mr-2 btn-secondary"
+                                className="w-full md:w-auto py-1.5 px-4 text-sm mr-2 btn-secondary"
                               >
                                 Submit
                               </button>
@@ -1798,7 +1798,7 @@ export default function InspectionForm(){
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => UpdatePartB()}
-                              className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                              className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                               disabled={submitLoading}
                             >
                               {submitLoading ? (
@@ -1819,7 +1819,7 @@ export default function InspectionForm(){
                                   setUpdatePartBdate(inspectionData?.date_of_filling);
                                   setUpdateLastFilledDate(inspectionData?.date_of_last_repair);
                                   setUpdateNatureRepair(inspectionData?.nature_of_last_repair);
-                                }} className="w-full md:w-auto py-1 px-4 text-sm btn-cancel">
+                                }} className="w-full md:w-auto py-1.5 px-4 text-sm btn-cancel">
                                 Cancel
                               </button>
                             )}
@@ -2163,7 +2163,7 @@ export default function InspectionForm(){
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => SubmitPartC()}
-                              className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                              className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                               disabled={submitLoading}
                             >
                             {submitLoading ? (
@@ -2180,7 +2180,7 @@ export default function InspectionForm(){
                             {!submitLoading && (
                               <button onClick={() => { 
                                   setPartCForm(false); 
-                                }} className="w-full md:w-auto py-1 px-4 text-sm btn-cancel">
+                                }} className="w-full md:w-auto py-1.5 px-4 text-sm btn-cancel">
                                 Cancel
                               </button>
                             )}
@@ -2192,7 +2192,7 @@ export default function InspectionForm(){
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => UpdatePartC()}
-                              className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                              className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                               disabled={submitLoading}
                             >
                               {submitLoading ? (
@@ -2212,7 +2212,7 @@ export default function InspectionForm(){
                                   setPartCDate(inspectionData?.before_repair_date);
                                   setUpdateFindings(inspectionData?.findings);
                                   setUpdateRecommendations(inspectionData?.recommendations);
-                                }} className="w-full md:w-auto py-1 px-4 text-sm btn-cancel">
+                                }} className="w-full md:w-auto py-1.5 px-4 text-sm btn-cancel">
                                 Cancel
                               </button>
                             )}
@@ -2447,7 +2447,7 @@ export default function InspectionForm(){
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => SubmitPartD()}
-                              className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                              className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                               disabled={submitLoading}
                             >
                             {submitLoading ? (
@@ -2464,7 +2464,7 @@ export default function InspectionForm(){
                             {!submitLoading && (
                               <button onClick={() => { 
                                   setPartDForm(false); 
-                                }} className="w-full md:w-auto py-1 px-4 text-sm btn-cancel">
+                                }} className="w-full md:w-auto py-1.5 px-4 text-sm btn-cancel">
                                 Cancel
                               </button>
                             )}
@@ -2476,7 +2476,7 @@ export default function InspectionForm(){
                             {/* Submit */}
                             <button type="submit"
                               onClick={() => UpdatePartD()}
-                              className={`w-full md:w-auto py-1 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                              className={`w-full md:w-auto py-1.5 px-4 text-sm mr-2 ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                               disabled={submitLoading}
                             >
                               {submitLoading ? (
@@ -2495,7 +2495,7 @@ export default function InspectionForm(){
                                   setEnablePartD(false);
                                   setPartDDate(inspectionData?.after_reapir_date);
                                   setUpdateRemarks(inspectionData?.remarks);
-                                }} className="w-full md:w-auto py-1 px-4 text-sm btn-cancel">
+                                }} className="w-full md:w-auto py-1.5 px-4 text-sm btn-cancel">
                                 Cancel
                               </button>
                             )}

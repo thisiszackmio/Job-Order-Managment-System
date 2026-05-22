@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Validation\Rules\Password;
 use Jenssegers\Agent\Agent;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -24,6 +25,16 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request) {
         try {
+            // Check if username already exists
+            $usernameExists = PPAEmployee::where('username', $request->input('username'))
+                ->exists();
+
+            if ($usernameExists) {
+                return response()->json([
+                    'message' => 'Username already exists.'
+                ], 409);
+            }
+
             if ($request->hasFile('avatar') && $request->file('avatar')->isValid() &&
                 $request->hasFile('esig') && $request->file('esig')->isValid()) {
                 
@@ -56,6 +67,18 @@ class AuthController extends Controller
                     'username' => $request->input('username'),
                     'password' => Hash::make($request->input('password')),
                     'status' => $request->input('status'),
+                ]);
+
+                // Generate ID
+                $prefix = 'JOMS';
+                $year = Carbon::now()->year;
+                $getID = $user->id;
+                $formatNumber = sprintf('%05d', $getID);
+                $generateUserId = $prefix."-".$year.$formatNumber;
+
+                // Update Data
+                $generateID = $user->update([
+                    'userId' => $generateUserId,
                 ]);
     
                 // Save files to storage

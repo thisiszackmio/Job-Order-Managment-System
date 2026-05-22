@@ -15,7 +15,6 @@ class PPAEmployee extends Authenticatable
 
     protected $fillable = [
         'firstname',
-        'middlename',
         'lastname',
         'gender',
         'division',
@@ -23,6 +22,7 @@ class PPAEmployee extends Authenticatable
         'code_clearance',
         'esign',
         'avatar',
+        'userId',
         'username',
         'password',
         'status',

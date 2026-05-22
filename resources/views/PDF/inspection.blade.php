@@ -67,7 +67,7 @@
           <tbody>
             <tr>
               <td class="logo" width="13%">
-                {{-- <img src="{{ $base64; }}" alt="My Image" /> --}}
+                <img src="{{ $base64; }}" alt="My Image" />
               </td>
               <td class="header-title" width="60%">
                 <p class="form-name">PRE-REPAIR/POST REPAIR INSPECTION FORM</p>

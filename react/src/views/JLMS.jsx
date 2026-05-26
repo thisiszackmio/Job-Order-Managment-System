@@ -5,7 +5,7 @@ export default function JLMS(){
   return(
   <>
     <header className="ppa-logo-name">
-      <div className="ppa-wrap space-x-4">
+      <div className="ppa-wrap justify-center items-center md:flex md:space-x-4">
         <img src={ppalogo} alt="PPA PMO/LNI" className="ppa-img-logo" />
         <div className="ppa-ld-text">
           <div className="ppa-ltitle">
@@ -27,7 +27,7 @@ export default function JLMS(){
         <div className="relative text-center">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/asset.gif" alt="Your Company" />
-            <div className="text-5xl font-bold mt-2">AMS</div>
+            <div className="text-3xl md:text-5xl font-bold mt-2">AMS</div>
           </div>
           <div className="ppa-system-text">
             Asset Management System
@@ -37,10 +37,10 @@ export default function JLMS(){
 
       {/* JOMS */}
       <Link to={`/joms`}> 
-        <div className="relative">
+        <div className="relative text-center">
           <div className="ppa-system-abbr joms">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/task-unscreen.gif" alt="Your Company" />
-            <div className="text-5xl font-bold mt-2">JOMS</div>
+            <div className="text-3xl md:text-5xl font-bold mt-2">JOMS</div>
           </div>
           <div className="ppa-system-text">
             Job Order Management System
@@ -52,7 +52,7 @@ export default function JLMS(){
       <div className="relative text-center">
         <div className="ppa-system-abbr">
           <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/personnel-unscreen.gif" alt="Your Company" />
-          <div className="text-5xl font-bold mt-2">PPS</div>
+          <div className="text-3xl md:text-5xl font-bold mt-2">PPS</div>
         </div>
 
         <div className="ppa-system-text">
@@ -71,11 +71,11 @@ export default function JLMS(){
     <div className="ppa-system-wrap-2">
       
       {/* DTS Row */}
-      <div className="ppa-system-2">
+      <div className="ppa-system-2 text-center">
         <div className="">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/folder-unscreen.gif" alt="Your Company" />
-            <div className="text-5xl font-bold mt-2">DTS</div>
+            <div className="text-3xl md:text-5xl font-bold mt-2">DTS</div>
           </div>
 
           <div className="ppa-system-text">
@@ -90,11 +90,11 @@ export default function JLMS(){
       </div>
 
       {/* DIS */}
-      <div className="ppa-system-2">
+      <div className="ppa-system-2 text-center">
         <div className="">
           <div className="ppa-system-abbr">
             <img className="mx-auto jlms-icons w-40 h-40 object-contain" src="default/file-info-unscreen.gif" alt="Your Company" />
-            <div className="text-5xl font-bold mt-2">DIS</div>
+            <div className="text-3xl md:text-5xl font-bold mt-2">DIS</div>
           </div>
 
           <div className="ppa-system-text">

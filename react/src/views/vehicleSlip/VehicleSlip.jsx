@@ -669,7 +669,7 @@ export default function VehicleSlip(){
   const PortManager = codes.includes("PM");
   const Admin = codes.includes("AM");
   const GSO = codes.includes("GSO");
-  const AuthorityAccess = codes.includes("AVU");
+  const AuthorityAccess = codes.includes("AUV");
   const SuperHacker = codes.includes("HACK");
   const ITAdmin = codes.includes("AUS");
   const roles = ["HACK", "AUS", "AM", "AUV", "PM", "DM", "GSO" ];

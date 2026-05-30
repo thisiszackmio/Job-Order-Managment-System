@@ -1,0 +1,510 @@
+{/* Dashboard */}
+          <li className={`sidebar-item mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } ${pathname === "/joms/dashboard" ? "nav-active" : "not-active"}`}
+          >
+            <Link to="/joms/dashboard" className="sidebar-link">
+              <FontAwesomeIcon icon={faTachometerAlt} className="ppa-icon" />
+              <span className="sidebar-text">Dashboard</span>
+            </Link>
+          </li>
+
+          {/* My Request */}
+          <li className={`sidebar-item mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } ${pathname === "/joms/myrequest" ? "nav-active" : "not-active"}`}
+          >
+            <Link to="/joms/myrequest" className="sidebar-link">
+              <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+              <span className="sidebar-text">My Request</span>
+            </Link>
+          </li>
+
+          {/* Pending Request */}
+          {(SuperAdmin || ITAdmin || AuthorizePersonnel || PortManager || AdminManager || DivisionManager || GSO ) && (
+            <li className={`sidebar-item mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/pending" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/pending" className="sidebar-link">
+                <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+                <span className="sidebar-text">Pending Request</span>
+              </Link>
+            </li>
+          )}
+
+          {/* Request Form */}
+          <li className={`sidebar-item cursor-pointer mt-1 ${
+              isSidebarExpanded ? "full" : "mini"
+            } 
+            ${location.pathname === "/joms/inspection/form" || 
+              location.pathname === "/joms/facilityvenue/form" || 
+              location.pathname === "/joms/vehicle/form" || 
+              location.pathname === "/joms/locator/form" ? "nav-active" : "not-active"}
+            `}
+          >
+            <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(1)} >
+              <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+              <span className="sidebar-text">Request Forms</span>
+
+              {isSidebarExpanded && (
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  className={`icon-arrow ${activeAccordion === 1 ? "rotate" : ""}`}
+                />
+              )}
+            </div>
+          </li>
+
+          {/* For Request Form Section */}
+          <section className={`accordion-content ${activeAccordion === 1 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Pre/Post Repair Inspection Form */}
+              <li className="mt-2">
+                <Link to="/joms/inspection/form"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/inspection/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Pre/Post Repair Inspection Form</span>
+                  )}
+                </Link>
+              </li>
+
+              {/* Facility / Venue Request Form */}
+              <li className="mt-1">
+                <Link to="/joms/facilityvenue/form"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/facilityvenue/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Facility / Venue Request Form</span>
+                  )}
+                </Link>
+              </li>
+
+              {/* Vehicle Slip Form */}
+              <li className="mt-1">
+                <Link  to="/joms/vehicle/form" 
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/vehicle/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  {isSidebarExpanded && (
+                    <span className="submenu-text">Vehicle Slip Form</span>
+                  )}
+                  
+                </Link>
+              </li>
+
+              {/* Locator Slip Form */}
+              {/* <li className="mt-1">
+                <Link  to="/joms/locator/form" 
+                  className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/locator/form" ? "sub-active" : "not-active"}`}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                  <span className="submenu-text">Locator Slip Form</span>
+                </Link>
+              </li> */}
+            </ul>
+          </section>
+
+          {/* Request List */}
+          {(SuperAdmin || ITAdmin || AuthorizePersonnel || PortManager || AdminManager || DivisionManager || GSO || InspectionAuthorize || FacilityAuthorize || VehicleAuthorize ) && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/inspection" || 
+                location.pathname === "/joms/facilityvenue" || 
+                location.pathname === "/joms/vehicle" || 
+                location.pathname === "/joms/locator" ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(2)} >
+                <FontAwesomeIcon icon={faClipboard} className="ppa-icon" />
+                <span className="sidebar-text">Request List</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 2 ? "rotate" : ""}`}
+                  />
+                )}
+              </div>
+            </li>
+          )}
+
+          {/* For Request List Section */}
+          <section className={`accordion-content ${activeAccordion === 2 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Pre/Post Repair Inspection Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || InspectionAuthorize) && (
+                <li className="mt-2">
+                  <Link to="/joms/inspection"
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/inspection" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Pre/Post Repair Inspection Form</span>
+                  </Link>
+                </li>
+              )}
+
+              {/* Facility / Venue Request Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || FacilityAuthorize) && (
+                <li className="mt-1">
+                  <Link to="/joms/facilityvenue"
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/facilityvenue" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Facility / Venue Request Form</span>
+                  </Link>
+                </li>
+              )}
+
+              {/* Vehicle Slip Form */}
+              {(SuperAdmin || ITAdmin || PortManager || AdminManager || DivisionManager || GSO || VehicleAuthorize || AuthorizePersonnel) && (
+                <li className="mt-1">
+                  <Link  to="/joms/vehicle" 
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/vehicle" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className="ppa-icon" />
+                    <span className="submenu-text">Vehicle Slip Form</span>
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </section>
+
+          {/* Users */}
+          {(SuperAdmin || ITAdmin || VehicleAuthorize || AuthorizePersonnel || GSO || PortManager || AdminManager) && (
+            <li className={`sidebar-item mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/traveldetails" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/traveldetails" className="sidebar-link">
+                <FontAwesomeIcon icon={faVanShuttle} className="ppa-icon" />
+                <span className="sidebar-text">Vehicle & Personnel <br/> Details</span>
+              </Link>
+            </li>
+          )}
+
+          {/* Superadmin Settings */}
+          {SuperAdmin && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/settings" ||
+                location.pathname === "/joms/logs"  ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(4)} >
+                <FontAwesomeIcon icon={faGears} className="ppa-icon" />
+                <span className="sidebar-text">Settings</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 4 ? "rotate" : ""}`}
+                  />
+                )}
+              </div>
+            </li>
+          )}
+
+          {/* For Settings Section */}
+          <section className={`accordion-content ${activeAccordion === 4 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <li className="mt-2">
+              <Link to="/joms/settings"
+                className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/settings" ? "sub-active" : "not-active"}`}
+              >
+                <FontAwesomeIcon icon={faGear} className="ppa-icon" />
+                <span className="submenu-text">General Settings</span>
+              </Link>
+            </li>
+
+            <li className="mt-2">
+              <Link to="/joms/logs"
+                className={`submenu-item 
+                  ${isSidebarExpanded ? "full" : "mini"}
+                  ${location.pathname === "/joms/logs" ? "sub-active" : "not-active"}`}
+              >
+                <FontAwesomeIcon icon={faList} className="ppa-icon" />
+                <span className="submenu-text">Logs</span>
+              </Link>
+            </li>
+          </section>
+
+
+
+{/* Buttons */}
+            {!isMobile && (
+              <div className="flex space-x-2"> 
+                {!loading && (
+                  activateForm ? (
+                <>
+                  {/* Edit Details */}
+                  {enableDetail && (
+                  <>
+                    {/* Submit */}
+                    <button
+                      onClick={ () => { submitUpdateDetail() } }
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableDetails(false);
+                          setActivateForm(false);
+                          setFname(userDet.firstname);
+                          setMname(userDet.middlename);
+                          setLname(userDet.lastname);
+                          setPosition(userDet.position);
+                        }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+
+                  {/* Update Password */}
+                  {enableAccount && (
+                  <>
+                    {/* Submit */}
+                    <button
+                      onClick={ () => { submitUpdateAccount() } }
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableAccount(false);
+                          setActivateForm(false);
+                          setInputErrors('');
+                        }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+
+                  {/* Update Badge */}
+                  {enableCodeClearance && (
+                  <>
+                    {/* Submit */}
+                      <button
+                        onClick={ () => { submitUpdateCodeClearance() } }
+                        className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      >
+                        {submitLoading ? (
+                          <div className="flex justify-center">
+                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                            <span className="ml-2">Loading</span>
+                          </div>
+                        ):(
+                          'Submit'
+                        )}
+                      </button>
+
+                      {/* Cancel */}
+                      {!submitLoading && (
+                        <button onClick={() => { 
+                            setEnableCodeClearance(false);
+                            setActivateForm(false);
+                            setSelectedRoles('');
+                          }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
+                          Cancel
+                        </button>
+                      )}
+                  </>
+                  )}
+
+                  {/* Update Avatar */}
+                  {enableAvatar && (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      form="user_avatar"
+                      type="submit"
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableAvatar(false);
+                          setActivateForm(false);
+                          setInputErrors('');
+                        }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+
+                  {/* Update Esig */}
+                  {enableEsig && (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      form="user_esig"
+                      type="submit"
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableEsig(false);
+                          setActivateForm(false);
+                          setInputErrors('');
+                        }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+                </>
+                  ):(
+                    userDet?.status === 0 ? (
+                      (SuperAdmin || ITAuthority) && (
+                      <>
+                        {/* Back to the List */}
+                        <button 
+                          onClick={() => window.location.href = '/joms/userlist'}
+                          className="w-auto py-1.5 px-4 text-sm btn-primary"
+                        >
+                          Back
+                        </button>
+
+                        {/* Reactivate Account */}
+                        <button 
+                          onClick={handleActivateUser}
+                          className="w-auto py-1.5 px-4 text-sm btn-warning"
+                        >
+                          Reactivate
+                        </button>
+                      </>
+                      )
+                    ):(
+                    <>
+                      {/* Back to the List */}
+                      <button 
+                        onClick={() => window.location.href = '/joms/userlist'}
+                        className="w-auto py-1.5 px-4 text-sm btn-primary"
+                      >
+                        Back
+                      </button>
+
+                      {/* Edit Details */}
+                      <button 
+                        onClick={() => {setEnableDetails(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                      >
+                        Update Details
+                      </button>
+
+                      {/* Edit Account */}
+                      <button 
+                        onClick={() => {setEnableAccount(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Account
+                      </button>
+
+                      {/* Edit Badge */}
+                      <button 
+                        onClick={() => {setEnableCodeClearance(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                      >
+                        Update Badge
+                      </button>
+
+                      {/* Edit Avatar */}
+                      <button 
+                        onClick={() => {setEnableAvatar(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Avatar
+                      </button>
+
+                      {/* Edit Esig */}
+                      <button 
+                        onClick={() => {setEnableEsig(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Esig
+                      </button>
+
+                      {/* Delete */}
+                      {SuperAdmin && (
+                        <button 
+                          onClick={() => handleDeleteConfirmation()}
+                          className="w-auto py-1.5 px-4 text-sm btn-error"
+                        >
+                          Delete User
+                        </button>
+                      )}
+                    </>
+                    )
+                  )
+                )}
+              </div>
+            )}

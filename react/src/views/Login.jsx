@@ -116,7 +116,6 @@ export default function Login() {
     if (ev) ev.preventDefault();
 
     setSubmitLoading(true);
-    setInputErrors('');
 
     const LoginData = { username, password, method: changeMethod, loginType: "Regular" }
 
@@ -138,10 +137,9 @@ export default function Login() {
       localStorage.removeItem("logoutReason");
 
       window.location.href = '/joms/dashboard';
-
-
     }catch(error){
       const responseData = error.response?.data?.error;
+
       if(responseData == "NotFound"){
         setInputErrors('The user does not exist.');
       }
@@ -158,10 +156,19 @@ export default function Login() {
       else if(responseData == "ChangePass"){
         setChangePass(true);
       }
+      // If both are empty fields
+      else if(error.response?.status === 422){
+        const errors = error.response.data.errors;
+        const firstError =
+        Object.values(errors || {})?.[0]?.[0] ||
+        "Please fill in all required fields.";
+
+        setInputErrors(firstError);
+      }
       else{
         setInputErrors(error);
       }
-      
+
     }finally{
       setSubmitLoading(false);
     }

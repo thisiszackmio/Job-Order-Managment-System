@@ -32,26 +32,29 @@ export default function UserDetails(){
     }
   }, [currentUserId]);
 
+  const clearanceOrder = [ 'PM', 'AM', 'DM', 'GSO', 'HACK', 'AUS', 'AUI', 'AUF', 'AUV', 'SEC', 'AP', 'MEM' ];
+
+  const sortedClearance =
+  userDet?.code_clearance
+    ?.split(',')
+    .map(item => item.trim())
+    .sort((a, b) => clearanceOrder.indexOf(a) - clearanceOrder.indexOf(b)) || [];
+
   return (
     <PageComponent title="Employee Details">
       <div className="ppa-widget request-form px-4 pb-6 mt-8">
         {/* Header */}
-        <div className="joms-user-info-header text-left"> 
-          User Details
-        </div>
-        {loading ? (
-          <div className="flex justify-center items-center">
-            <img className="h-6 w-auto mr-1" src={loading_table} alt="Loading" />
-            <span className="loading-table">Loading User</span>
-          </div>
-        ):(
-        <>
-          {/* Detail */}
-          <div className="detail-container mt-5">
-            {/* Avatar and Esig */}
+        <div className="joms-user-info-header text-left"> Profile Details </div>
+
+        {/* Det */}
+        <div className="detail-container mt-5">
+          {/* Avatar and Esig */}
+          <div>
+            {/* Avatar */}
             <div>
-              {/* Avatar */}
-              <div>
+              {loading ? (
+                <div className="skeleton-user-image w-full"></div>
+              ):(
                 <img
                   src={userDet.avatar}
                   alt="User"
@@ -60,101 +63,180 @@ export default function UserDetails(){
                   onContextMenu={(e) => e.preventDefault()}
                   draggable="false"
                 />
-              </div>
-              {/* Esig */}
-              <div className="mt-4">
+              )}
+            </div>
+
+            {/* Esig */}
+            <div className="mt-5">
+              {loading ? (
+                <div className="skeleton-signature"></div>
+              ) : (
                 <img
                   src={userDet?.esig}
                   alt="User Signature"
-                  className="ppa-esignature-prf mb-2 mx-auto"
+                  className="ppa-esignature-prf mx-auto"
                   loading="lazy"
                   onContextMenu={(e) => e.preventDefault()}
                   draggable="false"
                 />
+              )}
+            </div>
+          </div>
+
+          {/* Details */}
+          <div>
+            {/* User ID */}
+            <div className="flex items-stretch mt-10 md:mt-0">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label>
+                  User ID
+                </label>
+              </div>
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-full md:w-1/2"></div>
+                ) : (
+                  <div className="w-full md:w-1/2">
+                    <div className="w-full h-full ppa-form-confirm flex items-center">
+                      {userDet?.userId}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Details */}
-            <div>
-              {/* User ID */}
-              <div className="flex items-center mt-3">
-                <div className="w-36">
-                  <label className="det-form-title">
-                    User ID:
-                  </label> 
-                </div>
-                <div className="w-full">
-                  <div className="w-1/2">
-                    {userDet?.id}
-                  </div>
-                </div>
+            {/* User Fullname */}
+            <div className="flex items-stretch mt-2">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label> 
+                  Name 
+                </label> 
               </div>
-
-              {/* User Name */}
-              <div className="flex items-center mt-3">
-                <div className="w-36">
-                  <label className="det-form-title">
-                    User Name:
-                  </label> 
-                </div>
-                <div className="w-full">
-                  <div className="w-1/2">
-                    {userDet?.name}
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-full md:w-1/2"></div>
+                ):(
+                <>
+                  <div className="w-full md:w-1/2">
+                    <div className="w-full h-full ppa-form-confirm flex items-center">
+                      {userDet.name}
+                    </div>
                   </div>
-                </div>
+                </>
+                )}
               </div>
+            </div>
 
-              {/* Position */}
-              <div className="flex items-center mt-3">
-                <div className="w-36">
-                  <label className="det-form-title">
-                    Position:
-                  </label> 
-                </div>
-                <div className="w-full">
-                  <div className="w-1/2">
-                    {userDet?.position}
-                  </div>
-                </div>
+            {/* Position */}
+            <div className="flex items-stretch mt-2">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label> 
+                  Position 
+                </label> 
               </div>
-
-              {/* Division */}
-              <div className="flex items-center mt-3">
-                <div className="w-36">
-                  <label className="det-form-title">
-                    Division:
-                  </label> 
-                </div>
-                <div className="w-full">
-                  <div className="w-1/2">
-                    {userDet?.division}
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-full md:w-1/2"></div>
+                ):(
+                <>
+                  <div className="w-full md:w-1/2">
+                    <div className="w-full h-full ppa-form-confirm flex items-center">
+                      {userDet?.position}
+                    </div>
                   </div>
-                </div>
+                </>
+                )}
               </div>
+            </div>
 
-              {/* Badge */}
-              <div className="flex items-start mt-3">
-                <div className="w-36">
-                  <label className="det-form-title">
-                    Badge:
-                  </label> 
-                </div>
-                <div className="w-full">
-                  <div className="w-1/2 flex flex-wrap gap-2">
-                    {userDet?.code_clearance
-                      ?.split(',')
-                      .map((badge, index) => (
-                        <span key={index} className={`badge-${badge.trim()}`}>
-                          {badge.trim()}
-                        </span>
-                    ))}
+            {/* Division */}
+            <div className="flex items-stretch mt-2">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label> 
+                  Division 
+                </label> 
+              </div>
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-full md:w-1/2"></div>
+                ):(
+                <>
+                  <div className="w-full md:w-1/2">
+                    <div className="w-full h-full ppa-form-confirm flex items-center">
+                      {userDet?.division}
+                    </div>
                   </div>
-                </div>
+                </>
+                )}
+              </div>
+            </div>
+
+            {/* Username */}
+            <div className="flex items-stretch mt-2">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label> 
+                  Username 
+                </label> 
+              </div>
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-full md:w-1/2"></div>
+                ):(
+                <>
+                  <div className="w-full md:w-1/2">
+                    <div className="w-full h-full ppa-form-confirm flex items-center">
+                      {userDet?.username}
+                    </div>
+                  </div>
+                </>
+                )}
+              </div>
+            </div>
+
+            {/* Badge */}
+            <div className="flex items-stretch mt-2">
+              {/* Label */}
+              <div className="w-28 md:w-52 flex form-title items-center">
+                <label> 
+                  Badge 
+                </label> 
+              </div>
+              {/* Content */}
+              <div className="flex w-full">
+                {loading ? (
+                  <div className="skeleton-form w-1/2"></div>
+                ):(
+                <>
+                  <div className="flex w-full md:w-1/2">
+                    {sortedClearance.map((code, index) => (
+                        <div
+                          key={index}
+                          className={`w-full h-full flex items-center badge badge-${code} ${
+                            index === sortedClearance.length - 1
+                              ? 'rounded-tr-[4px] rounded-br-[4px]'
+                              : ''
+                          }`}
+                        >
+                          {code}
+                        </div>
+                      ))}
+                  </div>
+                </>
+                )}
               </div>
             </div>
           </div>
-        </>
-        )}
+        </div>
       </div>
     </PageComponent>
   );

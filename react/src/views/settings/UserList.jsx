@@ -106,7 +106,7 @@ export default function UserListJLMS(){
                 onChange={(e) =>
                   setSearchUser(e.target.value)
                 }
-                className="block w-1/4 focus:ring-0 ppa-form-field-en"
+                className="block w-1/2 md:w-1/4 focus:ring-0 ppa-form-field-en"
               />
 
               {/* Page Count (RIGHT) */}

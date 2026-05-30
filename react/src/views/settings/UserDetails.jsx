@@ -16,6 +16,18 @@ export default function UserDetailsJLMS(){
 
   const {id} = useParams();
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
   // Popup
   const [showPopup, setShowPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");
@@ -700,81 +712,17 @@ export default function UserDetailsJLMS(){
           {/* Details */}
           <div>
             {/* Buttons */}
-            <div className="flex space-x-2"> 
-              {!loading && (
-                activateForm ? (
-              <>
-                {/* Edit Details */}
-                {enableDetail && (
+            {!isMobile && (
+              <div className="flex space-x-2"> 
+                {!loading && (
+                  activateForm ? (
                 <>
-                  {/* Submit */}
-                  <button
-                    onClick={ () => { submitUpdateDetail() } }
-                    className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { 
-                        setEnableDetails(false);
-                        setActivateForm(false);
-                        setFname(userDet.firstname);
-                        setMname(userDet.middlename);
-                        setLname(userDet.lastname);
-                        setPosition(userDet.position);
-                      }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-
-                {/* Update Password */}
-                {enableAccount && (
-                <>
-                  {/* Submit */}
-                  <button
-                    onClick={ () => { submitUpdateAccount() } }
-                    className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-2">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { 
-                        setEnableAccount(false);
-                        setActivateForm(false);
-                        setInputErrors('');
-                      }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-
-                {/* Update Badge */}
-                {enableCodeClearance && (
-                <>
-                  {/* Submit */}
+                  {/* Edit Details */}
+                  {enableDetail && (
+                  <>
+                    {/* Submit */}
                     <button
-                      onClick={ () => { submitUpdateCodeClearance() } }
+                      onClick={ () => { submitUpdateDetail() } }
                       className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
                     >
                       {submitLoading ? (
@@ -790,85 +738,169 @@ export default function UserDetailsJLMS(){
                     {/* Cancel */}
                     {!submitLoading && (
                       <button onClick={() => { 
-                          setEnableCodeClearance(false);
+                          setEnableDetails(false);
                           setActivateForm(false);
-                          setSelectedRoles('');
+                          setFname(userDet.firstname);
+                          setMname(userDet.middlename);
+                          setLname(userDet.lastname);
+                          setPosition(userDet.position);
+                        }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+
+                  {/* Update Password */}
+                  {enableAccount && (
+                  <>
+                    {/* Submit */}
+                    <button
+                      onClick={ () => { submitUpdateAccount() } }
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableAccount(false);
+                          setActivateForm(false);
+                          setInputErrors('');
+                        }} className="w-auto px-4 py-1.5 ml-2 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                  )}
+
+                  {/* Update Badge */}
+                  {enableCodeClearance && (
+                  <>
+                    {/* Submit */}
+                      <button
+                        onClick={ () => { submitUpdateCodeClearance() } }
+                        className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      >
+                        {submitLoading ? (
+                          <div className="flex justify-center">
+                            <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                            <span className="ml-2">Loading</span>
+                          </div>
+                        ):(
+                          'Submit'
+                        )}
+                      </button>
+
+                      {/* Cancel */}
+                      {!submitLoading && (
+                        <button onClick={() => { 
+                            setEnableCodeClearance(false);
+                            setActivateForm(false);
+                            setSelectedRoles('');
+                          }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
+                          Cancel
+                        </button>
+                      )}
+                  </>
+                  )}
+
+                  {/* Update Avatar */}
+                  {enableAvatar && (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      form="user_avatar"
+                      type="submit"
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableAvatar(false);
+                          setActivateForm(false);
+                          setInputErrors('');
                         }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
                         Cancel
                       </button>
                     )}
-                </>
-                )}
+                  </>
+                  )}
 
-                {/* Update Avatar */}
-                {enableAvatar && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_avatar"
-                    type="submit"
-                    className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
-                    ):(
-                      'Submit'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { 
-                        setEnableAvatar(false);
-                        setActivateForm(false);
-                        setInputErrors('');
-                      }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
-                      Cancel
+                  {/* Update Esig */}
+                  {enableEsig && (
+                  <>
+                    {/* Submit */}
+                    <button 
+                      form="user_esig"
+                      type="submit"
+                      className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-1">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
                     </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableEsig(false);
+                          setActivateForm(false);
+                          setInputErrors('');
+                        }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                  </>
                   )}
                 </>
-                )}
+                  ):(
+                    userDet?.status === 0 ? (
+                      (SuperAdmin || ITAuthority) && (
+                      <>
+                        {/* Back to the List */}
+                        <button 
+                          onClick={() => window.location.href = '/joms/userlist'}
+                          className="w-auto py-1.5 px-4 text-sm btn-primary"
+                        >
+                          Back
+                        </button>
 
-                {/* Update Esig */}
-                {enableEsig && (
-                <>
-                  {/* Submit */}
-                  <button 
-                    form="user_esig"
-                    type="submit"
-                    className={`w-auto px-4 py-1.5 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                        <span className="ml-1">Loading</span>
-                      </div>
+                        {/* Reactivate Account */}
+                        <button 
+                          onClick={handleActivateUser}
+                          className="w-auto py-1.5 px-4 text-sm btn-warning"
+                        >
+                          Reactivate
+                        </button>
+                      </>
+                      )
                     ):(
-                      'Submit'
-                    )}
-                  </button>
-
-                  {/* Cancel */}
-                  {!submitLoading && (
-                    <button onClick={() => { 
-                        setEnableEsig(false);
-                        setActivateForm(false);
-                        setInputErrors('');
-                      }} className="w-auto ml-2 px-4 py-1.5 text-sm btn-cancel">
-                      Cancel
-                    </button>
-                  )}
-                </>
-                )}
-              </>
-                ):(
-                  userDet?.status === 0 ? (
-                    (SuperAdmin || ITAuthority) && (
                     <>
                       {/* Back to the List */}
                       <button 
@@ -878,97 +910,79 @@ export default function UserDetailsJLMS(){
                         Back
                       </button>
 
-                      {/* Reactivate Account */}
+                      {/* Edit Details */}
                       <button 
-                        onClick={handleActivateUser}
-                        className="w-auto py-1.5 px-4 text-sm btn-warning"
+                        onClick={() => {setEnableDetails(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
                       >
-                        Reactivate
+                        Update Details
                       </button>
+
+                      {/* Edit Account */}
+                      <button 
+                        onClick={() => {setEnableAccount(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Account
+                      </button>
+
+                      {/* Edit Badge */}
+                      <button 
+                        onClick={() => {setEnableCodeClearance(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                      >
+                        Update Badge
+                      </button>
+
+                      {/* Edit Avatar */}
+                      <button 
+                        onClick={() => {setEnableAvatar(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Avatar
+                      </button>
+
+                      {/* Edit Esig */}
+                      <button 
+                        onClick={() => {setEnableEsig(true); setActivateForm(true);}}
+                        className="w-auto py-1.5 px-4 text-sm btn-secondary"
+                        disabled={activateForm}
+                      >
+                        Update Esig
+                      </button>
+
+                      {/* Delete */}
+                      {SuperAdmin && (
+                        <button 
+                          onClick={() => handleDeleteConfirmation()}
+                          className="w-auto py-1.5 px-4 text-sm btn-error"
+                        >
+                          Delete User
+                        </button>
+                      )}
                     </>
                     )
-                  ):(
-                  <>
-                    {/* Back to the List */}
-                    <button 
-                      onClick={() => window.location.href = '/joms/userlist'}
-                      className="w-auto py-1.5 px-4 text-sm btn-primary"
-                    >
-                      Back
-                    </button>
-
-                    {/* Edit Details */}
-                    <button 
-                      onClick={() => {setEnableDetails(true); setActivateForm(true);}}
-                      className="w-auto py-1.5 px-4 text-sm btn-secondary"
-                    >
-                      Update Details
-                    </button>
-
-                    {/* Edit Account */}
-                    <button 
-                      onClick={() => {setEnableAccount(true); setActivateForm(true);}}
-                      className="w-auto py-1.5 px-4 text-sm btn-secondary"
-                      disabled={activateForm}
-                    >
-                      Update Account
-                    </button>
-
-                    {/* Edit Badge */}
-                    <button 
-                      onClick={() => {setEnableCodeClearance(true); setActivateForm(true);}}
-                      className="w-auto py-1.5 px-4 text-sm btn-secondary"
-                    >
-                      Update Badge
-                    </button>
-
-                    {/* Edit Avatar */}
-                    <button 
-                      onClick={() => {setEnableAvatar(true); setActivateForm(true);}}
-                      className="w-auto py-1.5 px-4 text-sm btn-secondary"
-                      disabled={activateForm}
-                    >
-                      Update Avatar
-                    </button>
-
-                    {/* Edit Esig */}
-                    <button 
-                      onClick={() => {setEnableEsig(true); setActivateForm(true);}}
-                      className="w-auto py-1.5 px-4 text-sm btn-secondary"
-                      disabled={activateForm}
-                    >
-                      Update Esig
-                    </button>
-
-                    {/* Delete */}
-                    {SuperAdmin && (
-                      <button 
-                        onClick={() => handleDeleteConfirmation()}
-                        className="w-auto py-1.5 px-4 text-sm btn-error"
-                      >
-                        Delete User
-                      </button>
-                    )}
-                  </>
                   )
-                )
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* Status */}
             <div className="flex items-center mt-4">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   Status
                 </label> 
               </div>
               <div className="flex w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                 <>
-                  <div className="w-3/4">
-                    <div className="w-full ppa-form-confirm h-[40px]">
+                  <div className="w-full md:w-3/4">
+                    <div className="w-full ppa-form-confirm h-[34px] md:h-[40px]">
                       {userDet?.status === 0 && (
                       <>
                         Deleted (Permanently removed from the database after {remaining} days). 
@@ -985,18 +999,18 @@ export default function UserDetailsJLMS(){
 
             {/* User ID */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   User ID 
                 </label> 
               </div>
               <div className="flex w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                 <>
-                  <div className="w-1/4">
-                    <div className="w-full ppa-form-confirm h-[40px]">
+                  <div className="w-full md:w-1/4">
+                    <div className="w-full ppa-form-confirm h-[34px] md:h-[40px]">
                       {userDet?.userId}
                     </div>
                   </div>
@@ -1029,14 +1043,14 @@ export default function UserDetailsJLMS(){
 
             {/* User Name */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   User Name 
                 </label> 
               </div>
               <div className="w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableDetail ? (
                     <div className="flex w-1/2">
@@ -1070,7 +1084,7 @@ export default function UserDetailsJLMS(){
                       </div>
                     </div>
                   ):(
-                    <div className="w-1/2">
+                    <div className="w-full md:w-1/2">
                       <div className="w-full ppa-form-confirm">
                         {userDet?.name}
                       </div>
@@ -1082,14 +1096,14 @@ export default function UserDetailsJLMS(){
 
             {/* Position */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   Position 
                 </label> 
               </div>
               <div className="w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableDetail ? (
                     <div className="w-1/2">
@@ -1102,7 +1116,7 @@ export default function UserDetailsJLMS(){
                       />
                     </div>
                   ):(
-                    <div className="w-1/2">
+                    <div className="w-full md:w-1/2">
                       <div className="w-full ppa-form-confirm">
                         {userDet?.position}
                       </div>
@@ -1114,14 +1128,14 @@ export default function UserDetailsJLMS(){
 
             {/* Division */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   Division 
                 </label> 
               </div>
               <div className="w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableDetail ? (
                     <div className="w-1/2">
@@ -1141,7 +1155,7 @@ export default function UserDetailsJLMS(){
                       </select>
                     </div>
                   ):(
-                    <div className="w-1/2">
+                    <div className="w-full md:w-1/2">
                       <div className="w-full ppa-form-confirm">
                         {userDet?.division}
                       </div>
@@ -1153,14 +1167,14 @@ export default function UserDetailsJLMS(){
 
             {/* Username */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   Username 
                 </label> 
               </div>
               <div className="w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableAccount ? (
                     <div className="w-1/2">
@@ -1172,7 +1186,7 @@ export default function UserDetailsJLMS(){
                         />
                     </div>
                   ):(
-                    <div className="w-1/2">
+                    <div className="w-full md:w-1/2">
                       <div className="w-full ppa-form-confirm">
                         {userDet?.username}
                       </div>
@@ -1184,14 +1198,14 @@ export default function UserDetailsJLMS(){
 
             {/* Password */}
             <div className="flex items-center mt-2">
-              <div className="w-52 flex form-title">
+              <div className="w-28 md:w-52 flex form-title">
                 <label> 
                   Password 
                 </label> 
               </div>
               <div className="w-full relative">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableAccount ? (
                     <div className="w-1/2">
@@ -1211,7 +1225,7 @@ export default function UserDetailsJLMS(){
                       </button>
                     </div>
                   ):(
-                    <div className="w-1/2">
+                    <div className="w-full md:w-1/2">
                       <div className="w-full ppa-form-confirm">
                         ********
                       </div>
@@ -1223,14 +1237,14 @@ export default function UserDetailsJLMS(){
 
             {/* Badge */}
             <div className={`items-center mt-2 ${enableCodeClearance ? "":"flex"}`}>
-              <div className={`flex ${enableCodeClearance ? "w-44 form-title-separate":"w-52 form-title"}`}>
+              <div className={`flex ${enableCodeClearance ? "w-44 form-title-separate":"w-28 md:w-52 form-title"}`}>
                 <label> 
                   Badge 
                 </label> 
               </div>
               <div className="w-full">
                 {loading ? (
-                  <div className="skeleton-form w-1/2"></div>
+                  <div className="skeleton-form w-full md:w-1/2"></div>
                 ):(
                   enableCodeClearance ? (
                     <div className="w-full mt-2">
@@ -1426,11 +1440,11 @@ export default function UserDetailsJLMS(){
                     </div>
                   ):(
                   <>
-                    <div className="flex w-1/2">
+                    <div className="flex w-full md:w-1/2">
                       {sortedClearance.map((code, index) => (
                         <div
                           key={index}
-                          className={`w-auto badge badge-${code} ${
+                          className={`w-auto h-[34px] md:h-[40px] badge badge-${code} ${
                             index === sortedClearance.length - 1
                               ? 'rounded-tr-[4px] rounded-br-[4px]'
                               : ''
@@ -1529,6 +1543,90 @@ export default function UserDetailsJLMS(){
                 </div>
               </form>
             </>
+            )}
+
+            {/* Buttons on mobile */}
+            {isMobile && (
+              activateForm ? (
+              <div className="mt-5">
+                {/* Enable Detail */}
+                {enableDetail && (
+                <div className="flex justify-end gap-4">
+                  {/* Submit */}
+                    <button
+                      onClick={ () => { submitUpdateDetail() } }
+                      className={`w-full px-4 py-1.5 btn-mobile ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                    >
+                      {submitLoading ? (
+                        <div className="flex justify-center">
+                          <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                          <span className="ml-2">Loading</span>
+                        </div>
+                      ):(
+                        'Submit'
+                      )}
+                    </button>
+
+                    {/* Cancel */}
+                    {!submitLoading && (
+                      <button onClick={() => { 
+                          setEnableDetails(false);
+                          setActivateForm(false);
+                          setFname(userDet.firstname);
+                          setMname(userDet.middlename);
+                          setLname(userDet.lastname);
+                          setPosition(userDet.position);
+                        }} className="w-full px-4 py-1.5 ml-2 btn-mobile btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                </div>
+                )}
+              </div>
+              ):(
+              <div className="mt-5"> 
+
+                <div className="flex justify-end gap-4">
+
+                  {/* Back to the List */}
+                  <button 
+                    onClick={() => window.location.href = '/joms/userlist'}
+                    className="w-full py-1.5 px-4 btn-mobile btn-primary"
+                  >
+                    Back
+                  </button>
+
+                  {/* Edit Details */}
+                  <button 
+                    onClick={() => {setEnableDetails(true); setActivateForm(true);}}
+                    className="w-full py-1.5 px-4 text-sm btn-secondary"
+                  >
+                    Update Details
+                  </button>
+
+                </div>
+
+                <div className="flex justify-end gap-4 mt-4">
+                  {/* Edit Account */}
+                  <button 
+                    onClick={() => {setEnableAccount(true); setActivateForm(true);}}
+                    className="w-full py-1.5 px-4 text-sm btn-secondary"
+                    disabled={activateForm}
+                  >
+                    Update Account
+                  </button>
+
+                  {/* Edit Badge */}
+                  <button 
+                    onClick={() => {setEnableCodeClearance(true); setActivateForm(true);}}
+                    className="w-full py-1.5 px-4 text-sm btn-secondary"
+                  >
+                    Update Badge
+                  </button>
+                </div>
+
+              </div>
+              )
             )}
 
           </div>

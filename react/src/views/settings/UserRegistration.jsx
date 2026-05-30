@@ -303,10 +303,14 @@ export default function UserRegistrationJLMS(){
     window.location.href = '/joms/userlist';
   }
   
+
+  // Restrictions
   const ucode = currentUserCode;
   const codes = ucode.split(',').map(code => code.trim());
+  const SuperAdmin = codes.includes("HACK");
   const roles = ["HACK", "AUS"];
   const Access = roles.some(role => codes.includes(role));
+
   return(
     !pageRestrict ? (<Restrict />):(
     <PageComponent title="Add Employee">
@@ -315,60 +319,79 @@ export default function UserRegistrationJLMS(){
         {/* Form */}
         <div className="form-container">
           <form onSubmit={onSubmit} action="#" method="POST" encType="multipart/form-data">
+            {/* Button */}
+            <div className="flex justify-end">
+              {/* Submit */}
+              <button 
+                type="submit"
+                className={`w-full md:w-auto py-1.5 px-4 btn-text ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                disabled={submitLoading}
+              >
+                {submitLoading ? (
+                  <div className="flex justify-center">
+                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
+                    <span className="ml-1">Loading</span>
+                  </div>
+                ):(
+                  'Submit'
+                )}
+              </button>
+            </div>
             <div className="grid grid-cols-2">
               {/* 1st Column */}
-              <div className="col-span-1 px-4">
+              <div className="col-span-1 px-4 mt-4">
                 {/* Name */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Name
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Name 
                     </label> 
                   </div>
-                  <div className="w-full">
-                    <div className="flex">
-                      <div className="w-[45%]">
-                        <input
-                          type="text"
-                          className="focus:ring-0 w-full form-fields h-[40px] border"
-                          value={firstName}
-                          onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
-                          placeholder="First Name"
-                        />
-                      </div>
-                      <div className="w-[10%]">
-                        <input
-                          type="text"
-                          className="focus:ring-0 block w-full form-fields border-t border-b h-[40px]"
-                          value={middleName}
-                          onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
-                          placeholder="M.I"
-                          maxLength={2}
-                        />
-                      </div>
-                      <div className="w-[45%]">
-                        <input
-                          type="text"
-                          className="focus:ring-0 block w-full form-fields-last"
-                          value={lastName}
-                          onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
-                          placeholder="Last Name"
-                        />
-                      </div>
+                  {/* Content */}
+                  <div className="flex w-full">
+                    <div className="w-[45%]">
+                      <input
+                        type="text"
+                        className="focus:ring-0 w-full h-full flex items-center form-fields border"
+                        value={firstName}
+                        onChange={ev => setFirstName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="First Name"
+                      />
+                    </div>
+                    <div className="w-[10%]">
+                      <input
+                        type="text"
+                        className="focus:ring-0 block w-full h-full flex items-center form-fields border-t border-b h-[40px]"
+                        value={middleName}
+                        onChange={ev => setMiddleName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="M.I"
+                        maxLength={2}
+                      />
+                    </div>
+                    <div className="w-[45%]">
+                      <input
+                        type="text"
+                        className="focus:ring-0 block w-full h-full flex items-center form-fields-last"
+                        value={lastName}
+                        onChange={ev => setLastName(capitalizeFirstLetter(ev.target.value))}
+                        placeholder="Last Name"
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Gender */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Gender
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Gender 
                     </label> 
                   </div>
-                  <div className="w-full">
-                    <div className="flex">
-                      {/* Male */}
+                  {/* Content */}
+                  <div className="flex w-full">
+                    {/* Male */}
                       <div className="flex items-center">
                         <input
                           id="within-city-checkbox"
@@ -379,7 +402,7 @@ export default function UserRegistrationJLMS(){
                               prev === "Male" ? "" : "Male"
                             )
                           }
-                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                          className="focus:ring-0 h-full w-[40px] form-check checked"
                         />
                         <label
                           htmlFor="within-city-checkbox"
@@ -399,7 +422,7 @@ export default function UserRegistrationJLMS(){
                               prev === "Female" ? "" : "Female"
                             )
                           }
-                          className="focus:ring-0 h-[40px] w-[40px] form-check checked"
+                          className="focus:ring-0 h-full w-[40px] form-check checked"
                         />
                         <label
                           htmlFor="outside-city-checkbox"
@@ -408,17 +431,18 @@ export default function UserRegistrationJLMS(){
                           Female
                         </label>
                       </div>
-                    </div>
                   </div>
                 </div>
-                
+
                 {/* Position */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Position
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Position 
                     </label> 
                   </div>
+                  {/* Content */}
                   <div className="w-full">
                     <input
                       id="ppa-position"
@@ -427,25 +451,27 @@ export default function UserRegistrationJLMS(){
                       value={position}
                       onChange={ev => setPosition(capitalizeFirstLetter(ev.target.value))}
                       placeholder="Enter your position"
-                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                      className="focus:ring-0 w-full h-full flex items-center form-fields-last border"
                     />
                   </div>
                 </div>
 
                 {/* Division */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Division
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Division 
                     </label> 
                   </div>
+                  {/* Content */}
                   <div className="w-full">
                     <select 
                       name="ppa-division" 
                       id="ppa-division"
                       value={division}
                       onChange={ev => setDivision(ev.target.value)}
-                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                      className="focus:ring-0 w-full h-full flex items-center form-fields-last border"
                     >
                       <option value="" disabled style={{ color: '#A9A9A9' }}>Choose Division</option>
                       <option value="Administrative Division">Administrative Division</option>
@@ -460,12 +486,14 @@ export default function UserRegistrationJLMS(){
                 </div>
 
                 {/* Username */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Username
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Username 
                     </label> 
                   </div>
+                  {/* Content */}
                   <div className="w-full">
                     <input
                       id="ppa-username"
@@ -474,18 +502,20 @@ export default function UserRegistrationJLMS(){
                       value={getusername}
                       onChange={ev => setUsername(ev.target.value)}
                       placeholder="Enter your username"
-                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                      className="focus:ring-0 w-full h-full flex items-center form-fields-last border"
                     />
                   </div>
                 </div>
 
                 {/* Password */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Password
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Password 
                     </label> 
                   </div>
+                  {/* Content */}
                   <div className="w-full relative">
                     <input
                       id="password"
@@ -494,7 +524,7 @@ export default function UserRegistrationJLMS(){
                       value={getpassword}
                       onChange={ev => setPassword(ev.target.value)}
                       placeholder="Enter your password"
-                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                      className="focus:ring-0 w-full h-full flex items-center form-fields-last border"
                     />
                     <button
                       type="button"
@@ -507,12 +537,14 @@ export default function UserRegistrationJLMS(){
                 </div>
 
                 {/* Confirm Password */}
-                <div className="flex items-center mt-2">
-                  <div className="w-56 form-title">
-                    <label htmlFor="rep_date"> 
-                      Confirm Password
+                <div className="flex items-stretch mt-2">
+                  {/* Label */}
+                  <div className="w-56 flex form-title items-center">
+                    <label> 
+                      Confirm Password 
                     </label> 
                   </div>
+                  {/* Content */}
                   <div className="w-full relative">
                     <input
                       id="password"
@@ -521,7 +553,7 @@ export default function UserRegistrationJLMS(){
                       value={passwordCorfirmation}
                       onChange={ev => setPasswordConfirmation(ev.target.value)}
                       placeholder="Re-enter the password"
-                      className="focus:ring-0 w-full form-fields-last h-[40px] border"
+                      className="focus:ring-0 w-full h-full flex items-center form-fields-last border"
                     />
                     <button
                       type="button"
@@ -594,11 +626,10 @@ export default function UserRegistrationJLMS(){
                     </div>
                   </div>
                 </div>
-
               </div>
 
               {/* 2nd Column */}
-              <div className="col-span-1 px-4">
+              <div className="col-span-1 px-4 mt-4">
                 {/* Badge */}
                 <div className="items-center mt-2">
                   <div className="w-24 form-title-separate">
@@ -607,6 +638,24 @@ export default function UserRegistrationJLMS(){
                     </label> 
                   </div>
                   <div className="w-full">
+                    {SuperAdmin && (
+                      <div className="relative flex items-center mt-2">
+                        <div className="flex items-center h-5">
+                          <input
+                            id="pm-checkbox"
+                            type="checkbox"
+                            checked={selectedRoles.includes('HACK')}
+                            onChange={(e) => handleCheckboxChange(e, 'HACK')}
+                            className="focus:ring-0 h-[25px] w-[25px] form-check checked"
+                          />
+                        </div>
+                        <div className="ml-3">
+                          <label htmlFor="pm-checkbox" className="checkbox-name">
+                            <b>HACK</b> <span className="checkbox-description">- Full system control and access to all features.</span>
+                          </label> 
+                        </div>
+                      </div>
+                    )}
                     {/* PM */}
                     <div className="relative flex items-center mt-2">
                       <div className="flex items-center h-5">
@@ -620,7 +669,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          PM <span className="checkbox-description">- Port Manager access; can view the Form List and Employee List only.</span>
+                          <b>PM</b> <span className="checkbox-description">- Port Manager access; can view the Form List and Employee List only.</span>
                         </label> 
                       </div>
                     </div>
@@ -637,7 +686,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          DM <span className="checkbox-description">- Division Manager access; can view the Form List and Employee List</span>
+                          <b>DM</b> <span className="checkbox-description">- Division Manager access; can view the Form List and Employee List</span>
                         </label> 
                       </div>
                     </div>
@@ -654,7 +703,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          AM <span className="checkbox-description">- Admin Manager access; can approve all forms.</span>
+                          <b>AM</b> <span className="checkbox-description">- Admin Manager access; can approve all forms.</span>
                         </label> 
                       </div>
                     </div>
@@ -671,7 +720,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          GSO <span className="checkbox-description">- General Services Officer access; can manage all forms, including editing and closing forms, and handle driver and vehicle assignments.</span>
+                          <b>GSO</b> <span className="checkbox-description">- General Services Officer access; can manage all forms, including editing and closing forms, and handle driver and vehicle assignments.</span>
                         </label> 
                       </div>
                     </div>
@@ -688,7 +737,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          AUS <span className="checkbox-description">- IT Access – Full system control with some restrictions.</span>
+                          <b>AUS</b> <span className="checkbox-description">- IT Access – Full system control with some restrictions.</span>
                         </label> 
                       </div>
                     </div>
@@ -705,7 +754,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          AUI <span className="checkbox-description">- Authorized Personnel for Inspection and Repair Forms only.</span>
+                          <b>AUI</b> <span className="checkbox-description">- Authorized Personnel for Inspection and Repair Forms only.</span>
                         </label> 
                       </div>
                     </div>
@@ -722,7 +771,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          AUF <span className="checkbox-description">- Authorized Personnel for Facility Request Forms only.</span>
+                          <b>AUF</b> <span className="checkbox-description">- Authorized Personnel for Facility Request Forms only.</span>
                         </label> 
                       </div>
                     </div>
@@ -739,7 +788,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          AUV <span className="checkbox-description">- Authorized Personnel for Vehicle Slip Forms, including vehicle and driver assignments.</span>
+                          <b>AUV</b> <span className="checkbox-description">- Authorized Personnel for Vehicle Slip Forms, including vehicle and driver assignments.</span>
                         </label> 
                       </div>
                     </div>
@@ -756,7 +805,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          SEC <span className="checkbox-description">- Security Personnel access; can manage Vehicle Slip and Locator Slip forms.</span>
+                          <b>SEC</b> <span className="checkbox-description">- Security Personnel access; can manage Vehicle Slip and Locator Slip forms.</span>
                         </label> 
                       </div>
                     </div>
@@ -773,7 +822,7 @@ export default function UserRegistrationJLMS(){
                       </div>
                       <div className="ml-3">
                         <label htmlFor="pm-checkbox" className="checkbox-name">
-                          MEM <span className="checkbox-description">- Default system badge for regular users.</span>
+                          <b>MEM</b> <span className="checkbox-description">- Default system badge for regular users.</span>
                         </label> 
                       </div>
                     </div>
@@ -781,25 +830,7 @@ export default function UserRegistrationJLMS(){
                   <p className="text-gray-500 text-xs mt-1">Please ensure that the correct badge is selected.</p>
                 </div>
               </div>
-            </div>
-      
-            {/* Button */}
-            <div className="mt-8 md:mt-10">
-              {/* Submit */}
-              <button 
-                type="submit"
-                className={`w-full md:w-auto py-1.5 px-4 text-sm ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                disabled={submitLoading}
-              >
-                {submitLoading ? (
-                  <div className="flex justify-center">
-                    <img src={submitAnimation} alt="Submit" className="h-5 w-5" />
-                    <span className="ml-1">Loading</span>
-                  </div>
-                ):(
-                  'Submit'
-                )}
-              </button>
+
             </div>
           </form>
         </div>

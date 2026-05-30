@@ -6,7 +6,7 @@ export default function JLMSLayout() {
       {/* Main Content */}
       <div className="transition-width duration-300">
         {/* Content */}
-        <div style={{ minHeight: '100vh'}} className="w-full h-full content-here">
+        <div style={{ minHeight: '100vh'}} className="w-full h-full">
           <Outlet />
         </div>
       </div>

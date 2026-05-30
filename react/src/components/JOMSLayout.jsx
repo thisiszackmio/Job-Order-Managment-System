@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useMatches, useNavigate } from "react-router-dom";
 import { BellIcon } from '@heroicons/react/24/outline'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faClipboard, faUsers, faFileLines, faBars, faTachometerAlt, faUserPlus, faAddressBook, faVanShuttle, faUserGear, faGears, faGear, faList } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faClipboard, faUsers, faFileLines, faBars, faTachometerAlt, faUserPlus, faAddressBook, faVanShuttle, faUserGear, faGears, faGear, faList, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useUserStateContext } from "../context/ContextProvider";
 import Footer from "./Footer";
 import ppalogomini from '/default/img/logo-no-words.png';
@@ -44,7 +44,21 @@ export default function JOMSLayout() {
       return 'Just now';
     }
   }
+
+  const location = useLocation();
+  const pathname = location.pathname;
+  const navigate = useNavigate();
+
+  // JOMS
+  const words = [
+    { letter: "J", word: "ob" },
+    { letter: "O", word: "rder" },
+    { letter: "M", word: "anagement" },
+    { letter: "S", word: "ystem" }
+  ];
   
+  const [showLink, setShowLink] = useState(false);
+
   // For Maintenance Mode
   const [maintenance, setMaintenance] = useState(false);
   useEffect(() => {
@@ -87,7 +101,7 @@ export default function JOMSLayout() {
     }
   }, [title]);
 
-  // --- For the Notification --- //
+    // --- For the Notification --- //
   const [notifications, setNotifications] = useState([]);
   const [count, setCount] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
@@ -146,59 +160,56 @@ export default function JOMSLayout() {
   };
 
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
-  const [showLink, setShowLink] = useState(false);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+
   const [isMobile, setIsMobile] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [activeAccordion, setActiveAccordion] = useState(null);
-
-  const isSidebarExpanded = !isSidebarMinimized || isSidebarHovered;
-  const location = useLocation();
-  const pathname = location.pathname;
-  const navigate = useNavigate();
 
   const handleToggle = (index) => {
     setActiveAccordion(index === activeAccordion ? null : index);
   };
 
-  // Detect Mobile Screen
+  // Sidebar expanded logic (CLEAN SEPARATION)
+  const isDesktopSidebarOpen = !isSidebarMinimized || isSidebarHovered;
+  const isSidebarExpanded = isMobile
+    ? isMobileSidebarOpen
+    : isDesktopSidebarOpen;
+
   useEffect(() => {
     const checkScreen = () => {
-      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+      setIsMobile(window.innerWidth < 768);
     };
 
-    checkScreen(); // run on load
-    window.addEventListener('resize', checkScreen);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
 
-    return () => window.removeEventListener('resize', checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
-  //Force close the sidebar
   useEffect(() => {
     if (isMobile) {
-      setIsSidebarMinimized(true);
-      setActiveAccordion(null);
+      setIsSidebarHovered(false);      // IMPORTANT
+      setIsSidebarMinimized(true);     // collapse desktop state
+      setIsMobileSidebarOpen(false);   // ensure closed initially
+      setActiveAccordion(null);        // close menus
     }
   }, [isMobile]);
 
-  // Showlink Date
-  useEffect(() => {
-    const now = new Date();
-    const startDate = new Date("2025-02-13");
-    const endDate = new Date("2026-02-28");
+  const handleMouseEnter = () => {
+    if (!isMobile) setIsSidebarHovered(true);
+  };
 
-    if (now >= startDate && now <= endDate) {
-      setShowLink(true);
+  const handleMouseLeave = () => {
+    if (!isMobile) setIsSidebarHovered(false);
+  };
+
+  const closeSidebarOnMobile = () => {
+    if (isMobile) {
+      setIsMobileSidebarOpen(false);
     }
-  }, []);
-
-  // JOMS
-  const words = [
-    { letter: "J", word: "ob" },
-    { letter: "O", word: "rder" },
-    { letter: "M", word: "anagement" },
-    { letter: "S", word: "ystem" }
-  ];
+  };
 
   // Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -232,7 +243,7 @@ export default function JOMSLayout() {
     };
   }, [showPopup]);
 
-  // For the Profile
+    // For the Profile
   function handleProfile(){
     setActiveAccordion(null);
     navigate(`/joms/user`);
@@ -297,13 +308,17 @@ export default function JOMSLayout() {
   return(
   <div className="ppa-page font-roboto">
     {/* Sidebar */}
-    <aside 
+    <aside
       className={`
         ppa-sidebar shadow-xl flex transition-all duration-300 ease-in-out
-        ${isSidebarExpanded ? "sidebar-open" : "sidebar-close"}
+
+        ${isMobile
+          ? (isMobileSidebarOpen ? "sidebar-open" : "sidebar-close")
+          : (isSidebarExpanded ? "sidebar-open" : "sidebar-close")
+        }
       `}
-      onMouseEnter={() => setIsSidebarHovered(true)}
-      onMouseLeave={() => setIsSidebarHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className={`${isSidebarMinimized ? 'minimized' : 'not-minimized'} w-full`}>
         {/* Logo Area */}
@@ -316,16 +331,244 @@ export default function JOMSLayout() {
           <span className={`logo-text ${isSidebarExpanded ? "show" : "hide"}`}>
             PPA PMO LNI
           </span>
+          {/* Hamburger for mobile only */}
+          {isMobile && (
+            <div className="ppa-hamburger-mobile">
+              <button onClick={() => setIsMobileSidebarOpen(prev => !prev)} className="text-white">
+                <FontAwesomeIcon icon={faXmark} className="ham-mobile-haha" />
+              </button>
+            </div>
+          )}
         </div>
+        <hr className={`line-separate ${isSidebarExpanded ? "full" : "mini"}`} />
+        {/* System Name */}
+        <div className={`text-title mb-5 mt-5 ${isSidebarExpanded ? "full" : "mini"}`}>
+          {words.map((item, index) => (
+            <div key={index} className="title-row">
+              <span className="first-letter">{item.letter}</span>
+              <span className={`word-part ${isSidebarExpanded ? "show" : "hide"}`}>
+                {item.word}
+              </span>
+            </div>
+          ))}
+        </div>
+        <hr className={`line-separate ${isSidebarExpanded ? "full" : "mini"}`} />
+
+        {/* Navigation */}
+        <ul className={`ppa-accordion mt-5 ${isSidebarMinimized ? 'nav-min':''}`}>
+          {/* Relase Note */}
+          {showLink && (
+            <li className={`sidebar-item ${
+              isSidebarExpanded ? "full" : "mini"
+              } ${pathname === "/joms/systemupdate" ? "nav-active" : "not-active"}`}
+            >
+              <Link to="/joms/systemupdate" className="sidebar-link">
+                <FontAwesomeIcon icon={faUserGear} className="ppa-icon" />
+                <span className="sidebar-text">System Update</span>
+              </Link>
+            </li>
+          )}
+
+          {/* User */}
+          {(SuperAdmin || ITAdmin) && (
+            <li className={`sidebar-item cursor-pointer mt-1 ${
+                isSidebarExpanded ? "full" : "mini"
+              } 
+              ${location.pathname === "/joms/userlist" || 
+                location.pathname === "/joms/addemployee" ? "nav-active" : "not-active"}
+              `}
+            >
+              <div className="sidebar-link" onClick={() => isSidebarExpanded && handleToggle(3)} >
+                <FontAwesomeIcon icon={faUsers} className="ppa-icon" />
+                <span className="sidebar-text">Users</span>
+
+                {isSidebarExpanded && (
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className={`icon-arrow ${activeAccordion === 3 ? "rotate" : ""}`}
+                  />
+                )}
+              </div>
+            </li>
+          )}
+
+          {/* For User's List Section */}
+          <section className={`accordion-content ${activeAccordion === 3 ? "open" : "" } ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
+            <ul>
+              {/* Add User */}
+              {!isMobile && (
+                <li className="mt-2">
+                  <Link to="/joms/addemployee"
+                    className={`submenu-item 
+                      ${isSidebarExpanded ? "full" : "mini"}
+                      ${location.pathname === "/joms/addemployee" ? "sub-active" : "not-active"}`}
+                  >
+                    <FontAwesomeIcon icon={faUserPlus} className="ppa-icon" />
+                    <span className="submenu-text">Add User</span>
+                  </Link>
+                </li>
+              )}
+
+              {/* All User */}
+              <li className="mt-1">
+                <Link to="/joms/userlist"
+                  className={`submenu-item 
+                    ${isSidebarExpanded ? "full" : "mini"}
+                    ${location.pathname === "/joms/userlist" ? "sub-active" : "not-active"}`}
+                  onClick={closeSidebarOnMobile}
+                >
+                  <FontAwesomeIcon icon={faAddressBook} className="ppa-icon" />
+                  <span className="submenu-text">All User</span>
+                </Link>
+              </li>
+            </ul>
+          </section>
+        </ul>
       </div>
     </aside>
 
     {/* --- MAIN CONTENT WRAPPER --- */}
     <main className={`ppa-content transition-width duration-300 relative ${isSidebarMinimized ? 'minimized' : 'not-minimized'}`}>
       <div className="navigation-area z-50 transition-transform duration-300" >
+        <h1 className="page-title">{title}</h1>
+        {/* Notification Icon */}
+        <div className="notification-area">
+          <div className="relative">
+            <Menu as="div" className="relative">
+              {/* Display number of Notification */}
+              <div>
+                <Menu.Button className="notification-icon">
+                  <span className="absolute -inset-1.5" />
+                  <span className="sr-only">View notifications</span>
+                  <BellIcon className="bell-icon" aria-hidden="true" />
+                </Menu.Button>
+              </div>
+              {/* Count */}
+              {!maintenance && (
+                !loadingNotifications ? (
+                  count ? (
+                    count > 10 ? (
+                      <span className="notification-count">9+</span>
+                    ):(
+                      <span className="notification-count">{count}</span>
+                    )
+                  ) : null
+                ):null
+              )}
+              {/* Display the message of notification */}
+              <div>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="mobile-nav absolute right-0 z-10 mt-2 w-[450px] max-h-[450px] overflow-y-auto origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {maintenance ? (
+                      <p className="text-base font-bold text-center leading-7 py-4">Notification is disable on Maint Mode</p>
+                    ):(
+                    <>
+                      <p className="notification-text font-roboto pl-3">Notifications</p>
+                      {notifications?.length > 0 ? (
+                        notifications?.map(NofiData => (
+                          <div key={NofiData?.id} className="notification-item">
+                            <a onClick={() => OpenLink(NofiData?.id, NofiData?.joms_id, NofiData?.joms_type)} className="noti-link">
+                              <div className="flex notification-container p-3 font-roboto">
+                                {/* Image and Icon */}
+                                <div className="w-28 md:w-32 items-center relative">
+                                  <img src={NofiData?.sender_avatar} className="notification_avatar" alt={`${NofiData?.sender_name}'s avatar`} />
+                                  <img src={
+                                    NofiData?.joms_type == "JOMS_Vehicle" ? VehicleSlip : 
+                                    NofiData?.joms_type == "JOMS_Inspection" ? repair : 
+                                    NofiData?.joms_type == "JOMS_Facility" ? facilityicon : 
+                                    null
+                                  } className="notification_icon" alt='Avatar' /> 
+                                </div>
+                                {/* Message */}
+                                <div className="w-full">
+                                  <h4 className={`noti-type ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>
+                                    {NofiData?.joms_type == 'JOMS_Vehicle' && `Vehicle Slip Request (Vehicle Slip No ${NofiData?.joms_id})`}
+                                    {NofiData?.joms_type == 'JOMS_Inspection' && `Pre/Post Repair Inspection Form: (Control No ${NofiData?.joms_id})`}
+                                    {NofiData?.joms_type == 'JOMS_Facility' && `Facility / Venue Form: (Control No ${NofiData?.joms_id})`}
+                                  </h4>
+                                  <h3 className={`noti-message ${ NofiData?.status === 1 ? 'noti-read' : ''} `}>{NofiData?.message}</h3>
+                                  <h4 className="text-sm text-blue-500 font-bold">{formatTimeDifference(NofiData?.date_request)}</h4>
+                                </div>
+                              </div>
+                            </a>
+                          </div>
+                        ))
+                      ):(
+                        <p className="text-base font-bold text-center leading-7 py-4">No Notifications</p>
+                      )}
+                    </>
+                    )}
+                  </Menu.Items>
+                </Transition>
+              </div>
+            </Menu>
+          </div>
+        </div>
+        {/* Hamburger */}
+        {isMobile ? (
+          <div className="ppa-hamburger">
+            <button onClick={() => setIsMobileSidebarOpen(prev => !prev)} className="text-white">
+              <FontAwesomeIcon icon={faBars} className="ham-haha" />
+            </button>
+          </div>
+        ):(
+          <div className="ppa-hamburger">
+            <button onClick={() => setIsSidebarMinimized(prev => !prev)} className="text-white">
+              <FontAwesomeIcon icon={faBars} className="ham-haha" />
+            </button>
+          </div>
+        )}
+        {/* Profile */}
+        <div className="profile">
+          <ul>
+            <li className="relative">
+            <img src={currentUserAvatar} className="ppa-display-picture cursor-pointer" alt="" onClick={() => handleToggle(5)} />
 
+            {/* Dropdown Container */}
+            <div className={`profile-dropdown ${activeAccordion === 5 ? "open" : ""}`}>
+              <ul className="profile-menu">
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleProfile}>
+                    Profile
+                  </button>
+                </li>
+
+                <li>
+                  <button className="profile-item logout-btn" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </li>
+          </ul>
+        </div>
+      </div>
+      {/* For the main content */}
+      <div className="content-here">
+        <Outlet />
       </div>
     </main>
+
+    {showPopup && (
+      <Popup 
+        popupContent={popupContent}
+        popupMessage={popupMessage}
+        submitLoading={submitLoading}
+        submitAnimation={loading_table}
+        logout={logout}
+        justClose={justClose}
+        userId={currentUserId}
+      />
+    )}
   </div>
   );
 }

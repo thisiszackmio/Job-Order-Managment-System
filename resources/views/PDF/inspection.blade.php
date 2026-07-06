@@ -132,10 +132,10 @@
                 {{-- Acquisition Cost --}}
                 <tr>
                   <td style="font-size:13px;">Acquisition Cost:</td>
-                  <td style="border-bottom:1px solid #000; padding:0 5px; font-size:13px;">
-                    {{ $inspection->acquisition_cost 
-                      ? '₱ ' . number_format($inspection->acquisition_cost, 2) 
-                      : 'N/A' }}
+                  <td style="border-bottom:1px solid #000; padding:0 5px; font-size:13px; font-family: 'DejaVu Sans', sans-serif;">
+                      {{ $inspection->acquisition_cost
+                          ? '₱ ' . number_format($inspection->acquisition_cost, 2)
+                          : 'N/A' }}
                   </td>
                 </tr>
                 <tr><td colspan="2" height="5"></td></tr>

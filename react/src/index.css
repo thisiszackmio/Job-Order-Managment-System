@@ -989,6 +989,7 @@ span.joms-mp-total {
   overflow-y: auto;
   padding: 0rem 1.5rem;
 }
+.joms-table { padding: 0rem 1.5rem; }
 .joms-table-team {
   min-height: auto;
   max-height: 450px;
@@ -1016,6 +1017,16 @@ span.joms-mp-total {
   position: relative;
   gap: 0.8rem;
 }
+
+/* Table on each form 5+12=17+18=35+15=50+20=70 */
+.insp-table th.ppa-table-header:nth-child(1) { width: 5%; }
+.insp-table th.ppa-table-header:nth-child(2) { width: 12%; }
+.insp-table th.ppa-table-header:nth-child(3) { width: 18%; }
+.insp-table th.ppa-table-header:nth-child(4) { width: 15%; }
+.insp-table th.ppa-table-header:nth-child(5) { width: 20%; }
+.insp-table th.ppa-table-header:nth-child(6) { width: 15%; }
+.insp-table th.ppa-table-header:nth-child(7) { width: 15%; }
+
 
 /* Id Table animation */
 .link-hover-flip {

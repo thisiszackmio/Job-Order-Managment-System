@@ -189,9 +189,9 @@ export default function MyRequest() {
                         <input
                             type="text"
                             placeholder="Search here ..."
-                            value={searchFac}
+                            value={searchInsp}
                             onChange={(e) =>
-                            setSearchFac(e.target.value)
+                            setSearchInsp(e.target.value)
                             }
                             className="ppa-form-search"
                         />
@@ -350,7 +350,7 @@ export default function MyRequest() {
                                     ))
                                 ):(
                                     <tr>
-                                        <td colSpan={7} className="text-center ppa-table-body"> No Announcement </td>
+                                        <td colSpan={7} className="text-center ppa-table-body"> No List </td>
                                     </tr>
                                 )
                             )}

@@ -228,7 +228,6 @@ export default function Dashboard() {
         <div className="greet-section">
             <div className="greeting">
                 {getGreeting()} {currentUserName.gender == 'Male' ? "Sir":"Ma'am"} {APM && "APM"} {currentUserName.firstname}
-                Hi
             </div>
         </div>
 

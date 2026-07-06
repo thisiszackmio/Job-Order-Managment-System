@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function(){
   Route::delete('/deleteuser/{id}', [UserController::class, 'removeEmployee']); // Delete User
   Route::get('/showusers', [UserController::class, 'showEmployee']); // Show employee list
   Route::get('/userdetail/{id}', [UserController::class, 'employeeDetails']); // Get employee details
+  Route::get('/usercountreq/{id}', [UserController::class, 'countEmployeeRequest']); // Get employee details
   Route::get('/getsupervisor', [UserController::class, 'getSupervisor']); // Get supervisor details
   Route::get('/getgso', [UserController::class, 'getGSO']); // Get GSO details
   Route::get('/getsecurity/{id}', [UserController::class, 'getSecurity']);
@@ -129,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function(){
   // --- JOMS Inspection Request --- //
   Route::get('/inspection/pdf/{id}', [InspectionController::class, 'generateInspectionPDF']);
   Route::get('/allinspection', [InspectionController::class, 'index']);
+  Route::put('/manualcomplete/{id}', [InspectionController::class, 'manualComplete']);
   Route::get('/showinsprequest/{id}', [InspectionController::class, 'showInspectionForm']);
   Route::post('/submitinsprequest', [InspectionController::class, 'storeInspectionRequest']);
   Route::put('/updateinsprequestparta/{id}', [InspectionController::class, 'updatePartA']);
@@ -190,3 +192,7 @@ Route::post('/showlogs', [LogsController::class, 'showLogs']);
 // --- Test --- //
 Route::get('/getlocreq/{id}', [LocatorSlipController::class, 'getRequestor']);
 // Route::get('/inspection/download/{id}', [InspectionController::class, 'ForcePDF']);
+
+Route::get('/phpinfo', function () {
+    phpinfo();
+});

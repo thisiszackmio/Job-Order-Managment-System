@@ -205,6 +205,23 @@ class UserController extends Controller
     }
 
     /**
+     * Count Form Request
+     */
+    public function countEmployeeRequest($id){
+        $inspectionCount = InspectionModel::where('user_id', $id)->count();
+        $facilityCount = FacilityVenueModel::where('user_id', $id)->count();
+        $vehicleCount = VehicleSlipModel::where('user_id', $id)->count();
+
+        $data = [
+            'inspection' => $inspectionCount,
+            'facility' => $facilityCount,
+            'vehicle' => $vehicleCount
+        ];
+
+        return response()->json($data);
+    }
+
+    /**
      * Update User's Detail
      */
     public function updateEmployeeDetail(Request $request, $id){

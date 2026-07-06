@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:9200',     // Vite dev local
-        'http://20.20.48.2:9200',   // Vite dev network
+        'http://20.20.51.5:9200',   // Vite dev network
     ],
 
     'allowed_origins_patterns' => [],

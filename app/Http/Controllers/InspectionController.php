@@ -94,31 +94,37 @@ class InspectionController extends Controller
     public function generateInspectionPDF($id){
         $inspection = InspectionModel::findOrFail($id);
 
-        // Get all needed employees in one query
         $employees = PPAEmployee::whereIn('id', [
             $inspection->user_id,
             $inspection->supervisor_id,
             $inspection->personnel_id
         ])->get()->keyBy('id');
 
-        $requestor = $employees[$inspection->user_id] ?? null;
+        $requestor  = $employees[$inspection->user_id]       ?? null;
         $supervisor = $employees[$inspection->supervisor_id] ?? null;
-        $assign = $employees[$inspection->personnel_id] ?? null;
+        $assign     = $employees[$inspection->personnel_id]  ?? null;
 
-        // GSO & Admin
-        $gso = PPAEmployee::where('code_clearance', 'LIKE', '%GSO%')->first();
+        $gso   = PPAEmployee::where('code_clearance', 'LIKE', '%GSO%')->first();
         $admin = PPAEmployee::where('code_clearance', 'LIKE', '%AM%')->first();
 
-        $pdf = Pdf::loadView('pdf.inspection', compact(
-            'inspection',
-            'requestor',
-            'supervisor',
-            'assign',
-            'gso',
-            'admin'
-        ))->setPaper('a4', 'portrait');
+        try {
+            $pdf = \Pdf::loadView('pdf.inspection', compact(
+                'inspection',
+                'requestor',
+                'supervisor',
+                'assign',
+                'gso',
+                'admin'
+            ))->setPaper('a4', 'portrait');
 
-        return $pdf->stream("Inspection-Control-No-$id.pdf");
+            return $pdf->stream("Inspection-Control-No-$id.pdf");
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
+        }
     }
 
     /**
@@ -197,9 +203,6 @@ class InspectionController extends Controller
     public function storeInspectionRequest(InspectionFormRequest $request){
         $data = $request->validated();
 
-        if($request->input('form') === "Check"){
-            return response()->json(['message' => 'Check'], 200);
-        }else{
             // Get the Requestor Data to get the avatar
             $req = PPAEmployee::where('id', $data['user_id'])->first();
             $reqAvatar = $req->avatar;
@@ -225,11 +228,11 @@ class InspectionController extends Controller
             $receiverName = '';
 
             if(!empty(array_intersect($allowedCodes, $codeClearance))){
-                $notiMessage = $data['user_name']." has submitted a request.";
+                $notiMessage = $data['user_name']." has submitted a new request.";
                 $receiverId = $GSOId;
                 $receiverName = $GSOName;
             } else {
-                $notiMessage = $data['user_name']." has submitted a request and needs your approval.";
+                $notiMessage = $data['user_name']." has submitted a request and requires your approval.";
                 $receiverId = $data['supervisor_id'];
                 $receiverName = $data['supervisor_name'];
             }
@@ -254,7 +257,7 @@ class InspectionController extends Controller
                 $track = new FormTracker();
                 $track->form_id = $deploymentData->id;
                 $track->type_of_request = 'Repair';
-                $track->remarks = $request->input('user_name').' submitted a request.';
+                $track->remarks = $request->input('user_name').' submitted a new request.';
                 $track->save();
 
                 // Create logs
@@ -268,7 +271,6 @@ class InspectionController extends Controller
 
             
             return response()->json(['message' => 'Deployment data created successfully'], 200);
-            }
     }
     
     /**
@@ -1286,7 +1288,7 @@ class InspectionController extends Controller
         
         }
 
-        // return response()->json(['message' => 'Form is finished and closed'], 200);
+        return response()->json(['message' => 'Form is finished and closed'], 200);
     }
 
     /**
@@ -1327,6 +1329,43 @@ class InspectionController extends Controller
 
         } else {
             return response()->json(['error' => 'Failed to update the request'], 406);
+        }
+    }
+
+    /**
+     * Manual Complete Form
+     */ 
+    public function manualComplete($id){
+        $ManualRequest = InspectionModel::where('id', $id)
+            ->whereIn('form_status', [5, 6, 8, 9, 10, 11])
+            ->whereNotNull([
+                'date_of_filling',
+                'before_repair_date',
+                'after_reapir_date'
+            ])
+            ->first();
+
+        if ($ManualRequest) {
+            // Update the record
+            $ManualRequest->form_status = 1;
+            $ManualRequest->form_remarks = 'Form is closed';
+            
+            if($ManualRequest->save()){
+
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $ManualRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = 'The form was closed by the system.';
+                $track->save();
+
+                // Log the action
+                $logs = new LogsModel();
+                $logs->category = 'FORM';
+                $logs->message = 'The system has closed the Pre/Post Repair Inspection Form (Control No. ' . $ManualRequest->id . ').';
+                $logs->save();
+            }
+        
         }
     }
 

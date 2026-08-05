@@ -16,14 +16,25 @@ use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Validation\Rules\Password;
 use Jenssegers\Agent\Agent;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
     /**
-     * Register the system
+     * Register the system (Add User)
      */
     public function register(RegisterRequest $request) {
         try {
+            // Check if username already exists
+            $usernameExists = PPAEmployee::where('username', $request->input('username'))
+                ->exists();
+
+            if ($usernameExists) {
+                return response()->json([
+                    'message' => 'Username already exists.'
+                ], 409);
+            }
+
             if ($request->hasFile('avatar') && $request->file('avatar')->isValid() &&
                 $request->hasFile('esig') && $request->file('esig')->isValid()) {
                 
@@ -36,11 +47,6 @@ class AuthController extends Controller
                 if (($dp_extension !== 'png' && $dp_extension !== 'jpeg' && $dp_extension !== 'jpg') || 
                     ($esig_extension !== 'png' && $esig_extension !== 'jpeg' && $esig_extension !== 'jpg')) {
                     return response()->json(['message' => "This is not the format that we want"], 400);
-                }
-
-                // Check if the passwords is are not match
-                if($request->input('password') != $request->input('consfirmPassword')){
-                    return response()->json(['error' => "Passwords do not match"], 422);
                 }
     
                 // Generate a file name
@@ -62,15 +68,29 @@ class AuthController extends Controller
                     'password' => Hash::make($request->input('password')),
                     'status' => $request->input('status'),
                 ]);
+
+                // Generate ID
+                $prefix = 'JOMS';
+                $year = Carbon::now()->year;
+                $getID = $user->id;
+                $formatNumber = sprintf('%05d', $getID);
+                $generateUserId = $prefix."-".$year.$formatNumber;
+
+                // Update Data
+                $generateID = $user->update([
+                    'userId' => $generateUserId,
+                ]);
     
                 // Save files to storage
                 Storage::disk('public')->put('displaypicture/' . $dp_name, file_get_contents($dp));
                 Storage::disk('public')->put('displayesig/' . $esig_name, file_get_contents($esig));
 
                 // Logs
+                $authory = $request->input('registrant');
+                $AddUser = $request->input('firstname').' '.$request->input('middlename').'. '.$request->input('lastname');
                 $logs = new LogsModel();
                 $logs->category = 'USER';
-                $logs->message = $request->input('registrant').' has registered '.$request->input('firstname').' '.$request->input('middlename').'. '.$request->input('lastname').' in the system.';
+                $logs->message = $AddUser.' was registered in the system by '.$authory.'.';
                 $logs->save();
 
                 return response()->json([
@@ -98,29 +118,39 @@ class AuthController extends Controller
 
         // Root URL
         $rootUrl = URL::to('/');
-
+        // Agent
         $agent = new Agent();
-
+        // Validation
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string'
         ]);
 
         $pcName = gethostname();
+        $type = $request->input('loginType');
 
         // Get the user information
         $user = PPAEmployee::where('username', $credentials['username'])->first();
 
+        // Check if user exist
+        if(!$user){
+            return response()->json(['error' => 'NotFound'], 404);
+        }
+
         // Check if the user account exists and the password is valid
-        if(!$user || !Hash::check($credentials['password'], $user->password)){
+        if(!Hash::check($credentials['password'], $user->password)){
             return response()->json(['error' => 'Invalid'], 422);
+        }
+
+        // Account Disabled
+        if ($user->status == 0) {
+            return response()->json([
+                'error' => 'AccountDisabled',
+            ], 403);
         }
 
         // Check if the user is need to change pass
         if($user->status == 2){ return response()->json(['error' => 'ChangePass'], 422); }
-
-        // Check if the user is not active anymore
-        if($user->status == 0){ return response()->json(['error' => 'NotActive'], 404); }
 
         // Check if the user logs in even the token is active
         $existingToken  = PersonalAccessToken::where('tokenable_id', $user->id)->first();
@@ -128,47 +158,48 @@ class AuthController extends Controller
 
         if($existingToken && $method === 'login'){
             return response()->json(['error' => 'TokenExist'], 404);
-        }else if($existingToken && $method === 'continue')
+        }
 
-            if ($existingToken) {
-                $existingToken->delete();
-            }
+        if($existingToken && $method === 'exist'){
+            if ($existingToken) { $existingToken->delete(); }
+        }
 
-            // Create a fresh token
-            $token = $user->createToken('PPA_Token')->plainTextToken;
+        // Create a fresh token
+        $token = $user->createToken('PPA_Token')->plainTextToken;
 
-            // User details
-            $userdata = [
-                'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
-                'firstname' => $user->firstname,
-                'gender' => $user->gender,
-            ];
+        // User details
+        $userdata = [
+            'name' => $user->firstname . ' ' . $user->middlename . '. ' . $user->lastname,
+            'firstname' => $user->firstname,
+            'gender' => $user->gender,
+        ];
 
-            // Handle security info
-            $security = PPASecurity::where('user_id', $user->id)->first();
-            if (!$security) {
-                $security = new PPASecurity();
-                $security->user_id = $user->id;
-            }
+        // Handle security info
+        $security = PPASecurity::where('user_id', $user->id)->first();
+        if (!$security) {
+            $security = new PPASecurity();
+            $security->user_id = $user->id;
+        }
 
-            $security->browser = $agent->browser();
+        $security->browser = $agent->browser();
 
-            if ($security->save()) {
-                // Add to logs
-                $logs = new LogsModel();
-                $logs->category = 'USER';
-                $logs->message = $user->firstname.' '.$user->middlename.'. '. $user->lastname.' has logged into the system ('.$agent->browser().').';
-                $logs->save();
-            }
+        if ($security->save()) {
+            // Add to logs
+            $logs = new LogsModel();
+            $logs->category = 'USER';
+            $logs->message = $user->firstname.' '.$user->middlename.'. '. $user->lastname.' has logged into the system using '.$agent->browser().'.';
+            $logs->save();
+        }
 
-            return response([
-                'userId' => $user->id,
-                'userDet' => $userdata,
-                'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
-                'code' => $user->code_clearance,
-                'token' => $token
-            ]);
-        
+        return response([
+            'userId' => $user->id,
+            'userDet' => $userdata,
+            'userAvatar' => $rootUrl . '/storage/displaypicture/' . $user->avatar,
+            'code' => $user->code_clearance,
+            'token' => $token
+        ]);
+
+        return response()->json(['message' => 'LoginSuccessfull'], 200);
     }
 
     /**

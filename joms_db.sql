@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 14, 2024 at 03:08 AM
+-- Generation Time: May 30, 2026 at 03:03 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -18,113 +18,143 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `joms_db`
+-- Database: `jlms_db`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `assign_personnels`
+-- Table structure for table `announcement`
 --
 
-CREATE TABLE `assign_personnels` (
+CREATE TABLE `announcement` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `type_of_personnel` varchar(255) NOT NULL,
+  `date_of_request` date NOT NULL,
+  `details` varchar(1000) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `assign_personnels`
+-- Dumping data for table `announcement`
 --
 
-INSERT INTO `assign_personnels` (`id`, `user_id`, `type_of_personnel`, `created_at`, `updated_at`) VALUES
-(1, 13, 'IT Service', '2024-03-20 07:18:25', '2024-03-20 07:18:25'),
-(2, 14, 'Driver/Mechanic', '2024-03-20 07:20:17', '2024-03-20 07:20:17'),
-(3, 15, 'Driver/Mechanic', '2024-03-20 07:20:49', '2024-03-20 07:20:49'),
-(4, 16, 'Driver/Mechanic', '2024-03-20 07:23:16', '2024-03-20 07:23:16'),
-(10, 18, 'IT Service', '2024-04-30 07:00:24', '2024-04-30 07:00:24'),
-(11, 1, 'IT Service', '2024-05-06 06:38:59', '2024-05-06 06:38:59'),
-(12, 17, 'IT Service', '2024-05-06 06:39:26', '2024-05-06 06:39:26'),
-(13, 124, 'IT Service', '2024-05-06 06:39:58', '2024-05-06 06:39:58'),
-(14, 92, 'IT Service', '2024-05-06 06:40:35', '2024-05-06 06:40:35'),
-(15, 87, 'Janitorial Service', '2024-05-06 06:41:13', '2024-05-06 06:41:13'),
-(16, 67, 'IT Service', '2024-05-06 06:41:37', '2024-05-06 06:41:37'),
-(17, 99, 'Electronics', '2024-05-06 06:42:11', '2024-05-06 06:42:11'),
-(18, 94, 'Janitorial Service', '2024-05-06 06:42:33', '2024-05-06 06:42:33'),
-(19, 101, 'Electronics', '2024-05-06 06:42:58', '2024-05-06 06:42:58'),
-(20, 88, 'Janitorial Service', '2024-05-06 06:43:33', '2024-05-06 06:43:33'),
-(21, 86, 'Electrical Works', '2024-05-06 06:44:42', '2024-05-06 06:44:42'),
-(22, 95, 'Janitorial Service', '2024-05-06 06:45:14', '2024-05-06 06:45:14'),
-(23, 93, 'Electrical Works', '2024-05-06 06:45:55', '2024-05-06 06:45:55'),
-(24, 42, 'Electrical Works', '2024-05-06 06:46:11', '2024-05-06 06:46:11'),
-(25, 100, 'Janitorial Service', '2024-05-06 06:46:29', '2024-05-06 06:46:29'),
-(26, 90, 'Watering Services', '2024-05-06 06:46:36', '2024-05-06 06:46:36'),
-(27, 122, 'Engeneering Services', '2024-05-06 06:47:12', '2024-05-06 06:47:12'),
-(28, 131, 'Engeneering Services', '2024-05-06 06:47:41', '2024-05-06 06:47:41'),
-(29, 120, 'Engeneering Services', '2024-05-06 06:48:15', '2024-05-06 06:48:15'),
-(30, 102, 'Janitorial Service', '2024-05-06 06:48:44', '2024-05-06 06:48:44'),
-(31, 118, 'Engeneering Services', '2024-05-06 06:48:50', '2024-05-06 06:48:50'),
-(32, 91, 'Janitorial Service', '2024-05-06 06:49:19', '2024-05-06 06:49:19'),
-(33, 114, 'Janitorial Service', '2024-05-06 06:49:59', '2024-05-06 06:49:59'),
-(34, 103, 'Janitorial Service', '2024-05-06 06:50:42', '2024-05-06 06:50:42'),
-(35, 128, 'Janitorial Service', '2024-05-06 06:50:44', '2024-05-06 06:50:44'),
-(36, 127, 'Janitorial Service', '2024-05-06 06:51:13', '2024-05-06 06:51:13'),
-(37, 104, 'Janitorial Service', '2024-05-06 06:51:26', '2024-05-06 06:51:26'),
-(38, 106, 'Janitorial Service', '2024-05-06 06:51:40', '2024-05-06 06:51:40'),
-(39, 69, 'Janitorial Service', '2024-05-06 06:51:59', '2024-05-06 06:51:59'),
-(40, 109, 'Janitorial Service', '2024-05-06 06:52:18', '2024-05-06 06:52:18'),
-(41, 89, 'Janitorial Service', '2024-05-06 06:52:41', '2024-05-06 06:52:41'),
-(42, 110, 'Janitorial Service', '2024-05-06 06:52:41', '2024-05-06 06:52:41'),
-(43, 117, 'Janitorial Service', '2024-05-06 06:53:19', '2024-05-06 06:53:19'),
-(44, 70, 'Janitorial Service', '2024-05-06 06:53:19', '2024-05-06 06:53:19'),
-(45, 112, 'Janitorial Service', '2024-05-06 06:53:57', '2024-05-06 06:53:57'),
-(46, 43, 'Driver/Mechanic', '2024-05-06 06:54:12', '2024-05-06 06:54:12'),
-(48, 44, 'Driver/Mechanic', '2024-05-06 06:55:37', '2024-05-06 06:55:37'),
-(50, 72, 'Driver/Mechanic', '2024-05-06 06:56:43', '2024-05-06 06:56:43'),
-(51, 64, 'Driver/Mechanic', '2024-05-06 06:57:26', '2024-05-06 06:57:26');
+INSERT INTO `announcement` (`id`, `date_of_request`, `details`, `created_at`, `updated_at`) VALUES
+(11, '2025-12-23', 'Hello, Love, JOMS, Hahaha', '2025-12-23 03:01:51', '2025-12-23 06:07:32');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `equipment_form`
+-- Table structure for table `assign_personnel`
 --
 
-CREATE TABLE `equipment_form` (
+CREATE TABLE `assign_personnel` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `type_of_equipment` varchar(255) NOT NULL,
-  `date_request` date NOT NULL,
-  `title_of_activity` varchar(255) NOT NULL,
-  `date_of_activity` date NOT NULL,
-  `time_start` time NOT NULL,
-  `time_end` time NOT NULL,
-  `instructions` varchar(1000) DEFAULT NULL,
-  `driver` varchar(255) DEFAULT NULL,
-  `operator` varchar(255) DEFAULT NULL,
-  `rescue_members` varchar(1000) DEFAULT NULL,
-  `opr` varchar(1000) DEFAULT NULL,
-  `division_manager_id` smallint(6) NOT NULL,
-  `division_manager_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `admin_manager_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `harbor_master_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `port_manager_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `status` tinyint(1) NOT NULL DEFAULT 0,
+  `personnel_id` smallint(6) NOT NULL,
+  `personnel_name` varchar(255) NOT NULL,
+  `assignment` varchar(500) NOT NULL,
+  `status` int(11) NOT NULL,
+  `date_assigned` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `assign_personnel`
+--
+
+INSERT INTO `assign_personnel` (`id`, `personnel_id`, `personnel_name`, `assignment`, `status`, `date_assigned`, `created_at`, `updated_at`) VALUES
+(4, 43, 'Jan Dexter T. Loang', 'Driver/Mechanic', 0, NULL, '2024-09-26 08:40:49', '2026-05-12 01:00:48'),
+(5, 44, 'Joel A. Magno', 'Driver/Mechanic', 0, NULL, '2024-09-26 08:41:16', '2026-05-09 04:01:28'),
+(6, 68, 'Daryl T. Sumanoy', 'Driver/Mechanic', 0, NULL, '2024-09-26 08:41:41', '2026-05-09 04:03:22'),
+(8, 50, 'Edward Sonny B. Namindang', 'IT Service', 0, NULL, '2024-09-26 08:42:12', '2024-09-26 08:42:12'),
+(9, 1, 'Zack-Mio A. Sermon', 'IT Service', 0, NULL, '2024-10-01 05:49:02', '2024-10-01 05:49:02'),
+(21, 27, 'Janrey Vincent P. Durano', 'Driver/Mechanic', 0, NULL, '2025-09-18 01:48:29', '2026-04-03 04:38:36'),
+(22, 25, 'Edgardo B. Dandoy', 'Watering Services', 0, NULL, '2025-09-25 00:39:46', '2025-12-20 05:49:10'),
+(23, 29, 'Kate Wendell A. Eugenio', 'Janitorial Service', 0, NULL, '2025-09-25 00:40:29', '2025-09-25 00:40:29'),
+(24, 21, 'Luis A. Calderon', 'Driver/Mechanic', 0, NULL, '2025-10-30 01:46:13', '2026-04-03 05:38:43'),
+(28, 37, 'Mark Anthony C. Gonzales', 'Driver/Mechanic', 0, NULL, '2026-01-14 07:08:33', '2026-05-26 05:50:23'),
+(32, 1, 'Zack-Mio A. Sermon', 'Driver/Mechanic', 3, NULL, '2026-03-31 03:50:35', '2026-04-28 01:28:12'),
+(35, 25, 'Edgardo B. Dandoy', 'Driver/Mechanic', 0, NULL, '2026-03-31 03:53:37', '2026-04-03 04:35:22'),
+(36, 12, 'Clint Bryan B. Balmores', 'Driver/Mechanic', 0, NULL, '2026-03-31 03:58:00', '2026-04-03 04:36:32'),
+(38, 20, 'Colin Kay R. Cajote', 'Engeneering Services', 0, NULL, '2026-04-07 00:50:09', '2026-04-07 00:50:09'),
+(39, 34, 'Richie Aram B. Garganera', 'Janitorial Service', 0, NULL, '2026-04-07 00:55:23', '2026-04-07 00:55:23'),
+(43, 12, 'Clint Bryan B. Balmores', 'Janitorial Service', 0, NULL, '2026-04-07 01:01:10', '2026-04-07 01:01:10'),
+(44, 38, 'Cris Ian R. Jacinto', 'Janitorial Service', 0, NULL, '2026-04-07 01:01:58', '2026-04-07 01:01:58');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `facility`
+-- Table structure for table `form_request_tracker`
 --
 
-CREATE TABLE `facility` (
+CREATE TABLE `form_request_tracker` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `date_requested` date NOT NULL,
+  `form_id` int(11) NOT NULL,
+  `type_of_request` varchar(255) NOT NULL,
+  `remarks` varchar(500) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `form_request_tracker`
+--
+
+INSERT INTO `form_request_tracker` (`id`, `form_id`, `type_of_request`, `remarks`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Vehicle', 'Zack-Mio A. Sermon submitted a request.', '2026-05-09 01:36:12', '2026-05-09 01:36:12'),
+(2, 1, 'Vehicle', 'Zack-Mio A. Sermon has canceled the form.', '2026-05-09 01:44:33', '2026-05-09 01:44:33'),
+(3, 2, 'Vehicle', 'Zack-Mio A. Sermon submitted a request.', '2026-05-09 01:45:47', '2026-05-09 01:45:47'),
+(4, 2, 'Vehicle', 'Zack-Mio A. Sermon updated the form.', '2026-05-09 01:53:12', '2026-05-09 01:53:12'),
+(5, 2, 'Vehicle', 'Sue Christine A. Sade has assigned the driver and vehicle.', '2026-05-09 02:22:57', '2026-05-09 02:22:57'),
+(6, 2, 'Vehicle', 'Naomie D. Zalsos approved the request.', '2026-05-09 02:33:44', '2026-05-09 02:33:44'),
+(7, 2, 'Vehicle', 'Zack-Mio A. Sermon updated the form.', '2026-05-09 04:03:22', '2026-05-09 04:03:22'),
+(8, 3, 'Vehicle', 'Sue Christine A. Sade submitted a request.', '2026-05-09 05:20:54', '2026-05-09 05:20:54'),
+(9, 3, 'Vehicle', 'Sue Christine A. Sade updated the form.', '2026-05-09 05:39:04', '2026-05-09 05:39:04'),
+(10, 3, 'Vehicle', 'Arthur B. Nogas approved the request.', '2026-05-09 06:02:53', '2026-05-09 06:02:53'),
+(11, 4, 'Vehicle', 'Dennis S. Cambaya submitted a request.', '2026-05-09 06:09:04', '2026-05-09 06:09:04'),
+(12, 4, 'Vehicle', 'Sue Christine A. Sade has assigned the driver and vehicle.', '2026-05-09 06:16:48', '2026-05-09 06:16:48'),
+(13, 4, 'Vehicle', 'Arthur B. Nogas disapproved the request.', '2026-05-09 06:26:39', '2026-05-09 06:26:39'),
+(14, 50, 'Repair', 'Zack-Mio A. Sermon submitted a request.', '2026-05-12 08:30:12', '2026-05-12 08:30:12'),
+(15, 50, 'Repair', 'Sheila Andrea R. Bollozos disapproved the request.', '2026-05-13 01:03:26', '2026-05-13 01:03:26'),
+(16, 16, 'Facility/Venue', 'The form was closed by the system.', '2026-05-13 02:57:20', '2026-05-13 02:57:20'),
+(17, 2, 'Vehicle', 'The form was closed by the system.', '2026-05-13 03:16:30', '2026-05-13 03:16:30'),
+(18, 51, 'Repair', 'Zack-Mio A. Sermon submitted a request.', '2026-05-22 02:19:12', '2026-05-22 02:19:12'),
+(19, 51, 'Repair', 'Zack-Mio A. Sermon cancel the request.', '2026-05-22 02:20:03', '2026-05-22 02:20:03'),
+(20, 52, 'Repair', 'Dennis S. Cambaya submitted a request.', '2026-05-22 02:32:18', '2026-05-22 02:32:18'),
+(21, 52, 'Repair', 'Dennis S. Cambaya updated the part A form.', '2026-05-22 02:34:09', '2026-05-22 02:34:09'),
+(22, 52, 'Repair', 'Dennis S. Cambaya cancel the request.', '2026-05-22 02:41:35', '2026-05-22 02:41:35'),
+(23, 53, 'Repair', 'Dennis S. Cambaya submitted a request.', '2026-05-22 02:42:58', '2026-05-22 02:42:58'),
+(24, 53, 'Repair', 'Joel B. Escala disapproved the request.', '2026-05-22 02:45:50', '2026-05-22 02:45:50'),
+(25, 54, 'Repair', 'Dennis S. Cambaya submitted a request.', '2026-05-22 02:47:05', '2026-05-22 02:47:05'),
+(26, 54, 'Repair', 'Dennis S. Cambaya updated the part A form.', '2026-05-22 02:49:00', '2026-05-22 02:49:00'),
+(27, 54, 'Repair', 'Joel B. Escala approved the request.', '2026-05-22 03:01:14', '2026-05-22 03:01:14'),
+(28, 54, 'Repair', 'Sue Christine A. Sade updated the part A form.', '2026-05-22 03:04:43', '2026-05-22 03:04:43'),
+(29, 54, 'Repair', 'Sue Christine A. Sade filled out Part B form.', '2026-05-22 03:06:16', '2026-05-22 03:06:16'),
+(30, 54, 'Repair', 'Sue Christine A. Sade updated the part B form.', '2026-05-22 03:07:00', '2026-05-22 03:07:00'),
+(31, 54, 'Repair', 'Naomie D. Zalsos approved the request.', '2026-05-22 03:10:19', '2026-05-22 03:10:19'),
+(32, 54, 'Repair', 'Zack-Mio A. Sermon filled out Part C form.', '2026-05-22 03:21:17', '2026-05-22 03:21:17'),
+(33, 54, 'Repair', 'Zack-Mio A. Sermon updated the part C form.', '2026-05-22 03:21:36', '2026-05-22 03:21:36'),
+(34, 54, 'Repair', 'Zack-Mio A. Sermon filled out Part D form.', '2026-05-22 03:36:05', '2026-05-22 03:36:05'),
+(35, 55, 'Repair', 'Cheryl C. Saluta submitted a request.', '2026-05-22 03:40:09', '2026-05-22 03:40:09'),
+(36, 55, 'Repair', 'Sue Christine A. Sade filled out Part B form.', '2026-05-22 03:54:12', '2026-05-22 03:54:12'),
+(37, 55, 'Repair', 'Naomie D. Zalsos approved the request.', '2026-05-22 03:55:55', '2026-05-22 03:55:55'),
+(38, 56, 'Repair', 'Arthur B. Nogas submitted a request.', '2026-05-22 03:58:34', '2026-05-22 03:58:34'),
+(39, 56, 'Repair', 'Sue Christine A. Sade filled out Part B form.', '2026-05-22 04:03:47', '2026-05-22 04:03:47'),
+(40, 56, 'Repair', 'Naomie D. Zalsos approved the request.', '2026-05-22 04:05:20', '2026-05-22 04:05:20'),
+(41, 5, 'Vehicle', 'Zack-Mio A. Sermon submitted a request.', '2026-05-26 05:43:24', '2026-05-26 05:43:24'),
+(42, 5, 'Vehicle', 'Joan G. Bongcawel has assigned the driver and vehicle.', '2026-05-26 05:50:27', '2026-05-26 05:50:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `joms_facility_venue`
+--
+
+CREATE TABLE `joms_facility_venue` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
   `request_office` varchar(255) NOT NULL,
   `title_of_activity` varchar(255) NOT NULL,
   `date_start` date NOT NULL,
@@ -142,7 +172,7 @@ CREATE TABLE `facility` (
   `microphone` tinyint(1) NOT NULL DEFAULT 0,
   `no_microphone` int(11) DEFAULT NULL,
   `others` tinyint(1) NOT NULL DEFAULT 0,
-  `specify` varchar(255) DEFAULT NULL,
+  `specify` varchar(500) DEFAULT NULL,
   `projector` tinyint(1) NOT NULL DEFAULT 0,
   `projector_screen` tinyint(1) NOT NULL DEFAULT 0,
   `document_camera` tinyint(1) NOT NULL DEFAULT 0,
@@ -162,69 +192,197 @@ CREATE TABLE `facility` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `joms_facility_venue`
+--
+
+INSERT INTO `joms_facility_venue` (`id`, `user_id`, `user_name`, `request_office`, `title_of_activity`, `date_start`, `time_start`, `date_end`, `time_end`, `mph`, `conference`, `dorm`, `other`, `table`, `no_table`, `chair`, `no_chair`, `microphone`, `no_microphone`, `others`, `specify`, `projector`, `projector_screen`, `document_camera`, `laptop`, `television`, `sound_system`, `videoke`, `name_male`, `name_female`, `other_details`, `admin_approval`, `date_approve`, `obr_instruct`, `obr_comment`, `remarks`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting', '2025-10-24', '08:00:00', '2025-10-24', '16:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 1, 0, 0, 1, 0, 0, 0, NULL, NULL, NULL, 1, '2025-10-24', 'Test Here', 'Test Here II', 'Form is closed', '2025-10-23 06:06:29', '2025-10-27 01:12:29'),
+(2, 9, 'Sue Christine A. Sade', 'PSD', 'Berthing Meeting', '2025-10-27', '10:00:00', '2025-10-27', '12:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Sue Christine A. Sade canceled the form request.', '2025-10-24 07:48:31', '2025-10-27 01:14:27'),
+(3, 9, 'Sue Christine A. Sade', 'Admin', 'Audit Meeting', '2025-10-27', '13:00:00', '2025-10-27', '15:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 0, NULL, 1, 'Snacks', 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 1, '2025-10-27', 'Please ko Sue', 'Copy Maam', 'Form is closed', '2025-10-27 01:18:44', '2025-10-30 02:55:27'),
+(4, 76, 'Naomie D. Zalsos', 'Admin', 'General Orientation', '2025-10-28', '13:00:00', '2025-10-28', '15:30:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 1, 0, 0, 0, 0, NULL, NULL, NULL, 1, '2025-10-27', 'Please ko facilitate Sue, Thanks', 'Okay maam', 'Form is closed', '2025-10-27 02:23:06', '2025-10-30 02:55:35'),
+(5, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting', '2025-11-13', '10:00:00', '2025-11-13', '13:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Zack-Mio A. Sermon canceled the form request.', '2025-11-12 06:46:05', '2025-11-12 06:54:36'),
+(6, 19, 'Joan G. Bongcawel', 'Admin', 'General Assembley', '2025-11-13', '09:00:00', '2025-11-13', '12:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 1, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Joan G. Bongcawel canceled the form request.', '2025-11-12 07:06:42', '2025-11-13 01:09:38'),
+(7, 19, 'Joan G. Bongcawel', 'Admin', 'General Meeting 2025', '2025-11-18', '08:00:00', '2025-11-18', '17:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 1, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Joan G. Bongcawel canceled the form request.', '2025-11-13 01:15:01', '2025-11-15 03:10:20'),
+(8, 19, 'Joan G. Bongcawel', 'Admin', 'Overnight Stay', '2025-11-17', '08:00:00', '2025-11-21', '12:00:00', 0, 0, 1, 0, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 'John A. Doe', 'Jane A. Doe', NULL, 0, NULL, NULL, NULL, 'Joan G. Bongcawel canceled the form request.', '2025-11-15 03:12:03', '2025-11-15 03:12:42'),
+(9, 19, 'Joan G. Bongcawel', 'Admin', 'Meeting (basta meeting)', '2025-11-17', '08:00:00', '2025-11-17', '17:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Joan G. Bongcawel canceled the form request.', '2025-11-15 03:14:38', '2025-11-15 03:15:20'),
+(10, 1, 'Zack-Mio A. Sermon', 'Admin', 'Division Manager\'s Meeting', '2025-12-02', '08:00:00', '2025-12-02', '12:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 1, 0, 0, 1, 0, 0, 0, NULL, NULL, NULL, 4, '2025-12-01', NULL, NULL, 'Disapproved (Reason: Ganahan lang ko)', '2025-11-29 07:04:51', '2025-12-01 02:57:12'),
+(11, 1, 'Zack-Mio A. Sermon', 'Admin', 'HO QMS', '2025-12-01', '10:00:00', '2025-12-05', '08:00:00', 0, 0, 1, 0, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 'Miguel Santos\nJohn Dela Cruz', 'Maria Lopez\nAngela Bautista', 'Serve Foods everyday', 1, '2025-12-01', 'Please ko Sue', 'Test', 'Form is closed', '2025-12-01 00:54:04', '2026-04-22 03:46:35'),
+(12, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting', '2026-03-11', '08:00:00', '2026-03-11', '17:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 0, 1, 0, 0, NULL, NULL, NULL, 7, NULL, NULL, NULL, 'Waiting for admin manager\'s approval.', '2026-03-10 05:26:03', '2026-03-10 05:26:03'),
+(13, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting 2025', '2026-03-20', '08:00:00', '2026-03-21', '17:00:00', 1, 0, 0, 0, 1, NULL, 1, 80, 1, NULL, 0, NULL, 0, 0, 1, 0, 0, 0, 0, NULL, NULL, NULL, 2, '2026-03-20', 'Please ko ani Sue', 'Noted Maam Nao, I assign IT for this and also for the snacks and also documents.', 'The Admin Manager has approved this request.', '2026-03-19 02:52:14', '2026-03-20 03:40:06'),
+(14, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting', '2026-03-20', '15:00:00', '2026-03-20', '17:00:00', 0, 1, 0, 0, 1, NULL, 0, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Zack-Mio A. Sermon canceled the form request.', '2026-03-20 05:25:32', '2026-03-20 05:39:08'),
+(15, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting', '2026-03-21', '06:00:00', '2026-03-21', '12:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 4, '2026-03-20', NULL, NULL, 'Disapproved (Reason: Wala lang, ganahan lang ko)', '2026-03-20 05:46:27', '2026-03-20 06:48:53'),
+(16, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-23', '08:00:00', '2026-04-23', '22:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 1, 1, 0, 0, NULL, NULL, NULL, 1, '2026-04-22', 'This is test only Haha, huhu', 'This is test ha? Huhu, hehehe,', 'Form is closed', '2026-04-16 03:01:03', '2026-05-13 02:57:20'),
+(17, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-23', '10:00:00', '2026-04-23', '12:00:00', 1, 0, 0, 0, 1, 3, 1, 80, 1, 5, 0, NULL, 0, 0, 1, 0, 0, 0, 0, NULL, NULL, NULL, 2, '2026-04-22', 'This is test only', 'This is noted maam Nao', 'The Admin Manager has approved this request.', '2026-04-22 06:00:54', '2026-04-22 07:04:07'),
+(18, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-24', '20:00:00', '2026-04-25', '12:00:00', 0, 0, 1, 0, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 'Zack-Mio A. Sermon', NULL, 'Breakfast only', 4, '2026-04-22', NULL, NULL, 'Disapproved (Reason: ganahan lang ko)', '2026-04-22 07:05:36', '2026-04-22 07:29:48'),
+(19, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-27', '10:00:00', '2026-04-27', '12:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 0, 0, 0, 1, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Zack-Mio A. Sermon canceled the form request.', '2026-04-22 07:30:40', '2026-04-22 07:32:39'),
+(20, 76, 'Naomie D. Zalsos', 'Admin', 'Berthing Meeting II', '2026-04-24', '13:00:00', '2026-04-24', '17:00:00', 1, 0, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 6, '2026-04-23', 'Please so Sue', NULL, 'The Admin Manager has submit the request.', '2026-04-23 01:10:28', '2026-04-23 01:10:28'),
+(21, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-30', '14:00:00', '2026-04-30', '17:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 1, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 1, NULL, NULL, NULL, 4, '2026-04-30', NULL, NULL, 'Disapproved (Reason: Ganahan lang ko)', '2026-04-30 00:33:14', '2026-04-30 00:55:47'),
+(22, 1, 'Zack-Mio A. Sermon', 'Admin', 'Berthing Meeting II', '2026-04-30', '15:00:00', '2026-04-30', '17:00:00', 0, 1, 0, 0, 1, NULL, 1, NULL, 0, NULL, 0, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'Zack-Mio A. Sermon canceled the form request.', '2026-04-30 01:00:37', '2026-04-30 01:01:11');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `inspection_form_admin`
+-- Table structure for table `joms_inspection_form`
 --
 
-CREATE TABLE `inspection_form_admin` (
+CREATE TABLE `joms_inspection_form` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `inspection__form_id` bigint(20) UNSIGNED NOT NULL,
-  `date_of_filling` date NOT NULL,
-  `date_of_last_repair` date DEFAULT NULL,
-  `nature_of_last_repair` varchar(255) DEFAULT NULL,
-  `assign_personnel` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `inspection__forms`
---
-
-CREATE TABLE `inspection__forms` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `date_of_request` date NOT NULL,
-  `property_number` varchar(255) NOT NULL,
-  `acq_date` date NOT NULL,
-  `acq_cost` varchar(255) NOT NULL,
-  `brand_model` varchar(255) NOT NULL,
-  `serial_engine_no` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `property_number` varchar(255) DEFAULT NULL,
+  `acquisition_date` date DEFAULT NULL,
+  `acquisition_cost` varchar(255) DEFAULT NULL,
+  `brand_model` varchar(255) DEFAULT NULL,
+  `serial_engine_no` varchar(255) DEFAULT NULL,
   `type_of_property` varchar(255) NOT NULL,
   `property_description` varchar(255) NOT NULL,
   `location` varchar(255) NOT NULL,
-  `complain` varchar(255) NOT NULL,
-  `supervisor_name` smallint(6) NOT NULL,
-  `supervisor_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `admin_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `inspector_status` int(1) NOT NULL,
+  `complain` varchar(500) NOT NULL,
+  `date_of_filling` date DEFAULT NULL,
+  `date_of_last_repair` date DEFAULT NULL,
+  `nature_of_last_repair` varchar(255) DEFAULT NULL,
+  `before_repair_date` date DEFAULT NULL,
+  `after_reapir_date` date DEFAULT NULL,
+  `findings` varchar(500) DEFAULT NULL,
+  `recommendations` varchar(500) DEFAULT NULL,
   `remarks` varchar(500) DEFAULT NULL,
+  `supervisor_id` smallint(6) NOT NULL,
+  `supervisor_name` varchar(255) NOT NULL,
+  `personnel_id` smallint(6) DEFAULT NULL,
+  `personnel_name` varchar(255) DEFAULT NULL,
+  `form_status` tinyint(1) NOT NULL DEFAULT 0,
+  `form_remarks` varchar(500) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `joms_inspection_form`
+--
+
+INSERT INTO `joms_inspection_form` (`id`, `user_id`, `user_name`, `property_number`, `acquisition_date`, `acquisition_cost`, `brand_model`, `serial_engine_no`, `type_of_property`, `property_description`, `location`, `complain`, `date_of_filling`, `date_of_last_repair`, `nature_of_last_repair`, `before_repair_date`, `after_reapir_date`, `findings`, `recommendations`, `remarks`, `supervisor_id`, `supervisor_name`, `personnel_id`, `personnel_name`, `form_status`, `form_remarks`, `created_at`, `updated_at`) VALUES
+(1, 22, 'Dennis S. Cambaya', '12344567', '2025-09-29', '20000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'This is test only', 'ESD', 'Test lang ko kay ganahan man ko walay kay mabuhat', '2025-10-20', '2025-10-08', 'Test', '2025-10-20', '2025-10-20', 'Test', 'Test', 'Test Here', 4, 'Joel B. Escala', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2025-10-20 05:04:54', '2025-10-21 02:05:16'),
+(2, 22, 'Dennis S. Cambaya', '12344567', '2025-09-29', '20000', 'DHI-XVR5116H-4KL', '4HO2010PAZ245A6', 'IT Equipment & Related Materials', 'Printer', 'ESD', 'My printer was not working spill ink', '2025-10-21', NULL, NULL, '2025-10-21', '2025-10-21', 'Test', 'Test here', 'Test g', 4, 'Joel B. Escala', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2025-10-21 02:23:10', '2025-10-22 05:58:22'),
+(3, 22, 'Dennis S. Cambaya', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 0, 'Dennis S. Cambaya canceled the form request.', '2025-10-21 02:29:40', '2025-10-21 02:31:02'),
+(4, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: There is no issue).', '2025-10-22 02:33:29', '2025-10-22 02:41:34'),
+(5, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'This is test only', 'Test', '2025-10-22', NULL, NULL, '2025-10-22', '2025-10-22', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-10-22 03:15:50', '2025-11-06 03:02:49'),
+(6, 76, 'Naomie D. Zalsos', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test Here', '2025-10-22', NULL, NULL, '2025-10-22', '2025-10-22', 'Test', 'Test', 'Test', 76, 'Naomie D. Zalsos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-10-22 05:47:46', '2025-11-06 03:03:11'),
+(7, 2, 'Arthur B. Nogas', 'Laptop20200', '2025-10-09', '20000', 'wrwer', 'Test Serial Numbers', 'IT Equipment & Related Materials', 'Test', 'OPM', 'Test', '2025-10-22', NULL, NULL, '2025-10-22', '2025-10-22', 'Test', 'Test', 'Test', 2, 'Arthur B. Nogas', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2025-10-22 05:59:53', '2025-11-06 03:03:20'),
+(8, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'PC', 'Admin', 'My computer is so slow', '2025-10-22', NULL, NULL, '2025-10-22', '2025-10-22', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-10-22 06:36:55', '2025-11-04 06:13:48'),
+(9, 1, 'Zack-Mio A. Sermon', 'Laptop20200', '2025-05-08', '50000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'My laptop not working hehehe', '2025-11-04', '2025-10-30', 'Test Here', '2025-11-04', '2025-11-05', 'Test III', 'Test III', 'Test III', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 2, 'The assigned personnel has completed the form.', '2025-11-04 05:50:51', '2025-11-05 03:20:05'),
+(10, 19, 'Joan G. Bongcawel', '12344567', '2025-10-28', '50000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'PC', 'Admin', 'My PC not working and also my printer', '2025-11-05', '2025-10-29', 'Test', '2025-11-05', '2025-11-05', 'Test III', 'Test', 'Test III', 18, 'Sheila Andrea R. Bollozos', 65, 'Jeffrey N. Silao', 2, 'The assigned personnel has completed the form.', '2025-11-05 03:26:15', '2025-11-05 05:19:13'),
+(11, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'This is test only Hehe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Ganahan lang ko).', '2025-11-05 05:43:06', '2025-11-05 08:09:45'),
+(12, 9, 'Sue Christine A. Sade', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Wala Lang).', '2025-11-05 05:49:15', '2025-11-05 08:17:27'),
+(13, 22, 'Dennis S. Cambaya', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'ESD', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 0, 'Dennis S. Cambaya canceled the form request.', '2025-11-05 05:58:15', '2025-11-05 06:18:10'),
+(14, 68, 'Daryl T. Sumanoy', 'Test Property Number', '2025-10-28', '100000', 'Test Brand/Model', 'Test Serial/Engine No', 'Vehicle Supplies & Materials', 'Test', 'Admin', 'Test only', '2025-11-05', NULL, NULL, '2025-11-05', '2025-11-05', 'Test I', 'Test II', 'Test III', 18, 'Sheila Andrea R. Bollozos', 68, 'Daryl T. Sumanoy', 4, 'This form was approved by the admin manager.', '2025-11-05 08:22:43', '2025-11-06 03:26:11'),
+(15, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'PC', 'Admin', 'Not working and also the mouse', '2025-11-06', '2023-04-02', 'Test here hahaha', '2025-11-06', '2025-11-06', 'Test II', 'Test', 'Test I', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-11-06 03:34:49', '2026-03-21 05:19:26'),
+(16, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', '2025-11-06', NULL, NULL, '2025-11-06', '2025-11-06', 'Test', 'Test', 'test', 18, 'Sheila Andrea R. Bollozos', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2025-11-06 04:00:45', '2026-04-16 03:01:20'),
+(17, 9, 'Sue Christine A. Sade', 'Test Property Number', '2025-10-29', '10000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', '2025-11-06', NULL, NULL, '2025-11-06', '2025-11-06', 'Test', 'Test II', 'Test III', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-11-06 06:05:03', '2026-01-14 00:56:44'),
+(18, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Not Working', '2025-11-06', NULL, NULL, '2025-11-06', '2025-11-06', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 2, 'The assigned personnel has completed the form.', '2025-11-06 08:27:47', '2025-11-07 01:48:59'),
+(19, 1, 'Zack-Mio A. Sermon', 'Test Property Number', '2022-11-07', '20000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', '2025-11-07', NULL, NULL, '2025-11-07', '2025-11-07', 'Test III', 'Test III', 'Test III', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'This form was approved by the admin manager.', '2025-11-07 01:55:04', '2025-12-27 02:29:48'),
+(20, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test', 'ESD', 'Test', '2025-11-07', NULL, NULL, '2025-11-07', '2025-11-07', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-11-07 02:10:11', '2025-11-12 02:32:50'),
+(21, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Sue Christine A. Sade canceled the form request.', '2025-11-12 02:42:31', '2025-12-27 01:55:43'),
+(22, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Printer', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Joan G. Bongcawel canceled the form request.', '2025-11-13 06:07:13', '2025-11-13 06:07:38'),
+(23, 1, 'Zack-Mio A. Sermon', 'Laptop2020', '2025-11-05', '50000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test here', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Zack-Mio A. Sermon canceled the form request.', '2025-11-17 02:39:03', '2025-11-29 05:44:05'),
+(24, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Slow performance', '2025-11-29', '2025-11-04', 'Test Here', '2025-11-29', '2025-11-29', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2025-11-29 02:09:40', '2025-12-09 08:53:07'),
+(26, 1, 'Zack-Mio A. Sermon', '12344567', '2025-12-03', '50000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'This is test only', 'Admin', 'This is test', '2025-12-27', '2025-12-04', 'This is test only', '2025-12-27', '2025-12-27', 'This is test II', 'This is test II', 'Test Here II', 18, 'Sheila Andrea R. Bollozos', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2025-12-27 01:49:29', '2026-01-05 06:11:27'),
+(27, 9, 'Sue Christine A. Sade', NULL, NULL, NULL, NULL, NULL, 'Others', 'U', 'H', 'U', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 11, 'Waiting for supervisor approval.', '2026-01-14 02:03:17', '2026-01-14 02:03:17'),
+(28, 9, 'Sue Christine A. Sade', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Tes', 'Tes', 'Tes', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 11, 'Waiting for supervisor approval.', '2026-01-14 02:07:47', '2026-01-14 02:07:47'),
+(29, 22, 'Dennis S. Cambaya', 'Testing', '2023-01-10', '50000', 'Test', 'Test I', 'IT Equipment & Related Materials', 'Laptop', 'ESD', 'Test here', '2026-01-15', NULL, NULL, '2026-01-15', '2026-01-15', 'Test', 'Test I', 'Test I', 4, 'Joel B. Escala', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2026-01-15 02:27:34', '2026-01-20 01:52:50'),
+(30, 79, 'Zackiee A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Not charging and keyboard not working', '2026-01-20', '2026-01-09', 'Test', '2026-01-20', '2026-01-20', 'Test', 'Test', 'Test', 18, 'Sheila Andrea R. Bollozos', 65, 'Jeffrey N. Silao', 1, 'Form is closed', '2026-01-20 03:16:11', '2026-01-22 01:10:31'),
+(31, 22, 'Dennis S. Cambaya', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Printer', 'ESD', 'Always paper JAM', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: This request need for disposal).', '2026-01-20 04:12:14', '2026-01-20 05:55:02'),
+(32, 1, 'Zack-Mio A. Sermon', '12344567', '2026-02-04', '50000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Laptop', 'Test Location', 'test', '2026-02-21', '2026-02-10', 'This is test II', '2026-02-21', '2026-02-21', 'Test I', 'Test II', 'Test III', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 2, 'The assigned personnel has completed the form.', '2026-02-20 05:21:46', '2026-02-21 06:19:23'),
+(33, 1, 'Zack-Mio A. Sermon', NULL, '2026-02-05', '50000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'This is test', 'Admin', 'Test only I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Sue Christine A. Sade canceled the form request.', '2026-02-21 06:20:19', '2026-02-23 05:29:19'),
+(34, 22, 'Dennis S. Cambaya', 'Test Property Number', NULL, NULL, 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Test Description', 'This is test only', 'Test only lang ni ha?', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Ganahan lang ko).', '2026-02-23 07:44:47', '2026-02-23 11:06:43'),
+(35, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'This is test only', 'This is test only and mao nato', '2026-02-23', '2026-02-03', 'Test', '2026-02-23', '2026-02-23', 'Test II', 'Test III', 'Test Here', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2026-02-23 11:16:14', '2026-02-25 00:07:20'),
+(36, 1, 'Zack-Mio A. Sermon', '12344567', NULL, NULL, NULL, 'Test Serial Number', 'IT Equipment & Related Materials', 'Test Description', 'Tersfdhdgd', 'tsadfsdsd', '2026-02-27', '2026-03-03', 'Test Here', '2026-02-27', '2026-02-27', 'Test I', 'Test II', 'Heheheheeeeee', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2026-02-26 03:56:44', '2026-03-07 07:46:15'),
+(37, 19, 'Joan G. Bongcawel', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Test', '2026-02-27', NULL, NULL, '2026-02-27', '2026-02-27', 'Test I', 'Test I', 'Test III', 18, 'Sheila Andrea R. Bollozos', 65, 'Jeffrey N. Silao', 11, 'Waiting for supervisor approval.', '2026-02-27 02:20:08', '2026-02-27 02:38:02'),
+(38, 1, 'Zack-Mio A. Sermon', 'Test Property Number', '2026-03-12', '50000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', '2026-03-19', NULL, NULL, '2026-03-18', '2026-03-18', 'Test I', 'Test III', 'Test IIIiugg', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2026-03-18 06:04:55', '2026-04-15 01:00:37'),
+(39, 1, 'Zack-Mio A. Sermon', 'Test Property Number', '2026-03-11', '50000', 'Test Brand Model', 'Test Serial Number', 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Test', '2026-03-19', NULL, 'Test', '2026-03-19', '2026-03-19', 'Test', 'Test II', 'Test I', 18, 'Sheila Andrea R. Bollozos', 50, 'Edward Sonny B. Namindang', 1, 'Form is closed', '2026-03-19 01:35:53', '2026-04-15 00:36:24'),
+(40, 1, 'Zack-Mio A. Sermon', NULL, NULL, '10000', NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Test Location', 'Wala lang test lang nako ni', '2026-03-19', NULL, NULL, '2026-03-19', '2026-03-19', 'Test', 'Test II', 'Test I', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2026-03-19 01:53:33', '2026-04-11 07:57:07'),
+(41, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Zack-Mio A. Sermon canceled the form request.', '2026-03-20 06:55:15', '2026-03-20 06:58:25'),
+(42, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Ganahan lang ko).', '2026-03-20 06:58:56', '2026-03-20 08:15:28'),
+(43, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'Vehicle Supplies & Materials', 'Test Description', 'Test Location', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Zack-Mio A. Sermon canceled the form request.', '2026-03-20 08:15:59', '2026-03-20 08:34:00'),
+(44, 1, 'Zack-Mio A. Sermon', '123445670', '2025-10-29', '50000', 'DHI-XVR5116H-4KL0', 'LTDFEF34234FFDF0', 'IT Equipment & Related Materials', 'Test Here', 'Admin', 'This is test only', '2026-04-14', NULL, NULL, '2026-04-14', '2026-04-14', 'Test', 'Test II', 'Test I', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 4, 'This form was approved by the admin manager.', '2026-04-10 09:31:34', '2026-04-14 07:19:33'),
+(45, 1, 'Zack-Mio A. Sermon', '123445678', '2023-06-27', '50000', 'DHI-XVR5116H-4KL8', 'LTDFEF34234FFDFH', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'This is test only', '2026-04-12', '2026-03-10', 'This is test II', NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 4, 'This form was approved by the admin manager.', '2026-04-10 09:36:32', '2026-04-14 02:23:57'),
+(46, 1, 'Zack-Mio A. Sermon', '12344567', '2022-06-14', '20000', 'Test Brand Model', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'This is test only and mao nato', '2026-04-09', NULL, NULL, '2026-04-14', '2026-04-14', 'Test', 'Test II', 'Test', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 2, 'The assigned personnel has completed the form.', '2026-04-11 04:10:19', '2026-04-14 04:29:39'),
+(47, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'This is test only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 0, 'Zack-Mio A. Sermon canceled the form request.', '2026-04-14 02:39:11', '2026-04-14 02:44:29'),
+(48, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'This is test only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Ganahan lang ko).', '2026-04-14 02:44:01', '2026-04-14 03:02:50'),
+(49, 1, 'Zack-Mio A. Sermon', 'Test Property Number', '2022-07-20', '50000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDFr', 'IT Equipment & Related Materials', 'Laptop', 'Admin', 'Not working', '2026-04-14', NULL, 'Test', '2026-04-14', '2026-04-14', 'Test I', 'Test II', 'Hehehe', 18, 'Sheila Andrea R. Bollozos', 1, 'Zack-Mio A. Sermon', 1, 'Form is closed', '2026-04-14 07:38:02', '2026-04-16 04:00:14'),
+(50, 1, 'Zack-Mio A. Sermon', 'Test Property Number', '2021-03-10', '50000', 'Test Brand Model', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'This is test only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 18, 'Sheila Andrea R. Bollozos', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Ganahan lang ko).', '2026-05-12 08:30:12', '2026-05-13 01:03:26'),
+(51, 1, 'Zack-Mio A. Sermon', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'This is test only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 0, 'Zack-Mio A. Sermon canceled the form request.', '2026-05-22 02:19:12', '2026-05-22 02:20:03'),
+(52, 22, 'Dennis S. Cambaya', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'PC', 'Admin', 'Dili mu gana', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 0, 'Dennis S. Cambaya canceled the form request.', '2026-05-22 02:32:18', '2026-05-22 02:41:35'),
+(53, 22, 'Dennis S. Cambaya', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'Admin', 'This is test only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'Joel B. Escala', NULL, NULL, 7, 'Disapproved by the Supervisor (Reason: Wala lang ganahan ko).', '2026-05-22 02:42:58', '2026-05-22 02:45:50'),
+(54, 22, 'Dennis S. Cambaya', 'Laptop20200', '2023-06-06', '50000', 'DHI-XVR5116H-4KL', 'LTDFEF34234FFDF', 'IT Equipment & Related Materials', 'PC', 'Admin', 'Na guba akong PC', '2026-05-22', '2026-05-01', 'Test here', '2026-05-22', '2026-05-22', 'Test II', 'Test IV', 'Test Here', 4, 'Joel B. Escala', 1, 'Zack-Mio A. Sermon', 2, 'The assigned personnel has completed the form.', '2026-05-22 02:47:05', '2026-05-22 03:36:05'),
+(55, 6, 'Cheryl C. Saluta', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'This is test only', 'Test', '2026-05-22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 'Cheryl C. Saluta', 1, 'Zack-Mio A. Sermon', 4, 'This form was approved by the admin manager.', '2026-05-22 03:40:09', '2026-05-22 03:55:55'),
+(56, 2, 'Arthur B. Nogas', NULL, NULL, NULL, NULL, NULL, 'IT Equipment & Related Materials', 'Test Description', 'This is test only', 'Test', '2026-05-22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, 'Arthur B. Nogas', 1, 'Zack-Mio A. Sermon', 4, 'This form was approved by the admin manager.', '2026-05-22 03:58:34', '2026-05-22 04:05:20');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `inspector__forms`
+-- Table structure for table `joms_vehicle_slip_form`
 --
 
-CREATE TABLE `inspector__forms` (
+CREATE TABLE `joms_vehicle_slip_form` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `inspection__form_id` int(11) NOT NULL,
-  `before_repair_date` date NOT NULL,
-  `findings` varchar(255) NOT NULL,
-  `recommendations` varchar(255) NOT NULL,
-  `after_reapir_date` date DEFAULT NULL,
-  `remarks` varchar(255) DEFAULT NULL,
-  `close` int(11) NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `type_of_slip` varchar(255) NOT NULL,
+  `purpose` varchar(500) NOT NULL,
+  `passengers` varchar(1000) NOT NULL,
+  `place_visited` varchar(255) NOT NULL,
+  `date_arrival` date NOT NULL,
+  `time_arrival` time NOT NULL,
+  `vehicle_type` varchar(255) DEFAULT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `driver` varchar(255) DEFAULT NULL,
+  `admin_approval` tinyint(1) NOT NULL DEFAULT 0,
+  `remarks` varchar(500) NOT NULL,
+  `notes` varchar(500) DEFAULT NULL,
+  `recieved_datetime` datetime DEFAULT NULL,
+  `recieved_by` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `joms_vehicle_slip_form`
+--
+
+INSERT INTO `joms_vehicle_slip_form` (`id`, `user_id`, `user_name`, `type_of_slip`, `purpose`, `passengers`, `place_visited`, `date_arrival`, `time_arrival`, `vehicle_type`, `driver_id`, `driver`, `admin_approval`, `remarks`, `notes`, `recieved_datetime`, `recieved_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Zack-Mio A. Sermon', 'within', 'Test here', 'None', 'Place', '2026-05-09', '17:00:00', NULL, NULL, NULL, 0, 'Zack-Mio A. Sermon has canceled this form.', NULL, NULL, NULL, '2026-05-09 01:36:12', '2026-05-09 01:44:33'),
+(2, 1, 'Zack-Mio A. Sermon', 'within', 'Test Ride', 'Zack Mio A. Sermon\nJohn A. Doe', 'Iligan City', '2026-05-09', '17:00:00', 'Toyota Hi-Ace Commuter (SND 2265)', 43, 'Jan Dexter T. Loang', 1, 'Form is closed', NULL, NULL, NULL, '2026-05-09 01:45:47', '2026-05-13 03:16:30'),
+(3, 9, 'Sue Christine A. Sade', 'outside', 'Test Purpose', 'Sue Christine Sade\nRaymart Ruelan', 'Tubod, Lanao Del Norte', '2026-05-12', '17:00:00', 'Toyota Hi-Lux/FX (131203)', 37, 'Mark Anthony C. Gonzales', 2, 'Approved by the Port Manager.', NULL, NULL, NULL, '2026-05-09 05:20:54', '2026-05-09 06:02:53'),
+(4, 22, 'Dennis S. Cambaya', 'outside', 'Test here', 'None', 'Place', '2026-05-09', '22:00:00', 'Toyota Hi-Lux/FX (131203)', 44, 'Joel A. Magno', 3, 'Disapproved by the Port Manager (Reason: Ganahan lang ko)', NULL, NULL, NULL, '2026-05-09 06:09:04', '2026-05-09 06:26:39'),
+(5, 1, 'Zack-Mio A. Sermon', 'within', 'Test here', 'None', 'Place', '2026-05-26', '17:00:00', 'Toyota Hi-Lux/FX (131203)', 43, 'Jan Dexter T. Loang', 4, 'Joan G. Bongcawel has assigned a vehicle and driver, and is waiting for the Admin Manager\'s approval.', NULL, NULL, NULL, '2026-05-26 05:43:24', '2026-05-26 05:50:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `joms_vehicle_type`
+--
+
+CREATE TABLE `joms_vehicle_type` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `vehicle_name` varchar(255) NOT NULL,
+  `vehicle_plate` varchar(255) NOT NULL,
+  `status` int(11) NOT NULL,
+  `date_used` date DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `joms_vehicle_type`
+--
+
+INSERT INTO `joms_vehicle_type` (`id`, `vehicle_name`, `vehicle_plate`, `status`, `date_used`, `created_at`, `updated_at`) VALUES
+(1, 'Toyota Hi-Lux', 'SND 2290', 0, NULL, '2025-03-21 03:05:30', '2026-05-09 04:03:22'),
+(2, 'Toyota Hi-Lux/FX', '131203', 0, NULL, '2025-03-21 03:06:28', '2026-05-26 05:50:23'),
+(4, 'Mitsubishi Adventure', 'SLF 432', 3, NULL, '2025-04-07 00:51:29', '2025-12-04 05:46:44'),
+(5, 'Toyota Hi-Ace', 'SAB 4362', 0, NULL, '2025-04-07 00:53:06', '2026-05-01 02:32:25'),
+(10, 'Toyota Hi-Ace Commuter', 'SND 2265', 0, NULL, '2025-04-07 06:04:31', '2026-05-12 01:00:48');
 
 -- --------------------------------------------------------
 
@@ -234,10 +392,155 @@ CREATE TABLE `inspector__forms` (
 
 CREATE TABLE `logs` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `remarks` varchar(1000) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `message` varchar(500) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `logs`
+--
+
+INSERT INTO `logs` (`id`, `category`, `message`, `created_at`, `updated_at`) VALUES
+(1, 'USER', 'Zack-Mio A. Sermon updated Joel A. Magno\'s badge.', '2026-05-08 05:57:11', '2026-05-08 05:57:11'),
+(2, 'USER', 'Zack-Mio A. Sermon updated Daryl T. Sumanoy\'s badge.', '2026-05-08 05:57:44', '2026-05-08 05:57:44'),
+(4, 'USER', 'Dennis S. Cambaya has logged into the system using Edge.', '2026-05-08 06:03:24', '2026-05-08 06:03:24'),
+(7, 'USER', 'Dennis S. Cambaya has logged out on the system.', '2026-05-08 08:55:40', '2026-05-08 08:55:40'),
+(8, 'USER', 'Daryl T. Sumanoy has logged into the system using Edge.', '2026-05-08 08:55:59', '2026-05-08 08:55:59'),
+(9, 'USER', 'Daryl T. Sumanoy has logged out on the system.', '2026-05-08 08:59:01', '2026-05-08 08:59:01'),
+(10, 'USER', 'Joel A. Magno has logged into the system using Edge.', '2026-05-08 08:59:14', '2026-05-08 08:59:14'),
+(15, 'USER', 'Sue Christine A. Sade has logged into the system using Chrome.', '2026-05-09 01:33:09', '2026-05-09 01:33:09'),
+(16, 'FORM', 'Zack-Mio A. Sermon has submitted a Vehicle Slip request.', '2026-05-09 01:36:12', '2026-05-09 01:36:12'),
+(17, 'FORM', 'Zack-Mio A. Sermon has canceled Zack-Mio A. Sermon\'s request on Vehicle Slip No.1.', '2026-05-09 01:44:33', '2026-05-09 01:44:33'),
+(18, 'FORM', 'Zack-Mio A. Sermon has submitted a Vehicle Slip request.', '2026-05-09 01:45:47', '2026-05-09 01:45:47'),
+(19, 'FORM', 'Zack-Mio A. Sermon has updated Zack-Mio A. Sermon\'s request on Vehicle Slip No.2.', '2026-05-09 01:53:12', '2026-05-09 01:53:12'),
+(20, 'FORM', 'Sue Christine A. Sade has assigned a driver and vehicle to Zack-Mio A. Sermon\'s request on Vehicle Slip No.2.', '2026-05-09 02:22:57', '2026-05-09 02:22:57'),
+(21, 'USER', 'Joel A. Magno has logged out on the system.', '2026-05-09 02:31:48', '2026-05-09 02:31:48'),
+(22, 'USER', 'Naomie D. Zalsos has logged into the system using Edge.', '2026-05-09 02:32:00', '2026-05-09 02:32:00'),
+(23, 'FORM', 'Naomie D. Zalsos has approved Zack-Mio A. Sermon\'s request on Vehicle Slip No.2.', '2026-05-09 02:33:44', '2026-05-09 02:33:44'),
+(24, 'FORM', 'Zack-Mio A. Sermon has updated Zack-Mio A. Sermon\'s request on Vehicle Slip No.2.', '2026-05-09 04:03:22', '2026-05-09 04:03:22'),
+(25, 'FORM', 'Sue Christine A. Sade has submitted a Vehicle Slip request.', '2026-05-09 05:20:54', '2026-05-09 05:20:54'),
+(26, 'FORM', 'Sue Christine A. Sade has updated Sue Christine A. Sade\'s request on Vehicle Slip No.3.', '2026-05-09 05:39:04', '2026-05-09 05:39:04'),
+(27, 'USER', 'Naomie D. Zalsos has logged out on the system.', '2026-05-09 05:40:25', '2026-05-09 05:40:25'),
+(28, 'USER', 'Arthur B. Nogas has logged into the system using Edge.', '2026-05-09 05:40:31', '2026-05-09 05:40:31'),
+(29, 'FORM', 'Arthur B. Nogas has approved Sue Christine A. Sade\'s request on Vehicle Slip No.3.', '2026-05-09 06:02:53', '2026-05-09 06:02:53'),
+(30, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-09 06:04:49', '2026-05-09 06:04:49'),
+(31, 'USER', 'Dennis S. Cambaya has logged into the system using Chrome.', '2026-05-09 06:05:01', '2026-05-09 06:05:01'),
+(32, 'FORM', 'Dennis S. Cambaya has submitted a Vehicle Slip request.', '2026-05-09 06:09:04', '2026-05-09 06:09:04'),
+(33, 'USER', 'Dennis S. Cambaya has logged out on the system.', '2026-05-09 06:13:01', '2026-05-09 06:13:01'),
+(34, 'USER', 'Sue Christine A. Sade has logged into the system using Chrome.', '2026-05-09 06:13:21', '2026-05-09 06:13:21'),
+(35, 'FORM', 'Sue Christine A. Sade has assigned a driver and vehicle to Dennis S. Cambaya\'s request on Vehicle Slip No.4.', '2026-05-09 06:16:48', '2026-05-09 06:16:48'),
+(36, 'FORM', 'Arthur B. Nogas has dispprove Dennis S. Cambaya\'s request on Vehicle Slip No.4.', '2026-05-09 06:26:39', '2026-05-09 06:26:39'),
+(37, 'USER', 'Arthur B. Nogas has logged out on the system.', '2026-05-09 06:34:27', '2026-05-09 06:34:27'),
+(38, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-09 06:34:35', '2026-05-09 06:34:35'),
+(39, 'USER', 'Sue Christine A. Sade has logged into the system using Chrome.', '2026-05-12 01:00:17', '2026-05-12 01:00:17'),
+(40, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-12 08:00:11', '2026-05-12 08:00:11'),
+(41, 'USER', 'Sheila Andrea R. Bollozos has logged into the system using Chrome.', '2026-05-12 08:11:03', '2026-05-12 08:11:03'),
+(42, 'FORM', 'Zack-Mio A. Sermon has submitted the request for Pre/Post Repair Inspection.', '2026-05-12 08:30:12', '2026-05-12 08:30:12'),
+(43, 'INSP', 'Sheila Andrea R. Bollozos has disapproved the request on the Pre/Post Repair Inspection Form (Control No. 50).', '2026-05-13 01:03:26', '2026-05-13 01:03:26'),
+(44, 'FORM', 'The system has closed the Facility / Venue Request Form (Control No. 16).', '2026-05-13 02:57:20', '2026-05-13 02:57:20'),
+(45, 'FORM', 'The system has closed the Vehicle Slip No. 2', '2026-05-13 03:16:30', '2026-05-13 03:16:30'),
+(46, 'USER', 'Sheila Andrea R. Bollozos has logged out on the system.', '2026-05-13 03:27:56', '2026-05-13 03:27:56'),
+(47, 'USER', 'Zack-Mio A. Sermon has logged out on the system.', '2026-05-13 03:28:08', '2026-05-13 03:28:08'),
+(48, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-13 03:34:57', '2026-05-13 03:34:57'),
+(49, 'USER', 'Zack-Mio A. Sermon has logged out on the system.', '2026-05-13 03:35:28', '2026-05-13 03:35:28'),
+(50, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-13 03:40:48', '2026-05-13 03:40:48'),
+(51, 'USER', 'Juan M. Dela cruz was registered in the system by Zack-Mio A. Sermon.', '2026-05-13 08:01:39', '2026-05-13 08:01:39'),
+(52, 'USER', 'Sue Christine A. Sade has logged into the system using Chrome.', '2026-05-14 02:44:51', '2026-05-14 02:44:51'),
+(53, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-14 02:52:37', '2026-05-14 02:52:37'),
+(54, 'USER', 'Dennis S. Cambaya has logged into the system using Chrome.', '2026-05-14 02:52:49', '2026-05-14 02:52:49'),
+(55, 'USER', 'Dennis S. Cambaya has logged out on the system.', '2026-05-14 05:20:59', '2026-05-14 05:20:59'),
+(56, 'USER', 'Sue Christine A. Sade has logged into the system using Chrome.', '2026-05-14 06:06:25', '2026-05-14 06:06:25'),
+(57, 'USER', 'Zack-Mio A. Sermon updated Arthur B. Nogas\'s details.', '2026-05-15 01:55:44', '2026-05-15 01:55:44'),
+(58, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-15 04:44:16', '2026-05-15 04:44:16'),
+(59, 'USER', 'Dennis S. Cambaya has logged into the system using Chrome.', '2026-05-15 04:50:00', '2026-05-15 04:50:00'),
+(60, 'USER', 'Dennis S. Cambaya has logged out on the system.', '2026-05-15 04:50:40', '2026-05-15 04:50:40'),
+(61, 'USER', 'Zack-Mio A. Sermon updated Sheila Andrea R. Bollozos\'s details.', '2026-05-16 00:28:40', '2026-05-16 00:28:40'),
+(62, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s details.', '2026-05-16 00:29:28', '2026-05-16 00:29:28'),
+(63, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s account.', '2026-05-16 00:31:27', '2026-05-16 00:31:27'),
+(64, 'USER', 'Zackiee Mio A. Sermon has logged into the system using Chrome.', '2026-05-16 00:33:33', '2026-05-16 00:33:33'),
+(65, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s account.', '2026-05-16 00:50:26', '2026-05-16 00:50:26'),
+(66, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s badge.', '2026-05-16 02:37:03', '2026-05-16 02:37:03'),
+(67, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s badge.', '2026-05-16 02:37:53', '2026-05-16 02:37:53'),
+(68, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s badge.', '2026-05-16 02:38:10', '2026-05-16 02:38:10'),
+(69, 'USER', 'Zackiee Mio A. Sermon has logged into the system using Chrome.', '2026-05-16 02:43:03', '2026-05-16 02:43:03'),
+(70, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s badge.', '2026-05-16 02:44:02', '2026-05-16 02:44:02'),
+(71, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s avatar.', '2026-05-16 03:08:35', '2026-05-16 03:08:35'),
+(72, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s esignature.', '2026-05-16 03:53:37', '2026-05-16 03:53:37'),
+(73, 'USER', 'Zack-Mio A. Sermon deactivate Zackiee Mio A. Sermon from the system.', '2026-05-16 06:18:04', '2026-05-16 06:18:04'),
+(74, 'USER', 'Zack-Mio A. Sermon reactivate Zackiee Mio A. Sermon from the system.', '2026-05-16 06:44:25', '2026-05-16 06:44:25'),
+(75, 'USER', 'Zack-Mio A. Sermon deactivate Zackiee Mio A. Sermon from the system.', '2026-05-16 06:44:55', '2026-05-16 06:44:55'),
+(76, 'USER', 'Zack-Mio A. Sermon reactivate Zackiee Mio A. Sermon from the system.', '2026-05-16 08:34:26', '2026-05-16 08:34:26'),
+(77, 'USER', 'Zack-Mio A. Sermon deactivate Zackiee Mio A. Sermon from the system.', '2026-05-16 08:34:35', '2026-05-16 08:34:35'),
+(78, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu . Islao\'s details.', '2026-05-19 01:01:35', '2026-05-19 01:01:35'),
+(79, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu . Islao\'s details.', '2026-05-19 01:04:04', '2026-05-19 01:04:04'),
+(80, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu . Islao\'s details.', '2026-05-19 01:09:20', '2026-05-19 01:09:20'),
+(81, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu . Islao\'s details.', '2026-05-19 01:10:21', '2026-05-19 01:10:21'),
+(82, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu N. Islao\'s details.', '2026-05-19 01:19:31', '2026-05-19 01:19:31'),
+(83, 'USER', 'Zack-Mio A. Sermon updated Jeffrey Datu N. Islao\'s account.', '2026-05-19 01:20:02', '2026-05-19 01:20:02'),
+(84, 'USER', 'Juan D. Cruz was registered in the system by Zack-Mio A. Sermon.', '2026-05-19 02:08:23', '2026-05-19 02:08:23'),
+(85, 'USER', 'John A. Doe was registered in the system by Zack-Mio A. Sermon.', '2026-05-19 06:57:36', '2026-05-19 06:57:36'),
+(86, 'USER', 'Jane A. Doe was registered in the system by Zack-Mio A. Sermon.', '2026-05-19 07:01:28', '2026-05-19 07:01:28'),
+(87, 'USER', 'Zack-Mio A. Sermon deactivate Jane null. Doe from the system.', '2026-05-19 07:02:02', '2026-05-19 07:02:02'),
+(88, 'FORM', 'Zack-Mio A. Sermon has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 02:19:12', '2026-05-22 02:19:12'),
+(89, 'FORM', 'Zack-Mio A. Sermon has canceled the request for the Pre/Post Repair Inspection Form (Control No. 51).', '2026-05-22 02:20:03', '2026-05-22 02:20:03'),
+(90, 'USER', 'Dennis S. Cambaya has logged into the system using Chrome.', '2026-05-22 02:20:50', '2026-05-22 02:20:50'),
+(91, 'FORM', 'Dennis S. Cambaya has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 02:32:18', '2026-05-22 02:32:18'),
+(92, 'FORM', 'Dennis S. Cambaya has updated Part A of the Pre/Post Repair Inspection Form (Control No. 52).', '2026-05-22 02:34:09', '2026-05-22 02:34:09'),
+(93, 'USER', 'Joel B. Escala has logged into the system using Edge.', '2026-05-22 02:35:45', '2026-05-22 02:35:45'),
+(94, 'FORM', 'Dennis S. Cambaya has canceled the request for the Pre/Post Repair Inspection Form (Control No. 52).', '2026-05-22 02:41:35', '2026-05-22 02:41:35'),
+(95, 'FORM', 'Dennis S. Cambaya has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 02:42:58', '2026-05-22 02:42:58'),
+(96, 'INSP', 'Joel B. Escala has disapproved the request on the Pre/Post Repair Inspection Form (Control No. 53).', '2026-05-22 02:45:50', '2026-05-22 02:45:50'),
+(97, 'FORM', 'Dennis S. Cambaya has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 02:47:05', '2026-05-22 02:47:05'),
+(98, 'FORM', 'Dennis S. Cambaya has updated Part A of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 02:49:00', '2026-05-22 02:49:00'),
+(99, 'FORM', 'Joel B. Escala has approved the request on the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:01:14', '2026-05-22 03:01:14'),
+(100, 'USER', 'Joel B. Escala has logged out on the system.', '2026-05-22 03:02:19', '2026-05-22 03:02:19'),
+(101, 'USER', 'Sue Christine A. Sade has logged into the system using Edge.', '2026-05-22 03:02:53', '2026-05-22 03:02:53'),
+(102, 'FORM', 'Sue Christine A. Sade has updated Part A of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:04:43', '2026-05-22 03:04:43'),
+(103, 'FORM', 'Sue Christine A. Sade has filled out Part B of the Pre/Post Repair Inspection Form (Control No. 54)', '2026-05-22 03:06:16', '2026-05-22 03:06:16'),
+(104, 'FORM', 'Sue Christine A. Sade has updated Part B of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:07:00', '2026-05-22 03:07:00'),
+(105, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-22 03:08:27', '2026-05-22 03:08:27'),
+(106, 'USER', 'Naomie D. Zalsos has logged into the system using Edge.', '2026-05-22 03:08:40', '2026-05-22 03:08:40'),
+(107, 'FORM', 'Naomie D. Zalsos has approved the request on the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:10:19', '2026-05-22 03:10:19'),
+(108, 'FORM', 'Zack-Mio A. Sermon has filled out Part C of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:21:17', '2026-05-22 03:21:17'),
+(109, 'FORM', 'Zack-Mio A. Sermon has updated Part C of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:21:36', '2026-05-22 03:21:36'),
+(110, 'FORM', 'Zack-Mio A. Sermon has filled out Part D of the Pre/Post Repair Inspection Form (Control No. 54).', '2026-05-22 03:36:05', '2026-05-22 03:36:05'),
+(111, 'USER', 'Naomie D. Zalsos has logged out on the system.', '2026-05-22 03:37:50', '2026-05-22 03:37:50'),
+(112, 'USER', 'Cheryl C. Saluta has logged into the system using Edge.', '2026-05-22 03:38:24', '2026-05-22 03:38:24'),
+(113, 'FORM', 'Cheryl C. Saluta has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 03:40:09', '2026-05-22 03:40:09'),
+(114, 'USER', 'Cheryl C. Saluta has logged out on the system.', '2026-05-22 03:46:00', '2026-05-22 03:46:00'),
+(115, 'USER', 'Sue Christine A. Sade has logged into the system using Edge.', '2026-05-22 03:46:08', '2026-05-22 03:46:08'),
+(116, 'FORM', 'Sue Christine A. Sade has filled out Part B of the Pre/Post Repair Inspection Form (Control No. 55)', '2026-05-22 03:54:12', '2026-05-22 03:54:12'),
+(117, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-22 03:54:27', '2026-05-22 03:54:27'),
+(118, 'USER', 'Naomie D. Zalsos has logged into the system using Edge.', '2026-05-22 03:54:44', '2026-05-22 03:54:44'),
+(119, 'FORM', 'Naomie D. Zalsos has approved the request on the Pre/Post Repair Inspection Form (Control No. 55).', '2026-05-22 03:55:55', '2026-05-22 03:55:55'),
+(120, 'USER', 'Naomie D. Zalsos has logged out on the system.', '2026-05-22 03:56:10', '2026-05-22 03:56:10'),
+(121, 'USER', 'Arthur B. Nogas has logged into the system using Edge.', '2026-05-22 03:56:37', '2026-05-22 03:56:37'),
+(122, 'FORM', 'Arthur B. Nogas has submitted the request for Pre/Post Repair Inspection.', '2026-05-22 03:58:34', '2026-05-22 03:58:34'),
+(123, 'USER', 'Arthur B. Nogas has logged out on the system.', '2026-05-22 04:00:15', '2026-05-22 04:00:15'),
+(124, 'USER', 'Sue Christine A. Sade has logged into the system using Edge.', '2026-05-22 04:00:40', '2026-05-22 04:00:40'),
+(125, 'FORM', 'Sue Christine A. Sade has filled out Part B of the Pre/Post Repair Inspection Form (Control No. 56)', '2026-05-22 04:03:47', '2026-05-22 04:03:47'),
+(126, 'USER', 'Sue Christine A. Sade has logged out on the system.', '2026-05-22 04:04:07', '2026-05-22 04:04:07'),
+(127, 'USER', 'Naomie D. Zalsos has logged into the system using Edge.', '2026-05-22 04:04:12', '2026-05-22 04:04:12'),
+(128, 'FORM', 'Naomie D. Zalsos has approved the request on the Pre/Post Repair Inspection Form (Control No. 56).', '2026-05-22 04:05:20', '2026-05-22 04:05:20'),
+(129, 'SYSTEM', 'Maintenance mode activated.', '2026-05-22 07:01:13', '2026-05-22 07:01:13'),
+(130, 'SYSTEM', 'Maintenance mode deactivated.', '2026-05-22 07:02:03', '2026-05-22 07:02:03'),
+(131, 'USER', 'Zack-Mio A. Sermon has logged out on the system.', '2026-05-23 05:41:17', '2026-05-23 05:41:17'),
+(132, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-26 03:26:15', '2026-05-26 03:26:15'),
+(133, 'FORM', 'Zack-Mio A. Sermon has submitted a Vehicle Slip request.', '2026-05-26 05:43:25', '2026-05-26 05:43:25'),
+(134, 'USER', 'Joan G. Bongcawel has logged into the system using Chrome.', '2026-05-26 05:43:44', '2026-05-26 05:43:44'),
+(135, 'USER', 'Zack-Mio A. Sermon updated Joan G. Bongcawel\'s badge.', '2026-05-26 05:45:45', '2026-05-26 05:45:45'),
+(136, 'USER', 'Joan G. Bongcawel has logged into the system using Chrome.', '2026-05-26 05:46:01', '2026-05-26 05:46:01'),
+(137, 'FORM', 'Joan G. Bongcawel has assigned a driver and vehicle to Zack-Mio A. Sermon\'s request on Vehicle Slip No.5.', '2026-05-26 05:50:27', '2026-05-26 05:50:27'),
+(138, 'USER', 'Joan G. Bongcawel has logged out on the system.', '2026-05-26 05:52:18', '2026-05-26 05:52:18'),
+(139, 'USER', 'Zack-Mio A. Sermon reactivate Zackiee Mio A. Sermon from the system.', '2026-05-28 02:30:31', '2026-05-28 02:30:31'),
+(140, 'USER', 'Zack-Mio A. Sermon updated Zackiee Mio A. Sermon\'s account.', '2026-05-28 02:30:51', '2026-05-28 02:30:51'),
+(141, 'USER', 'Zack-Mio A. Sermon has logged out on the system.', '2026-05-28 02:36:46', '2026-05-28 02:36:46'),
+(142, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-28 02:37:06', '2026-05-28 02:37:06'),
+(143, 'USER', 'Zack-Mio A. Sermon has logged out on the system.', '2026-05-28 02:37:30', '2026-05-28 02:37:30'),
+(144, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-28 03:12:30', '2026-05-28 03:12:30'),
+(145, 'USER', 'Zack-Mio A. Sermon has logged into the system using Chrome.', '2026-05-28 03:13:34', '2026-05-28 03:13:34');
 
 -- --------------------------------------------------------
 
@@ -257,50 +560,93 @@ CREATE TABLE `migrations` (
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (1, '2019_12_14_000001_create_personal_access_tokens_table', 1),
-(2, '2023_08_22_030500_create_users_table', 1),
-(3, '2023_08_22_053132_create_p_p_a_users_table', 1),
-(4, '2023_09_11_010239_create_inspection__forms_table', 1),
-(5, '2023_09_19_041010_create_technical_personnel_table', 1),
-(6, '2023_09_19_074453_create_inspection_form_admin_table', 1),
-(7, '2023_10_05_053219_create_notifications_table', 1),
-(8, '2023_10_12_053100_create_inspector_form_table', 1),
-(9, '2023_11_06_080540_create_request_facility_table', 1),
-(10, '2023_11_09_071634_create_facility_mph', 2),
-(11, '2023_11_14_012612_create_facility_conference_table', 3),
-(12, '2023_11_15_053249_create_facility_dormitory_table', 4),
-(13, '2023_12_21_021016_create_vehicle_slip_table', 5),
-(15, '2024_01_12_011625_create_equipment_form_table', 6),
-(18, '2024_01_30_085007_create_facility_form_table', 7),
-(23, '2024_01_30_085459_create_facility_room_table', 8),
-(24, '2024_01_30_085548_create_facility_dorm_table', 8),
-(25, '2024_01_31_081222_create_facility_table', 9),
-(26, '2024_02_14_154226_create_notification_table', 10),
-(27, '2024_04_01_131434_create_logs_table', 11),
-(28, '2024_05_07_143310_create_notifications_table', 12);
+(2, '2024_07_31_161217_create_ppa_user_table', 2),
+(3, '2024_08_05_134457_create_announcement_table', 3),
+(4, '2024_08_07_151604_create_logs_table', 4),
+(5, '2024_08_09_134442_create_joms_inspection_form_table', 5),
+(6, '2024_08_14_101647_create_assign_personnel_table', 6),
+(7, '2024_08_20_091611_create_notification_table', 7),
+(8, '2024_08_22_084714_create_joms_facility_venue_table', 8),
+(9, '2024_09_11_152952_create_vehicle_slip_form_table', 9),
+(10, '2024_09_13_085443_create_joms_vehicle_type_table', 10),
+(11, '2024_11_20_151423_create_ppa_security', 11),
+(12, '2025_08_07_090324_create_form_request_tracker', 12);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notifications`
+-- Table structure for table `notification`
 --
 
-CREATE TABLE `notifications` (
+CREATE TABLE `notification` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `type_of_request` varchar(255) NOT NULL,
-  `message` varchar(400) NOT NULL,
-  `status` int(11) NOT NULL,
+  `type_of_jlms` varchar(255) NOT NULL,
+  `sender_avatar` varchar(255) NOT NULL,
+  `sender_id` smallint(6) NOT NULL,
+  `sender_name` varchar(255) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `receiver_id` smallint(6) NOT NULL,
+  `receiver_name` varchar(255) NOT NULL,
+  `joms_type` varchar(255) DEFAULT NULL,
+  `joms_id` smallint(6) DEFAULT NULL,
+  `status` smallint(6) NOT NULL,
+  `form_location` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `notifications`
+-- Dumping data for table `notification`
 --
 
-INSERT INTO `notifications` (`id`, `sender_id`, `type_of_request`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(1, 5, 'Pre-Repair/Post Repair Inspect Form', 'There is a request for sir Zack-Mio Sermon, and it requires your approval', 1, '2024-05-07 07:21:33', '2024-05-07 07:21:33'),
-(2, 5, 'Pre-Repair/Post Repair Inspect Form', 'There is a request for sir John Ian Obach, and it requires your approval', 1, '2024-05-07 07:29:09', '2024-05-07 07:29:09');
+INSERT INTO `notification` (`id`, `type_of_jlms`, `sender_avatar`, `sender_id`, `sender_name`, `message`, `receiver_id`, `receiver_name`, `joms_type`, `joms_id`, `status`, `form_location`, `created_at`, `updated_at`) VALUES
+(4, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 2, 1, 0, '2026-05-09 01:45:47', '2026-05-09 01:53:37'),
+(5, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 44, 'Joel A. Magno', 'JOMS_Vehicle', 2, 1, 0, '2026-05-09 01:45:47', '2026-05-09 02:31:17'),
+(6, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 68, 'Daryl T. Sumanoy', 'JOMS_Vehicle', 2, 0, 0, '2026-05-09 01:45:47', '2026-05-09 01:45:47'),
+(7, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'There is a request for Zack-Mio A. Sermon that needs your approval.', 76, 'Naomie D. Zalsos', 'JOMS_Vehicle', 2, 1, 0, '2026-05-09 02:22:57', '2026-05-09 02:33:17'),
+(8, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'The request for Zack-Mio A. Sermon has been approved by the Admin Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 2, 0, 0, '2026-05-09 02:33:44', '2026-05-09 02:33:44'),
+(9, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'Your request has been approved by the Admin Manager.', 1, 'Zack-Mio A. Sermon', 'JOMS_Vehicle', 2, 0, 0, '2026-05-09 02:33:44', '2026-05-09 02:33:44'),
+(10, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'There is a request for Sue Christine A. Sade and needs your approval.', 2, 'Arthur B. Nogas', 'JOMS_Vehicle', 3, 1, 0, '2026-05-09 05:20:54', '2026-05-09 05:41:06'),
+(11, 'JOMS', 'Arthur_Nogas_avatar.jpg', 2, 'Arthur B. Nogas', 'Your request has been approved by the Port Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 3, 0, 0, '2026-05-09 06:02:53', '2026-05-09 06:02:53'),
+(12, 'JOMS', 'Dennis_Cambaya_avatar.jpg', 22, 'Dennis S. Cambaya', 'There is a request for Dennis S. Cambaya.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 4, 1, 0, '2026-05-09 06:09:04', '2026-05-09 06:13:46'),
+(13, 'JOMS', 'Dennis_Cambaya_avatar.jpg', 22, 'Dennis S. Cambaya', 'There is a request for Dennis S. Cambaya.', 44, 'Joel A. Magno', 'JOMS_Vehicle', 4, 0, 0, '2026-05-09 06:09:04', '2026-05-09 06:09:04'),
+(14, 'JOMS', 'Dennis_Cambaya_avatar.jpg', 22, 'Dennis S. Cambaya', 'There is a request for Dennis S. Cambaya.', 68, 'Daryl T. Sumanoy', 'JOMS_Vehicle', 4, 0, 0, '2026-05-09 06:09:04', '2026-05-09 06:09:04'),
+(15, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'There is a request for Dennis S. Cambaya that needs your approval.', 2, 'Arthur B. Nogas', 'JOMS_Vehicle', 4, 1, 0, '2026-05-09 06:16:48', '2026-05-09 06:21:41'),
+(16, 'JOMS', 'Arthur_Nogas_avatar.jpg', 2, 'Arthur B. Nogas', 'Your request has been disapproved by Port Manager.', 22, 'Dennis S. Cambaya', 'JOMS_Vehicle', 4, 0, 0, '2026-05-09 06:26:39', '2026-05-09 06:26:39'),
+(17, 'JOMS', 'Arthur_Nogas_avatar.jpg', 2, 'Arthur B. Nogas', 'The request for Dennis S. Cambaya was disapproved by the Port Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 4, 0, 0, '2026-05-09 06:26:39', '2026-05-09 06:26:39'),
+(18, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'Zack-Mio A. Sermon has submitted a request and needs your approval.', 18, 'Sheila Andrea R. Bollozos', 'JOMS_Inspection', 50, 1, 0, '2026-05-12 08:30:12', '2026-05-12 08:34:32'),
+(19, 'JOMS', 'Sheila_Andrea_Bollozos_avatar.jpg', 18, 'Sheila Andrea R. Bollozos', 'Your request has been disapproved by Sheila Andrea R. Bollozos.', 1, 'Zack-Mio A. Sermon', 'JOMS_Inspection', 50, 0, 0, '2026-05-13 01:03:25', '2026-05-13 01:03:25'),
+(20, 'JOMS', 'Sheila_Andrea_Bollozos_avatar.jpg', 18, 'Sheila Andrea R. Bollozos', 'The request for Zack-Mio A. Sermon has been disapproved by Sheila Andrea R. Bollozos.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 50, 0, 0, '2026-05-13 01:03:25', '2026-05-13 01:03:25'),
+(23, 'JOMS', 'Dennis_Cambaya_avatar.jpg', 22, 'Dennis S. Cambaya', 'Dennis S. Cambaya has submitted a request and needs your approval.', 4, 'Joel B. Escala', 'JOMS_Inspection', 53, 1, 0, '2026-05-22 02:42:58', '2026-05-22 02:44:50'),
+(24, 'JOMS', 'Joel_Escala_avatar.jpg', 4, 'Joel B. Escala', 'Your request has been disapproved by Joel B. Escala.', 22, 'Dennis S. Cambaya', 'JOMS_Inspection', 53, 0, 0, '2026-05-22 02:45:50', '2026-05-22 02:45:50'),
+(25, 'JOMS', 'Joel_Escala_avatar.jpg', 4, 'Joel B. Escala', 'The request for Dennis S. Cambaya has been disapproved by Joel B. Escala.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 53, 0, 0, '2026-05-22 02:45:50', '2026-05-22 02:45:50'),
+(26, 'JOMS', 'Dennis_Cambaya_avatar.jpg', 22, 'Dennis S. Cambaya', 'Dennis S. Cambaya has submitted a request and needs your approval.', 4, 'Joel B. Escala', 'JOMS_Inspection', 54, 1, 0, '2026-05-22 02:47:05', '2026-05-22 03:00:48'),
+(27, 'JOMS', 'Joel_Escala_avatar.jpg', 4, 'Joel B. Escala', 'Your request has been approved by Joel B. Escala.', 22, 'Dennis S. Cambaya', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:01:14', '2026-05-22 03:01:14'),
+(28, 'JOMS', 'Joel_Escala_avatar.jpg', 4, 'Joel B. Escala', 'The request for Dennis S. Cambaya has been approved by Joel B. Escala.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 54, 1, 0, '2026-05-22 03:01:14', '2026-05-22 03:03:36'),
+(29, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has completed Part B of your request. It is now pending approval from the Admin Manager.', 22, 'Dennis S. Cambaya', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:06:16', '2026-05-22 03:06:16'),
+(30, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has filled out Part B and is now waiting for your approval.', 76, 'Naomie D. Zalsos', 'JOMS_Inspection', 54, 1, 0, '2026-05-22 03:06:16', '2026-05-22 03:09:29'),
+(31, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'Your request has been approved by the Admin Manager', 22, 'Dennis S. Cambaya', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:10:19', '2026-05-22 03:10:19'),
+(32, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'You have been assigned to this task.', 1, 'Zack-Mio A. Sermon', 'JOMS_Inspection', 54, 1, 0, '2026-05-22 03:10:19', '2026-05-22 03:10:58'),
+(33, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'The request for Dennis S. Cambaya has been approved by the Admin Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:10:19', '2026-05-22 03:10:19'),
+(34, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'Zack-Mio A. Sermon has finished filling out the Part C.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:21:17', '2026-05-22 03:21:17'),
+(35, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'The request for Dennis S. Cambaya is complete.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:36:05', '2026-05-22 03:36:05'),
+(36, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'Your request has been completed.', 22, 'Dennis S. Cambaya', 'JOMS_Inspection', 54, 0, 0, '2026-05-22 03:36:05', '2026-05-22 03:36:05'),
+(37, 'JOMS', 'Cheryl_Saluta_avatar.jpg', 6, 'Cheryl C. Saluta', 'Cheryl C. Saluta has submitted a request.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 55, 1, 0, '2026-05-22 03:40:09', '2026-05-22 03:51:01'),
+(38, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has completed Part B of your request. It is now pending approval from the Admin Manager.', 6, 'Cheryl C. Saluta', 'JOMS_Inspection', 55, 0, 0, '2026-05-22 03:54:12', '2026-05-22 03:54:12'),
+(39, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has filled out Part B and is now waiting for your approval.', 76, 'Naomie D. Zalsos', 'JOMS_Inspection', 55, 1, 0, '2026-05-22 03:54:12', '2026-05-22 03:55:28'),
+(40, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'Your request has been approved by the Admin Manager', 6, 'Cheryl C. Saluta', 'JOMS_Inspection', 55, 0, 0, '2026-05-22 03:55:55', '2026-05-22 03:55:55'),
+(41, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'You have been assigned to this task.', 1, 'Zack-Mio A. Sermon', 'JOMS_Inspection', 55, 0, 0, '2026-05-22 03:55:55', '2026-05-22 03:55:55'),
+(42, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'The request for Cheryl C. Saluta has been approved by the Admin Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 55, 0, 0, '2026-05-22 03:55:55', '2026-05-22 03:55:55'),
+(43, 'JOMS', 'Arthur_Nogas_avatar.jpg', 2, 'Arthur B. Nogas', 'Arthur B. Nogas has submitted a request.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 56, 1, 0, '2026-05-22 03:58:34', '2026-05-22 04:02:41'),
+(44, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has completed Part B of your request. It is now pending approval from the Admin Manager.', 2, 'Arthur B. Nogas', 'JOMS_Inspection', 56, 0, 0, '2026-05-22 04:03:47', '2026-05-22 04:03:47'),
+(45, 'JOMS', 'Sue_Christine_Sade_avatar.jpg', 9, 'Sue Christine A. Sade', 'The GSO has filled out Part B and is now waiting for your approval.', 76, 'Naomie D. Zalsos', 'JOMS_Inspection', 56, 1, 0, '2026-05-22 04:03:47', '2026-05-22 04:04:45'),
+(46, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'Your request has been approved by the Admin Manager', 2, 'Arthur B. Nogas', 'JOMS_Inspection', 56, 0, 0, '2026-05-22 04:05:20', '2026-05-22 04:05:20'),
+(47, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'You have been assigned to this task.', 1, 'Zack-Mio A. Sermon', 'JOMS_Inspection', 56, 1, 0, '2026-05-22 04:05:20', '2026-05-29 00:57:56'),
+(48, 'JOMS', 'Naomie_Zalsos_avatar.jpg', 76, 'Naomie D. Zalsos', 'The request for Arthur B. Nogas has been approved by the Admin Manager.', 9, 'Sue Christine A. Sade', 'JOMS_Inspection', 56, 0, 0, '2026-05-22 04:05:20', '2026-05-22 04:05:20'),
+(49, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 9, 'Sue Christine A. Sade', 'JOMS_Vehicle', 5, 0, 0, '2026-05-26 05:43:24', '2026-05-26 05:43:24'),
+(50, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 44, 'Joel A. Magno', 'JOMS_Vehicle', 5, 0, 0, '2026-05-26 05:43:24', '2026-05-26 05:43:24'),
+(51, 'JOMS', 'Zack-Mio_Sermon_avatar.jpg', 1, 'Zack-Mio A. Sermon', 'There is a request for Zack-Mio A. Sermon.', 68, 'Daryl T. Sumanoy', 'JOMS_Vehicle', 5, 0, 0, '2026-05-26 05:43:24', '2026-05-26 05:43:24'),
+(52, 'JOMS', 'Joan_Bongcawel_avatar.jpg', 19, 'Joan G. Bongcawel', 'There is a request for Zack-Mio A. Sermon that needs your approval.', 76, 'Naomie D. Zalsos', 'JOMS_Vehicle', 5, 0, 0, '2026-05-26 05:50:27', '2026-05-26 05:50:27');
 
 -- --------------------------------------------------------
 
@@ -326,471 +672,212 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(2, 'App\\Models\\PPAUser', 2, 'main', '12d770fc15d5846c0c159da6dc7be58b3a0aec5a7766f6f4c65cb63cd69a7da1', '[\"*\"]', NULL, NULL, '2023-11-07 19:32:06', '2023-11-07 19:32:06'),
-(3, 'App\\Models\\PPAUser', 3, 'main', '2e9ef293779547696bd768fa0a2b0910110d90312508a39b8c86fb7cec530d7d', '[\"*\"]', NULL, NULL, '2023-11-07 19:33:24', '2023-11-07 19:33:24'),
-(4, 'App\\Models\\PPAUser', 4, 'main', '41aad03621922d57ac8dc12c2281bc799525b6822564b5d4260ec9eb5c389748', '[\"*\"]', NULL, NULL, '2023-11-07 19:34:16', '2023-11-07 19:34:16'),
-(5, 'App\\Models\\PPAUser', 5, 'main', 'ffbadb9b85acac319c47b1ed35273a63a9b0ec77dffb06ec90bdaba30bdfd1ef', '[\"*\"]', NULL, NULL, '2023-11-07 19:36:15', '2023-11-07 19:36:15'),
-(32, 'App\\Models\\PPAUser', 6, 'main', 'e0d66c76d8ce125ab235f255b1acdf202d7907016a6c45701037e36326059d57', '[\"*\"]', NULL, NULL, '2023-11-16 21:42:36', '2023-11-16 21:42:36'),
-(46, 'App\\Models\\PPAUser', 7, 'main', '408e710df3d6bb905b350e4244ff1d8d2d2b5bc550fc4ed3a52b1052478747c0', '[\"*\"]', NULL, NULL, '2023-11-21 01:05:37', '2023-11-21 01:05:37'),
-(49, 'App\\Models\\PPAUser', 1, 'main', 'e93f8fc6cb262a4f1491298eb1b2c1a7e29e539e023e22ab73fab70a0797bcf9', '[\"*\"]', '2023-11-27 21:44:25', NULL, '2023-11-27 18:31:16', '2023-11-27 21:44:25'),
-(56, 'App\\Models\\PPAUser', 1, 'main', '82c60d1cd01161c670eb8247dab0a79e522f00d622d3a77d602b136dc09cee73', '[\"*\"]', '2023-11-28 16:40:13', NULL, '2023-11-28 16:37:28', '2023-11-28 16:40:13'),
-(63, 'App\\Models\\PPAUser', 6, 'main', '9a441fbfa14c096395d5e9bdcb38e2ec139119d3e24aeddf76fb542fc2efe602', '[\"*\"]', '2023-11-28 18:56:22', NULL, '2023-11-28 17:59:34', '2023-11-28 18:56:22'),
-(96, 'App\\Models\\PPAUser', 5, 'main', 'a55aa1dc03c04e6f17853038b5b21961f20cc5a57d152edabdcff5e22cb63b88', '[\"*\"]', '2023-11-30 22:45:38', NULL, '2023-11-30 22:05:26', '2023-11-30 22:45:38'),
-(114, 'App\\Models\\PPAUser', 5, 'main', 'c1825bc139dda96f4071a9b6f569aeb30dfcf2be2870772cb6292604cb8acff3', '[\"*\"]', '2023-12-07 00:10:11', NULL, '2023-12-06 23:24:49', '2023-12-07 00:10:11'),
-(126, 'App\\Models\\PPAUser', 1, 'main', '0db076b0bdecca17dcf3b0633ac3e780629efd4f3d2a7fe001ae2872a5dd89e5', '[\"*\"]', '2023-12-12 20:35:35', NULL, '2023-12-11 23:08:36', '2023-12-12 20:35:35'),
-(145, 'App\\Models\\PPAUser', 8, 'main', '0a8834407f47d0805c7503aa3ae8f437a08efd3289554b92f500d81b4ac827f7', '[\"*\"]', NULL, NULL, '2023-12-19 23:15:01', '2023-12-19 23:15:01'),
-(146, 'App\\Models\\PPAUser', 9, 'main', '3638b2b12f082245c6a5d5b5b4cb5dd1ab6b5bb7fb564348535cc319e22f2059', '[\"*\"]', NULL, NULL, '2023-12-19 23:18:14', '2023-12-19 23:18:14'),
-(147, 'App\\Models\\PPAUser', 10, 'main', '4437af3595bd41a3a860594c5746904a26b32c6fd15397d127e0ae7bfb949e9c', '[\"*\"]', NULL, NULL, '2023-12-19 23:22:31', '2023-12-19 23:22:31'),
-(148, 'App\\Models\\PPAUser', 11, 'main', '95fbebe73d30cb5ed6c50837a023481377dfa048077c80449715110a9e3ea0cf', '[\"*\"]', NULL, NULL, '2023-12-19 23:24:33', '2023-12-19 23:24:33'),
-(149, 'App\\Models\\PPAUser', 12, 'main', 'd8f8d634495a0dd8aceecd315e90f8bec4b05de74dae38e03f205911689a980f', '[\"*\"]', NULL, NULL, '2023-12-19 23:28:58', '2023-12-19 23:28:58'),
-(150, 'App\\Models\\PPAUser', 13, 'main', '78fe2a7bb29bc2fe0eb08e38a813544d11d0df43fa296ba9c07ec4890f03b0fe', '[\"*\"]', NULL, NULL, '2023-12-19 23:33:15', '2023-12-19 23:33:15'),
-(151, 'App\\Models\\PPAUser', 14, 'main', '145a249273a9904f82b3580bac9ff8c9dc6f40f2299b363232085d9d7ae10b7e', '[\"*\"]', NULL, NULL, '2023-12-19 23:35:43', '2023-12-19 23:35:43'),
-(152, 'App\\Models\\PPAUser', 15, 'main', '6091f067312c2ca0629baef22727326780b1653fbec2549455fa6f3e94bf3fce', '[\"*\"]', NULL, NULL, '2023-12-19 23:43:01', '2023-12-19 23:43:01'),
-(173, 'App\\Models\\PPAUser', 16, 'main', 'f323c555030257eb768a6da445912ff64c35e720895fcb6b6742321f98cac2c9', '[\"*\"]', NULL, NULL, '2023-12-26 17:24:46', '2023-12-26 17:24:46'),
-(219, 'App\\Models\\PPAUser', 2, 'main', 'bbebebaf8fc2a0851e4641203c79bc7181a29cc082daf5c2f30511d4cda84214', '[\"*\"]', '2024-01-04 22:49:19', NULL, '2024-01-02 22:34:23', '2024-01-04 22:49:19'),
-(233, 'App\\Models\\PPAUser', 17, 'main', 'da42f57e98dc4486f109a2eb2fc3209ba6e8ba26acec15604eb8eee9d7c009f7', '[\"*\"]', NULL, NULL, '2024-01-09 23:01:28', '2024-01-09 23:01:28'),
-(237, 'App\\Models\\PPAUser', 5, 'main', 'e5aa4baea7ba82ae297beadff014742a1e0544228e96f6942341ae9963c43a95', '[\"*\"]', '2024-01-10 00:22:59', NULL, '2024-01-09 23:41:34', '2024-01-10 00:22:59'),
-(244, 'App\\Models\\PPAUser', 18, 'main', '6282f8c8ebb4d12003b2939991c6b1608824201be78e975e7dc8d0059e2b72ad', '[\"*\"]', NULL, NULL, '2024-01-18 16:47:02', '2024-01-18 16:47:02'),
-(250, 'App\\Models\\PPAUser', 4, 'main', 'cc360b822863a7e0d92db8903d73c8fe3d65d296170ba26be19cacbf41d0baf7', '[\"*\"]', '2024-01-19 00:30:22', NULL, '2024-01-18 21:53:56', '2024-01-19 00:30:22'),
-(262, 'App\\Models\\PPAUser', 19, 'main', '8d392d3cc82cf3d7875171aca1f993d7ec08505481d80917d9977257ce383ce6', '[\"*\"]', NULL, NULL, '2024-01-21 21:23:29', '2024-01-21 21:23:29'),
-(263, 'App\\Models\\PPAUser', 20, 'main', '7174bec052586d57b91c1457e63f983d9364f00e3905e0d20ebd1597ec8ff085', '[\"*\"]', NULL, NULL, '2024-01-21 21:26:40', '2024-01-21 21:26:40'),
-(264, 'App\\Models\\PPAUser', 21, 'main', '8e5f621bf9c55f03e2158090118bbf2fef118db8624b3e458ab785cecfecf1b1', '[\"*\"]', NULL, NULL, '2024-01-21 21:29:32', '2024-01-21 21:29:32'),
-(265, 'App\\Models\\PPAUser', 22, 'main', 'ca3c0ee629a08cb65e6c534f4423b2f53696880863326d09119c63b367ba86b7', '[\"*\"]', NULL, NULL, '2024-01-21 21:32:15', '2024-01-21 21:32:15'),
-(303, 'App\\Models\\PPAUser', 5, 'main', '3b7fcf93fab81e6bfca372199b5a5c69b91817db9101a5abd266e2282a0bb521', '[\"*\"]', '2024-01-24 01:04:02', NULL, '2024-01-23 00:45:00', '2024-01-24 01:04:02'),
-(323, 'App\\Models\\PPAUser', 3, 'main', '5c8a1f76e3800f5f6f6f94ec51241b57ffbac857a3dc9f7302d27c6580e67b60', '[\"*\"]', '2024-01-25 00:42:09', NULL, '2024-01-25 00:26:42', '2024-01-25 00:42:09'),
-(325, 'App\\Models\\PPAUser', 3, 'main', '0d6a33b932ce480f281dae69d5d3f5aa43ccd167744a8f1f2b6e3ff9eeb81b40', '[\"*\"]', '2024-01-25 16:37:08', NULL, '2024-01-25 00:51:56', '2024-01-25 16:37:08'),
-(346, 'App\\Models\\PPAUser', 11, 'main', '432988ae5be14372891a57dd847402c86662c58c5ec926c3f05fc463c64d0f1a', '[\"*\"]', '2024-01-25 22:55:12', NULL, '2024-01-25 20:40:30', '2024-01-25 22:55:12'),
-(371, 'App\\Models\\PPAUser', 3, 'main', 'af860f8161109c1522fa5b3679c7718d6ee010e62054b2794c0c862bdf1dd491', '[\"*\"]', NULL, NULL, '2024-01-25 23:14:29', '2024-01-25 23:14:29'),
-(375, 'App\\Models\\PPAUser', 11, 'main', '799bbdc413ce05e0957e27ca723d274aa1e463b103d3480c0701aaab5dbbe505', '[\"*\"]', '2024-01-26 00:58:59', NULL, '2024-01-25 23:55:45', '2024-01-26 00:58:59'),
-(389, 'App\\Models\\PPAUser', 11, 'main', 'b4a650339ce01bf3a43e25e1c891f2dbf5ee261a94de4995499cc67a0dcfbd1d', '[\"*\"]', '2024-01-28 17:25:20', NULL, '2024-01-28 17:25:04', '2024-01-28 17:25:20'),
-(396, 'App\\Models\\PPAUser', 11, 'main', 'd92145115419215cf2fc42fabf25ba80106d79ad40f7fe7d1944ea9355a8036a', '[\"*\"]', '2024-01-29 01:10:40', NULL, '2024-01-28 17:57:01', '2024-01-29 01:10:40'),
-(477, 'App\\Models\\PPAUser', 1, 'main', '55ba11c6290a0901fcd0d4f839f0194288adc101a678e1a248acbebcee954a29', '[\"*\"]', '2024-02-06 09:13:47', NULL, '2024-02-06 03:12:35', '2024-02-06 09:13:47'),
-(492, 'App\\Models\\PPAUser', 1, 'main', 'df6bc26c152af460384eaa20d238bc114854762403507ff17637e1b99af11a9a', '[\"*\"]', NULL, NULL, '2024-02-08 01:27:05', '2024-02-08 01:27:05'),
-(493, 'App\\Models\\PPAUser', 1, 'main', 'dcc828227fa1554cb5399b9d39c8d93552786c5e244667b7b24f2722354c13da', '[\"*\"]', NULL, NULL, '2024-02-08 02:27:52', '2024-02-08 02:27:52'),
-(496, 'App\\Models\\PPAUser', 1, 'main', '77a5b051ef67f710cff006f8ee3f51981147846fb406950117cad7226557a2c1', '[\"*\"]', NULL, NULL, '2024-02-08 02:40:19', '2024-02-08 02:40:19'),
-(524, 'App\\Models\\PPAUser', 1, 'main', 'a750842f14679db1eb0aaa926d0e9f61ba7b3f8e0c29b5c6aef37fa6e1765aac', '[\"*\"]', '2024-02-10 03:34:17', NULL, '2024-02-10 03:20:15', '2024-02-10 03:34:17'),
-(560, 'App\\Models\\PPAUser', 2, 'main', '156d8de31059b58ac2edd6a206b167186cde92ac12618fbbf94f6d857d55f850', '[\"*\"]', '2024-02-12 08:40:21', NULL, '2024-02-12 04:37:18', '2024-02-12 08:40:21'),
-(568, 'App\\Models\\PPAUser', 4, 'main', '2676a4cd3e9ec60c38eb0f549daebe0250a08d1fcdbb29156fa7133eca12673f', '[\"*\"]', '2024-02-13 01:34:04', NULL, '2024-02-13 01:28:38', '2024-02-13 01:34:04'),
-(632, 'App\\Models\\PPAUser', 23, 'main', 'e113176476ca840a868236665134bd28aefa13f90c4372994afc75f094c70756', '[\"*\"]', NULL, NULL, '2024-02-16 01:51:12', '2024-02-16 01:51:12'),
-(705, 'App\\Models\\PPAUser', 24, 'main', '1e0077691b04d98efd64f8da711c828a45613b692ebfe6ff5922cb1ba649b959', '[\"*\"]', NULL, NULL, '2024-02-21 03:04:09', '2024-02-21 03:04:09'),
-(713, 'App\\Models\\PPAUser', 5, 'main', '5846dbea5f67a192ebcf19e0d9c8b29f8e75ff400699bf444419dbe544e299ee', '[\"*\"]', '2024-02-21 07:51:04', NULL, '2024-02-21 06:38:19', '2024-02-21 07:51:04'),
-(718, 'App\\Models\\PPAUser', 4, 'main', 'd22f178427ed7a0cbcd9b9ca4eb8dd0ed7f29c8bab6cb8c77e53e203a4774015', '[\"*\"]', '2024-02-21 09:23:58', NULL, '2024-02-21 09:23:16', '2024-02-21 09:23:58'),
-(721, 'App\\Models\\PPAUser', 4, 'main', '2019eb1c095d40214c9b44c8da4b9d2b6e28e193ed758acffdc7467274da0ce8', '[\"*\"]', '2024-02-22 06:21:27', NULL, '2024-02-22 03:24:12', '2024-02-22 06:21:27'),
-(724, 'App\\Models\\PPAUser', 2, 'main', '8185655a080608912736250b363b920c6fd517052cd2f044e36515096c310a0b', '[\"*\"]', NULL, NULL, '2024-02-22 07:01:34', '2024-02-22 07:01:34'),
-(725, 'App\\Models\\PPAUser', 2, 'main', '929e7229b86c5142d9307f44b8f4797499a81ca658eda43db9f50e78ee924be0', '[\"*\"]', '2024-02-22 07:12:12', NULL, '2024-02-22 07:11:35', '2024-02-22 07:12:12'),
-(726, 'App\\Models\\PPAUser', 2, 'main', '05f2e7e7e13ddf611f1afcced82c25667808d16c32daf612a898e31bb278259a', '[\"*\"]', NULL, NULL, '2024-02-22 07:19:20', '2024-02-22 07:19:20'),
-(729, 'App\\Models\\PPAUser', 3, 'main', '182c885dae3aaa53ebe2c2c3b5318a884669d4452e4103bce6feef44d206f3e2', '[\"*\"]', NULL, NULL, '2024-02-22 09:13:03', '2024-02-22 09:13:03'),
-(882, 'App\\Models\\PPAUser', 4, 'main', '4eff62037368dcf11f176cc3b653767036f380564d984c8ec4054dee361d82e5', '[\"*\"]', '2024-03-01 07:57:27', NULL, '2024-03-01 07:57:15', '2024-03-01 07:57:27'),
-(909, 'App\\Models\\PPAUser', 2, 'main', '8b3cb6831aa0a0faef353f9ab47cddd8295c291ec7eb1a8a8265fcfe617a4763', '[\"*\"]', '2024-03-12 09:04:58', NULL, '2024-03-12 05:21:33', '2024-03-12 09:04:58'),
-(910, 'App\\Models\\PPAUser', 2, 'main', '5bb90d0318fe03dfa2e4499733af7038d629849aa0f343d9fd14d75aa0a9dd61', '[\"*\"]', '2024-03-13 03:14:59', NULL, '2024-03-13 00:44:24', '2024-03-13 03:14:59'),
-(916, 'App\\Models\\PPAUser', 4, 'main', 'fb793466be269a88c790e6e1bfcca2b681ff8b45434bc17365ecd455048dabd7', '[\"*\"]', '2024-03-14 01:03:57', NULL, '2024-03-13 08:56:18', '2024-03-14 01:03:57'),
-(918, 'App\\Models\\PPAUser', 2, 'main', '067a00d12420fe0792bc8b42caec0593af894da8a078f6995c9ee6cee1e61896', '[\"*\"]', NULL, NULL, '2024-03-20 02:29:31', '2024-03-20 02:29:31'),
-(919, 'App\\Models\\PPAUser', 3, 'main', '9c7e5dc6440faf34adb84acb8a7a522fe14d00e4e0e70a38938fc6c606d82106', '[\"*\"]', NULL, NULL, '2024-03-20 03:03:10', '2024-03-20 03:03:10'),
-(920, 'App\\Models\\PPAUser', 4, 'main', 'bc95d4c73b4ba1777ce03deedd9d0b8c056ddf47a8f4e4b6c988c1fb78e6262e', '[\"*\"]', NULL, NULL, '2024-03-20 03:26:14', '2024-03-20 03:26:14'),
-(921, 'App\\Models\\PPAUser', 5, 'main', '54070d951a0631fd3498aa710062adafab4d3125e1936f0744b12013371c4201', '[\"*\"]', NULL, NULL, '2024-03-20 06:30:10', '2024-03-20 06:30:10'),
-(922, 'App\\Models\\PPAUser', 6, 'main', '76683b075a982f3e8f9193e0672216999119ef4539f238f0b9c6411e119ce5f0', '[\"*\"]', NULL, NULL, '2024-03-20 06:31:49', '2024-03-20 06:31:49'),
-(923, 'App\\Models\\PPAUser', 7, 'main', '0d1edae52e5fed8b737468581f7205f2d7b28768dc60f34743ca8ef8b9244b6c', '[\"*\"]', NULL, NULL, '2024-03-20 06:34:18', '2024-03-20 06:34:18'),
-(924, 'App\\Models\\PPAUser', 8, 'main', '8778d9e992725200adf6005d13b23b0b009c172f7926557aa4bc1228029d5467', '[\"*\"]', NULL, NULL, '2024-03-20 06:40:45', '2024-03-20 06:40:45'),
-(925, 'App\\Models\\PPAUser', 9, 'main', 'da5ef0a06c205a7c8159cb917943d69caf929d293dca8c7e7763c3c3cfcd766f', '[\"*\"]', NULL, NULL, '2024-03-20 06:52:36', '2024-03-20 06:52:36'),
-(926, 'App\\Models\\PPAUser', 10, 'main', '3c3556b1ddabcbee8e6342a3fcfe61ebda88b3bb001b895e7492c7239f905065', '[\"*\"]', NULL, NULL, '2024-03-20 06:54:50', '2024-03-20 06:54:50'),
-(927, 'App\\Models\\PPAUser', 11, 'main', '588af04c8c71b8b473542d195a86ce2379b493677b44e86c9dd5a16da5fe8e64', '[\"*\"]', NULL, NULL, '2024-03-20 07:02:46', '2024-03-20 07:02:46'),
-(928, 'App\\Models\\PPAUser', 12, 'main', 'b0a8587913cf9bd1075f7a632b4d0274abb6d54b1e2b486eb54a8877df1f8dd3', '[\"*\"]', NULL, NULL, '2024-03-20 07:04:48', '2024-03-20 07:04:48'),
-(929, 'App\\Models\\PPAUser', 13, 'main', 'b3fadff878d23380da6ce296fe206d548d8db94966a5fdb0e410c9f1057182bb', '[\"*\"]', NULL, NULL, '2024-03-20 07:09:39', '2024-03-20 07:09:39'),
-(930, 'App\\Models\\PPAUser', 14, 'main', '71965a8a1533a2a0b78e7ced4b19ee22a5b2a8421010721cae558f88a59bfbf4', '[\"*\"]', NULL, NULL, '2024-03-20 07:13:09', '2024-03-20 07:13:09'),
-(931, 'App\\Models\\PPAUser', 15, 'main', 'c38894114c2b69ad1e50ad6fcf69ce43e72e56a5558f88b75bf22d751291aa9c', '[\"*\"]', NULL, NULL, '2024-03-20 07:14:04', '2024-03-20 07:14:04'),
-(932, 'App\\Models\\PPAUser', 16, 'main', 'c882a6e76448b12eba1e3731bdeeb344624665835293e5d24975a5e6bca90acf', '[\"*\"]', NULL, NULL, '2024-03-20 07:16:46', '2024-03-20 07:16:46'),
-(934, 'App\\Models\\PPAUser', 5, 'main', '5c638adec7fd251ea1475036da5e0870282ad59ee59c14035525e991bdd23cf6', '[\"*\"]', '2024-03-21 05:55:26', NULL, '2024-03-21 05:50:22', '2024-03-21 05:55:26'),
-(949, 'App\\Models\\PPAUser', 6, 'main', '6bb50ef7ffe5ac490712e22e046e5a1b4c013475feb031c8df095ae8abb1b8ce', '[\"*\"]', '2024-03-26 03:15:50', NULL, '2024-03-26 03:13:50', '2024-03-26 03:15:50'),
-(952, 'App\\Models\\PPAUser', 1, 'main', '79d0afc73741a0a0bb745b39ce53c16e14c09ab3850f0eef667b10cd13443341', '[\"*\"]', '2024-03-27 02:27:43', NULL, '2024-03-27 02:01:11', '2024-03-27 02:27:43'),
-(960, 'App\\Models\\PPAUser', 1, 'main', '784b54305fe417d9ef3a59dc68a584a89a676de53dbfe765f37eb481e14d17cb', '[\"*\"]', '2024-03-27 02:25:52', NULL, '2024-03-27 02:25:12', '2024-03-27 02:25:52'),
-(970, 'App\\Models\\PPAUser', 1, 'main', '92791847654f1f22b525683fdc138a5b87badd5c8ce20816e793f386054ffb44', '[\"*\"]', '2024-03-27 04:00:43', NULL, '2024-03-27 04:00:31', '2024-03-27 04:00:43'),
-(973, 'App\\Models\\PPAUser', 17, 'main', '241291dfb6d919445c717ccbb9fef95c1b478a94e0fe4aa4d732394736738133', '[\"*\"]', NULL, NULL, '2024-04-01 05:52:35', '2024-04-01 05:52:35'),
-(974, 'App\\Models\\PPAUser', 18, 'main', '09f7e48027a09b530253ad4d184f2375c39339ede689a7bf452e4daa7cff1131', '[\"*\"]', NULL, NULL, '2024-04-01 05:57:32', '2024-04-01 05:57:32'),
-(1006, 'App\\Models\\PPAUser', 1, 'main', 'a0c7aade72517215c2bb7755f80e4152a2e7d56b37cc45cabb043d89f5755d21', '[\"*\"]', '2024-04-04 05:05:26', NULL, '2024-04-03 03:29:08', '2024-04-04 05:05:26'),
-(1007, 'App\\Models\\PPAUser', 4, 'main', 'b7ba7a075a68e60f16eda49befc1f5b1a7295a13e0dae92a6e587a2cb0960ab4', '[\"*\"]', '2024-04-04 05:26:11', NULL, '2024-04-03 05:28:00', '2024-04-04 05:26:11'),
-(1008, 'App\\Models\\PPAUser', 6, 'main', '3bf355a1d86c15961a9ae494b8be3b74d1606429764fd75fa3036e804c9445e5', '[\"*\"]', '2024-04-04 01:16:04', NULL, '2024-04-04 00:34:47', '2024-04-04 01:16:04'),
-(1009, 'App\\Models\\PPAUser', 5, 'main', 'a939ec5486a6e8f2d8606390c634df9c7018a0b29f6bb278b2704284e5e6965b', '[\"*\"]', '2024-04-04 01:06:00', NULL, '2024-04-04 00:50:31', '2024-04-04 01:06:00'),
-(1010, 'App\\Models\\PPAUser', 4, 'main', '164abbe8c2bd9c4cec1af66383f99a468213bed332c7bbc6ee1c74ccc18e900e', '[\"*\"]', '2024-04-04 01:10:27', NULL, '2024-04-04 00:52:38', '2024-04-04 01:10:27'),
-(1011, 'App\\Models\\PPAUser', 13, 'main', '9809aed050d3363cb6600fd4e44256fd1215333045a8337bcce334af42ba96c3', '[\"*\"]', '2024-04-04 00:55:09', NULL, '2024-04-04 00:53:53', '2024-04-04 00:55:09'),
-(1014, 'App\\Models\\PPAUser', 1, 'main', '28f17040b232e31ae96c67333a97fcfd5ea0dc6079c33d823a2188a75131f619', '[\"*\"]', '2024-04-04 05:26:43', NULL, '2024-04-04 02:58:37', '2024-04-04 05:26:43'),
-(1015, 'App\\Models\\PPAUser', 1, 'main', '6e9426f838e0eb398fe3f0e58b34afbad36708efbdaded0a0918c80bc078bb1e', '[\"*\"]', NULL, NULL, '2024-04-05 00:59:01', '2024-04-05 00:59:01'),
-(1016, 'App\\Models\\PPAUser', 1, 'main', '9bd4cfc971a594dc8041fd6d064f646fd8e002a02a5d9e0e1d60a60be49cc7f9', '[\"*\"]', NULL, NULL, '2024-04-05 01:22:26', '2024-04-05 01:22:26'),
-(1017, 'App\\Models\\PPAUser', 1, 'main', '86694e92dfa18cf4e3c6cded58b450c209b31ec1a5477057c8fd8fd9794192bd', '[\"*\"]', NULL, NULL, '2024-04-05 01:22:39', '2024-04-05 01:22:39'),
-(1022, 'App\\Models\\PPAUser', 6, 'main', 'ab326446a52cef80f589485e80849ab00f71f82f4c0a78ee0ab6e4e907138ba6', '[\"*\"]', '2024-04-14 05:34:27', NULL, '2024-04-11 03:31:50', '2024-04-14 05:34:27'),
-(1073, 'App\\Models\\PPAUser', 1, 'main', 'a3865a10ed65d011af8ca43806c942658a1b7f5d54a96093de152e8ed24ef49e', '[\"*\"]', '2024-04-19 01:55:29', NULL, '2024-04-18 07:26:24', '2024-04-19 01:55:29'),
-(1080, 'App\\Models\\PPAUser', 4, 'main', 'dec05905a73666b06be393045537f899b7c374fbd668eba50cef46931545f5e7', '[\"*\"]', '2024-04-19 02:00:07', NULL, '2024-04-19 01:56:09', '2024-04-19 02:00:07'),
-(1171, 'App\\Models\\PPAUser', 4, 'main', 'f64d0f09e95605b234f510e0aff1729b52f67461e16a8c1d6655d9cccb2ab7b6', '[\"*\"]', '2024-04-29 05:24:47', NULL, '2024-04-29 02:48:44', '2024-04-29 05:24:47'),
-(1187, 'App\\Models\\PPAUser', 6, 'main', 'ec74d6f7bc4765875366d733fa2c2a5dee3f3cc3f2d8fc15484bb21d1aa95886', '[\"*\"]', '2024-04-30 06:43:52', NULL, '2024-04-30 02:17:36', '2024-04-30 06:43:52'),
-(1195, 'App\\Models\\PPAUser', 4, 'main', 'aa938910479262111479654cdaf70e871d7d48a6489b88edb17e3784eb648f45', '[\"*\"]', '2024-05-03 09:01:27', NULL, '2024-05-02 02:53:47', '2024-05-03 09:01:27'),
-(1198, 'App\\Models\\PPAUser', 1, 'main', 'e4f8eb9fd8b763e278b4550f7e5a628d135a491c5a61a131948e7b2d99a55439', '[\"*\"]', '2024-05-14 01:01:33', NULL, '2024-05-02 05:58:29', '2024-05-14 01:01:33'),
-(1199, 'App\\Models\\PPAUser', 1, 'main', '324424630ca437e7a3ab7c159bb27a82821860a2d187c46ba16bf0c3c9e9ae7f', '[\"*\"]', NULL, NULL, '2024-05-06 01:24:59', '2024-05-06 01:24:59'),
-(1200, 'App\\Models\\PPAUser', 1, 'main', '3bd98e5afada69887f4a9301f80c019b2d9d715d79352cbe5cac7add2a9f3fa2', '[\"*\"]', NULL, NULL, '2024-05-06 01:35:45', '2024-05-06 01:35:45'),
-(1201, 'App\\Models\\PPAUser', 1, 'main', 'bc560586c8ed970486b805ba82013e2f8964db0993da4a05c5d096c8b8b70e70', '[\"*\"]', '2024-05-06 01:36:58', NULL, '2024-05-06 01:36:53', '2024-05-06 01:36:58'),
-(1202, 'App\\Models\\PPAUser', 1, 'main', '67203368fe2acdf54c99d51e463a10e0ccda282987a460a65f39a16396e8dd13', '[\"*\"]', '2024-05-06 08:46:31', NULL, '2024-05-06 01:39:34', '2024-05-06 08:46:31'),
-(1205, 'App\\Models\\PPAUser', 19, 'main', '64c29b51e0bb1c56c7f77ecd84458380e8e7d2e62867b63a2e8ed6dde91c65ca', '[\"*\"]', NULL, NULL, '2024-05-06 02:07:02', '2024-05-06 02:07:02'),
-(1206, 'App\\Models\\PPAUser', 1, 'main', '7d634e86951cd2e4dd8b91ecc36ba02e2fb6d68b3b28a8daf3529f1379a6c623', '[\"*\"]', '2024-05-06 05:29:37', NULL, '2024-05-06 02:10:23', '2024-05-06 05:29:37'),
-(1207, 'App\\Models\\PPAUser', 20, 'main', 'a36cbdf4a56dea77b43e196c6ff81005dced9254a56f83f0213b409953c1a7a1', '[\"*\"]', NULL, NULL, '2024-05-06 02:10:38', '2024-05-06 02:10:38'),
-(1208, 'App\\Models\\PPAUser', 21, 'main', '7cc569219a447017fa64d3d511159bcb86ac08e68100262a833c0dd6e344f777', '[\"*\"]', NULL, NULL, '2024-05-06 02:21:15', '2024-05-06 02:21:15'),
-(1209, 'App\\Models\\PPAUser', 22, 'main', '4fcea74e8eb241f981475d38f7c01fe48c915c6a5aa001b87a03d3d923a7f8b0', '[\"*\"]', NULL, NULL, '2024-05-06 02:22:03', '2024-05-06 02:22:03'),
-(1210, 'App\\Models\\PPAUser', 23, 'main', '4e39f5c48517eb3c209bcb85613549db8bf298dc60854637fb9a4344d272d0da', '[\"*\"]', NULL, NULL, '2024-05-06 02:23:02', '2024-05-06 02:23:02'),
-(1211, 'App\\Models\\PPAUser', 24, 'main', '608f05a596f2f66a0e7404f38bb75ae6160fc6f76792d2decbcfd11049db707c', '[\"*\"]', NULL, NULL, '2024-05-06 02:24:27', '2024-05-06 02:24:27'),
-(1212, 'App\\Models\\PPAUser', 25, 'main', '6a8c3088d43b280b9527f022a6cbcbab6a625410463d40f8d4aafbb267b54da7', '[\"*\"]', NULL, NULL, '2024-05-06 02:27:12', '2024-05-06 02:27:12'),
-(1213, 'App\\Models\\PPAUser', 26, 'main', '6eb73d6e77b3458b3213ec5ab0d87cc20ebcf12222558e0acd01c3877aed030c', '[\"*\"]', NULL, NULL, '2024-05-06 02:30:03', '2024-05-06 02:30:03'),
-(1214, 'App\\Models\\PPAUser', 27, 'main', '1448ee35abc46d3fb9e56919c899ecd07da605fcfb74285bd9d5efa5dce42090', '[\"*\"]', NULL, NULL, '2024-05-06 02:30:11', '2024-05-06 02:30:11'),
-(1215, 'App\\Models\\PPAUser', 28, 'main', 'd8c39dda2b3d0fa9fe66381f48530584dbe46b023fa57a03e3dcb6bb73dc3b83', '[\"*\"]', NULL, NULL, '2024-05-06 02:32:50', '2024-05-06 02:32:50'),
-(1216, 'App\\Models\\PPAUser', 29, 'main', '9fe3937daddd344e0dce59718dfba7a4071c95df651ce08b5fafca5f6254b707', '[\"*\"]', NULL, NULL, '2024-05-06 02:37:01', '2024-05-06 02:37:01'),
-(1217, 'App\\Models\\PPAUser', 30, 'main', '976b26ea1acba7d60ece6f31198f7d180f3ccf12738a918971a4388153fdfbe1', '[\"*\"]', NULL, NULL, '2024-05-06 02:39:56', '2024-05-06 02:39:56'),
-(1218, 'App\\Models\\PPAUser', 31, 'main', '43a0e5ee12c22e829adf97b175052cd2e5ab0526f4f3638eea4e11cd4c9b7d3b', '[\"*\"]', NULL, NULL, '2024-05-06 02:41:40', '2024-05-06 02:41:40'),
-(1219, 'App\\Models\\PPAUser', 32, 'main', '8d7d61553b03ce1b1ee3e34c07bf652c6a81ccda482e476aa6dd8a2da5ec5af8', '[\"*\"]', NULL, NULL, '2024-05-06 02:42:17', '2024-05-06 02:42:17'),
-(1220, 'App\\Models\\PPAUser', 33, 'main', '3651afee19fe58d6e102be18ccdd4ea61436c0ade3161069cd2aae3fdf090bfd', '[\"*\"]', NULL, NULL, '2024-05-06 02:44:46', '2024-05-06 02:44:46'),
-(1221, 'App\\Models\\PPAUser', 34, 'main', 'fa98ec579e641db4bd3ec610c187708c68104afa86ce46603ba3cab394a81446', '[\"*\"]', NULL, NULL, '2024-05-06 02:52:14', '2024-05-06 02:52:14'),
-(1222, 'App\\Models\\PPAUser', 35, 'main', 'db4e696200e0a0b447886c749198c4053735d13d4541b62ccb5a3faa8c7f7096', '[\"*\"]', NULL, NULL, '2024-05-06 02:54:33', '2024-05-06 02:54:33'),
-(1223, 'App\\Models\\PPAUser', 36, 'main', '3c924c2c8a9aaed709ba9b80b63a3717ac751042db058090a97868ce8283ff92', '[\"*\"]', NULL, NULL, '2024-05-06 02:55:50', '2024-05-06 02:55:50'),
-(1224, 'App\\Models\\PPAUser', 37, 'main', '2afe9044de827e08526c631afd09765202c5971e1daf13f08fe994e3a021fd35', '[\"*\"]', NULL, NULL, '2024-05-06 02:57:09', '2024-05-06 02:57:09'),
-(1225, 'App\\Models\\PPAUser', 38, 'main', '824130d0016737dd6923e7d2d3f432f244d89f469baabad9be8b4f5b083752cf', '[\"*\"]', NULL, NULL, '2024-05-06 02:59:09', '2024-05-06 02:59:09'),
-(1226, 'App\\Models\\PPAUser', 39, 'main', 'e3903c6dfae7c6b350cc98ef866508154c89f3f138455eecfb19f4369b4609cf', '[\"*\"]', NULL, NULL, '2024-05-06 03:00:45', '2024-05-06 03:00:45'),
-(1227, 'App\\Models\\PPAUser', 40, 'main', 'c9efe2aa8a9ff802ad405707a495560097eaa790e933a4fc3d53c4c93a48d64f', '[\"*\"]', NULL, NULL, '2024-05-06 03:06:04', '2024-05-06 03:06:04'),
-(1228, 'App\\Models\\PPAUser', 41, 'main', '832d520b63ccd6226c993343762d29a5249787e7dfd1b7e00ca9380457d029f8', '[\"*\"]', NULL, NULL, '2024-05-06 03:08:32', '2024-05-06 03:08:32'),
-(1229, 'App\\Models\\PPAUser', 42, 'main', '995339b1f2e145dbed1fc2ff5fd9cab2234bc671e0eaa506ff20a004b7028f0c', '[\"*\"]', NULL, NULL, '2024-05-06 03:09:14', '2024-05-06 03:09:14'),
-(1230, 'App\\Models\\PPAUser', 43, 'main', 'd05ae511a94f71715a05c79ee535d041023eefee008fcc264a8592f465e64664', '[\"*\"]', NULL, NULL, '2024-05-06 03:09:51', '2024-05-06 03:09:51'),
-(1231, 'App\\Models\\PPAUser', 44, 'main', 'e836329b3a6e209a0f230df1f283217a12ceb9d614deba5cd4af4bb0f83d65b4', '[\"*\"]', NULL, NULL, '2024-05-06 03:12:37', '2024-05-06 03:12:37'),
-(1232, 'App\\Models\\PPAUser', 45, 'main', '007122605d917b6b68de7df42d75bf56f8cc1ec573db1ce6ff70ebefb6af437b', '[\"*\"]', NULL, NULL, '2024-05-06 03:12:42', '2024-05-06 03:12:42'),
-(1233, 'App\\Models\\PPAUser', 46, 'main', 'c7906fab4e72d66db65a8311557730486a4f8e49af7f14c3a0ffff8fe07eaeee', '[\"*\"]', NULL, NULL, '2024-05-06 03:15:51', '2024-05-06 03:15:51'),
-(1234, 'App\\Models\\PPAUser', 47, 'main', 'c9f8170570cd65dba0832f494fba8dd753cac932cb911aece21cfa5680cc8119', '[\"*\"]', NULL, NULL, '2024-05-06 03:19:24', '2024-05-06 03:19:24'),
-(1235, 'App\\Models\\PPAUser', 48, 'main', '28ed2c85e61898326638a327964d4caee43f0ed63a0cf5b3243d1c95da73357f', '[\"*\"]', NULL, NULL, '2024-05-06 03:19:57', '2024-05-06 03:19:57'),
-(1236, 'App\\Models\\PPAUser', 49, 'main', 'a351d9638d6ed74ad60a3f044993aa88c9a9fb308f92124ed2d0fd43ff37bf42', '[\"*\"]', NULL, NULL, '2024-05-06 03:20:50', '2024-05-06 03:20:50'),
-(1237, 'App\\Models\\PPAUser', 50, 'main', '72df8820c19c5223d1ab976944c6d67b1f0765dafc464b056407cb5034fd76fb', '[\"*\"]', NULL, NULL, '2024-05-06 03:22:54', '2024-05-06 03:22:54'),
-(1238, 'App\\Models\\PPAUser', 51, 'main', '7f12e0ba53d3d4154f50b092c57268727fae865eac406dd26b7803ea7244766e', '[\"*\"]', NULL, NULL, '2024-05-06 03:23:25', '2024-05-06 03:23:25'),
-(1239, 'App\\Models\\PPAUser', 52, 'main', '2cfea23174335f736430cff677df8decac2a86e93d56445168eda62ed38cad26', '[\"*\"]', NULL, NULL, '2024-05-06 03:25:10', '2024-05-06 03:25:10'),
-(1240, 'App\\Models\\PPAUser', 53, 'main', '25cf0d94c16669e97afdba33b598e11d8769e2328cf71f4a21dd6a3bf5d25238', '[\"*\"]', NULL, NULL, '2024-05-06 03:25:45', '2024-05-06 03:25:45'),
-(1241, 'App\\Models\\PPAUser', 54, 'main', '141a7f1b2576b492135d2b3c4f4e056c2294688e0914eb9d8ae795758e6abde9', '[\"*\"]', NULL, NULL, '2024-05-06 03:27:45', '2024-05-06 03:27:45'),
-(1242, 'App\\Models\\PPAUser', 55, 'main', '846739f6f1d0770fda796be4b1cd7cbd25b5643e45ec5dff3bb078cddb052529', '[\"*\"]', NULL, NULL, '2024-05-06 03:29:29', '2024-05-06 03:29:29'),
-(1243, 'App\\Models\\PPAUser', 56, 'main', '28969b8c8c4a3ca34d602a48b95e749116187af2c1bd5e095b543e4051708e78', '[\"*\"]', NULL, NULL, '2024-05-06 03:30:23', '2024-05-06 03:30:23'),
-(1244, 'App\\Models\\PPAUser', 57, 'main', 'bfa206b0cbc309b9fb7d2ebbec996ad7d8f2c3162199374e932bd2cf42ec0cd7', '[\"*\"]', NULL, NULL, '2024-05-06 03:32:20', '2024-05-06 03:32:20'),
-(1245, 'App\\Models\\PPAUser', 58, 'main', '71d2dedcaaf38bb5de6898046981ee91a46690b3279e63e9e2e1352fe2aef3f5', '[\"*\"]', NULL, NULL, '2024-05-06 03:34:57', '2024-05-06 03:34:57'),
-(1246, 'App\\Models\\PPAUser', 59, 'main', 'fb8194e0b2767589eeac2e9e870511c3593b795f7e97a240c39813ea024db7dc', '[\"*\"]', NULL, NULL, '2024-05-06 03:36:51', '2024-05-06 03:36:51'),
-(1247, 'App\\Models\\PPAUser', 60, 'main', 'd4501e585fe82cc3c4ffe9c0d5cb33baaf70e163267cb7c2d487d85c125ee6f4', '[\"*\"]', NULL, NULL, '2024-05-06 03:37:13', '2024-05-06 03:37:13'),
-(1248, 'App\\Models\\PPAUser', 61, 'main', '9fc72e3106dd69bd2fc9a527abd3d9d589d8710e7604ac706a86f6f423336427', '[\"*\"]', NULL, NULL, '2024-05-06 03:38:22', '2024-05-06 03:38:22'),
-(1249, 'App\\Models\\PPAUser', 62, 'main', '8e843031e4c05b72442fe0cea87085b2dcca389d0b458e10b2b088db2c828b9b', '[\"*\"]', NULL, NULL, '2024-05-06 03:39:54', '2024-05-06 03:39:54'),
-(1250, 'App\\Models\\PPAUser', 63, 'main', '2c6e0f164b3c7649fe19151d2c4249e8271d749f7471a8cd6d2b13e1f5c9a43e', '[\"*\"]', NULL, NULL, '2024-05-06 03:40:02', '2024-05-06 03:40:02'),
-(1251, 'App\\Models\\PPAUser', 64, 'main', '847ba45fa1a38f60fde4612136620059521bae1f6db36fde2214bfff8fa9d62d', '[\"*\"]', NULL, NULL, '2024-05-06 03:42:10', '2024-05-06 03:42:10'),
-(1252, 'App\\Models\\PPAUser', 65, 'main', 'bf98ee4c3c379d568c586088ce08b3e64973ae2154870b8788ff747148a49e27', '[\"*\"]', NULL, NULL, '2024-05-06 03:43:58', '2024-05-06 03:43:58'),
-(1253, 'App\\Models\\PPAUser', 66, 'main', 'a228eeddeca7e6b98dee1f3a7ec4391ce479eb865ba491e36fa6965abd3c53bc', '[\"*\"]', NULL, NULL, '2024-05-06 03:45:11', '2024-05-06 03:45:11'),
-(1254, 'App\\Models\\PPAUser', 67, 'main', '0dc4b559fe3a2a4822ba97a90bdc616e1246cac53b70a2994ac3f793c3e3aab9', '[\"*\"]', NULL, NULL, '2024-05-06 03:46:52', '2024-05-06 03:46:52'),
-(1255, 'App\\Models\\PPAUser', 68, 'main', '47cfced66e00f0eeb6b39d5b7b9088124feef8f768d3cd7c7d49fe2fb602c241', '[\"*\"]', NULL, NULL, '2024-05-06 03:47:46', '2024-05-06 03:47:46'),
-(1256, 'App\\Models\\PPAUser', 69, 'main', 'a0d8cd17143ed09631d243e78d18208f221e31491cbfd9f81f047a2456c75080', '[\"*\"]', NULL, NULL, '2024-05-06 03:48:39', '2024-05-06 03:48:39'),
-(1257, 'App\\Models\\PPAUser', 70, 'main', 'f48ef49cd92dc953d48e9f1cf54c13fd78a11b9c98e4922d35a51ad271207eca', '[\"*\"]', NULL, NULL, '2024-05-06 03:49:52', '2024-05-06 03:49:52'),
-(1258, 'App\\Models\\PPAUser', 71, 'main', 'f834b4fb5d53bf775e6a4ce9672394006253c92e9428a9bb95764bfdd7e7fa54', '[\"*\"]', NULL, NULL, '2024-05-06 03:50:30', '2024-05-06 03:50:30'),
-(1259, 'App\\Models\\PPAUser', 72, 'main', '3153cc0811a0ad9373da71f3b7e37cc24ddb61140580a9d61a9fc3f73ccca27d', '[\"*\"]', NULL, NULL, '2024-05-06 03:52:42', '2024-05-06 03:52:42'),
-(1260, 'App\\Models\\PPAUser', 73, 'main', '269b0a7efbcf81b65d86eff6958a1bd37c3581a095d6c2b8e20426fdff823d8a', '[\"*\"]', NULL, NULL, '2024-05-06 03:58:01', '2024-05-06 03:58:01'),
-(1261, 'App\\Models\\PPAUser', 74, 'main', 'd2254a880b27667116b0ab73c009eb767419ff318995d4aa63f2f92fc2c50b30', '[\"*\"]', NULL, NULL, '2024-05-06 04:02:00', '2024-05-06 04:02:00'),
-(1262, 'App\\Models\\PPAUser', 75, 'main', 'dc7bbbcadcb6c327d618ab3300aa3a545f22561f0cb33d8b6dd8d71a1ff92f0f', '[\"*\"]', NULL, NULL, '2024-05-06 04:04:10', '2024-05-06 04:04:10'),
-(1263, 'App\\Models\\PPAUser', 76, 'main', '3352867f5317191c812a28a421046aaa6786a1a5e5d07f7a62157a00cf073a5c', '[\"*\"]', NULL, NULL, '2024-05-06 04:06:00', '2024-05-06 04:06:00'),
-(1264, 'App\\Models\\PPAUser', 77, 'main', 'b8286f61a3c46f230d0640320469448d72e69262c3a831c447b98869e4e5f799', '[\"*\"]', NULL, NULL, '2024-05-06 04:06:55', '2024-05-06 04:06:55'),
-(1265, 'App\\Models\\PPAUser', 78, 'main', 'f3925c3e93bec66a485501b2f7843218a182ff5484d5a0695204cc0f4b586beb', '[\"*\"]', NULL, NULL, '2024-05-06 04:08:29', '2024-05-06 04:08:29'),
-(1266, 'App\\Models\\PPAUser', 79, 'main', 'b126b830d513dadf4338e21862dd3494a394f0a839d7f05fdd4613fdfc5b54a1', '[\"*\"]', NULL, NULL, '2024-05-06 04:09:59', '2024-05-06 04:09:59'),
-(1267, 'App\\Models\\PPAUser', 80, 'main', '274c167e3407e9911a0c7f2354e239609df07c7013a810196a362791036bdaf1', '[\"*\"]', NULL, NULL, '2024-05-06 04:11:04', '2024-05-06 04:11:04'),
-(1268, 'App\\Models\\PPAUser', 81, 'main', 'e34990880d6683ababa1149462fdf101be0e0384a91579f9b336b2b78ea73e11', '[\"*\"]', NULL, NULL, '2024-05-06 04:13:27', '2024-05-06 04:13:27'),
-(1269, 'App\\Models\\PPAUser', 82, 'main', '4e06262b3f20e185a7b6325c73107bfa19d32c305176ca612c02dbb85e6ccc7c', '[\"*\"]', NULL, NULL, '2024-05-06 04:14:11', '2024-05-06 04:14:11'),
-(1270, 'App\\Models\\PPAUser', 83, 'main', '8db0d2cf80e29617ce839656e5f3b9a17f626e9acb81f9f76410ef4b905783c2', '[\"*\"]', NULL, NULL, '2024-05-06 04:16:53', '2024-05-06 04:16:53'),
-(1271, 'App\\Models\\PPAUser', 84, 'main', '0c30d560b37a15978bf3f2638c956cdd9cefd45d74cd1eccbb54a8906bc63086', '[\"*\"]', NULL, NULL, '2024-05-06 04:17:00', '2024-05-06 04:17:00'),
-(1272, 'App\\Models\\PPAUser', 85, 'main', 'a11b6d6760fab48619bd2d3a8784ead020235a671bda1bc9ec8306f8e65a946e', '[\"*\"]', NULL, NULL, '2024-05-06 04:19:14', '2024-05-06 04:19:14'),
-(1273, 'App\\Models\\PPAUser', 86, 'main', '9363231c344f9e335744f26527de2af2e957118d53c9d86f551fd5b0024027ff', '[\"*\"]', NULL, NULL, '2024-05-06 04:19:48', '2024-05-06 04:19:48'),
-(1274, 'App\\Models\\PPAUser', 87, 'main', '8f220c16b56eda6769bbb715a7ee11cea3510398629badc50079b3a4a1a647a2', '[\"*\"]', NULL, NULL, '2024-05-06 04:21:16', '2024-05-06 04:21:16'),
-(1275, 'App\\Models\\PPAUser', 88, 'main', '855a7fe81d58c82d298483b8f76407a2184f367764921b286d27e40e21a07b1a', '[\"*\"]', NULL, NULL, '2024-05-06 04:22:32', '2024-05-06 04:22:32'),
-(1276, 'App\\Models\\PPAUser', 89, 'main', 'd7cb91a13011d1a1647dab83a95a89707d2d805ddaf1f84657aae94444998f55', '[\"*\"]', NULL, NULL, '2024-05-06 04:24:14', '2024-05-06 04:24:14'),
-(1277, 'App\\Models\\PPAUser', 90, 'main', 'eba3ccb9aea686056d18312471c23a679800c2a8c7cbf8283b67fd4fc5740644', '[\"*\"]', NULL, NULL, '2024-05-06 04:25:28', '2024-05-06 04:25:28'),
-(1278, 'App\\Models\\PPAUser', 91, 'main', 'de86d7d837401fac2452e877edf6e8a2a404335f17dcc7ec5faf2354fc787320', '[\"*\"]', NULL, NULL, '2024-05-06 04:27:19', '2024-05-06 04:27:19'),
-(1279, 'App\\Models\\PPAUser', 92, 'main', '24a68c53d830fd0ddb0ccd840c4edb211720637a14f8b082c57ea46c3ba5ef0a', '[\"*\"]', NULL, NULL, '2024-05-06 04:27:53', '2024-05-06 04:27:53'),
-(1280, 'App\\Models\\PPAUser', 93, 'main', '5dde63fe03eaa94f0ebf5ebac964432873f693b21e25e3687269c37d979e3929', '[\"*\"]', NULL, NULL, '2024-05-06 04:28:44', '2024-05-06 04:28:44'),
-(1281, 'App\\Models\\PPAUser', 94, 'main', '52b5035073337e71bb1137b4e130d7d5e2fd2f108e08acf46db30a13d78bec77', '[\"*\"]', NULL, NULL, '2024-05-06 04:29:58', '2024-05-06 04:29:58'),
-(1282, 'App\\Models\\PPAUser', 95, 'main', '3e86527b8dda1221e14381c2575e6121ffa663a01bf21b986982b8dbcaad007a', '[\"*\"]', NULL, NULL, '2024-05-06 04:30:18', '2024-05-06 04:30:18'),
-(1283, 'App\\Models\\PPAUser', 96, 'main', 'b28abc071b2283e31ff34c89c1c3552a1fedd56c642ffc2c11b2b986d719b656', '[\"*\"]', NULL, NULL, '2024-05-06 04:31:21', '2024-05-06 04:31:21'),
-(1284, 'App\\Models\\PPAUser', 97, 'main', '67f6d0fd52265545bd1982f8caf47059acb6969adab9e558d2661a7492c97a86', '[\"*\"]', NULL, NULL, '2024-05-06 04:32:53', '2024-05-06 04:32:53'),
-(1285, 'App\\Models\\PPAUser', 98, 'main', '5eec95c3b51f7f44a8be4ea3f317979184883dc83b664b8ca1e44aa8c07a7734', '[\"*\"]', NULL, NULL, '2024-05-06 04:35:03', '2024-05-06 04:35:03'),
-(1286, 'App\\Models\\PPAUser', 99, 'main', '8816183194a6eb146a73443782a9a4d8567d34aa03a65743d3d28e918d2fa9a9', '[\"*\"]', NULL, NULL, '2024-05-06 04:35:06', '2024-05-06 04:35:06'),
-(1287, 'App\\Models\\PPAUser', 100, 'main', 'ee32e3e2a4b44aac62f2a4fbd6cfcc6ed802606333a12a6d0c4533e56a6296c8', '[\"*\"]', NULL, NULL, '2024-05-06 04:36:42', '2024-05-06 04:36:42'),
-(1288, 'App\\Models\\PPAUser', 101, 'main', 'b8d8bd9e1b6b1aa4b7cc62987c16612cbe09c46b76ae52734fb80d46d638c06c', '[\"*\"]', NULL, NULL, '2024-05-06 04:37:28', '2024-05-06 04:37:28'),
-(1289, 'App\\Models\\PPAUser', 102, 'main', 'cd03060f2a90680a291c69caf2f9e8d043e1b5858ef999c2cba5644f6e66bb65', '[\"*\"]', NULL, NULL, '2024-05-06 04:39:57', '2024-05-06 04:39:57'),
-(1290, 'App\\Models\\PPAUser', 103, 'main', 'b940499478e2b6929524fa269bdd8f75f879c312b2de61307f34f5e7b4633c47', '[\"*\"]', NULL, NULL, '2024-05-06 04:41:19', '2024-05-06 04:41:19'),
-(1291, 'App\\Models\\PPAUser', 104, 'main', '94631bd2cbf0552ff5bab084d3232fab8fe146254e39e46cf7441f393883265f', '[\"*\"]', NULL, NULL, '2024-05-06 04:43:10', '2024-05-06 04:43:10'),
-(1292, 'App\\Models\\PPAUser', 105, 'main', 'ff74710036b2dbbeee3272bed8d1550b3273ae287f8cdf36464191d15c6c2163', '[\"*\"]', NULL, NULL, '2024-05-06 04:45:10', '2024-05-06 04:45:10'),
-(1293, 'App\\Models\\PPAUser', 106, 'main', '3fc0b3991c0dbeee856888893df73d62c5e984bc4b4ad1a31168344b90da06ef', '[\"*\"]', NULL, NULL, '2024-05-06 04:46:06', '2024-05-06 04:46:06'),
-(1294, 'App\\Models\\PPAUser', 107, 'main', '28978571ed35fd78797fe90a52f9358b649d722d269bf8b93235857df0f8492f', '[\"*\"]', NULL, NULL, '2024-05-06 04:48:40', '2024-05-06 04:48:40'),
-(1295, 'App\\Models\\PPAUser', 108, 'main', '3a90a0f615ad84736d36dc0d0fae37d6d64281095c8abd42f78086985d99ca3a', '[\"*\"]', NULL, NULL, '2024-05-06 04:49:24', '2024-05-06 04:49:24'),
-(1296, 'App\\Models\\PPAUser', 109, 'main', 'be5ff14a8122d2bfe24d0db46d4d95193228b80cc123fc2453cf771e8a425245', '[\"*\"]', NULL, NULL, '2024-05-06 04:52:42', '2024-05-06 04:52:42'),
-(1297, 'App\\Models\\PPAUser', 110, 'main', '6c566302980d283c8778ffa614cbccae26ce7bde74186c151f689394ffa35546', '[\"*\"]', NULL, NULL, '2024-05-06 04:54:36', '2024-05-06 04:54:36'),
-(1298, 'App\\Models\\PPAUser', 111, 'main', 'd37ce0bb6d7330a943ceb790f4a5fc455af9e548dba6e3c6e0c5f90b957f7909', '[\"*\"]', NULL, NULL, '2024-05-06 04:56:03', '2024-05-06 04:56:03'),
-(1299, 'App\\Models\\PPAUser', 112, 'main', 'd812542ba940133d552b8be4badd486de83533b05527d547bf425047ccb82519', '[\"*\"]', NULL, NULL, '2024-05-06 04:58:34', '2024-05-06 04:58:34'),
-(1300, 'App\\Models\\PPAUser', 113, 'main', '1d95e0d2bfb4e593144a41fd92504d2248bece2638a5856a2b0d2fc554671942', '[\"*\"]', NULL, NULL, '2024-05-06 04:58:51', '2024-05-06 04:58:51'),
-(1301, 'App\\Models\\PPAUser', 114, 'main', '854c1cf78cd1e9f1d97e02c0377120ae7bafd10b73cb6e463e5230edcde46f62', '[\"*\"]', NULL, NULL, '2024-05-06 05:00:50', '2024-05-06 05:00:50'),
-(1302, 'App\\Models\\PPAUser', 115, 'main', '90aafda8b3195050b80552e9ccff8860a75767e8c0be8b6a0bb29185706e89f8', '[\"*\"]', NULL, NULL, '2024-05-06 05:00:58', '2024-05-06 05:00:58'),
-(1303, 'App\\Models\\PPAUser', 116, 'main', '1d97aedad0b8f1b01f085b36e6b553076bf52d277761d2799294d000fc63820c', '[\"*\"]', NULL, NULL, '2024-05-06 05:02:13', '2024-05-06 05:02:13'),
-(1304, 'App\\Models\\PPAUser', 117, 'main', '500143c27253bba48327041509bac882322ed07804edfd4093f9a0f57d6c21f5', '[\"*\"]', NULL, NULL, '2024-05-06 05:03:05', '2024-05-06 05:03:05'),
-(1305, 'App\\Models\\PPAUser', 118, 'main', 'cfd995e9be462a54d2f3cca730c2dab2007e397af35a2eca6f0d0df7bfd607f7', '[\"*\"]', NULL, NULL, '2024-05-06 05:04:53', '2024-05-06 05:04:53'),
-(1306, 'App\\Models\\PPAUser', 119, 'main', 'accf2f50f61b85cd9881b3a0c2c4a1aa70d248a82081b339ee77ce73339c1fc9', '[\"*\"]', NULL, NULL, '2024-05-06 05:06:22', '2024-05-06 05:06:22'),
-(1307, 'App\\Models\\PPAUser', 120, 'main', '6f7be6cfe84debe426a4cd368ff27917f33d29012a25abb59b45b70a505bf394', '[\"*\"]', NULL, NULL, '2024-05-06 05:06:52', '2024-05-06 05:06:52'),
-(1308, 'App\\Models\\PPAUser', 121, 'main', 'bfaa68e1af251c49deb2667fb9ff56a3f6ca72f67871d4077b1eddab1db0dda7', '[\"*\"]', NULL, NULL, '2024-05-06 05:08:39', '2024-05-06 05:08:39'),
-(1309, 'App\\Models\\PPAUser', 122, 'main', 'e9d374d188eb907c75601ae184b42e3cd4c875ca7b85cc4cdaca5afa46202bfc', '[\"*\"]', NULL, NULL, '2024-05-06 05:09:00', '2024-05-06 05:09:00'),
-(1310, 'App\\Models\\PPAUser', 123, 'main', '3d308783423915c8057e2ca16b5713b0bb41f1319f9198cc4cf518087b7de8e7', '[\"*\"]', NULL, NULL, '2024-05-06 05:31:00', '2024-05-06 05:31:00'),
-(1311, 'App\\Models\\PPAUser', 124, 'main', '0a643e3c212e8e4f9468d3950de659199930328fd4398041dca8bae8cfab4e2e', '[\"*\"]', NULL, NULL, '2024-05-06 05:32:46', '2024-05-06 05:32:46'),
-(1312, 'App\\Models\\PPAUser', 125, 'main', '832f75caf9f4e27810ab6f076b5acfa46913574c0c2a8526ca28336077465f56', '[\"*\"]', NULL, NULL, '2024-05-06 05:34:23', '2024-05-06 05:34:23'),
-(1313, 'App\\Models\\PPAUser', 126, 'main', '38c7f091a59491676bd4ad6e756e141215b3c714fab2217bc11867caea57c882', '[\"*\"]', NULL, NULL, '2024-05-06 05:36:14', '2024-05-06 05:36:14'),
-(1314, 'App\\Models\\PPAUser', 127, 'main', '3e2c6b5a5f1754b289279286969b3c6b52f576e515a6c7349a11627c3d5a3a89', '[\"*\"]', NULL, NULL, '2024-05-06 05:37:45', '2024-05-06 05:37:45'),
-(1315, 'App\\Models\\PPAUser', 128, 'main', '52c3efbd3f5ea26218a281259082b0d6132bf07887d5627649979b746f1e12d0', '[\"*\"]', NULL, NULL, '2024-05-06 05:38:46', '2024-05-06 05:38:46'),
-(1316, 'App\\Models\\PPAUser', 129, 'main', 'aefa120294bf27cce44c38cfed468837588ced06d65136b963bb6bcebdec4cd0', '[\"*\"]', NULL, NULL, '2024-05-06 05:56:23', '2024-05-06 05:56:23'),
-(1317, 'App\\Models\\PPAUser', 130, 'main', '25008b68ae93d5b55619ff8903242f0826ac28b17836db7fef2eb46e6b57915d', '[\"*\"]', NULL, NULL, '2024-05-06 05:58:56', '2024-05-06 05:58:56'),
-(1318, 'App\\Models\\PPAUser', 131, 'main', '161ca3d2c4fa38919aa7eacddfd944c1f54e45321fe847b26e0f81c914abb418', '[\"*\"]', NULL, NULL, '2024-05-06 06:17:48', '2024-05-06 06:17:48'),
-(1328, 'App\\Models\\PPAUser', 3, 'main', '44ebf486abfd8216c78be11760872c989dfacae694151060e9d1efb1bc2e7b48', '[\"*\"]', '2024-05-06 08:16:36', NULL, '2024-05-06 07:23:02', '2024-05-06 08:16:36'),
-(1367, 'App\\Models\\PPAUser', 32, 'main', '01b0df7947a9a7191d8faf5c6a2dc368a2a1c02f93f7e1d679da1b5d3bc1e8f1', '[\"*\"]', '2024-05-06 08:57:32', NULL, '2024-05-06 08:47:22', '2024-05-06 08:57:32'),
-(1370, 'App\\Models\\PPAUser', 1, 'main', '519b9b96da805c955b9a25bd6dd865a4f4dfa2d77f78f63beb946b0b0b3bb9bc', '[\"*\"]', '2024-05-07 05:05:08', NULL, '2024-05-06 23:52:26', '2024-05-07 05:05:08'),
-(1378, 'App\\Models\\PPAUser', 5, 'main', '3f82202b20dea5708c89ef4c0681e578262acaa2c9f73fe38a29819977f431c4', '[\"*\"]', '2024-05-07 01:00:44', NULL, '2024-05-07 01:00:27', '2024-05-07 01:00:44'),
-(1404, 'App\\Models\\PPAUser', 6, 'main', '77d7b672b3ebd9d3bb9840c14cd08f3866fc61be31c3f1da75e5489bbd5dc877', '[\"*\"]', '2024-05-07 05:05:07', NULL, '2024-05-07 02:08:20', '2024-05-07 05:05:07'),
-(1427, 'App\\Models\\PPAUser', 13, 'main', '6326c0f723b1b293b4f22a821105136870a5a13b3e6acfdd5b042c863a74fd99', '[\"*\"]', '2024-05-07 03:15:58', NULL, '2024-05-07 03:14:02', '2024-05-07 03:15:58'),
-(1428, 'App\\Models\\PPAUser', 6, 'main', '086ae0768c94415299077747dc00621bc02b457d859ae924d4b01da003430e25', '[\"*\"]', '2024-05-07 03:15:23', NULL, '2024-05-07 03:14:49', '2024-05-07 03:15:23'),
-(1437, 'App\\Models\\PPAUser', 5, 'main', '5a370ca90debe70ad8e0a09f49f67b2f19e4846dbe44f90f9d23f97052202a08', '[\"*\"]', '2024-05-09 23:42:17', NULL, '2024-05-08 03:04:08', '2024-05-09 23:42:17'),
-(1439, 'App\\Models\\PPAUser', 74, 'main', '9214884461a9883cb52a27bf738ce690dea841fe4738fe52320e1d2dcb035018', '[\"*\"]', '2024-05-09 07:33:53', NULL, '2024-05-08 06:17:33', '2024-05-09 07:33:53');
+(1, 'App\\Models\\PPAEmployee', 1, 'PPA_Token', 'c46dfdc62d0adeaf08e653cbba18eb7bac4d921fa8596bb1153006fc791796f0', '[\"*\"]', '2026-05-30 00:42:39', NULL, '2026-05-28 03:13:34', '2026-05-30 00:42:39');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `p_p_a_users`
+-- Table structure for table `ppa_security`
 --
 
-CREATE TABLE `p_p_a_users` (
+CREATE TABLE `ppa_security` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `fname` varchar(255) NOT NULL,
-  `mname` varchar(255) NOT NULL,
-  `lname` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `hostingname` varchar(255) DEFAULT NULL,
+  `browser` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ppa_security`
+--
+
+INSERT INTO `ppa_security` (`id`, `user_id`, `hostingname`, `browser`, `created_at`, `updated_at`) VALUES
+(346, 79, NULL, 'Chrome', '2026-01-16 01:30:25', '2026-01-16 01:30:25'),
+(355, 65, NULL, 'Edge', '2026-01-20 06:03:13', '2026-01-20 06:03:13'),
+(431, 82, NULL, 'Chrome', '2026-03-27 02:29:58', '2026-03-27 02:29:58'),
+(473, 22, NULL, 'Chrome', '2026-05-22 02:20:50', '2026-05-22 02:20:50'),
+(482, 76, NULL, 'Edge', '2026-05-22 04:04:12', '2026-05-22 04:04:12'),
+(486, 1, NULL, 'Chrome', '2026-05-28 03:12:30', '2026-05-28 03:12:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ppa_user`
+--
+
+CREATE TABLE `ppa_user` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `firstname` varchar(255) NOT NULL,
+  `middlename` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) NOT NULL,
   `gender` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
   `division` varchar(255) NOT NULL,
   `position` varchar(255) NOT NULL,
-  `code_clearance` int(11) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `image` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `p_p_a_users`
---
-
-INSERT INTO `p_p_a_users` (`id`, `fname`, `mname`, `lname`, `gender`, `username`, `division`, `position`, `code_clearance`, `password`, `image`, `created_at`, `updated_at`) VALUES
-(1, 'Zack-Mio', 'A', 'Sermon', 'Male', 'zackmio2023', 'Administrative Division', 'Information System Analyst ll', 10, '$2a$12$h8gww6TMmY9p888YskjVDedmZJPL5LblK5uKrZ5dtv2MDWnHw8SSu', 'Zack-Mio_Sermon_2023.png', '2023-11-07 17:58:39', '2024-05-06 05:50:49'),
-(2, 'Juan', 'A', 'Dela Cruz', 'Male', 'juan2024', 'Administrative Division', 'Flower', 5, '$2y$10$4g8uq8nwjxW56qrxZ1WmguW2Z62s5juvPTAJciUKcWiSvwAmlV5Wq', 'Juan_Dela Cruz_2024.png', '2024-03-20 02:29:31', '2024-04-03 07:57:30'),
-(3, 'Medardo', 'I', 'Sosobrado, Jr', 'Male', 'PPA_jong', 'Office of the Port Manager', 'Acting Port Manager', 2, '$2y$10$Cm67OnOUxwmZPnR4h45dK.k06ymv2o06lkRUcWbIi/uztTq3unJxy', 'Medardo_Sosobrado, Jr_2024.png', '2024-03-20 03:03:10', '2024-03-20 03:26:49'),
-(4, 'Daisy', 'P', 'Tangcalagan', 'Female', 'PPA_Daisy', 'Administrative Division', 'Division Manager A', 1, '$2y$10$PDqUB7Pat5DSdYT2q5K3pOrHIfC2cpTIvPR/vwQOj8K60FrynDF9S', 'Daisy_Tangcalagan_2024.png', '2024-03-20 03:26:14', '2024-03-20 03:26:14'),
-(5, 'Joyriena Lynn', 'M', 'Seco', 'Female', 'PPA_JoySeco', 'Administrative Division', 'Administrative Officer IV', 4, '$2y$10$wvolnDJEXzelaCA/1FXMDu87j/w.jlYUhW/0S0xANkhZBoKjA99Qe', 'Joyriena_Lynn_Seco_2024.png', '2024-03-20 06:30:10', '2024-03-20 06:30:10'),
-(6, 'Sue Christine', 'A', 'Sade', 'Female', 'PPA_Sue', 'Administrative Division', 'General Services Officer A', 3, '$2y$10$A63AsRkQFiRrtDKXQmAThe7/7QIhj7ecIubtDZqT/PVxECHSTubSO', 'Sue_Christine_Sade_2024.png', '2024-03-20 06:31:49', '2024-03-20 06:31:49'),
-(7, 'Evelyn', 'F', 'Espinosa', 'Female', 'PPA_Evelyn', 'Office of the Port Manager', 'Executive Assistant A', 4, '$2y$10$osVaKIHz0jTfcnjMz6gHcufwr0WaVxhmlNAH/gilw3dpVMgkaow1.', 'Evelyn_Espinosa_2024.png', '2024-03-20 06:34:18', '2024-03-20 06:34:18'),
-(8, 'Cheryl', 'C', 'Saluta', 'Female', 'PPA_Che', 'Finance Division', 'Division Manager A', 4, '$2y$10$gkz1RgfaQvaQkx4Iw3yMaO0XMblC8jQlmtECDoFsQ0nxcuPQ6A3nG', 'Cheryl_Saluta_2024.png', '2024-03-20 06:40:45', '2024-03-20 06:40:45'),
-(9, 'Jose Randy', 'I', 'Pabelino', 'Male', 'PPA_Randy', 'Port Service Division', 'Terminal Supervisor A', 4, '$2y$10$bToQ3zLH/f9D1pzh3RHbj.TNhpLB1sCDy0s7G/.lIutpDqqYGQpY6', 'Jose_Randy_Pabelino_2024.png', '2024-03-20 06:52:36', '2024-03-20 06:52:36'),
-(10, 'Joel', 'B', 'Escala', 'Male', 'PPA_Joel', 'Engineering Service Division', 'Division Manager A', 4, '$2y$10$jIc/8RKvsnRH0Ced3B3RAeU/.5FTByGeaCaUbgyOnevNDgL9i4MZC', 'Joel_Escala_2024.png', '2024-03-20 06:54:50', '2024-03-20 06:54:50'),
-(11, 'Tito', 'F', 'Pontillo, Jr', 'Male', 'PPA_Tito', 'Port Police Division', 'Civil Security Officer A', 4, '$2y$10$g7PEY30glDbXpAnTHPEUrO0fZh6T8RPyGDOL.rotytKfI2w2KJMbu', 'Tito_Pontillo, Jr_2024.png', '2024-03-20 07:02:46', '2024-03-20 07:02:46'),
-(12, 'Omar', 'A', 'Sabdani', 'Male', 'PPA_Omar', 'Terminal Management Office - Tubod', 'Division Manager C', 4, '$2y$10$sS/sFDg3hL6Tw1V7NhHPFe.Iw7Ch5QsyvWXVc2xY0EXXcd7FMbw6u', 'Omar_Sabdani_2024.png', '2024-03-20 07:04:48', '2024-03-20 07:04:48'),
-(13, 'Jeffrey', 'N', 'Silao', 'Male', 'PPA_Jeffrey', 'Administrative Division', 'Computer Maintenance Technologist I', 7, '$2y$10$kmdXStzd5SqIb8a2EqVZa.VRXwm6.0c.8kSSiUI6RMDvdiaDECs8.', 'Jeffrey_Silao_2024.png', '2024-03-20 07:09:39', '2024-03-20 07:44:00'),
-(14, 'Rey', 'T', 'Sumanoy', 'Male', 'PPA_Rey', 'Administrative Division', 'Driver Mechanic B', 6, '$2y$10$TPk2xMHuiOITycEuNb2iyejq3jRmsUTnqO6H.CW0nGoGIwZ890ho6', 'Rey_Sumanoy_2024.png', '2024-03-20 07:13:09', '2024-03-20 07:20:17'),
-(15, 'Arnold', 'A', 'Turla', 'Male', 'PPA_Turla', 'Administrative Division', 'Driver Mechanic B', 6, '$2y$10$Y16QWQ3qvijYWqVhkQkZ.OWRdftds2A7x/PdGuEkgHbIhrLIX3NqO', 'Arnold_Turla_2024.png', '2024-03-20 07:14:04', '2024-03-20 07:20:49'),
-(16, 'Jan Dexter', 'T', 'Loang', 'Male', 'PPA_Jan', 'Administrative Division', 'Driver Mechanic A', 6, '$2y$10$tNJ3UhqGIDmoLeUyQisK7OYCh3wZYoF/a914QZlDHhFtZeMMY0Foa', 'Jan_Dexter_Loang_2024.png', '2024-03-20 07:16:46', '2024-05-06 06:06:52'),
-(17, 'Raymart', 'E', 'Ruelan', 'Male', 'PPA_Raymart', 'Administrative Division', 'Clerk Processor A', 6, '$2y$10$tO9Ekj7Fe1Qi0oHaDB4NF.UKpNsfDLSKhdm/dw4gqcN122pMh54dK', 'Raymart_Ruelan_2024.png', '2024-04-01 05:52:35', '2024-05-06 06:39:26'),
-(18, 'Cris Ian', 'R', 'Jacinto', 'Male', 'PPA_Ian', 'Administrative Division', 'Management Information System Analyst /IT Team', 6, '$2y$10$jfe8xEhAiTRMW0fPSbm7f.FYl6ARckp5gQwkAd1UP8/TQ8SyA2ms.', 'Cris_Ian_Jacinto_2024.png', '2024-04-01 05:57:32', '2024-04-30 07:00:24'),
-(19, 'Marianne', 'S', 'Paglinawan', 'Female', 'PPA_Paglinawan', 'Office of the Port Manager', 'Business Development/Marketing Specialist', 5, '$2y$10$QEW.ml7ebq58J2wZWSX9We527jSLvw5zPqLWaO9LWIwB1w1VX6KZy', 'Marianne_Paglinawan_2024.png', '2024-05-06 02:07:02', '2024-05-06 05:46:06'),
-(20, 'Joanne Mae', 'S', 'Janulgue', 'Female', 'PPA_Janulgue', 'Office of the Port Manager', 'Executive Secretary C', 5, '$2y$10$VMYaHV67cazItWyQbslMYu3D4gsCegnEIRHsCLMaIQ7zpRGTCzNLK', 'Joanne_Mae_Janulgue_2024.png', '2024-05-06 02:10:38', '2024-05-06 02:25:00'),
-(21, 'Angelyn', 'M', 'Lepiten', 'Female', 'PPA_Lepiten', 'Office of the Port Manager', 'Project Planning & Development Officer A', 5, '$2y$10$I71u1D8fwuRlu8HlUdAZl.F76411nnwAdURyTz49GSvlSwQZfRQB.', 'Angelyn_Lepiten_2024.png', '2024-05-06 02:21:15', '2024-05-06 02:27:15'),
-(22, 'Elva', 'A', 'Real', 'Female', 'PPA_Real', 'Office of the Port Manager', 'Business Development/ Marketing Officer A', 5, '$2y$10$WnGtW7qQJNVGtNq9UodJ6eIN.bmZVRWHgfTaUmIoSlPbPY.P0b7Zq', 'Elva_Real_2024.png', '2024-05-06 02:22:03', '2024-05-06 05:47:55'),
-(23, 'Jonalyn', 'N', 'Dandasan', 'Female', 'PPA_Dandasan', 'Finance Division', 'Corporate Finance Services Chief', 5, '$2y$10$z8XRUJAatiiIYRnEsfu5uO0A.mHt2MS7OnPYoCHcB44wn8YDzmOwG', 'Jonalyn_Dandasan_2024.png', '2024-05-06 02:23:02', '2024-05-06 02:26:14'),
-(24, 'Loradel', 'B', 'Pabillar', 'Female', 'PPA_Pabillar', 'Finance Division', 'Senior Corporate Accountant A', 5, '$2y$10$IGD9dFP8ZSkSpJPGNJhKVu8p.mdZZWLRtBU/Nub7Z0u9LcFE9FFra', 'Loradel_Pabillar_2024.png', '2024-05-06 02:24:27', '2024-05-06 02:59:00'),
-(25, 'Juliet', 'B', 'Merioles', 'Female', 'PPA_Merioles', 'Finance Division', 'Senior Cashier', 5, '$2y$10$l9c1h094RMtN7CEo91cPde6QgpHgVBCP9a/tDzk3fqmzLwyqpOuH.', 'Juliet_Merioles_2024.png', '2024-05-06 02:27:12', '2024-05-06 02:54:14'),
-(26, 'Edgardo', 'B', 'Dandoy', 'Male', 'PPA_Dandoy', 'Finance Division', 'Cashier B', 5, '$2y$10$IEqeEEN3Py9AwR5rii5DLOs6AgNR29qAXzrgzpKDfKoc7vNFX.7Bi', 'Edgardo_Dandoy_2024.png', '2024-05-06 02:30:03', '2024-05-06 02:44:21'),
-(27, 'Christine', 'J', 'Merto', 'Female', 'PPA_Merto', 'Finance Division', 'Cashier A', 5, '$2y$10$AeIIzJzW7iEhqowmpnt3wuX.cUAQvO.4phBYhtZ048u3bpbOM7pUK', 'Christine_Merto_2024.png', '2024-05-06 02:30:11', '2024-05-06 02:54:56'),
-(28, 'Christine', 'R', 'Jacinto', 'Female', 'PPA_Jacinto', 'Finance Division', 'Cashier B', 5, '$2y$10$rJjGf1S0M23O/j6O4EF02eZidEf8T3Mt04xjA0mEa2A3pEE7s.5MW', 'Christine_Jacinto_2024.png', '2024-05-06 02:32:50', '2024-05-06 02:52:34'),
-(29, 'Gemma', 'P', 'Pontillo', 'Female', 'PPA_Pontillo', 'Finance Division', 'Senior Corporate Accounts Analyst', 5, '$2y$10$UiltqwuXoa61LEF2RbC/ROCGFvpX9zrOJDv/WHDms5tQzMOly3KoW', 'Gemma_Pontillo_2024.png', '2024-05-06 02:37:01', '2024-05-06 05:50:43'),
-(30, 'Kate Wendell', 'A', 'Eugenio', 'Female', 'PPA_Eugenio', 'Finance Division', 'Cashier B', 5, '$2y$10$mUcHlylebry5SCURdikICOy/lDcqBi6exytQsHawub9v7JN0zfQIS', 'Kate_Wendell_Eugenio_2024.png', '2024-05-06 02:39:56', '2024-05-06 02:51:47'),
-(31, 'Hazel', 'B', 'Nadorra', 'Female', 'PPA_Nadorra', 'Finance Division', 'Cashier B', 5, '$2y$10$d5i9YVLCm4OlS8QhXpEIi.1pZVEJz.ekLmkZ/pbq.JWHPCKsMETHi', 'Hazel_Nadorra_2024.png', '2024-05-06 02:41:40', '2024-05-06 02:56:49'),
-(32, 'Janrey Vincent', 'P', 'Durano', 'Male', 'PPA_Durano', 'Finance Division', 'Cashier B', 5, '$2y$10$zrSWxyBWuca/96UXbW0U1uO8Swj8lKCl3h/6f/E07ZByIYeNuTejW', 'Janrey_Vincent_Durano_2024.png', '2024-05-06 02:42:17', '2024-05-06 02:50:29'),
-(33, 'Janessa', 'P', 'Balt', 'Female', 'PPA_Balt', 'Finance Division', 'Clearing Officer IV', 5, '$2y$10$YfwZWz/5dFY74BsmFAotQOzWSiwp7q.iPwebCVgCVaUjdUqAfSBBG', 'Janessa_Balt_2024.png', '2024-05-06 02:44:46', '2024-05-06 02:48:51'),
-(34, 'Naomie', 'D', 'Zalsos', 'Female', 'PPA_Zalsos', 'Administrative Division', 'Human Resource Management Officer III', 5, '$2y$10$1MSZHVwsgJJlo7g6j18oMeYmhqzgD5CIP/PYRs5H/IFuZFbAYDT/i', 'Naomie_Zalsos_2024.png', '2024-05-06 02:52:14', '2024-05-06 05:58:29'),
-(35, 'Sheila Andrea', 'R', 'Bollozos', 'Female', 'PPA_Bollozos', 'Administrative Division', 'Human Resource Management Officer III', 5, '$2y$10$kV6bh9/ijsIrdV5ulT45eeiXoMiXxCNTrn5y5b1ZKR9740xp51FA.', 'Sheila_Andrea_Bollozos_2024.png', '2024-05-06 02:54:33', '2024-05-06 02:55:38'),
-(36, 'Diony Lou', 'A', 'Jao', 'Female', 'PPA_Jao', 'Port Service Division', 'Environmental Specialist A', 5, '$2y$10$uk/r/.RvGBhkJJvKrg1nDewQ1BXLO6tVGTrU8Y3fgvGUy1G0S8mby', 'Diony_Lou_Jao_2024.png', '2024-05-06 02:55:50', '2024-05-06 02:58:13'),
-(37, 'Elinor Rosemary', 'G', 'Sevilla', 'Female', 'PPA_Sevilla', 'Administrative Division', 'Records Officer A', 5, '$2y$10$0e9OfoPknQentPehI//0vuDa2lLb6Xs7ZUR7mA506Lp.oo3ZGBeTO', 'Elinor_Rosemary_Sevilla_2024.png', '2024-05-06 02:57:09', '2024-05-06 06:00:44'),
-(38, 'Carolyn Gracelda', 'N', 'Orquillas', 'Female', 'PPA_Orquillas', 'Administrative Division', 'Human Resource Management Officer II', 5, '$2y$10$Jz1rS6pRPZwx3ZYQ6EVbkuQpcCrho82QNTPOZOplDHSstSNVsBOQ6', 'Carolyn_Gracelda_Orquillas_2024.png', '2024-05-06 02:59:09', '2024-05-06 03:11:42'),
-(39, 'Abigail Rose', 'N', 'Suangco', 'Female', 'PPA_AbiSuangco', 'Administrative Division', 'Human Resource Management Officer II', 5, '$2y$10$H7yADOlGVDqAQuROPjdANe8Lr93JlJ961nU79Yera0SjZ/NWqT4lu', 'Abigail_Rose_Suangco_2024.png', '2024-05-06 03:00:45', '2024-05-06 06:02:47'),
-(40, 'Mirja', 'C', 'Obach', 'Female', 'PPA_MirjaObach', 'Administrative Division', 'Procurement Officer B', 5, '$2y$10$QN73LZ1rGpIclWbJF/wFjOlS.zS06QxiE0UHPZEu4pimtNFgrcO/C', 'Mirja_Obach_2024.png', '2024-05-06 03:06:04', '2024-05-06 06:03:52'),
-(41, 'Mark Anthony', 'C', 'Gonzales', 'Male', 'PPA_Gonzales', 'Administrative Division', 'Storekeeper', 5, '$2y$10$D2EqHlaF3oBXUG58isRoReO3Rcij.e9wXv5N2VV6v9sQ57Hm8yz/O', 'Mark_Anthony_Gonzales_2024.png', '2024-05-06 03:08:32', '2024-05-06 03:17:56'),
-(42, 'Noel', 'G', 'Rosero', 'Male', 'PPA_Rosero', 'Administrative Division', 'Senior Building Electrician B', 6, '$2y$10$VvCsWirffZtWK.1IpDBvIugfu4badFKhAGonWEdSay9wPlS4DpPeO', 'Noel_Rosero_2024.png', '2024-05-06 03:09:14', '2024-05-06 06:46:11'),
-(43, 'Joel', 'A', 'Magno', 'Male', 'PPA_Magno', 'Administrative Division', 'Plant Mechanic/Electrician B', 6, '$2y$10$s.E0ksZA8kLm9FhBe8IgMuxovaf8XLy.4fP52DKjqq3E.kiMLSSxC', 'Joel_Magno_2024.png', '2024-05-06 03:09:51', '2024-05-06 06:54:12'),
-(44, 'Daryl', 'T', 'Sumanoy', 'Male', 'PPA_DarylSumanoy', 'Administrative Division', 'Driver-Mechanic B', 5, '$2y$10$RhnpkVCwYmcqWOpZhK/tt.C.HBRvoBQM2pN./4mdGN.6kUmUGjHti', 'Daryl_Sumanoy_2024.png', '2024-05-06 03:12:37', '2024-05-06 06:59:04'),
-(45, 'Joan', 'G', 'Bongcawel', 'Female', 'PPA_Bongcawel', 'Administrative Division', 'Liaison Aide', 5, '$2y$10$KiJYk9FbkIOKiMlvIRCDm.cRCiCmuLutlYkGRf32QL06K5S8Zq8/W', 'Joan_Bongcawel_2024.png', '2024-05-06 03:12:42', '2024-05-06 03:18:45'),
-(47, 'Tedegardo', 'N', 'Garces', 'Male', 'PPA_Garces', 'Port Service Division', 'Harbor Master', 5, '$2y$10$qpeRD395fgbmkg9mihhmuO3rhbG5D4z3pbXYFhkhQEUnHfSNP1Dlu', 'Tedegardo_Garces_2024.png', '2024-05-06 03:19:24', '2024-05-06 03:20:15'),
-(48, 'Lilybeth', 'Z', 'Remolino', 'Female', 'PPA_Remolino', 'Port Service Division', 'Chief Safety Officer', 5, '$2y$10$jRsccdxQuqWf6UFENW.Te.a8nPOnynLsOtDesqq84SyR1qgZFYgsS', 'Lilybeth_Remolino_2024.png', '2024-05-06 03:19:57', '2024-05-06 06:11:25'),
-(49, 'Rey', 'Y', 'Salaan', 'Male', 'PPA_Salaan', 'Port Service Division', 'Terminal Operations Officer A', 5, '$2y$10$jhcPvbAQBUhDEsyJ3q4zVO/tiPEWOY8LyvuG7diSUE832hKr0cdam', 'Rey_Salaan_2024.png', '2024-05-06 03:20:50', '2024-05-06 06:12:33'),
-(50, 'Vimbem Valentino', 'P', 'Merto', 'Male', 'PPA_VimMerto', 'Port Service Division', 'Terminal Operations Officer A', 5, '$2y$10$.hlbwLguqJ/aTBD7RuBW6e8.pB98kgfQJOhuOoZBf4LRxWnFZelry', 'Vimbem_Valentino_Merto_2024.png', '2024-05-06 03:22:54', '2024-05-06 06:13:22'),
-(51, 'Ronan', 'A', 'Quiapo', 'Male', 'PPA_Quiapo', 'Port Service Division', 'Port Operations Analyst A', 5, '$2y$10$uEmNPHTh1NGa3Jm1d1gF0.1fQyMDOAqcWeSSnTqw7EYk1zXGFYUvC', 'Ronan_Quiapo_2024.png', '2024-05-06 03:23:25', '2024-05-06 06:14:23'),
-(52, 'Simon Eli', 'P', 'Embay', 'Male', 'PPA_Embay', 'Port Service Division', 'Harbor Operations Officer', 5, '$2y$10$.RTXuljbqhAv/SnIBLRJZuSKB7gJggYdWUCs.2klsDwYA7peyrHY.', 'Simon_Eli_Embay_2024.png', '2024-05-06 03:25:10', '2024-05-06 03:31:42'),
-(54, 'Jealapril', 'S', 'Fernandez', 'Female', 'PPA_Fernandez', 'Port Service Division', 'Statistician A', 5, '$2y$10$hSuOmW52l/zLmXnTM4AaPeryLZn2K3WiI80EipZEMvWOYhN6vyjtS', 'Jealapril_Fernandez_2024.png', '2024-05-06 03:27:45', '2024-05-06 03:33:16'),
-(55, 'Rewel', 'B', 'Bares', 'Female', 'PPA_Bares', 'Port Service Division', 'Clerk Processor A', 5, '$2y$10$rvefQjATlyFqdo9gHY6DW.RKo.QhcNJ0aduj3cCgy5YluJEL4cIjq', 'Rewel_Bares_2024.png', '2024-05-06 03:29:29', '2024-05-06 03:32:33'),
-(56, 'Lorgie Mae', 'A', 'Tumbagahan', 'Female', 'PPA_Tumbagahan', 'Port Service Division', 'Statistician A', 5, '$2y$10$z89/FILyN/EmJv5j701lYu.AJEXTjYk1COpyWHaNXSVsUAuG4F8.W', 'Lorgie_Mae_Tumbagahan_2024.png', '2024-05-06 03:30:23', '2024-05-06 06:19:19'),
-(57, 'J. Wenceslao', 'S', 'Rosete', 'Male', 'PPA_Rosete', 'Port Police Division', 'Civil Security Officer A (Senior Port Police Inspector)', 5, '$2y$10$1VSz6x2n.w1B0.8M32IFdu7U4lO2MDkaKGRX1LGeqJXIMfx6XHnW2', 'J._Wenceslao_Rosete_2024.png', '2024-05-06 03:32:20', '2024-05-06 06:26:50'),
-(58, 'Colin Kay', 'R', 'Cajote', 'Female', 'PPA_Cajote', 'Engineering Service Division', 'Supervising Engineer A', 5, '$2y$10$x9ml3m/xHS1XIZrQtzTqkejaHbME5ugwPra/KrVaabYw3SIIQln6W', 'Colin_Kay_Cajote_2024.png', '2024-05-06 03:34:57', '2024-05-06 06:24:04'),
-(59, 'Arnel', 'C', 'Oclarino', 'Male', 'PPA_Oclarino', 'Engineering Service Division', 'Senior Engineer A', 5, '$2y$10$d4TL0io4RLY.2Q99/aJh5uVyo9xhz5fScNygjuFIV0SaEiIxwc9rq', 'Arnel_Oclarino_2024.png', '2024-05-06 03:36:51', '2024-05-06 06:25:40'),
-(60, 'Lawrence', 'M', 'Bersaldo', 'Male', 'PPA_Bersaldo', 'Port Police Division', 'Civil Security Officer C (Port Police Officer II)', 5, '$2y$10$Dgo4erFVYPR.9SYaSAFl3Oo62h9HyX99ymCTLYcNeLMIiEwdt5hwK', 'Lawrence_Bersaldo_2024.png', '2024-05-06 03:37:13', '2024-05-06 06:23:34'),
-(61, 'Luis', 'A', 'Calderon', 'Male', 'PPA_Calderon', 'Engineering Service Division', 'Construction Foreman A', 5, '$2y$10$CmVIPgTGerNDy/o8GK1zhOn7jmtpPNVD0OMBaFP8WR5TxJHVkc0yu', 'Luis_Calderon_2024.png', '2024-05-06 03:38:22', '2024-05-06 06:24:34'),
-(62, 'Dennis', 'S', 'Cambaya', 'Male', 'PPA_Cambaya', 'Engineering Service Division', 'Engineering Assistant A', 5, '$2y$10$meRw9jBsEQXeEDRGHxbcoOVN8A3lVZokd6kzBKaF5MNxLepqY.yuK', 'Dennis_Cambaya_2024.png', '2024-05-06 03:39:53', '2024-05-06 06:25:17'),
-(63, 'Tristan Luke', 'C', 'Misa', 'Male', 'PPA_Misa', 'Port Police Division', 'Industrial Security Officer (Port Police Officer I)', 5, '$2y$10$0mLDhwx7FIsxUpEKAWkwoeT7g6oRD2RtlnYrY2vSUA6nRexqS5LaK', 'Tristan_Luke_Misa_2024.png', '2024-05-06 03:40:02', '2024-05-06 06:28:11'),
-(64, 'Clint Bryan', 'B', 'Balmores', 'Male', 'PPA_Balmores', 'Terminal Management Office - Tubod', 'Collection Representative A', 6, '$2y$10$6X9v.htjROQKb.XJJsf2jeUdXXDwytbd174myXMoAvZQCj3PNOLgm', 'Clint_Bryan_Balmores_2024.png', '2024-05-06 03:42:10', '2024-05-06 06:57:26'),
-(65, 'Jennifer Anne', 'S', 'Ganaden', 'Female', 'PPA_Ganaden', 'Terminal Management Office - Tubod', 'Cashier B', 5, '$2y$10$aYa0M8lmCghFMIyvUVw5..1510NLU5JHrUKQTfu3F17JJd9TcrZMm', 'Jennifer_Anne_Ganaden_2024.png', '2024-05-06 03:43:58', '2024-05-06 06:25:57'),
-(66, 'Helbert', 'L', 'Marzon', 'Male', 'PPA_Marzon', 'Port Police Division', 'Civil Security Officer C (Port Police Officer II)', 5, '$2y$10$1Dhp7DIFBA0ww/c2sBqyreQpD5BjB5tYtQemCQsadXLsyeKHCXpZu', 'Helbert_Marzon_2024.png', '2024-05-06 03:45:11', '2024-05-06 06:29:01'),
-(67, 'Aldrin', 'B', 'Denopol', 'Male', 'PPA_Denopol', 'Office of the Port Manager', 'Data Encoder lll', 6, '$2y$10$3os5mPe/de/SYkLWeTX4FORpUVCy8cMxkXgyPhT0.fVZhtA3I8r1u', 'Aldrin_Denopol_2024.png', '2024-05-06 03:46:52', '2024-05-06 06:41:37'),
-(68, 'Queen Blaire', 'B', 'Unabia', 'Female', 'PPA_Unabia', 'Port Police Division', 'Industrial Security Officer (Port Police Officer I)', 5, '$2y$10$uSnsiOOFk1uUWxNO/TVgh.mRN.NI9seToZmjKTtRykNmtFFUOk7tq', 'Queen_Blaire_Unabia_2024.png', '2024-05-06 03:47:46', '2024-05-06 06:29:50'),
-(69, 'Ryan', 'J', 'Seville', 'Male', 'PPA_Seville', 'Office of the Port Manager', 'Utility Worker', 6, '$2y$10$X2Mipt1vxDylIpES.N.WY.aYfYA0AOS7awDhlYs75E97okvwRPnuK', 'Ryan_Seville_2024.png', '2024-05-06 03:48:39', '2024-05-06 06:51:59'),
-(70, 'Evelyn', 'C', 'Tambus', 'Female', 'PPA_Tambus', 'Office of the Port Manager', 'Utility Worker', 6, '$2y$10$vag1XcWSPzMsj5DcI5MU4eOzwRjEZabs2mQme9WQFUpXpdxsh3QFy', 'Evelyn_Tambus_2024.png', '2024-05-06 03:49:52', '2024-05-06 06:53:19'),
-(71, 'Japheth', 'T', 'Sumingit', 'Male', 'PPA_Sumingit', 'Port Police Division', 'Industrial Security Officer (Port Police Officer I)', 5, '$2y$10$gU1zUI8PbIzUVvQlMuzwpeoMEInqUPTLHjf5S.TBsCvckokuOMVAC', 'Japheth_Sumingit_2024.png', '2024-05-06 03:50:30', '2024-05-06 06:30:37'),
-(72, 'Ricardo', 'S', 'Villanueva', 'Male', 'PPA_Villanueva', 'Office of the Port Manager', 'Driver Mechanic B', 5, '$2y$10$.JJv5ld2DwGdnWbDslR1tO6rK2036EkF8gDAY.25tPINIEeBOeGhK', 'Ricardo_Villanueva_2024.png', '2024-05-06 03:52:42', '2024-05-06 06:59:11'),
-(73, 'Arlene', 'L', 'Acierto', 'Female', 'PPA_Acierto', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$LY6ra01OlZVB3ISJymqjJOh.GQuqdETAyzO/wMM9k4ZWkbmpWZBzm', 'Arlene_Acierto_2024.png', '2024-05-06 03:58:01', '2024-05-06 05:45:00'),
-(74, 'Laybert', 'S', 'Bakiki', 'Male', 'PPA_Bakiki', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$PSkgMO/pXbVtBAV6Jr7jy.C2QqVWRiXMa5hwu2FVPCYV.TxQ.05KK', 'Laybert_Bakiki_2024.png', '2024-05-06 04:02:00', '2024-05-06 05:48:01'),
-(75, 'Marilou', 'V', 'Duguil', 'Female', 'PPA_Duguil', 'Finance Division', 'Administrative Aide lll', 5, '$2y$10$oB0j1ars4movS8vZDh5JcOO3/S7Rx2oDk6XZAY9kSyXeN.qY9PEBO', 'Marilou_Duguil_2024.png', '2024-05-06 04:04:10', '2024-05-06 06:19:41'),
-(76, 'Nelson', 'V', 'Duguil', 'Male', 'PPA_NelDuguil', 'Finance Division', 'Cash Clerk lll', 5, '$2y$10$IYA66nXvae3lGD7jAAU1beK.BAvLOxm0jH1SrWpP4Jf0TPfl/.bt2', 'Nelson_Duguil_2024.png', '2024-05-06 04:06:00', '2024-05-06 05:49:39'),
-(77, 'Richie Aram', 'B', 'Garganera', 'Male', 'PPA_Garganera', 'Administrative Division', 'Administrative Services Assistant II', 5, '$2y$10$b6RMf9puUVq0BiqKNDh4b.Tn2JuWl7YDQi26g2CKolAp3/3f2CvqG', 'Richie_Aram_Garganera_2024.png', '2024-05-06 04:06:55', '2024-05-06 04:06:55'),
-(78, 'Joshua Raiben', 'M', 'Padilla', 'Male', 'PPA_Padilla', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$K90f3ho3PtFEsbROU1W5n.6loAG5vubCET/piWwGccWNBb.f9eVqe', 'Joshua_Raiben_Padilla_2024.png', '2024-05-06 04:08:29', '2024-05-06 05:45:33'),
-(79, 'Jocelyn', 'R', 'Petallo', 'Female', 'PPA_Petallo', 'Finance Division', 'Utility Worker', 5, '$2y$10$OWeV/hge8mIlyDMuy2M5RevsKGHp/TpHgZCPSH/3xnsAez9XESNIq', 'Jocelyn_Petallo_2024.png', '2024-05-06 04:09:59', '2024-05-06 06:02:24'),
-(80, 'Jonjon', 'A', 'Senajon', 'Male', 'PPA_Senajon', 'Finance Division', 'Cash Clerk lll', 5, '$2y$10$8gIlqc62U1WKUPItpJi6fOLlibjIdu4sCtTusIs9jxB4R.RcNP8eW', 'Jonjon_Senajon_2024.png', '2024-05-06 04:11:04', '2024-05-06 05:49:13'),
-(81, 'Judylyn', 'C', 'Velez', 'Female', 'PPA_Velez', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$bVIFMxuzGDB.Q3ga3jUOu.x.5yJW6jZERjL4CH8VnskrrBJQAZ2wa', 'Judylyn_Velez_2024.png', '2024-05-06 04:13:27', '2024-05-06 05:46:40'),
-(82, 'Juan Vicente', 'J', 'Torres', 'Male', 'PPA_Torres', 'Finance Division', 'Clerk lV', 5, '$2y$10$.tGoXtMK6pSYz3./iYbhWemYXAtOupUMLIukeUrxerVU8u6yMhWEO', 'Juan_Vicente_Torres_2024.png', '2024-05-06 04:14:11', '2024-05-06 05:50:01'),
-(83, 'Ricky', 'M', 'Villaver', 'Male', 'PPA_RickyVillaver', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$xOIWhqdr0ldAWe2fbjo3teGrFZBd5RkhUFLp1.PhMGXhKMDMqtNb2', 'Ricky_Villaver_2024.png', '2024-05-06 04:16:53', '2024-05-06 05:47:08'),
-(84, 'Levi', 'R', 'Villondo', 'Male', 'PPA_Villondo', 'Finance Division', 'Data Encoder lll', 5, '$2y$10$IzQWt.aB83A8PNZQ1nBN7eVwJ/1CgBEQPbTqiK4UxEeaLddxs0eCK', 'Levi_Villondo_2024.png', '2024-05-06 04:17:00', '2024-05-06 05:47:36'),
-(85, 'Bertito', 'E', 'Abaquita', 'Male', 'PPA_Abaquita', 'Administrative Division', 'Sr. Reproduction Machine Operator', 5, '$2y$10$ToSoM3v.c2rXsLVtHtpIXexdlIVJOxux.HzMcEKBSylGYXEJhdepa', 'Bertito_Abaquita_2024.png', '2024-05-06 04:19:14', '2024-05-06 05:41:37'),
-(86, 'Stephen', 'E', 'Acierto', 'Male', 'PPA_StephenAcierto', 'Administrative Division', 'Plant Mechanic /Electrician B', 6, '$2y$10$sCZeitBUbsLAO/DKAfHnpO5h9M2PddwxX4pJi0MAj3Y2YhJ2n1zWi', 'Stephen_Acierto_2024.png', '2024-05-06 04:19:48', '2024-05-06 06:44:42'),
-(87, 'Jason', 'S', 'Alindayo', 'Male', 'PPA_JasonAlindayo', 'Administrative Division', 'Utility Worker', 6, '$2y$10$ARQU9uE3.hn.oyak4bL28OvsUij1YZXrVHVBtJ81cG4.QbFdS.maG', 'Jason_Alindayo_2024.png', '2024-05-06 04:21:16', '2024-05-06 06:41:13'),
-(88, 'Reynaldo', 'P', 'Alindayo', 'Male', 'PPA_ReyAlindayo', 'Administrative Division', 'Senior Carpenter', 6, '$2y$10$MAvu.elfP0iPHHYc78RNZe62vixMlsdF9aS.d5a7yBUMfmsWtkqWm', 'Reynaldo_Alindayo_2024.png', '2024-05-06 04:22:32', '2024-05-06 06:43:33'),
-(89, 'Jesril', 'D', 'Ampo', 'Male', 'PPA_Ampo', 'Administrative Division', 'Administrative Aide lll', 6, '$2y$10$CuiRiQ86sRZ8JIhJ/IZaX.Gzn.RRSF3acSqnEAZn9dTIblA.MuxWK', 'Jesril_Ampo_2024.png', '2024-05-06 04:24:14', '2024-05-06 06:52:41'),
-(90, 'Noel', 'U', 'Balolong', 'Male', 'PPA_Balolong', 'Administrative Division', 'Plumber A', 6, '$2y$10$wjLzK.9CpUR8QCXeI7fCuuuwxAKy/yZRvgPSZJM39h8XMpHzf0L96', 'Noel_Balolong_2024.png', '2024-05-06 04:25:28', '2024-05-06 06:46:36'),
-(91, 'Jerome', 'C', 'Diango', 'Male', 'PPA_Diango', 'Administrative Division', 'Mason ll (A)', 6, '$2y$10$qkgsAz52ln/5d5PmAVmOYe.c0ErWtUPmgzNlHnt0UwH4assiz9ZTS', 'Jerome_Diango_2024.png', '2024-05-06 04:27:19', '2024-05-06 06:49:19'),
-(92, 'Adonis Mc Gabby', 'Ll', 'Dingcong', 'Male', 'PPA_Dingcong', 'Administrative Division', 'Computer Operator IV', 6, '$2y$10$hjmdH23zqphX6AMryFCcDesi0EGDOi/wEtm8Ednj6GVkNZ10QUNxS', 'Adonis_Mc_Gabby_Dingcong_2024.png', '2024-05-06 04:27:53', '2024-05-06 06:40:35'),
-(93, 'Jon Carlo', 'D', 'Gallarde', 'Male', 'PPA_Gallarde', 'Administrative Division', 'Mechanic/Technician lll', 6, '$2y$10$jA7kWMXomV/NT8i3l7WBB.fhEUufXv/uzV/SxTCLM6RtcgoMWTWXG', 'Jon_Carlo_Gallarde_2024.png', '2024-05-06 04:28:44', '2024-05-06 06:45:55'),
-(94, 'Genny', 'M', 'Gandillo', 'Male', 'PPA_Gandillo', 'Administrative Division', 'Painter ll (A)', 6, '$2y$10$dmB2Q0baS9NWTOZ5akFjWeiQPXXhkGiQseWjW4zmvsOChbPeW0jNe', 'Genny_Gandillo_2024.png', '2024-05-06 04:29:58', '2024-05-06 06:42:33'),
-(95, 'Michael Alfe', 'E', 'Guillena', 'Male', 'PPA_Guillena', 'Administrative Division', 'Utility Worker', 6, '$2y$10$AqDdxuPEqStj82nM60IxrOhVN/zn1H3/JxZ7gDFQYneMmNelHoao.', 'Michael_Alfe_Guillena_2024.png', '2024-05-06 04:30:18', '2024-05-06 06:45:14'),
-(97, 'Kharen Joy', 'B', 'Jerusalem', 'Female', 'PPA_Jerusalem', 'Administrative Division', 'Clerk lV', 5, '$2y$10$8xUNKmhjpFwElus4D9Vqte4mZGCNjND6jDjv902qKloQATyctacUS', 'Kharen_Joy_Jerusalem_2024.png', '2024-05-06 04:32:53', '2024-05-06 05:54:58'),
-(99, 'Jay Robin', 'S', 'Lluisma', 'Male', 'PPA_Lluisma', 'Administrative Division', 'Electronics Communication System Operator A', 6, '$2y$10$QSc8OBDZajwNK5pwPXMDXe.BkSkMvv0uReV9HG/2vJsu6Q1sQldfq', 'Jay_Robin_Lluisma_2024.png', '2024-05-06 04:35:06', '2024-05-06 06:42:11'),
-(100, 'Fatima', 'D', 'Meralles', 'Female', 'PPA_Meralles', 'Administrative Division', 'Utility Worker', 6, '$2y$10$mIYuZV/qh7NsA9fDNfH8z.yzaf0uXia0kBJmZHm1cZjncb3QdV.J6', 'Fatima_Meralles_2024.png', '2024-05-06 04:36:42', '2024-05-06 06:46:29'),
-(101, 'Edward Sonny', 'B', 'Namindang', 'Male', 'PPA_Namindang', 'Administrative Division', 'Electronics Communication System Operator A', 6, '$2y$10$V5Zrns0k4Pv5G/vhr2NY0OBxCX0CEc5g8i.Ugjk2uapgW6kxr6Saa', 'Edward_Sonny_Namindang_2024.png', '2024-05-06 04:37:28', '2024-05-06 06:42:58'),
-(102, 'Neirmae', 'A', 'Pagente', 'Female', 'PPA_Pagente', 'Administrative Division', 'Utility Worker', 6, '$2y$10$Iza746rBMl.1nzyeltyNnOyydO81aC1smoDF3R3T0h/yl7jF1/oBe', 'Neirmae_Pagente_2024.png', '2024-05-06 04:39:57', '2024-05-06 06:48:44'),
-(103, 'Locyl', 'L', 'Petallo', 'Female', 'PPA_LocylPetallo', 'Administrative Division', 'Utility Worker', 6, '$2y$10$rpK4CmBzM/pIryryuM007ecofFosX79Wd9h8ozSYplBFQvCVPszgW', 'Locyl_Petallo_2024.png', '2024-05-06 04:41:19', '2024-05-06 06:50:42'),
-(104, 'Lorenzo', 'G', 'Romeo', 'Male', 'PPA_Romeo', 'Administrative Division', 'Utility Worker', 6, '$2y$10$MmWDUnHyIxiA/yM3IeW0tey2jGl4wSs62Z/fkxoWErQePBVRd3mf.', 'Lorenzo_Romeo_2024.png', '2024-05-06 04:43:10', '2024-05-06 06:51:26'),
-(105, 'Mary Ann', 'P', 'Rosete', 'Female', 'PPA_MaryRosete', 'Administrative Division', 'Data Encoder lll', 5, '$2y$10$U4fQUANODu3CTsNkdtf/JOBkZVoUToywzOgtJx4BKxHt8X7LWdauW', 'Mary_Ann_Rosete_2024.png', '2024-05-06 04:45:10', '2024-05-06 05:44:17'),
-(106, 'Michael', 'G', 'Sade', 'Male', 'PPA_MichaelSade', 'Administrative Division', 'Administrative Aide lll', 6, '$2y$10$nP/jEg/tF2e/5WaPM/VsMOtjMys1QAKhUQoA/4GUFP5aBy6k65F7u', 'Michael_Sade_2024.png', '2024-05-06 04:46:06', '2024-05-06 06:51:40'),
-(107, 'John Ian', 'S', 'Obach', 'Male', 'PPA_IanObach', 'Administrative Division', 'Nurse ll', 5, '$2y$10$JSzR/.T9.2z6Skps9FA4cOJbE/kO1/puB0ovKeAErdhW9dQ57BQAO', 'John_Ian_Obach_2024.png', '2024-05-06 04:48:40', '2024-05-06 05:53:16'),
-(108, 'Melvic', 'S', 'Opema', 'Male', 'PPA_Opema', 'Administrative Division', 'Computer Programmer', 10, '$2y$10$Cl8eYeRY5HKvwC.RfZ5rCeO6DwBslwZlEgyFijDtpSgKZnoFwPCJW', 'Melvic_Opema_2024.png', '2024-05-06 04:49:24', '2024-05-06 06:35:22'),
-(109, 'Angelo', 'P', 'Serafin', 'Male', 'PPA_Serafin', 'Administrative Division', 'Administrative Aide lll', 6, '$2y$10$3vCsetB1ZmXUWa1fu2o9c.teqmWFi9lzymhCQE8aK8JNiWpkkxBa2', 'Angelo_Serafin_2024.png', '2024-05-06 04:52:42', '2024-05-06 06:52:18'),
-(110, 'Darwin', 'T', 'Sumanoy', 'Male', 'PPA_Sumanoy', 'Administrative Division', 'Utility Worker', 6, '$2y$10$2jfK2M1XAqg0skn3KJYPbuyU10w0qQcBJHkoltr2a/T3BN2RtHzya', 'Darwin_Sumanoy_2024.png', '2024-05-06 04:54:36', '2024-05-06 06:52:41'),
-(112, 'Erwin', 'Y', 'Villaver', 'Male', 'PPA_ErwinVillaver', 'Administrative Division', 'Utility Worker', 6, '$2y$10$hP4BnUf4zeYocxRn/kHwY.lYLr84nGDfJfWwhFY0UNWs4dCPqfk/K', 'Erwin_Villaver_2024.png', '2024-05-06 04:58:34', '2024-05-06 06:53:57'),
-(113, 'Lorena', 'A', 'Tamula', 'Female', 'PPA_Tamula', 'Port Service Division', 'Utility Worker', 5, '$2y$10$hrywvaX1r6U0AEepeoLd4eyq25VkQroyXcEZ5FMVNnfChO4GEIova', 'Lorena_Tamula_2024.png', '2024-05-06 04:58:51', '2024-05-06 06:21:39'),
-(114, 'Rowe', 'P', 'Panuncillo', 'Male', 'PPA_Panuncillo', 'Port Service Division', 'Utility Worker', 6, '$2y$10$mrw9CNlDxBl0uitQU8B/FeG9ZN4v4OjOW/SYpwYcxIa5sgY8nqChi', 'Rowe_Panuncillo_2024.png', '2024-05-06 05:00:50', '2024-05-06 06:49:59'),
-(115, 'Joseph Anthony', 'L', 'Suangco', 'Male', 'PPA_JosephSuangco', 'Port Service Division', 'Data Encoder lll', 5, '$2y$10$rpq3x5TQtBVesxST8q..Vu3ufeZPLfI/9WBjYTYSzJCYADgd2x29G', 'Joseph_Anthony_Suangco_2024.png', '2024-05-06 05:00:58', '2024-05-06 05:59:35'),
-(116, 'Muwhar', 'L', 'Canoy', 'Male', 'PPA_Canoy', 'Port Service Division', 'Information Assistant II', 5, '$2y$10$QCpAKtfZR.1S5DZLnojgoO330VnGMeL22MVI.ktsWb4q1dmw0SlXC', 'Muwhar_Canoy_2024.png', '2024-05-06 05:02:13', '2024-05-06 05:59:57'),
-(117, 'Rechievue', 'Y', 'Villaver', 'Male', 'PPA_Villaver', 'Port Service Division', 'Utility Worker', 6, '$2y$10$HtrLJb8Qd8BJ4Wn9tRMGR.FyHY9B2eDO2Gh8DfqGUsONQOmKeGBL6', 'Rechievue_Villaver_2024.png', '2024-05-06 05:03:05', '2024-05-06 06:53:19'),
-(118, 'Archer', 'A', 'Dahunan', 'Male', 'PPA_Dahunan', 'Engineering Service Division', 'Senior Welder', 6, '$2y$10$MAGRJDNnbqqFhvb7XII6Z.u8s1laakWWF8A4Ju2Ow0DUyFooD9O1.', 'Archer_Dahunan_2024.png', '2024-05-06 05:04:53', '2024-05-06 06:48:50'),
-(119, 'Mervin Angelou', 'Q', 'Faeldin', 'Male', 'PPA_Faeldin', 'Engineering Service Division', 'Clerk lV', 5, '$2y$10$1z6ojY9SUgwLL./HUcwMced/iAwZvdMqROhO4kmJChJZVRdCNnlDa', 'Mervin_Angelou_Faeldin_2024.png', '2024-05-06 05:06:22', '2024-05-06 05:55:46'),
-(120, 'Mark Jason', 'I', 'Gengone', 'Male', 'PPA_Gengone', 'Engineering Service Division', 'Electrician', 6, '$2y$10$/SBY7Uz4CxQjSQ2unKaDpODluXAz3uV8Is6WC1XoK3ZZN6oy1kgd6', 'Mark_Jason_Gengone_2024.png', '2024-05-06 05:06:52', '2024-05-06 06:48:15'),
-(121, 'Mychel Melchor', 'K', 'Nuevas', 'Male', 'PPA_Nuevas', 'Engineering Service Division', 'Data Encoder lll', 5, '$2y$10$3sQQOGBT0cKSXHzuZgY.uutkWk8OXmKs5wHrKiIouF6XXbBgWF.GK', 'Mychel_Melchor_Nuevas_2024.png', '2024-05-06 05:08:39', '2024-05-06 05:55:26'),
-(122, 'Jolito', 'S', 'Sepio', 'Male', 'PPA_Sepio', 'Engineering Service Division', 'Mason ll (A)', 6, '$2y$10$ME47o2Tl8/0Nj0VZhl9RHuUCReyw0L06qqH710pYdyIfWmRuXdg0y', 'Jolito_Sepio_2024.png', '2024-05-06 05:09:00', '2024-05-06 06:47:12'),
-(123, 'Charlotte', 'A', 'Castaño', 'Female', 'PPA_Castaño', 'Finance Division', 'Cash Clerk lll', 5, '$2y$10$Gsx1OEFh4rpa17SmPcEWfODRMIUwPiRgpBen/f6uBRqWK.nM/TsEy', 'Charlotte_Castaño_2024.png', '2024-05-06 05:31:00', '2024-05-06 05:48:47'),
-(124, 'Earl', 'S', 'Coquilla', 'Male', 'PPA_Coquilla', 'Port Police Division', 'Electronics Communication System Operator A', 6, '$2y$10$hniBSJumgJGxj0QdsBtQ1esE/QHvE8hngipymYc5SdTVG3PmslPDK', 'Earl_Coquilla_2024.png', '2024-05-06 05:32:46', '2024-05-06 06:39:58'),
-(125, 'Almudzni', 'J', 'Desierto', 'Male', 'PPA_Desierto', 'Port Police Division', 'Electronics Communication System Operator A', 5, '$2y$10$.LgjkKywq586aKYKD4ZMCOXo1C6lGNbSIC9vuYqEaLEqPQl90vjPu', 'Almudzni_Desierto_2024.png', '2024-05-06 05:34:23', '2024-05-06 05:34:23'),
-(126, 'Joy', 'D', 'Celocia', 'Male', 'PPA_Celocia', 'Terminal Management Office - Tubod', 'Utility Worker', 5, '$2y$10$9Fk.G5Q3apIJvTvBPAVJouPrPJkQ0ZSJ3ak9mf0Xv4/XxfdZOyp8S', 'Joy_Celocia_2024.png', '2024-05-06 05:36:14', '2024-05-06 05:40:35'),
-(127, 'Nilo John', 'C', 'Milmao', 'Male', 'PPA_Milmao', 'Terminal Management Office - Tubod', 'Clerk lV', 6, '$2y$10$AGWN4rxXCk7IF1HdkajqAOjoHqFC16e0GbAT8WPOJWaU1BJXE9/t2', 'Nilo_John_Milmao_2024.png', '2024-05-06 05:37:45', '2024-05-06 06:51:13'),
-(128, 'Allan', 'C', 'Balbarino', 'Male', 'PPA_Balbarino', 'Terminal Management Office - Tubod', 'Administrative Aide lll', 6, '$2y$10$jooNeRJNA/KVmUHCVkUSZeyS9Lj7Tlg.fC6h4CASCThiT/gQuMjT6', 'Allan_Balbarino_2024.png', '2024-05-06 05:38:46', '2024-05-06 06:50:44'),
-(129, 'Anabel', 'I', 'Pagente', 'Female', 'PPA_AnabelPagente', 'Finance Division', 'Senior Accounting Processor B', 5, '$2y$10$9E.Rel6TTMURZRUy2R0Y7eFOQhvkx2J.uA5pmfNwJVPeWyAw7U4FG', 'Anabel_Pagente_2024.png', '2024-05-06 05:56:23', '2024-05-06 05:56:23'),
-(130, 'Corinne', 'D', 'Madrio', 'Female', 'PPA_Madrio', 'Port Police Division', 'Information Assistant II', 5, '$2y$10$vW1YaR3l0QqXF1lQkT24x.fIhQvIqZRHF2LIu5Y8a0eFmYFuYO5Am', 'Corinne_Madrio_2024.png', '2024-05-06 05:58:56', '2024-05-06 05:58:56'),
-(131, 'Julito', 'S', 'Villacorte', 'Male', 'PPA_Villacorte', 'Engineering Service Division', 'Senior Carpenter', 6, '$2y$10$FE/xAqB.DXSL0qbeQlPmpeLrjlBuqLOA52bgAeAuda1BdF4ecT/cO', 'Julito_Villacorte_2024.png', '2024-05-06 06:17:48', '2024-05-06 06:47:41');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `fname` varchar(255) NOT NULL,
-  `lname` varchar(255) NOT NULL,
+  `code_clearance` varchar(255) NOT NULL,
+  `esign` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
+  `userId` varchar(20) DEFAULT NULL,
   `username` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `email_verified_at` timestamp NULL DEFAULT NULL,
-  `division` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
+  `status` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ppa_user`
+--
+
+INSERT INTO `ppa_user` (`id`, `firstname`, `middlename`, `lastname`, `gender`, `division`, `position`, `code_clearance`, `esign`, `avatar`, `userId`, `username`, `password`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Zack-Mio', 'A', 'Sermon', 'Male', 'Administrative Division', 'Information System Analyst ll', 'HACK, AP', 'Zack-Mio_Sermon_esignature.png', 'Zack-Mio_Sermon_avatar.jpg', 'JOMS-202600001', 'zackmio2024', '$2y$10$wwOuqJWvdW9P0FYspCD2buyRaZclnfLB2uRYO1Tv7mV/bJFnEVCNu', 1, '2024-08-02 04:05:30', '2026-05-15 07:46:47'),
+(2, 'Arthur', 'B', 'Nogas', 'Male', 'Office of the Port Manager', 'Acting Port Manager', 'PM', 'Arthur_Nogas_esignature.png', 'Arthur_Nogas_avatar.jpg', 'JOMS-202600002', 'ppa_nogas', '$2y$10$f9pmy/dYIgLsgZOcRlSbmuu4vVKDCfZ15nub2g4QeP9jU8qboBZF2', 1, '2024-09-26 02:51:39', '2026-05-15 07:38:51'),
+(4, 'Joel', 'B', 'Escala', 'Male', 'Engineering Service Division', 'Division Manager A', 'DM', 'Joel_Escala_esignature.png', 'Joel_Escala_avatar.jpg', 'JOMS-202600004', 'ppa_joel', '$2y$10$Q7lBtHMUVIjAridJzx5uR.hTVmM4Tl9XmB4jrRjIHRDCVzFdzETLW', 1, '2024-09-26 02:55:21', '2026-05-19 00:38:49'),
+(5, 'Omar', 'A', 'Sabdani', 'Male', 'Terminal Management Office - Tubod', 'Division Manager C', 'DM', 'Omar_Sabdani_esignature.png', 'Omar_Sabdani_avatar.jpg', '', 'ppa_omar', '$2y$10$WjkFL7YX2Z1DaGadgMnli.eFmboqkX1x3HTN0eVWMR3pMikwsTclu', 1, '2024-09-26 03:02:05', '2024-09-26 03:02:05'),
+(6, 'Cheryl', 'C', 'Saluta', 'Female', 'Finance Division', 'Division Manager A', 'DM', 'Cheryl_Saluta_esignature.png', 'Cheryl_Saluta_avatar.jpg', '', 'ppa_chekong', '$2y$10$f/.h.VUD7YiZCTk/WJNxRe/z7C.Ktgo4yYFmDHeE3WhdPRO8QZaKG', 1, '2024-09-26 03:03:26', '2024-09-26 03:03:26'),
+(7, 'Rommel Jason', 'C', 'Zalsos', 'Male', 'Port Police Division', 'Port Police Division Manager', 'DM', 'Rommel_Jason_Zalsos_esignature.png', 'Rommel_Jason_Zalsos_avatar.jpg', '', 'ppa_rommel', '$2y$10$8/XYAm.MUXQEm3phF8TXJe3oaJQFzgudpXFrYvOxRRYLr.ipOtWKO', 1, '2024-09-26 03:05:15', '2024-09-26 03:05:15'),
+(8, 'Jose Randy', 'I', 'Pabelino', 'Male', 'Port Service Division', 'Terminal Supervisor A', 'DM', 'Jose_Randy_Pabelino_esignature.png', 'Jose_Randy_Pabelino_avatar.jpg', '', 'ppa_randy', '$2y$10$eODp4S3OiRdY.eK0pkyaNeDCwcRzUpTN1hYikqbQv2UPsOQ4TO2eG', 1, '2024-09-26 03:07:37', '2024-09-26 03:07:37'),
+(9, 'Sue Christine', 'A', 'Sade', 'Female', 'Administrative Division', 'General Services Officer A', 'GSO', 'Sue_Christine_Sade_esignature.png', 'Sue_Christine_Sade_avatar.jpg', '', 'ppa_sue', '$2y$10$sw7SXnt/nUh0.5mQTz2ZX.5QQNbBynrwRhTt0AD82G62P/6NZj7yS', 1, '2024-09-26 03:11:53', '2026-01-15 06:52:14'),
+(10, 'Laybert', 'S', 'Bakiki', 'Female', 'Finance Division', 'Data Encoder lll', 'MEM', 'Laybert_Bakiki_esignature.png', 'Laybert_Bakiki_avatar.jpg', '', 'ppa_laybert', '$2y$10$Q6jK3SSvkDN7FiXAXU.59uanDYDyfYcPnJ.BlM9awA9X9QMFI.8S6', 1, '2024-09-26 03:13:31', '2025-12-20 06:19:37'),
+(11, 'Allan', 'C', 'Balbarino', 'Male', 'Terminal Management Office - Tubod', 'Administrative Aide lll', 'MEM', 'Allan_Balbarino_esignature.png', 'Allan_Balbarino_avatar.jpg', '', 'ppa_allan', '$2y$10$Np2fPX5fNH1TGPdcHI0j5ehzd3eBWJJD25X8qD5gcGru0eob47OrS', 1, '2024-09-26 03:15:44', '2026-04-07 01:51:52'),
+(12, 'Clint Bryan', 'B', 'Balmores', 'Male', 'Terminal Management Office - Tubod', 'Collection Representative A', 'MEM, AP', 'Clint_Bryan_Balmores_esignature.png', 'Clint_Bryan_Balmores_avatar.jpg', '', 'ppa_clint', '$2y$10$v2gv0NMHOoE30e/5uWj82ewRBVyVJfmzIjkoUSL3CsXcdw1BxT67S', 1, '2024-09-26 03:17:12', '2026-03-31 03:58:00'),
+(13, 'Evelyn', 'A', 'Espinosa', 'Female', 'Office of the Port Manager', 'Executive Assistant A', 'DM', 'Evelyn_Espinosa_esignature.png', 'Evelyn_Espinosa_avatar.jpg', '', 'ppa_evelyn', '$2y$10$f7PkUQWzECW91llEYM4Y2.cwrKE8MiGtzGwFGhp/KTXqOYJNkx/Wa', 1, '2024-09-26 03:24:29', '2024-09-26 03:24:29'),
+(14, 'Joyriena Lynn', 'M', 'Seco', 'Female', 'Administrative Division', 'Administrative Officer V', 'DM', 'Joyriena_Lynn_Seco_1773369716_esig.png', 'Joyriena_Lynn_Seco_1773368861_avatar.jpg', '', 'ppa_joyseco', '$2y$10$fDz01UFrRWV5tX1K/F.hPOaE58YtNrSsOdNGiPgc3UCxkJQrXfkJK', 1, '2024-09-26 03:26:05', '2026-03-13 03:39:26'),
+(15, 'Janessa', 'P', 'Balt', 'Female', 'Finance Division', 'Clearing Officer IV', 'MEM', 'Janessa_Balt_esignature.png', 'Janessa_Balt_avatar.jpg', '', 'ppa_janessa', '$2y$10$HwllbauPgPlf1fO6eZLP1.Gg4U6a3w4VtEdzQ1OFolvXXtFW9jRXG', 1, '2024-09-26 03:27:44', '2024-09-26 03:27:44'),
+(16, 'Rewel', 'B', 'Bares', 'Male', 'Port Service Division', 'Clerk Processor A', 'MEM', 'Rewel_Bares_esignature.png', 'Rewel_Bares_avatar.jpg', '', 'ppa_rewel', '$2y$10$4JXwPdaNkPKi2itVvQNTFeJYYN.cAa64pPGfQmq5Tt.K.iFKP6n/a', 1, '2024-09-26 03:32:54', '2024-09-26 03:32:54'),
+(17, 'Lawrence', 'M', 'Bersaldo', 'Male', 'Port Police Division', 'Civil Security Officer C', 'MEM', 'Lawrence_Bersaldo_esignature.png', 'Lawrence_Bersaldo_avatar.jpg', '', 'ppa_lao', '$2y$10$fRNTi31Aa8sOkILrKYhGx.qTvPEW3KoWlTt5RgAOcCkXIqTvtfsNK', 1, '2024-09-26 03:34:48', '2024-09-26 03:34:48'),
+(18, 'Sheila Andrea', 'R', 'Bollozos', 'Female', 'Administrative Division', 'Human Resource Management Officer III', 'DM', 'Sheila_Andrea_Bollozos_esignature.png', 'Sheila_Andrea_Bollozos_avatar.jpg', 'JOMS-202600018', 'ppa_sheila', '$2y$10$O.XgxmC.2HCCDWE6jtOOgO3APuU0mgV3ALhdOAMUSMqvpdKEGopqa', 1, '2024-09-26 03:36:03', '2026-05-16 00:25:09'),
+(19, 'Joan', 'G', 'Bongcawel', 'Female', 'Administrative Division', 'Liaison Aide', 'AUV', 'Joan_Bongcawel_esignature.png', 'Joan_Bongcawel_avatar.jpg', '', 'ppa_joan', '$2y$10$VLnDDREb/4QGtTu6w1.6u./Fc.5/5ZK2ikxMIBVbGxvJsuSCKZ/Ca', 1, '2024-09-26 03:38:24', '2026-05-26 05:45:45'),
+(20, 'Colin Kay', 'R', 'Cajote', 'Male', 'Engineering Service Division', 'Supervising Engineer A', 'MEM, AP', 'Colin_Kay_Cajote_esignature.png', 'Colin_Kay_Cajote_avatar.jpg', '', 'ppa_cajote', '$2y$10$50cZsxIHbhvbbUbNgkh3seB./TuuhI0Ms4vFrajvcCAW7mKjE9TV6', 1, '2024-09-26 03:40:01', '2026-03-31 03:47:33'),
+(21, 'Luis', 'A', 'Calderon', 'Male', 'Engineering Service Division', 'Construction Foreman A', 'MEM, AP', 'Luis_Calderon_esignature.png', 'Luis_Calderon_avatar.jpg', '', 'ppa_luis', '$2y$10$WYsD.4cGeqFW9beRSIVdUuNqCFEtu7YmTGQyrvGpt2iuoKSYegIJi', 1, '2024-09-26 03:42:19', '2025-10-30 01:46:13'),
+(22, 'Dennis', 'S', 'Cambaya', 'Male', 'Engineering Service Division', 'Engineering Assistant A', 'MEM', 'Dennis_Cambaya_esignature.png', 'Dennis_Cambaya_avatar.jpg', '', 'ppa_dennis', '$2y$10$SbY0h8fpmuJrL9OvA8i3keo6SvafInE2HKZwAQpgXlImFa.UOvlMK', 1, '2024-09-26 03:43:55', '2024-09-26 03:43:55'),
+(23, 'Archer', 'A', 'Dahunan', 'Male', 'Engineering Service Division', 'Senior Welder', 'MEM', 'Archer_Dahunan_esignature.png', 'Archer_Dahunan_avatar.jpg', '', 'ppa_dahunan', '$2y$10$NPVe..6Wr7INLsTHuv2Oa.N/InWhO24yf1WawhhFpfpDPiQvnJ6mu', 1, '2024-09-26 03:45:55', '2026-04-03 05:50:31'),
+(24, 'Jonalyn', 'N', 'Dandasan', 'Female', 'Finance Division', 'Corporate Finance Services Chief', 'MEM', 'Jonalyn_Dandasan_esignature.png', 'Jonalyn_Dandasan_avatar.jpg', '', 'ppa_dandasan', '$2y$10$9JyvrPNOlIxsxO1i4EO2/.W7PgtwyWl72VKn5MdQDNhQGZJ/9UvW2', 1, '2024-09-26 03:48:20', '2025-02-19 06:39:54'),
+(25, 'Edgardo', 'B', 'Dandoy', 'Male', 'Finance Division', 'Cashier B', 'MEM, AP', 'Edgardo_Dandoy_esignature.png', 'Edgardo_Dandoy_avatar.jpg', '', 'ppa_dandoy', '$2y$10$dIhQR6xsARcYNMHsKpYRuusJ6H43k5WZB2nUJ6oaR8G1K5W.BX3Gu', 1, '2024-09-26 03:49:40', '2025-09-25 00:39:46'),
+(26, 'Jerome', 'C', 'Diango', 'Male', 'Administrative Division', 'Mason ll (A)', 'MEM', 'Jerome_Diango_esignature.png', 'Jerome_Diango_avatar.jpg', '', 'ppa_diango', '$2y$10$sv/kOAdtAyb8XeCfE/2YOecP7bd18.sTK8fe98ZeJ9ciNISAFpEUy', 1, '2024-09-26 03:53:20', '2024-09-26 03:53:20'),
+(27, 'Janrey Vincent', 'P', 'Durano', 'Male', 'Finance Division', 'Cashier B', 'MEM, AP', 'Janrey_Vincent_Durano_esignature.png', 'Janrey_Vincent_Durano_avatar.jpg', '', 'ppa_durano', '$2y$10$gwOMYZhJGBc9cEvP4/D4neFg7uZzriwu2GI1PdoDoHoxWwk/7fRT2', 1, '2024-09-26 03:54:40', '2025-09-18 01:48:29'),
+(28, 'Simon Eli', 'P', 'Embay', 'Male', 'Port Service Division', 'Harbor Operations Officer', 'MEM', 'Simon_Eli_Embay_esignature.png', 'Simon_Eli_Embay_avatar.jpg', '', 'ppa_embay', '$2y$10$ShNZOvui9EN2AWzHBGmKwOtJ7L2GBpLhMcAvNvjSss8.tl6ZVNWNK', 1, '2024-09-26 04:01:40', '2026-04-28 01:12:36'),
+(29, 'Kate Wendell', 'A', 'Eugenio', 'Female', 'Finance Division', 'Cashier B', 'MEM', 'Kate_Wendell_Eugenio_esignature.png', 'Kate_Wendell_Eugenio_avatar.jpg', '', 'ppa_eugenio', '$2y$10$TAW0w3y4qXFgDMpMbeU0r.2kCS0/nUhShBRVyPvyKgWgXKn/nzhoS', 1, '2024-09-26 05:58:58', '2026-04-03 05:52:30'),
+(30, 'Mervin Angelou', 'Q', 'Faeldin', 'Male', 'Engineering Service Division', 'Clerk lV', 'MEM', 'Mervin_Angelou_Faeldin_esignature.png', 'Mervin_Angelou_Faeldin_avatar.jpg', '', 'ppa_faeldin', '$2y$10$CsQgCTO0HAHARamuwsEfw.2Kb5AUZs/gxfRur0esf6uuinYt.Ya8O', 1, '2024-09-26 06:05:11', '2024-09-26 06:05:11'),
+(31, 'Jealapril', 'S', 'Fernandez', 'Female', 'Port Service Division', 'Statistician A', 'MEM', 'Jealapril_Fernandez_esignature.png', 'Jealapril_Fernandez_avatar.jpg', '', 'ppa_jealapril', '$2y$10$tTDbqye3hKGxFpl4avnRNec21NTX0Rt2s418HxajAiZcVSf2vRFN6', 1, '2024-09-26 06:06:36', '2026-04-03 06:21:45'),
+(33, 'Tedegardo', 'N', 'Garces', 'Male', 'Port Service Division', 'Harbor Master', 'MEM', 'Tedegardo_Garces_esignature.png', 'Tedegardo_Garces_avatar.jpg', '', 'ppa_garces', '$2y$10$cFVubFw3g8v.Ns.gHgMU8.UlvN01lms/wtq.XzNEJVsIGEzmVeL5y', 1, '2024-09-26 06:11:34', '2024-09-26 06:11:34'),
+(34, 'Richie Aram', 'B', 'Garganera', 'Male', 'Administrative Division', 'Administrative Services Assistant II', 'MEM', 'Richie_Aram_Garganera_esignature.png', 'Richie_Aram_Garganera_avatar.jpg', '', 'ppa_richie', '$2y$10$S8iKynbGGiDkvVXMeed2xuy.zzLJPIT9BVCrMoUqNNXB0KScZwgGe', 1, '2024-09-26 06:13:07', '2026-04-08 03:23:24'),
+(35, 'Joanne Mae', 'S', 'Janulgue', 'Female', 'Office of the Port Manager', 'Executive Secretary C', 'MEM', 'Joanne_Mae_Janulgue_esignature.png', 'Joanne_Mae_Janulgue_avatar.jpg', '', 'ppa_joanne', '$2y$10$LhWy1Ttx8WVsO/ywYvmlwebnBBkaoGXlViUE3vz/ruIukYe.ysjk.', 1, '2024-09-26 06:16:40', '2026-04-07 01:46:51'),
+(36, 'Mark Jason', 'I', 'Gengone', 'Male', 'Engineering Service Division', 'Electrician', 'MEM', 'Mark_Jason_Gengone_esignature.png', 'Mark_Jason_Gengone_avatar.jpg', '', 'ppa_gengone', '$2y$10$snngwkGsUQlau5Pa64bMu.cbipuZZ3.tGPEp2u8yq0oF7eJ.lR89i', 1, '2024-09-26 06:19:13', '2024-09-26 06:19:13'),
+(37, 'Mark Anthony', 'C', 'Gonzales', 'Male', 'Administrative Division', 'Storekeeper', 'MEM, AP', 'Mark_Anthony_Gonzales_esignature.png', 'Mark_Anthony_Gonzales_avatar.jpg', '', 'ppa_gonzales', '$2y$10$yeFbbRejQsDbTYI7fMKXM.jwdsyKska74ZlaqjujwPJckqw6kV6Iu', 1, '2024-09-26 06:45:04', '2026-01-14 07:08:33'),
+(38, 'Cris Ian', 'R', 'Jacinto', 'Male', 'Administrative Division', 'Management Information System Analyst', 'MEM, HACK, AP', 'Cris_Ian_Jacinto_esignature.png', 'Cris_Ian_Jacinto_avatar.jpg', '', 'ppa_ian', '$2y$10$1souIelqRtNH0ImibZtjRu24vIyb9hZ2mI897E.Cd0VjSU6gIykVS', 1, '2024-09-26 06:46:14', '2026-04-07 01:01:58'),
+(39, 'Christine', 'R', 'Jacinto', 'Female', 'Finance Division', 'Cashier B', 'MEM', 'Christine_Jacinto_esignature.png', 'Christine_Jacinto_avatar.jpg', '', 'ppa_christine', '$2y$10$cLCfEQHAcZRgMdvV.W14R.S14kgkxCn6fFXXZfJUfZ32YA1ZoLGzu', 1, '2024-09-26 06:47:17', '2024-09-26 06:47:17'),
+(40, 'Diony Lou', 'A', 'Jao', 'Female', 'Port Service Division', 'Environmental Specialist A', 'MEM', 'Diony_Lou_Jao_esignature.png', 'Diony_Lou_Jao_avatar.jpg', '', 'ppa_jao', '$2y$10$y/7T0NjMqlGqeLV0BUK64.zUUZy1wCMTt/owrKvY9FHY2NNLSMmka', 1, '2024-09-26 06:49:50', '2024-09-26 06:49:50'),
+(41, 'Angelyn', 'M', 'Lepiten', 'Female', 'Office of the Port Manager', 'Project Planning & Development Officer A', 'MEM', 'Angelyn_Lepiten_esignature.png', 'Angelyn_Lepiten_avatar.jpg', '', 'ppa_lepiten', '$2y$10$qB2MZ30eDtzXzfcXiZkZlOKYCthffumGpic1fyQmHAnvGxUUsVG7C', 1, '2024-09-26 06:50:55', '2024-09-26 06:50:55'),
+(42, 'Jay Robin', 'S', 'Lluisma', 'Male', 'Administrative Division', 'Electronics Communication System Operator A', 'MEM', 'Jay_Robin_Lluisma_esignature.png', 'Jay_Robin_Lluisma_avatar.jpg', '', 'ppa_lluisma', '$2y$10$fW8PVFxQacUZKgEkbIOVV.MP6j/YLwYYnx9X9/J9GXYa/q6OP15Ve', 1, '2024-09-26 06:52:25', '2025-03-21 01:04:57'),
+(43, 'Jan Dexter', 'T', 'Loang', 'Male', 'Administrative Division', 'Driver Mechanic A', 'MEM, AP', 'Jan_Dexter_Loang_esignature.png', 'Jan_Dexter_Loang_avatar.jpg', '', 'ppa_janix', '$2y$10$6ubz1UZblMc1GtN6aIA68.N7q4JrNDCvfPGS84v3dzyqp5pqNTmhC', 1, '2024-09-26 06:53:51', '2024-09-26 08:40:49'),
+(44, 'Joel', 'A', 'Magno', 'Male', 'Administrative Division', 'Plant Mechanic/Electrician B', 'AUV, AP', 'Joel_Magno_esignature.png', 'Joel_Magno_avatar.jpg', '', 'ppa_magno', '$2y$10$C8hndP6FIGPbXVV3PAbwXeCNFjBriSQhXMTtCB8ximrWV1nlPrwBK', 1, '2024-09-26 06:54:48', '2026-05-08 05:57:11'),
+(45, 'Helbert', 'L', 'Marzon', 'Male', 'Port Police Division', 'Civil Security Officer C', 'MEM', 'Helbert_Marzon_1727339612_esig.png', 'Helbert_Marzon_avatar.jpg', '', 'ppa_marzon', '$2y$10$NDI8LwVupJT22zrftpbcJuKW7UucXQuK3kxraO1J8UsqlfI6bGhoq', 1, '2024-09-26 06:56:59', '2024-09-26 08:33:32'),
+(46, 'Juliet', 'B', 'Merioles', 'Female', 'Finance Division', 'Senior Cashier', 'MEM', 'Juliet_Merioles_esignature.png', 'Juliet_Merioles_avatar.jpg', '', 'ppa_merioles', '$2y$10$TdEZs/Y0dpV1NzLSDbRQ6Obi0GdMpEXtblNwULPxjRgDW7yk6Yi/O', 1, '2024-09-26 06:59:03', '2024-09-26 06:59:03'),
+(47, 'Christine', 'J', 'Merto', 'Female', 'Finance Division', 'Cashier A', 'MEM', 'Christine_Merto_esignature.png', 'Christine_Merto_avatar.jpg', '', 'ppa_merto', '$2y$10$c9tEwDJgIYdWCn.qmXIoQuxjs0A5wr7ZsET0j6hBAx9i3PgCPPULS', 1, '2024-09-26 07:01:16', '2026-01-14 07:08:14'),
+(48, 'Tristan Luke', 'C', 'Misa', 'Male', 'Port Police Division', 'Industrial Security Officer', 'MEM', 'Tristan_Luke_Misa_esignature.png', 'Tristan_Luke_Misa_avatar.jpg', '', 'ppa_misa', '$2y$10$5rZoXS30PMdJf340yNl6.OazmSCbMB7O0R1SVoyDzu11c82JL5Tae', 1, '2024-09-26 07:02:28', '2024-09-26 07:02:28'),
+(49, 'Hazel', 'B', 'Nadorra', 'Female', 'Finance Division', 'Cashier B', 'MEM', 'Hazel_Nadorra_esignature.png', 'Hazel_Nadorra_avatar.jpg', '', 'ppa_nadorra', '$2y$10$8NOVIm/xNt4K6xvXEqdcreyeN9L/RoLW6GF25zsuFZ.eGzKSi0ntm', 1, '2024-09-26 07:03:45', '2024-09-26 07:03:45'),
+(50, 'Edward Sonny', 'B', 'Namindang', 'Male', 'Administrative Division', 'Electronics Communication System Operator A', 'MEM, AP', 'Edward_Sonny_Namindang_esignature.png', 'Edward_Sonny_Namindang_avatar.jpg', '', 'ppa_sonny', '$2y$10$D219KDFMq3d0abOyNnc1p.uZsigRQRvWC122I3Qanl2qxRmgmNWta', 1, '2024-09-26 07:06:38', '2024-09-26 08:42:12'),
+(51, 'Mychel Melchor', 'K', 'Nuevas', 'Male', 'Engineering Service Division', 'Data Encoder lll', 'MEM', 'Mychel_Melchor_Nuevas_esignature.png', 'Mychel_Melchor_Nuevas_avatar.jpg', '', 'ppa_mike', '$2y$10$WaW1OTseYBmodBxGwsL6Eu6fuAuaBhpRK6t10NxrfSwVSgTiNYX8W', 1, '2024-09-26 07:08:08', '2024-09-26 07:08:08'),
+(52, 'Mirja', 'C', 'Obach', 'Female', 'Administrative Division', 'Procurement Officer B', 'MEM', 'Mirja_Obach_esignature.png', 'Mirja_Obach_avatar.jpg', '', 'ppa_mirja', '$2y$10$zAyz/2kEQIUcrac8BqkVc.7LHniIht.kovB5xdujb1vH5Emu.Ukw.', 1, '2024-09-26 07:09:15', '2024-09-26 07:09:15'),
+(53, 'Arnel', 'O', 'Oclarino', 'Male', 'Engineering Service Division', 'Senior Engineer A', 'MEM', 'Arnel_Oclarino_esignature.png', 'Arnel_Oclarino_avatar.jpg', '', 'ppa_arnel', '$2y$10$EKM5.JvSI/PafUyT1aH77uPcH8T3nz/pSiMywc8X/LHmCsDy93dZi', 1, '2024-09-26 07:11:02', '2024-09-26 07:11:02'),
+(54, 'Carolyn Gracelda', 'N', 'Orquillas', 'Female', 'Administrative Division', 'Human Resource Management Officer II', 'MEM', 'Carolyn_Gracelda_Orquillas_esignature.png', 'Carolyn_Gracelda_Orquillas_avatar.jpg', '', 'ppa_girlie', '$2y$10$ObMqzS49KSPqYRZR5kOG4OcP/Petnem2dBXzdXmGCa9NjeutsLV0m', 1, '2024-09-26 07:12:30', '2024-09-26 07:12:30'),
+(55, 'Loradel', 'B', 'Pabillar', 'Female', 'Finance Division', 'Senior Corporate Accountant A', 'MEM', 'Loradel_Pabillar_esignature.png', 'Loradel_Pabillar_avatar.jpg', '', 'ppa_pabillar', '$2y$10$ps0VJwrC2T3ONAo2ARDmN.W5FvVlBWEdDRkghYEiVljsHDrCj2skK', 1, '2024-09-26 07:16:23', '2024-09-26 07:16:23'),
+(56, 'Locyl', 'L', 'Petallo', 'Female', 'Administrative Division', 'Utility Worker', 'MEM', 'Locyl_Petallo_esignature.png', 'Locyl_Petallo_avatar.jpg', '', 'ppa_locyl', '$2y$10$HAlUsnr4SPlXILcAc19cledqK7FO1rg5O2jQbe5/yzQOdVVMkzNqa', 1, '2024-09-26 07:18:42', '2024-09-26 07:18:42'),
+(57, 'Gemma', 'P', 'Pontillo', 'Female', 'Finance Division', 'Senior Corporate Accounts Analyst', 'MEM', 'Gemma_Pontillo_esignature.png', 'Gemma_Pontillo_avatar.jpg', '', 'ppa_gemma', '$2y$10$7SVqquZBoHP8LasODhB/jeaHCkI8p74LfIid0/cKZFmU1Wa1lY3n.', 1, '2024-09-26 07:20:08', '2024-09-26 07:20:08'),
+(58, 'Tito', 'F', 'Pontillo, Jr', 'Male', 'Port Police Division', 'Civil Security Officer A', 'MEM', 'Tito_Pontillo, Jr_esignature.png', 'Tito_Pontillo, Jr_avatar.jpg', '', 'ppa_tito', '$2y$10$pdkU6SgRXuGvJyCRttbBFOn7mb.tVdvFQqH.t1W0l/.l.M64d65RS', 1, '2024-09-26 07:22:09', '2024-09-26 07:22:09'),
+(59, 'Ronan', 'A', 'Quiapo', 'Male', 'Port Police Division', 'Port Operations Analyst A', 'MEM', 'Ronan_Quiapo_esignature.png', 'Ronan_Quiapo_avatar.jpg', '', 'ppa_quiapo', '$2y$10$2ddpO80HAhAEL4X0AoRRr.XcKC0DeKENogz6ci/gXo2G9saOCbBjW', 1, '2024-09-26 07:23:19', '2024-09-26 07:23:19'),
+(60, 'Elva', 'V', 'Real', 'Female', 'Office of the Port Manager', 'Business Development/Marketing Officer A', 'MEM', 'Elva_Real_esignature.png', 'Elva_Real_avatar.jpg', '', 'ppa_elva', '$2y$10$FYiTKUHj0Vr2ktBMBrFrOefyBiARI7U5pk15MgIS7Dqr8cG44Taau', 1, '2024-09-26 07:24:19', '2024-09-26 07:24:19'),
+(61, 'Noel', 'G', 'Rosero', 'Male', 'Administrative Division', 'Senior Building Electrician B', 'MEM', 'Noel_Rosero_esignature.png', 'Noel_Rosero_avatar.jpg', '', 'ppa_rosero', '$2y$10$L/50IwNwJhugn26YAjxeyu2TFuKhPnEHKGxuGwlH3J8.e5cid9HZW', 1, '2024-09-26 07:26:00', '2024-09-26 07:26:00'),
+(62, 'J. Wenceslao', 'S', 'Rosete', 'Male', 'Port Police Division', 'Civil Security Officer A (Senior Port Police Inspector)', 'MEM', 'J._Wenceslao_Rosete_esignature.png', 'J._Wenceslao_Rosete_avatar.jpg', '', 'ppa_jrosete', '$2y$10$HokJ.43bnWUsfkck1CULxe5SehJAF78Mps9XFZlA./aUCSmyYqBhG', 1, '2024-09-26 07:28:33', '2024-09-26 07:28:33'),
+(63, 'Rey', 'Y', 'Salaan', 'Male', 'Port Service Division', 'Terminal Operations Officer A', 'MEM', 'Rey_Salaan_esignature.png', 'Rey_Salaan_avatar.jpg', '', 'ppa_salaan', '$2y$10$IOnOBnw6mXuDqKUqPO5MWuzOMmsJGeBg6qMUfOCNiTUKvJevKAvKa', 1, '2024-09-26 07:31:29', '2024-09-26 07:31:29'),
+(64, 'Raymart', 'E', 'Ruelan', 'Male', 'Administrative Division', 'Clerk Processor A', 'HACK, MEM', 'Raymart_Ruelan_1727336396_esig.png', 'Raymart_Ruelan_avatar.jpg', '', 'ppa_mart', '$2y$10$QRkDdpaNyDu/uGRY0ONblebl4ZMb.DAHEiuLYP3YqwT9JhkbMxNKq', 1, '2024-09-26 07:33:42', '2024-09-26 07:39:56'),
+(65, 'Jeffrey Datu', 'N', 'Islao', 'Male', 'Administrative Division', 'Computer Maintenance Technologist I', 'MEM, HACK', 'Jeffrey_Silao_esignature.png', 'Jeffrey_Silao_avatar.jpg', 'JOMS-202600065', 'ppa_silao', '$2y$10$s0aKPRkZ9xQ/CjYxxwWwsuXY/bPKMQpnQ/s4nt6F0RDpZSgqlWDjy', 2, '2024-09-26 07:41:45', '2026-05-19 01:20:02'),
+(66, 'Jolito', 'S', 'Sepio', 'Male', 'Engineering Service Division', 'Mason ll (A)', 'MEM', 'Jolito_Sepio_esignature.png', 'Jolito_Sepio_avatar.jpg', '', 'ppa_sepio', '$2y$10$QD4j8onzgzmmWJP8bNbZFeYVlomRcQ1dBq405kC3SMwY1LXfwK81.', 1, '2024-09-26 07:42:43', '2024-09-26 07:42:43'),
+(67, 'Abigail Rose', 'N', 'Suangco', 'Female', 'Administrative Division', 'Human Resource Management Officer II', 'MEM', 'Abigail_Rose_Suangco_esignature.png', 'Abigail_Rose_Suangco_avatar.jpg', '', 'ppa_abby', '$2y$10$v27ACsNuuU3dkt8l4QZEf.ZnVIevJPoRBzK8F.zWYYKa5koiMZ6FS', 1, '2024-09-26 07:44:05', '2024-09-26 07:44:05'),
+(68, 'Daryl', 'T', 'Sumanoy', 'Male', 'Administrative Division', 'Driver-Mechanic B', 'AUV, AP', 'Daryl_Sumanoy_esignature.png', 'Daryl_Sumanoy_avatar.jpg', '', 'ppa_daryl', '$2y$10$lTXHnNub3qT1lNsJZvryU.Xs1x2nAsL3taO/5Lri4wbSAYD.XaQ8K', 1, '2024-09-26 07:45:24', '2026-05-08 05:57:44'),
+(69, 'Japheth', 'T', 'Sumingit', 'Male', 'Port Police Division', 'Industrial Security Officer (Port Police Officer I)', 'MEM', 'Japheth_Sumingit_esignature.png', 'Japheth_Sumingit_avatar.jpg', '', 'ppa_sumingit', '$2y$10$uXi6pwZCPWgCYXCm9bve5.yWkSIeYdf/x10CRuqszjhcR2KIldgri', 1, '2024-09-26 07:46:30', '2024-09-26 07:46:30'),
+(70, 'Lorgie Mae', 'A', 'Tumbagahan', 'Female', 'Port Service Division', 'Statistician A', 'MEM', 'Lorgie_Mae_Tumbagahan_esignature.png', 'Lorgie_Mae_Tumbagahan_avatar.jpg', '', 'ppa_lorgie', '$2y$10$SUdPVo.jbJv6DX/0GzPm/./TKPShTQkBwYUcoX.Yl7b6/xkelZk7O', 1, '2024-09-26 07:47:37', '2024-09-26 07:47:37'),
+(71, 'John', 'A', 'Doe', 'Male', 'Administrative Division', 'Flower Girl Haha', 'MEM', 'John_Doe_1767937898_esig.png', 'John_Doe_1767937168_avatar.jpg', '', 'ppa_turla', '$2y$10$uqJORqxMW.y6F9Z6ncEICe/FBNiX/VMpkxUKQOEeG50D1fxvyFG1q', 2, '2024-09-26 07:48:34', '2026-01-09 05:51:38'),
+(72, 'Queen Blaire', 'B', 'Unabia', 'Female', 'Port Police Division', 'Industrial Security Officer (Port Police Officer I)', 'MEM', 'Queen_Blaire_Unabia_esignature.png', 'Queen_Blaire_Unabia_avatar.jpg', '', 'ppa_unabia', '$2y$10$wMQuvGqaPKMdTlNUKRL3s.3IP4nabTQx8/ipNv/rvtF/xEYm.96na', 1, '2024-09-26 07:49:40', '2024-09-26 07:49:40'),
+(73, 'Judylyn', 'V', 'Velez', 'Female', 'Finance Division', 'Data Encoder lll', 'MEM', 'Judylyn_Velez_esignature.png', 'Judylyn_Velez_avatar.jpg', '', 'ppa_judylyn', '$2y$10$wAH.xsuQiPZOdtRztiHg4.akZ4HSDTnAsncwAWi3ACOgmUlstv.6W', 1, '2024-09-26 07:50:42', '2024-09-26 07:50:42'),
+(74, 'Julito', 'S', 'Villacorte', 'Male', 'Engineering Service Division', 'Senior Carpenter', 'MEM', 'Julito_Villacorte_esignature.png', 'Julito_Villacorte_avatar.jpg', '', 'ppa_julito', '$2y$10$qDNen/PZa59rpW6KpLziWukGhPMZLgL.ix/6AB6L1gt.HNLNzM0Z2', 1, '2024-09-26 07:51:38', '2024-09-26 07:51:38'),
+(75, 'Ricky', 'M', 'Villaver', 'Male', 'Finance Division', 'Data Encoder lll', 'MEM', 'Ricky_Villaver_esignature.png', 'Ricky_Villaver_avatar.jpg', '', 'ppa_ricky', '$2y$10$0TPybFHXK2GpqJ1yPTjTYeINkLRJTHtj2afrO2uU9F6YsSNAQ3VsC', 1, '2024-09-26 07:52:39', '2024-09-26 07:52:39'),
+(76, 'Naomie', 'D', 'Zalsos', 'Female', 'Administrative Division', 'Acting Adminstrative Division Manager', 'AM', 'Naomie_Zalsos_esignature.png', 'Naomie_Zalsos_avatar.jpg', 'JOMS-202600076', 'ppa_naomie', '$2y$10$oUKjXITn3OXwE46UNrWn7esQmV04qgoHw3tg9FQ/GIWPPcHXeEGgS', 1, '2024-09-26 07:53:51', '2026-06-15 08:11:39'),
+(78, 'John', 'A', 'Doe', 'Male', 'Administrative Division', 'Tester User', 'MEM', 'John_Doe_1749534126_esig.png', 'John_Doe_1773381189_avatar.jpg', '', 'johnDoe', '$2y$10$Qa/rFMdp7kuW2MtD713b8Ow.Jd5U7yz2R58eWhBUx2Nc5mtnBmz46', 1, '2025-06-10 05:39:45', '2026-03-13 05:53:09'),
+(79, 'Zackiee Mio', 'A', 'Sermon', 'Male', 'Office of the Port Manager', 'Mobile Dev Tester II', 'AUS', 'Zackiee_Mio_Sermon_1778903617_esig.png', 'Zackiee_Mio_Sermon_1778900915_avatar.jpg', 'JOMS-202600079', 'ppa_tester', '$2y$10$hhS2D2vmrDuIvvU/Khh.RuEqnhGSiqSRNnQju0ZSMa1VKOPqkWFtO', 2, '2025-08-14 08:17:30', '2026-05-28 02:30:51'),
+(80, 'Main', '-', 'Gate', 'Male', 'Port Police Division', 'GATE', 'SEC', 'Main_Gate_esignature.png', 'Main_Gate_avatar.jpg', '', 'maingate', '$2y$10$HeaZMmstrRd0NKmI1A9uNO8KZ0P2hq4POT5pvg7HFV5XyExRTbInC', 1, '2026-01-30 03:04:46', '2026-01-30 03:26:16'),
+(81, 'Dexter', 'D', 'Dela Cruz', 'Male', 'Administrative Division', 'Joker V', 'MEM, AUS, AP', 'Dexter_Dela Cruz_esignature.png', 'Dexter_Dela Cruz_avatar.jpg', '', 'ppa_dexter', '$2y$10$i5axUs1xvqGfhcnKvOKSX.HEj3CtS5MmW179orsUcfaijOb80uZLK', 1, '2026-03-14 01:44:53', '2026-03-31 03:45:09'),
+(82, 'Juan', 'D', 'Cruz', 'Male', 'Office of the Port Manager', 'Joker II', 'AUF', 'Juan_Cruz_1773472245_esig.png', 'Juan_Cruz_1773471977_avatar.jpg', '', 'ppa_juan', '$2y$10$eu6DNCE4YOALUH3CrUVUG.lhe6kG0rW2vo1lqu7iPwAXTY1l5KyMS', 1, '2026-03-14 06:11:06', '2026-03-27 02:29:37'),
+(83, 'Juan', NULL, 'Dela cruz', 'Male', 'Administrative Division', 'Joker I', 'MEM', 'Juan_Dela cruz_esignature.png', 'Juan_Dela cruz_avatar.jpg', NULL, 'zackmio2024', '$2y$10$ogUD4c5kHdEfZgFEGfMONO86LooUDaIEa.NczWzUz06TcuL0gQnY2', 2, '2026-05-13 08:01:39', '2026-05-13 08:01:39'),
+(85, 'Juan', NULL, 'Cruz', 'Female', 'Administrative Division', 'Joker I', 'MEM', 'Juan_Cruz_esignature.png', 'Juan_Cruz_avatar.jpg', 'JOMS-202600085', 'jaun@2026', '$2y$10$Ep7XM9Sy2GGfW8GKk4Qib.bmmHXsHjzsP.TW6cMBIqpj0ecQlSjli', 2, '2026-05-19 02:08:23', '2026-05-19 02:08:23'),
+(86, 'John', NULL, 'Doe', 'Male', 'Finance Division', 'Data Encoder lll', 'MEM', 'John_Doe_esignature.png', 'John_Doe_avatar.jpg', 'JOMS-202600086', 'jandoe1234', '$2y$10$f9KwRwkUwba/T3pl3InZLeIGC6jAf/p6hy9ZeRsUi0BPfvWjOpRhy', 2, '2026-05-19 06:57:35', '2026-05-19 06:57:35'),
+(87, 'Jane', NULL, 'Doe', 'Female', 'Office of the Port Manager', 'Joker I', 'MEM', 'Jane_Doe_esignature.png', 'Jane_Doe_avatar.jpg', 'JOMS-202600087', 'ppa_nogas', '$2y$10$abfCCOX4ktbwAYSIGBUpVead6vSQW1ABwLzLlNEEegjQXOzxVnypS', 0, '2026-05-19 07:01:28', '2026-05-19 07:02:02');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vehicle_slip`
+-- Table structure for table `superadminsettings`
 --
 
-CREATE TABLE `vehicle_slip` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `date_of_request` date NOT NULL,
-  `purpose` varchar(500) NOT NULL,
-  `passengers` varchar(1000) NOT NULL,
-  `place_visited` varchar(255) NOT NULL,
-  `date_arrival` date NOT NULL,
-  `time_arrival` time NOT NULL,
-  `vehicle_type` varchar(255) NOT NULL,
-  `driver` varchar(255) NOT NULL,
-  `admin_approval` tinyint(1) NOT NULL DEFAULT 0,
-  `remarks` varchar(500) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE `superadminsettings` (
+  `super_id` int(11) NOT NULL,
+  `key_name` varchar(255) NOT NULL,
+  `key_value` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `superadminsettings`
+--
+
+INSERT INTO `superadminsettings` (`super_id`, `key_name`, `key_value`) VALUES
+(1, 'maintenance_mode', 'off');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `assign_personnels`
+-- Indexes for table `announcement`
 --
-ALTER TABLE `assign_personnels`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `assign_personnels_user_id_foreign` (`user_id`);
+ALTER TABLE `announcement`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `equipment_form`
+-- Indexes for table `assign_personnel`
 --
-ALTER TABLE `equipment_form`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `equipment_form_user_id_foreign` (`user_id`);
+ALTER TABLE `assign_personnel`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `facility`
+-- Indexes for table `form_request_tracker`
 --
-ALTER TABLE `facility`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `facility_user_id_foreign` (`user_id`);
+ALTER TABLE `form_request_tracker`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `inspection_form_admin`
+-- Indexes for table `joms_facility_venue`
 --
-ALTER TABLE `inspection_form_admin`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `inspection_form_admin_inspection__form_id_foreign` (`inspection__form_id`);
+ALTER TABLE `joms_facility_venue`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `inspection__forms`
+-- Indexes for table `joms_inspection_form`
 --
-ALTER TABLE `inspection__forms`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `inspection__forms_user_id_foreign` (`user_id`);
+ALTER TABLE `joms_inspection_form`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `inspector__forms`
+-- Indexes for table `joms_vehicle_slip_form`
 --
-ALTER TABLE `inspector__forms`
+ALTER TABLE `joms_vehicle_slip_form`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `joms_vehicle_type`
+--
+ALTER TABLE `joms_vehicle_type`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -806,9 +893,9 @@ ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `notifications`
+-- Indexes for table `notification`
 --
-ALTER TABLE `notifications`
+ALTER TABLE `notification`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -820,146 +907,110 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Indexes for table `p_p_a_users`
+-- Indexes for table `ppa_security`
 --
-ALTER TABLE `p_p_a_users`
+ALTER TABLE `ppa_security`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `ppa_user`
 --
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_email_unique` (`email`);
+ALTER TABLE `ppa_user`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `vehicle_slip`
+-- Indexes for table `superadminsettings`
 --
-ALTER TABLE `vehicle_slip`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `vehicle_slip_user_id_foreign` (`user_id`);
+ALTER TABLE `superadminsettings`
+  ADD PRIMARY KEY (`super_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `assign_personnels`
+-- AUTO_INCREMENT for table `announcement`
 --
-ALTER TABLE `assign_personnels`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+ALTER TABLE `announcement`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `equipment_form`
+-- AUTO_INCREMENT for table `assign_personnel`
 --
-ALTER TABLE `equipment_form`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `assign_personnel`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
--- AUTO_INCREMENT for table `facility`
+-- AUTO_INCREMENT for table `form_request_tracker`
 --
-ALTER TABLE `facility`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `form_request_tracker`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
--- AUTO_INCREMENT for table `inspection_form_admin`
+-- AUTO_INCREMENT for table `joms_facility_venue`
 --
-ALTER TABLE `inspection_form_admin`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `joms_facility_venue`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
--- AUTO_INCREMENT for table `inspection__forms`
+-- AUTO_INCREMENT for table `joms_inspection_form`
 --
-ALTER TABLE `inspection__forms`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `joms_inspection_form`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
--- AUTO_INCREMENT for table `inspector__forms`
+-- AUTO_INCREMENT for table `joms_vehicle_slip_form`
 --
-ALTER TABLE `inspector__forms`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `joms_vehicle_slip_form`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `joms_vehicle_type`
+--
+ALTER TABLE `joms_vehicle_type`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `notifications`
+-- AUTO_INCREMENT for table `notification`
 --
-ALTER TABLE `notifications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `notification`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1440;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `p_p_a_users`
+-- AUTO_INCREMENT for table `ppa_security`
 --
-ALTER TABLE `p_p_a_users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
+ALTER TABLE `ppa_security`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=487;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `ppa_user`
 --
-ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `ppa_user`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
--- AUTO_INCREMENT for table `vehicle_slip`
+-- AUTO_INCREMENT for table `superadminsettings`
 --
-ALTER TABLE `vehicle_slip`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `assign_personnels`
---
-ALTER TABLE `assign_personnels`
-  ADD CONSTRAINT `assign_personnels_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `p_p_a_users` (`id`);
-
---
--- Constraints for table `equipment_form`
---
-ALTER TABLE `equipment_form`
-  ADD CONSTRAINT `equipment_form_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `p_p_a_users` (`id`);
-
---
--- Constraints for table `facility`
---
-ALTER TABLE `facility`
-  ADD CONSTRAINT `facility_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `p_p_a_users` (`id`);
-
---
--- Constraints for table `inspection_form_admin`
---
-ALTER TABLE `inspection_form_admin`
-  ADD CONSTRAINT `inspection_form_admin_inspection__form_id_foreign` FOREIGN KEY (`inspection__form_id`) REFERENCES `inspection__forms` (`id`);
-
---
--- Constraints for table `inspection__forms`
---
-ALTER TABLE `inspection__forms`
-  ADD CONSTRAINT `inspection__forms_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `p_p_a_users` (`id`);
-
---
--- Constraints for table `vehicle_slip`
---
-ALTER TABLE `vehicle_slip`
-  ADD CONSTRAINT `vehicle_slip_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `p_p_a_users` (`id`);
+ALTER TABLE `superadminsettings`
+  MODIFY `super_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

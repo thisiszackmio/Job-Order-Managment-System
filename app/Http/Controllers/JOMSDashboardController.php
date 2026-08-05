@@ -378,73 +378,111 @@ class JOMSDashboardController extends Controller
     }
 
     /**
-     *  Personnel with Most Requested
+     *  Graph
      */
-    public function getPersonnelRequest()
+    public function RequestGraph()
     {
+        // For the Inspection
+        $inspApprove = InspectionModel::where('form_status', 1)->count();
+        $inspDisapprove = InspectionModel::where('form_status', 7)->count();
+        $inspPending = InspectionModel::whereIn('form_status', [2, 3, 4, 5, 6, 8, 9, 10, 11])->count();
+        $inspCancel = InspectionModel::where('form_status', 0)->count();
+
+        // For the Facility
+        $facApprove = FacilityVenueModel::whereIn('admin_approval', [1, 2, 3])->count();
+        $facDisapprove = FacilityVenueModel::where('admin_approval', 4)->count();
+        $facPending = FacilityVenueModel::whereIn('admin_approval', [5, 6, 7])->count();
+        $facCancel = FacilityVenueModel::where('admin_approval', 0)->count();
+
+        // For the Vechicle
+        $vehApprove = VehicleSlipModel::whereIn('admin_approval', [1, 2])->count();
+        $vehDisapprove = VehicleSlipModel::where('admin_approval', 3)->count();
+        $vehPending = VehicleSlipModel::whereIn('admin_approval', [4, 5, 6, 7, 8, 9])->count();
+        $vehCancel = VehicleSlipModel::where('admin_approval', 0)->count();
+
+        $data = [
+            'inspection' => [
+                'approve' => $inspApprove,
+                'disapprove' => $inspDisapprove,
+                'pending' => $inspPending,
+                'cancel' => $inspCancel
+            ],
+            'facility' => [
+                'approve' => $facApprove,
+                'disapprove' => $facDisapprove,
+                'pending' => $facPending,
+                'cancel' => $facCancel
+            ],
+            'vehicle' => [
+                'approve' => $vehApprove,
+                'disapprove' => $vehDisapprove,
+                'pending' => $vehPending,
+                'cancel' => $vehCancel
+            ],
+        ];
+
+        return response()->json($data);
+    }
+
+    /**
+     *  Most Requested Personnel
+     */
+    public function MostReqPersonnel(){
         $rootUrl = URL::to('/');
 
-        // Inspection
-        $inspection = InspectionModel::select(
-                'user_id',
-                'user_name',
-                DB::raw('COUNT(*) as inspection_total'),
-                DB::raw('0 as facility_total'),
-                DB::raw('0 as vehicle_total')
-            )
-            ->groupBy('user_id', 'user_name');
+        // Inspection Repair
+        $topInspection = InspectionModel::selectRaw(
+            "joms_inspection_form.user_id,
+            joms_inspection_form.user_name,
+            CONCAT('$rootUrl/storage/displaypicture/', ppa_user.avatar) as avatar_url,
+            COUNT(*) as inspection_total"
+        )
+        ->join('ppa_user', 'ppa_user.id', '=', 'joms_inspection_form.user_id')
+        ->groupBy(
+            'joms_inspection_form.user_id',
+            'joms_inspection_form.user_name',
+            'ppa_user.avatar'
+        )
+        ->orderByDesc('inspection_total')
+        ->first();
 
-        // Facility
-        $facility = FacilityVenueModel::select(
-                'user_id',
-                'user_name',
-                DB::raw('0 as inspection_total'),
-                DB::raw('COUNT(*) as facility_total'),
-                DB::raw('0 as vehicle_total')
-            )
-            ->groupBy('user_id', 'user_name');
+        // Facility Repair
+        $topFacility = FacilityVenueModel::selectRaw(
+            "joms_facility_venue.user_id,
+            joms_facility_venue.user_name,
+            CONCAT('$rootUrl/storage/displaypicture/', ppa_user.avatar) as avatar_url,
+            COUNT(*) as facility_total"
+        )
+        ->join('ppa_user', 'ppa_user.id', '=', 'joms_facility_venue.user_id')
+        ->groupBy(
+            'joms_facility_venue.user_id',
+            'joms_facility_venue.user_name',
+            'ppa_user.avatar'
+        )
+        ->orderByDesc('facility_total')
+        ->first();
 
-        // Vehicle
-        $vehicle = VehicleSlipModel::select(
-                'user_id',
-                'user_name',
-                DB::raw('0 as inspection_total'),
-                DB::raw('0 as facility_total'),
-                DB::raw('COUNT(*) as vehicle_total')
-            )
-            ->groupBy('user_id', 'user_name');
+        // Vehicle Slip
+        $topVehicle = VehicleSlipModel::selectRaw(
+            "joms_vehicle_slip_form.user_id,
+            joms_vehicle_slip_form.user_name,
+            CONCAT('$rootUrl/storage/displaypicture/', ppa_user.avatar) as avatar_url,
+            COUNT(*) as vehicle_total"
+        )
+        ->join('ppa_user', 'ppa_user.id', '=', 'joms_vehicle_slip_form.user_id')
+        ->groupBy(
+            'joms_vehicle_slip_form.user_id',
+            'joms_vehicle_slip_form.user_name',
+            'ppa_user.avatar'
+        )
+        ->orderByDesc('vehicle_total')
+        ->first();
 
-        // Combine all
-        $combined = $inspection
-            ->unionAll($facility)
-            ->unionAll($vehicle);
-
-        // Final aggregation
-        $result = DB::query()
-            ->fromSub($combined, 'requests')
-            ->leftJoin('ppa_user as e', 'e.id', '=', 'requests.user_id')
-            ->select(
-                'requests.user_id',
-                'requests.user_name',
-                DB::raw("CONCAT('$rootUrl/storage/displaypicture/', e.avatar) as avatar"),
-
-                DB::raw('SUM(requests.inspection_total) as inspection_count'),
-                DB::raw('SUM(requests.facility_total) as facility_count'),
-                DB::raw('SUM(requests.vehicle_total) as vehicle_count'),
-
-                DB::raw('
-                    SUM(requests.inspection_total) +
-                    SUM(requests.facility_total) +
-                    SUM(requests.vehicle_total)
-                    as no_of_requests
-                ')
-            )
-            ->groupBy('requests.user_id', 'requests.user_name', 'e.avatar')
-            ->orderByDesc('no_of_requests')
-            ->limit(5)
-            ->get();
-
-        return response()->json($result);
+        return response()->json([
+            'inspection' => $topInspection,
+            'facility' => $topFacility,
+            'vehicle' => $topVehicle
+        ]);
     }
         
 }

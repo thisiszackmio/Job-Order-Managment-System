@@ -1,14 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  env: {
-    VITE_API_BASE_URL: process.env.VITE_API_BASE_URL,
-  },
   server: {
-    port: 80,
-    host: true,
+    // host: '20.20.51.5',
+    host: 'localhost',
+    port: 9200,
   },
-});
+})

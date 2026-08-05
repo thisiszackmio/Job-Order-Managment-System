@@ -11,6 +11,7 @@ use App\Models\FormTracker;
 use App\Http\Requests\InspectionFormRequest;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InspectionController extends Controller
 {
@@ -37,29 +38,93 @@ class InspectionController extends Controller
     /**
      * Get all the Request List 
      */
-    public function index(){
-        // For Inspection Form
-        $getInspectionFormData = InspectionModel::orderBy('created_at', 'desc')->get();
+    public function index(Request $request){
+        $inspectionPage = $request->input('inspection_page', 1);
 
-        $inspDet = $getInspectionFormData->map(function ($inspectionForm) {
-            return[
-                'id' => $inspectionForm->id,
-                'date_request' => $inspectionForm->created_at,
-                'property_number' => $inspectionForm->property_number,
-                'acquisition_date' => $inspectionForm->acquisition_date,
-                'acquisition_cost' => $inspectionForm->acquisition_cost,
-                'brand_model' => $inspectionForm->brand_model,
-                'serial_engine_no' => $inspectionForm->serial_engine_no,
-                'type' => $inspectionForm->type_of_property,
-                'description' => $inspectionForm->property_description,
-                'location' => $inspectionForm->location,
-                'complain' => $inspectionForm->complain,
-                'requestor' => $inspectionForm->user_name,
-                'remarks' => $inspectionForm->form_remarks
+        $search = $request->input('search');
+
+        $query = InspectionModel::orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('property_number', 'LIKE', "%{$search}%")
+                ->orWhere('type_of_property', 'LIKE', "%{$search}%")
+                ->orWhere('property_description', 'LIKE', "%{$search}%")
+                ->orWhere('complain', 'LIKE', "%{$search}%")
+                ->orWhere('supervisor_name', 'LIKE', "%{$search}%")
+                ->orWhere('form_remarks', 'LIKE', "%{$search}%")
+                ->orWhereRaw("DATE_FORMAT(created_at, '%M %e, %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        $inspectionData = $query
+        ->orderBy('created_at', 'desc')
+        ->paginate(
+            25,
+            ['*'],
+            'inspection_page',
+            $inspectionPage
+        );
+
+        $inspectionData->getCollection()->transform(
+            function ($inspectionForm) use ($search) {
+
+            $formattedDate =
+                \Carbon\Carbon::parse(
+                    $inspectionForm->created_at
+                )->format('F j, Y');
+
+            return [
+                'repair_id' => $inspectionForm->id,
+                'repair_date_request' => $formattedDate,
+                'repair_type' => $inspectionForm->type_of_property,
+                'repair_description' => $inspectionForm->property_description,
+                'repair_complain' => $inspectionForm->complain,
+                'repair_requestor' => $inspectionForm->user_name,
+                'repair_remarks' => $inspectionForm->form_remarks
             ];
         });
 
-        return response()->json($inspDet);
+        return response()->json($inspectionData);
+    }
+
+    /**
+     * Generate PDF
+     */
+    public function generateInspectionPDF($id){
+        $inspection = InspectionModel::findOrFail($id);
+
+        $employees = PPAEmployee::whereIn('id', [
+            $inspection->user_id,
+            $inspection->supervisor_id,
+            $inspection->personnel_id
+        ])->get()->keyBy('id');
+
+        $requestor  = $employees[$inspection->user_id]       ?? null;
+        $supervisor = $employees[$inspection->supervisor_id] ?? null;
+        $assign     = $employees[$inspection->personnel_id]  ?? null;
+
+        $gso   = PPAEmployee::where('code_clearance', 'LIKE', '%GSO%')->first();
+        $admin = PPAEmployee::where('code_clearance', 'LIKE', '%AM%')->first();
+
+        try {
+            $pdf = \Pdf::loadView('pdf.inspection', compact(
+                'inspection',
+                'requestor',
+                'supervisor',
+                'assign',
+                'gso',
+                'admin'
+            ))->setPaper('a4', 'portrait');
+
+            return $pdf->stream("Inspection-Control-No-$id.pdf");
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
+        }
     }
 
     /**
@@ -75,29 +140,13 @@ class InspectionController extends Controller
             return response()->json(['error' => 'No-Form'], 404);
         }
 
-        // Requestor Esig
-        $RequestorEsigRequest = $SupervisorEsigRequest = PPAEmployee::where('id', $InspectionRequest->user_id)->first();
-        $RequestorEsig = $rootUrl . '/storage/displayesig/' . $RequestorEsigRequest->esign;
-
-        // Supervisor Esig
-        $SupervisorEsigRequest = PPAEmployee::where('id', $InspectionRequest->supervisor_id)->first();
-        $SupervisorEsig = $rootUrl . '/storage/displayesig/' . $SupervisorEsigRequest->esign;
-
-        // Assign Personnel Esig
-        $AssignEsigRequest = PPAEmployee::where('id', $InspectionRequest->personnel_id)->first();
-        $AssignEsig = $AssignEsigRequest && $AssignEsigRequest->esign 
-        ? $rootUrl . '/storage/displayesig/' . $AssignEsigRequest->esign 
-        : null;
-
         // GSO Esig and Name
         $GSOEsigRequest = PPAEmployee::where('code_clearance', 'LIKE', "%GSO%")->first();
         $GSOName = $GSOEsigRequest->firstname . ' ' . $GSOEsigRequest->middlename. '. ' . $GSOEsigRequest->lastname;
-        $GSOEsig = $rootUrl . '/storage/displayesig/' . $GSOEsigRequest->esign;
 
         // Admin Esig
         $AdminEsigRequest = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first();
         $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
-        $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
         // Prev & Next IDs
         $prevId = InspectionModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
@@ -105,10 +154,8 @@ class InspectionController extends Controller
 
         // Custom form data with limited fields
         $form = [
-            'prev_id' => $prevId,
-            'next_id' => $nextId,
             'id' => $InspectionRequest->id,
-            'date_request' => $InspectionRequest->created_at, 
+            'date_request' => $InspectionRequest->created_at->format('Y-m-d'), 
             'user_id' => $InspectionRequest->user_id,
             'user_name' => $InspectionRequest->user_name,
             'property_number' => $InspectionRequest->property_number,
@@ -120,13 +167,13 @@ class InspectionController extends Controller
             'property_description' => $InspectionRequest->property_description,
             'location' => $InspectionRequest->location,
             'complain' => $InspectionRequest->complain,
-            'date_of_filling' => $InspectionRequest->date_of_filling,
-            'date_of_last_repair' => $InspectionRequest->date_of_last_repair,
+            'date_of_filling' => $InspectionRequest->date_of_filling ? $InspectionRequest->date_of_filling->format('Y-m-d') : null,
+            'date_of_last_repair' => $InspectionRequest->date_of_last_repair ? $InspectionRequest->date_of_last_repair->format('Y-m-d') : null,
             'nature_of_last_repair' => $InspectionRequest->nature_of_last_repair,
-            'before_repair_date' => $InspectionRequest->before_repair_date,
+            'before_repair_date' => $InspectionRequest->before_repair_date ? $InspectionRequest->before_repair_date->format('Y-m-d') : null,
             'findings' => $InspectionRequest->findings,
             'recommendations' => $InspectionRequest->recommendations,
-            'after_reapir_date' => $InspectionRequest->after_reapir_date,
+            'after_reapir_date' => $InspectionRequest->after_reapir_date ? $InspectionRequest->after_reapir_date->format('Y-m-d') : null,
             'remarks' => $InspectionRequest->remarks,
             'personnel_id' => $InspectionRequest->personnel_id,
             'personnel_name' => $InspectionRequest->personnel_name,
@@ -140,15 +187,11 @@ class InspectionController extends Controller
         ];
 
         $respondData = [
+            'prev_id' => $prevId,
+            'next_id' => $nextId,
             'form' => $form,
-            'requestor_esig' => $RequestorEsig,
-            'supervisor_esig' => $SupervisorEsig,
-            'assign_esig' => $AssignEsig,
             'gso_name' => $GSOName,
-            'gso_esig' => $GSOEsig,
             'admin_name' => $AdminName,
-            'admin_esig' => $AdminEsig,
-            'gso_id' => $GSOEsigRequest->id
         ];
 
         return response()->json($respondData);
@@ -160,9 +203,6 @@ class InspectionController extends Controller
     public function storeInspectionRequest(InspectionFormRequest $request){
         $data = $request->validated();
 
-        if($request->input('form') === "Check"){
-            return response()->json(['message' => 'Check'], 200);
-        }else{
             // Get the Requestor Data to get the avatar
             $req = PPAEmployee::where('id', $data['user_id'])->first();
             $reqAvatar = $req->avatar;
@@ -188,11 +228,11 @@ class InspectionController extends Controller
             $receiverName = '';
 
             if(!empty(array_intersect($allowedCodes, $codeClearance))){
-                $notiMessage = $data['user_name']." has submitted a request.";
+                $notiMessage = $data['user_name']." has submitted a new request.";
                 $receiverId = $GSOId;
                 $receiverName = $GSOName;
             } else {
-                $notiMessage = $data['user_name']." has submitted a request and needs your approval.";
+                $notiMessage = $data['user_name']." has submitted a request and requires your approval.";
                 $receiverId = $data['supervisor_id'];
                 $receiverName = $data['supervisor_name'];
             }
@@ -207,8 +247,8 @@ class InspectionController extends Controller
             $noti->receiver_id = $receiverId;
             $noti->receiver_name = $receiverName;
             $noti->joms_type = 'JOMS_Inspection';
-            $noti->status = 2;
-            $noti->form_location = $data['form_status'];
+            $noti->status = 0;
+            $noti->form_location = 0;
             $noti->joms_id = $deploymentData->id;
 
             // Save the notification and create logs if successful
@@ -217,7 +257,7 @@ class InspectionController extends Controller
                 $track = new FormTracker();
                 $track->form_id = $deploymentData->id;
                 $track->type_of_request = 'Repair';
-                $track->remarks = $request->input('user_name').' submitted a request.';
+                $track->remarks = $request->input('user_name').' submitted a new request.';
                 $track->save();
 
                 // Create logs
@@ -231,13 +271,18 @@ class InspectionController extends Controller
 
             
             return response()->json(['message' => 'Deployment data created successfully'], 200);
-            }
     }
     
     /**
      * Update Part A Form
      */
     public function updatePartA(Request $request, $id){
+        $checkValidation = $request->validate([
+            'property_description' => 'required|string',
+            'location' => 'required|string',
+            'complain' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
         $codeClearance = explode(', ', $request->input('code'));
 
@@ -250,9 +295,13 @@ class InspectionController extends Controller
             !in_array("HACK", $codeClearance)) {
                 return response()->json(['message' => 'Closed'], 201);
         } 
-        else if ($InspectionRequest->form_status === 6 && $request->input('user_id') == $InspectionRequest->user_id){
-            return response()->json(['message' => 'Not Editable'], 201);
-        }
+
+        if (($InspectionRequest->form_status === 6 || $InspectionRequest->form_status === 7) && 
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)){
+                return response()->json(['message' => 'UnEdited'], 201);
+            }
+
         else {
             $uPartA = $InspectionRequest->update([
                 'property_number' => $request->input('property_number'),
@@ -261,9 +310,9 @@ class InspectionController extends Controller
                 'brand_model' => $request->input('brand_model'),
                 'serial_engine_no' => $request->input('serial_engine_no'),
                 'type_of_property' => $request->input('type_of_property'),
-                'property_description' => $request->input('property_description'),
-                'location' => $request->input('location'),
-                'complain' => $request->input('complain')
+                'property_description' => $checkValidation['property_description'],
+                'location' => $checkValidation['location'],
+                'complain' => $checkValidation['complain']
             ]);
 
             if($uPartA){
@@ -284,9 +333,9 @@ class InspectionController extends Controller
             } else {
                 return response()->json(['error' => 'There area some missing.'], 406);
             }
-        }
 
-        return response()->json($InspectionRequest);
+            return response()->json($InspectionRequest);
+        }
     }
 
     /**
@@ -360,8 +409,8 @@ class InspectionController extends Controller
                     'receiver_id' => $receiverId,
                     'receiver_name' => $receiverName,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => 6,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $ApproveRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -378,8 +427,8 @@ class InspectionController extends Controller
                 'receiver_id' => $GSOData->id,
                 'receiver_name' => trim($GSOData->firstname . ' ' . $GSOData->middlename . '. ' . $GSOData->lastname),
                 'joms_type' => 'JOMS_Inspection',
-                'status' => 2,
-                'form_location' => 6,
+                'status' => 0,
+                'form_location' => 0,
                 'joms_id' => $ApproveRequest->id,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -387,12 +436,6 @@ class InspectionController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $ApproveRequest->id)
-            ->where('form_location', 11)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
         } else {
             return response()->json(['error' => 'Failed to update the request'], 406);
@@ -481,7 +524,7 @@ class InspectionController extends Controller
                     'receiver_id' => $receiverId,
                     'receiver_name' => $receiverName,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
+                    'status' => 0,
                     'form_location' => 0,
                     'joms_id' => $DisapproveRequest->id,
                     'created_at' => $now,
@@ -499,7 +542,7 @@ class InspectionController extends Controller
                 'receiver_id' => $checkQueryGSO->id,
                 'receiver_name' => trim($checkQueryGSO->firstname . ' ' . $checkQueryGSO->middlename . '. ' . $checkQueryGSO->lastname),
                 'joms_type' => 'JOMS_Inspection',
-                'status' => 2,
+                'status' => 0,
                 'form_location' => 0,
                 'joms_id' => $DisapproveRequest->id,
                 'created_at' => $now,
@@ -515,12 +558,6 @@ class InspectionController extends Controller
             $track->type_of_request = 'Repair';
             $track->remarks = $DisapproveRequest->supervisor_name.' disapproved the request.';
             $track->save();
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $DisapproveRequest->id)
-            ->where('form_location', '!=', 0)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
         } else {
             return response()->json(['error' => 'Failed to update the request'], 406);
@@ -618,8 +655,8 @@ class InspectionController extends Controller
                     'receiver_id' => $receiverID,
                     'receiver_name' => $receiverName,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => $form,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $InspectionRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -638,8 +675,8 @@ class InspectionController extends Controller
                     'receiver_id' => $idAM,
                     'receiver_name' => $nameAM,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => $form,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $InspectionRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -655,8 +692,8 @@ class InspectionController extends Controller
                     'receiver_id' => $InspectionRequest->personnel_id,
                     'receiver_name' => $InspectionRequest->personnel_name,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => $form,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $InspectionRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -667,11 +704,6 @@ class InspectionController extends Controller
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
 
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $InspectionRequest->id)
-            ->whereIn('form_location', [6, 8, 9, 10])
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
         } else {
             return response()->json(['message' => 'There area some missing.'], 204);
@@ -695,23 +727,35 @@ class InspectionController extends Controller
      * Update Part B Form 
      */
     public function updatePartB(Request $request, $id){
+        // Validate the Part B Form
+        $validatePartB = $request->validate([
+            'date_of_filling' => 'required|date',
+            'personnel_id' => 'required|numeric',
+            'personnel_name' => 'required|string',
+        ]);
+
         $InspectionRequest = InspectionModel::find($id);
+        $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) {
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) {
             return response()->json(['message' => 'Request is already close'], 409);
-        } else if(in_array($InspectionRequest->form_status, [2, 3, 4, 12, 13]) && $request->input('personnel_id') != $InspectionRequest->personnel_id) {
+        } 
+        
+        if(in_array($InspectionRequest->form_status, [2, 3, 4, 12, 13]) && $request->input('personnel_id') != $InspectionRequest->personnel_id) {
             return response()->json(['message' => 'Cannot Update'], 408);
         } else {
             $uPartB = $InspectionRequest->update([
-                'date_of_filling' => $request->input('date_of_filling'),
+                'date_of_filling' => $validatePartB['date_of_filling'],
                 'date_of_last_repair' => $request->input('date_of_last_repair'),
                 'nature_of_last_repair' => $request->input('nature_of_last_repair'),
-                'personnel_id' => $request->input('personnel_id'),
-                'personnel_name' => $request->input('personnel_name')
+                'personnel_id' => $validatePartB['personnel_id'],
+                'personnel_name' => $validatePartB['personnel_name']
             ]);
 
             if($uPartB){
@@ -759,7 +803,11 @@ class InspectionController extends Controller
         }
 
         // Update Approve
-        $ApproveRequest->form_status = 4;
+        $ApproveRequest->form_status = (
+            $ApproveRequest->date_of_filling &&
+            $ApproveRequest->before_repair_date &&
+            $ApproveRequest->after_reapir_date
+        ) ? 2 : 4;
         $ApproveRequest->form_remarks = "This form was approved by the admin manager.";
 
         // Condition Area
@@ -791,8 +839,8 @@ class InspectionController extends Controller
                     'receiver_id' => $receiverId,
                     'receiver_name' => $receiverName,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => 4,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $ApproveRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -810,8 +858,8 @@ class InspectionController extends Controller
                     'receiver_id' => $ApproveRequest->personnel_id,
                     'receiver_name' => $ApproveRequest->personnel_name,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => 4,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $ApproveRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -834,8 +882,8 @@ class InspectionController extends Controller
                 'receiver_id' => $GSOData->id,
                 'receiver_name' => trim($GSOData->firstname . ' ' . $GSOData->middlename . '. ' . $GSOData->lastname),
                 'joms_type' => 'JOMS_Inspection',
-                'status' => 2,
-                'form_location' => 4,
+                'status' => 0,
+                'form_location' => 0,
                 'joms_id' => $ApproveRequest->id,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -843,12 +891,6 @@ class InspectionController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $ApproveRequest->id)
-            ->where('form_location', 5)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -928,8 +970,8 @@ class InspectionController extends Controller
                 'receiver_id' => $idGSO,
                 'receiver_name' => $nameGSO,
                 'joms_type' => 'JOMS_Inspection',
-                'status' => 2,
-                'form_location' => 3,
+                'status' => 0,
+                'form_location' => 0,
                 'joms_id' => $InspectionRequest->id,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -937,12 +979,6 @@ class InspectionController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $InspectionRequest->id)
-            ->where('form_location', 4)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -975,12 +1011,15 @@ class InspectionController extends Controller
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
+        $codeClearance = explode(', ', $request->input('code'));
 
         if (!$InspectionRequest) {
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) { 
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) { 
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
 
@@ -1091,8 +1130,8 @@ class InspectionController extends Controller
                     'receiver_id' => $idGSO,
                     'receiver_name' => $nameGSO,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => 2,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $InspectionRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -1110,8 +1149,8 @@ class InspectionController extends Controller
                     'receiver_id' => $receiverId,
                     'receiver_name' => $receiverName,
                     'joms_type' => 'JOMS_Inspection',
-                    'status' => 2,
-                    'form_location' => 2,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $InspectionRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -1120,12 +1159,6 @@ class InspectionController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $InspectionRequest->id)
-            ->where('form_location', 3)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -1157,12 +1190,15 @@ class InspectionController extends Controller
         ]);
 
         $InspectionRequest = InspectionModel::find($id);
-
+        $codeClearance = explode(', ', $request->input('code'));
+        
         if (!$InspectionRequest) {
             return response()->json(['error' => 'User not found.'], 404);
         }
 
-        if ($InspectionRequest->form_status === 1) { 
+        if ($InspectionRequest->form_status === 1 &&
+            !in_array("GSO", $codeClearance) && 
+            !in_array("HACK", $codeClearance)) { 
             return response()->json(['message' => 'Request is already close'], 409);
         } else {
 
@@ -1208,12 +1244,6 @@ class InspectionController extends Controller
         if ($ApproveRequest) {
             $ApproveRequest->form_status = 13;
             $ApproveRequest->save();
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $ApproveRequest->id)
-            ->whereIn('form_location', [4, 3])
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
         }
 
         return response()->json(['message' => 'Idle Activate'], 200);
@@ -1226,9 +1256,14 @@ class InspectionController extends Controller
         $twentyFourHoursAgo = Carbon::now()->subHours(24);
 
         $ApproveRequest = InspectionModel::where('id', $id)
-                                        ->where('form_status', 2)
-                                        ->where('updated_at', '<', $twentyFourHoursAgo)
-                                        ->first();
+            ->whereIn('form_status', [2, 4])
+            ->where('updated_at', '<', $twentyFourHoursAgo)
+            ->whereNotNull([
+                'date_of_filling',
+                'before_repair_date',
+                'after_reapir_date'
+            ])
+            ->first();
 
         if ($ApproveRequest) {
             // Update the record
@@ -1236,12 +1271,6 @@ class InspectionController extends Controller
             $ApproveRequest->form_remarks = 'Form is closed';
             
             if($ApproveRequest->save()){
-
-                // Update Notification (Para ma wala sa notifacion list)
-                NotificationModel::where('joms_type', 'JOMS_Inspection')
-                ->where('joms_id', $ApproveRequest->id)
-                ->where('form_location', 2)
-                ->update(['status' => 0]); // Change to 0 for delete the Notification
 
                 // Add to the Trackers
                 $track = new FormTracker();
@@ -1264,7 +1293,7 @@ class InspectionController extends Controller
 
     /**
      * Cancel Form
-     */
+     */ 
     public function cancelRequest(Request $request, $id){
 
         $ApproveRequest = InspectionModel::find($id);
@@ -1280,11 +1309,6 @@ class InspectionController extends Controller
         // Save Update
         if ($ApproveRequest->save()) {
 
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('joms_type', 'JOMS_Inspection')
-            ->where('joms_id', $ApproveRequest->id)
-            ->update(['status' => 0]); // Change to 0 for delete the Notification
-
             // Add to the Trackers
             $track = new FormTracker();
             $track->form_id = $ApproveRequest->id;
@@ -1298,8 +1322,50 @@ class InspectionController extends Controller
             $logs->message = $request->input('user_name').' has canceled the request for the Pre/Post Repair Inspection Form (Control No. '.$ApproveRequest->id.').';
             $logs->save();
 
+            // Delete Notifications
+            NotificationModel::where('joms_id', $id)
+            ->where('joms_type', 'JOMS_Inspection')
+            ->delete();
+
         } else {
             return response()->json(['error' => 'Failed to update the request'], 406);
+        }
+    }
+
+    /**
+     * Manual Complete Form
+     */ 
+    public function manualComplete($id){
+        $ManualRequest = InspectionModel::where('id', $id)
+            ->whereIn('form_status', [5, 6, 8, 9, 10, 11])
+            ->whereNotNull([
+                'date_of_filling',
+                'before_repair_date',
+                'after_reapir_date'
+            ])
+            ->first();
+
+        if ($ManualRequest) {
+            // Update the record
+            $ManualRequest->form_status = 1;
+            $ManualRequest->form_remarks = 'Form is closed';
+            
+            if($ManualRequest->save()){
+
+                // Add to the Trackers
+                $track = new FormTracker();
+                $track->form_id = $ManualRequest->id;
+                $track->type_of_request = 'Repair';
+                $track->remarks = 'The form was closed by the system.';
+                $track->save();
+
+                // Log the action
+                $logs = new LogsModel();
+                $logs->category = 'FORM';
+                $logs->message = 'The system has closed the Pre/Post Repair Inspection Form (Control No. ' . $ManualRequest->id . ').';
+                $logs->save();
+            }
+        
         }
     }
 

@@ -11,6 +11,7 @@ use App\Models\FormTracker;
 use App\Http\Requests\FacilityFormRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FacilityVenueController extends Controller
 {
@@ -31,35 +32,115 @@ class FacilityVenueController extends Controller
      /**
      *  Form List (Shows on the Request List)
      */
-    public function index(){
-        // For Facility Form
-        $FacilityFormData = FacilityVenueModel::orderBy('created_at', 'desc')->get();
+    public function index(Request $request){
+        $facilityPage = $request->input('facility_page', 1);
 
-        // Check if the facility request exists
-        if (!$FacilityFormData) {
-            return response()->json(['error' => 'Data not found'], 404);
+        $search = $request->input('search');
+
+        $query = FacilityVenueModel::orderBy('created_at', 'desc');
+
+        if ($search) {
+
+            $query->where(function ($q) use ($search) {
+                $q->where('request_office', 'LIKE', "%{$search}%")
+                ->orWhere('title_of_activity', 'LIKE', "%{$search}%")
+                ->orWhere('remarks', 'LIKE', "%{$search}%")
+                // SEARCH DATE
+                ->orWhereRaw("DATE_FORMAT(created_at, '%M %e, %Y') LIKE ?", ["%{$search}%"]);
+            });
         }
 
-        $facDet = $FacilityFormData->map(function ($facilityForm) {
-            return[
-                'id' => $facilityForm->id,
-                'date_request' => $facilityForm->created_at,
-                'request_office' => $facilityForm->request_office,
-                'title_activity' => $facilityForm->title_of_activity,
-                'date_start' => $facilityForm->date_start,
-                'time_start' => $facilityForm->time_start,
-                'date_end' => $facilityForm->date_end,
-                'time_end' => $facilityForm->time_end,
+        $facilityData = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(
+                25,
+                ['*'],
+                'facility_page',
+                $facilityPage
+            );
+
+        $facilityData->getCollection()->transform(
+            function ($facilityForm) {
+
+            return [
+
+                'fac_id' =>
+                    $facilityForm->id,
+
+                'fac_date_request' =>
+                    \Carbon\Carbon::parse(
+                        $facilityForm->created_at
+                    )->format('F j, Y'),
+                'fac_request_office' => $facilityForm->request_office,
+                'fac_title_of_activity' => $facilityForm->title_of_activity,
+                'fac_date_start' => $facilityForm->date_start,
+                'fac_time_start' => $facilityForm->time_start,
+                'fac_date_end' => $facilityForm->date_end,
+                'fac_time_end' => $facilityForm->time_end,
                 'mph' => $facilityForm->mph,
                 'conference' => $facilityForm->conference,
                 'dorm' => $facilityForm->dorm,
                 'other' => $facilityForm->other,
-                'requestor' => $facilityForm->user_name,
-                'remarks' => $facilityForm->remarks,
+                'fac_requestor' => $facilityForm->user_name,
+                'fac_remarks' => $facilityForm->remarks,
+
             ];
         });
 
-        return response()->json($facDet);
+        return response()->json($facilityData);
+
+
+        // // For Facility Form
+        // $FacilityFormData = FacilityVenueModel::orderBy('created_at', 'desc')->get();
+
+        // // Check if the facility request exists
+        // if (!$FacilityFormData) {
+        //     return response()->json(['error' => 'Data not found'], 404);
+        // }
+
+        // $facDet = $FacilityFormData->map(function ($facilityForm) {
+        //     return[
+        //         'id' => $facilityForm->id,
+        //         'date_request' => $facilityForm->created_at,
+        //         'request_office' => $facilityForm->request_office,
+        //         'title_activity' => $facilityForm->title_of_activity,
+        //         'date_start' => $facilityForm->date_start,
+        //         'time_start' => $facilityForm->time_start,
+        //         'date_end' => $facilityForm->date_end,
+        //         'time_end' => $facilityForm->time_end,
+        //         'mph' => $facilityForm->mph,
+        //         'conference' => $facilityForm->conference,
+        //         'dorm' => $facilityForm->dorm,
+        //         'other' => $facilityForm->other,
+        //         'requestor' => $facilityForm->user_name,
+        //         'remarks' => $facilityForm->remarks,
+        //     ];
+        // });
+
+        // return response()->json($facDet);
+    }
+
+    /**
+     * Generate PDF
+     */
+    public function generateFacilityPDF($id){
+        $facility = FacilityVenueModel::findOrFail($id);
+        $admin = PPAEmployee::where('code_clearance', 'LIKE', '%AM%')->first();
+
+        // Get all needed employees in one query
+        $employees = PPAEmployee::whereIn('id', [
+            $facility->user_id,
+        ])->get()->keyBy('id');
+
+        $requestor = $employees[$facility->user_id] ?? null;
+
+        $pdf = Pdf::loadView('pdf.facility', compact(
+            'facility',
+            'admin',
+            'requestor'
+        ))->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Facility-Control-No-$id.pdf");
     }
 
     /**
@@ -185,8 +266,8 @@ class FacilityVenueController extends Controller
             'receiver_id' => $receiverId,
             'receiver_name' => $receiverName,
             'joms_type' => 'JOMS_Facility',
-            'status' => 2,
-            'form_location' => $data['admin_approval'],
+            'status' => 0,
+            'form_location' => 0,
             'joms_id' => $deploymentData->id,
             'created_at' => $now,
             'updated_at' => $now
@@ -250,9 +331,9 @@ class FacilityVenueController extends Controller
         }
 
         // If the Admin Manager Closed the form
-        if($facilityData->admin_approval == 1){
-            return response()->json(['message' => 'Closed'], 201);
-        } 
+        // if($facilityData->admin_approval == 1){
+        //     return response()->json(['message' => 'Closed'], 201);
+        // } 
         
         // If the Admin Manager disapproves the form
         if($facilityData->admin_approval == 4){
@@ -328,19 +409,8 @@ class FacilityVenueController extends Controller
 
         // Check if the facility request exists
         if (!$FacilityRequest) {
-            return response()->json(['error' => 'Data Not Found'], 404);
+            return response()->json(['error' => 'No-Form'], 404);
         }
-
-        // Get Requestor Detail
-        $RequestorRequest = PPAEmployee::where('id', $FacilityRequest->user_id)->first();
-        $RequestorName = $RequestorRequest->firstname . ' ' . $RequestorRequest->middlename. '. ' . $RequestorRequest->lastname;
-        $RequestorEsig = $rootUrl . '/storage/displayesig/' . $RequestorRequest->esign;
-        $RequestorPosition = $RequestorRequest->position;
-
-        // Get Admin Manager's Detail
-        $AdminEsigRequest = PPAEmployee::where('code_clearance', 'LIKE', "%AM%")->first();
-        $AdminName = $AdminEsigRequest->firstname . ' ' . $AdminEsigRequest->middlename. '. ' . $AdminEsigRequest->lastname;
-        $AdminEsig = $rootUrl . '/storage/displayesig/' . $AdminEsigRequest->esign;
 
         // Prev & Next IDs
         $prevId = FacilityVenueModel::where('id', '<', $id)->orderBy('id', 'desc')->value('id');
@@ -350,11 +420,6 @@ class FacilityVenueController extends Controller
             'next' => $nextId,
             'prev' => $prevId,
             'form' => $FacilityRequest,
-            'admin_name' => $AdminName,
-            'admin_esig' => $AdminEsig,
-            'req_name' => $RequestorName,
-            'req_esig' => $RequestorEsig,
-            'req_position' => $RequestorPosition
         ];
         
         return response()->json($respondData);
@@ -431,8 +496,8 @@ class FacilityVenueController extends Controller
                 'receiver_id' => $dataGSO->id,
                 'receiver_name' => $nameGSO,
                 'joms_type' => 'JOMS_Facility',
-                'status' => 2,
-                'form_location' => 3,
+                'status' => 0,
+                'form_location' => 0,
                 'joms_id' => $facilityRequest->id,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -449,8 +514,8 @@ class FacilityVenueController extends Controller
                     'receiver_id' => $facilityRequest->user_id,
                     'receiver_name' => $facilityRequest->user_name,
                     'joms_type' => 'JOMS_Facility',
-                    'status' => 2,
-                    'form_location' => 3,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $facilityRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -459,13 +524,6 @@ class FacilityVenueController extends Controller
 
            // Insert notifications in bulk for efficiency
            NotificationModel::insert($notifications);
-
-           // Update Notification (Para ma wala sa notifacion list)
-           NotificationModel::where('receiver_id', $checkAM->id)
-                        ->where('joms_type', 'JOMS_Facility')
-                        ->where('joms_id', $facilityRequest->id)
-                        ->whereIn('form_location', [5, 6, 7])
-                        ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -578,8 +636,8 @@ class FacilityVenueController extends Controller
                     'receiver_id' => $facilityRequest->user_id,
                     'receiver_name' => $facilityRequest->user_name,
                     'joms_type' => 'JOMS_Facility',
-                    'status' => 2,
-                    'form_location' => 1,
+                    'status' => 0,
+                    'form_location' => 0,
                     'joms_id' => $facilityRequest->id,
                     'created_at' => $now,
                     'updated_at' => $now
@@ -588,13 +646,6 @@ class FacilityVenueController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::whereIn('receiver_id', [$senderId, $facilityRequest->user_id])
-                        ->where('joms_type', 'JOMS_Facility')
-                        ->where('joms_id', $facilityRequest->id)
-                        ->where('form_location', 3)
-                        ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -653,6 +704,9 @@ class FacilityVenueController extends Controller
      *  Admin Manager Disapproval
      */
     public function adminDisapproval(Request $request, $id){
+        $CheckReason = $request->validate([
+            'remarks' => 'required|string'
+        ]); 
         // Get the current timestamp
         $now = Carbon::now();
 
@@ -664,7 +718,7 @@ class FacilityVenueController extends Controller
 
         $facilityRequest->admin_approval = 4;
         $facilityRequest->date_approve = today();
-        $facilityRequest->remarks = "Disapproved (Reason: ".$request->input('remarks'). ")";
+        $facilityRequest->remarks = "Disapproved (Reason: ".$CheckReason['remarks']. ")";
         
         if($facilityRequest->save()){
 
@@ -705,7 +759,7 @@ class FacilityVenueController extends Controller
                 'receiver_id' => $receiverId,
                 'receiver_name' => $receiverName,
                 'joms_type' => 'JOMS_Facility',
-                'status' => 2,
+                'status' => 0,
                 'form_location' => 0,
                 'joms_id' => $facilityRequest->id,
                 'created_at' => $now,
@@ -723,7 +777,7 @@ class FacilityVenueController extends Controller
                     'receiver_id' => $facilityRequest->user_id,
                     'receiver_name' => $facilityRequest->user_name,
                     'joms_type' => 'JOMS_Facility',
-                    'status' => 2,
+                    'status' => 0,
                     'form_location' => 0,
                     'joms_id' => $facilityRequest->id,
                     'created_at' => $now,
@@ -733,13 +787,6 @@ class FacilityVenueController extends Controller
 
             // Insert notifications in bulk for efficiency
             NotificationModel::insert($notifications);
-
-            // Update Notification (Para ma wala sa notifacion list)
-            NotificationModel::where('receiver_id', $idAM)
-                            ->where('joms_type', 'JOMS_Facility')
-                            ->where('joms_id', $facilityRequest->id)
-                            ->whereIn('form_location', [5, 6, 7])
-                            ->update(['status' => 0]); // Change to 0 for delete the Notification
 
             // Add to the Trackers
             $track = new FormTracker();
@@ -819,28 +866,18 @@ class FacilityVenueController extends Controller
 
         // Save Update
         if ($facilityRequest->save()) {
+            // Add to the Trackers
+            $track = new FormTracker();
+            $track->form_id = $facilityRequest->id;
+            $track->type_of_request = 'Facility/Venue';
+            $track->remarks = $request->input('user_name').' canceled the form.';
+            $track->save();
 
-            $Noti = NotificationModel::where('joms_id', $facilityRequest->id)->where('joms_type', 'JOMS_Facility')->get();
-
-            // Loop through each notification and update status
-            foreach ($Noti as $notification) {
-                $notification->status = 0;
-
-                if ($notification->save()) {
-                    // Add to the Trackers
-                    $track = new FormTracker();
-                    $track->form_id = $facilityRequest->id;
-                    $track->type_of_request = 'Facility/Venue';
-                    $track->remarks = $request->input('user_name').' canceled the form.';
-                    $track->save();
-
-                    // Log only if saving the notification is successful
-                    $logs = new LogsModel();
-                    $logs->category = 'FORM';
-                    $logs->message = $request->input('user_name').' has canceled the form on Facility / Venue Request Form (Control Number:'.$facilityRequest->id.').';
-                    $logs->save();
-                }
-            }
+            // Log only if saving the notification is successful
+            $logs = new LogsModel();
+            $logs->category = 'FORM';
+            $logs->message = $request->input('user_name').' has canceled the form on Facility / Venue Request Form (Control Number:'.$facilityRequest->id.').';
+            $logs->save();
 
         } else {
             return response()->json(['message' => 'Failed to update the request'], 500);

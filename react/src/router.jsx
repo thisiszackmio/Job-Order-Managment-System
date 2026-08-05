@@ -1,100 +1,97 @@
 import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
+// Protected Route
+import ProtectedRoute from './components/protectedRoute';
+
 // Layout
-import ProtectedRoute from './components/ProtectedRoute';
 import JLMSLayout from './components/JLMSLayout';
-import JOMSLayout from './components/JOMSLayout';
-import GuestLayout from './components/GuestLayout';
+import GuestLayout from './components/guestLayout';
+import MainLayout from './components/mainLayout';
+import TopNav from './layout/topnav';
+import Sidebar from './layout/sidebar';
+import Footer from './layout/footer';
 
-// JOMS
-import DashboardJOMS from './views/sidebar/DashboardJOMS';
-import SystemUpdate from './views/sidebar/SystemUpdate';
-import MyRequest from './views/sidebar/MyRequestList';
-import InspectionRepairFormRequest from './views/inspectionForm/InpectionFormRequest';
-import InspectionRepairForm from './views/inspectionForm/InspectionForm';
-import InspectionFormList from './views/inspectionForm/InspectionFormList';
-import FacilityVenueFormRequest from './views/facilityForm/FacilityForRequest';
-import FacilityVenueForm from './views/facilityForm/FacilityForm';
-import FacilityVenueList from './views/facilityForm/FacilityFormList';
-import VehicleSlipFormRequest from './views/vehicleSlip/VehicleSlipRequest';
-import VehicleSlipForm from './views/vehicleSlip/VehicleSlip'; 
-import VehicleSlipList from './views/vehicleSlip/VehicleSlipList';
-import AddPersonnel from './views/sidebar/AddPersonnel';
-import AddVehicleType from './views/sidebar/VehicleType';
-import AllAnnouncements from './views/announcement/AllAnnounce';
-import AddAnnouncements from './views/announcement/AddAnnounce';
-import Logs from './views/settings/Logs';
-import UserRegistrationJLMS from './views/settings/UserRegistration';
-import UserListJLMS from './views/settings/UserList';
-import UserDetailsJLMS from './views/settings/UserDetails';
-import ViewUser from './views/ViewUser';
-import PendingRequest from './views/sidebar/Pending';
+// Landing Page
+import JLMS from './views/jlmsLp';
+import Login from './views/login';
 
-import JLMS from './views/jlms';
-import Login from './views/Login';
-import Maintenance from './views/settings/Maintenance';
-import FileNotFound from './components/404';
+// Pages
+import Dashboard from './views/dashboard';
+import Profile from './views/profile';
+import MyRequest from './views/myrequest';
+import PendingRequests from './views/pending';
+import VehicleDetails from './views/vehicleDetails';
+import SystemSettings from './views/Settings/systemSettings';
+import UserDetails from './views/Users/userDetails';
+import UserList from './views/Users/userList';
+import UserRegistration from './views/Users/userRegistration';
+import Announcement from './views/Settings/announcements';
+import Logs from './views/Settings/logs';
+
+
+// Form
+import InspectionRequest from './views/Inspection/inspectionRequest';
+import InspectionForm from './views/Inspection/inspectionForm';
+import InspectionList from './views/Inspection/inspectionList';
+import FacilityRequest from './views/FacilityVenue/facilityRequest';
+import FacilityForm from './views/FacilityVenue/facilityForm';
+import FacilityList from './views/FacilityVenue/facilityList';
+import VehicleRequest from './views/Vehicle/vehicleRequest';
+import VehicleForm from './views/Vehicle/vehicleForm';
+import VehicleList from './views/Vehicle/vehicleList';
+import LocatorRequest from './views/Locator/locatorRequest';
+import LocatorForm from './views/Locator/locatorForm';
+import LocatorList from './views/Locator/locatorList';
 
 const routes = [
-
-  // ---- Joint Local Management System (Open No need for the access) ---- //
-  {
-    path: '/',
-    element: <JLMSLayout />,
-    children: [
-      { path: '/', element:  <JLMS /> }
-    ]
-  },
-
-  // ---- Login ---- //
-  {
-    path: '/',
-    element: <GuestLayout />,
-    children: [
-      { path: "/joms/login", element: <Login /> },
-      { path: '/login', element: <Navigate to="/joms/login" replace /> },
-    ]
-  },
-
-  // ---- Job Order Management System ---- //
-  {
-    path: '/joms',
-    element: <ProtectedRoute><JOMSLayout /></ProtectedRoute>,
-    children: [
-      // SideBar
-      { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
-      { path: '/joms/dashboard', element: <DashboardJOMS /> },
-      { path: '/joms/systemupdate', element:  <SystemUpdate /> },
-      { path: '/joms/myrequest', element: <MyRequest /> },
-      { path: '/joms/personnel', element: <AddPersonnel /> },
-      { path: '/joms/vehicletype', element: <AddVehicleType /> },
-      { path: '/joms/allannouncement', element: <AllAnnouncements /> },
-      { path: '/joms/addannouncement', element: <AddAnnouncements /> },
-      { path: '/joms/settings', element: <Maintenance /> },
-      { path: '/joms/logs', element: <Logs /> },
-      { path: '/joms/addemployee', element: <UserRegistrationJLMS /> },
-      { path: '/joms/userlist', element: <UserListJLMS /> },
-      { path: '/joms/userdetails/:id', element: <UserDetailsJLMS /> },
-      { path: '/joms/user', element: <ViewUser /> },
-      { path: '/joms/pending', element: <PendingRequest /> },
-      // Inspection
-      { path: '/joms/inspection', element: <InspectionFormList /> },
-      { path: '/joms/inspection/form', element: <InspectionRepairFormRequest /> },
-      { path: '/joms/inspection/form/:id', element: <InspectionRepairForm /> },
-      // Facility
-      { path: '/joms/facilityvenue/form', element: <FacilityVenueFormRequest /> },
-      { path: '/joms/facilityvenue/form/:id', element: <FacilityVenueForm /> },
-      { path: '/joms/facilityvenue', element: <FacilityVenueList /> },
-      // Vehicle
-      { path: '/joms/vehicle/form', element: <VehicleSlipFormRequest /> },
-      { path: '/joms/vehicle/form/:id', element: <VehicleSlipForm /> },
-      { path: '/joms/vehicle', element: <VehicleSlipList /> },
-    ]
-  },
-
-  { path: '*', element: <FileNotFound /> },
-
+    // ---- Joint Local Management System (Open No need for the access) ---- //
+    { path: '/', element: <JLMSLayout />,
+        children: [
+            { path: '/', element:  <JLMS /> }
+        ]
+    },
+    // ---- Guest Layout (Open No need for the access) ---- //
+    { path: '/', element: <GuestLayout />, 
+        children: [
+            { path: '/joms/login', element: <Login /> },
+            { path: '/login', element: <Navigate to="/joms/login" replace /> }
+        ] 
+    },
+    // ---- Main Layout (Open No need for the access) ---- //
+    { path: '/', element: <ProtectedRoute><MainLayout /></ProtectedRoute>, 
+        children: [
+            { path: '/joms', element: <Navigate to="/joms/dashboard" /> },
+            { path: '/joms/dashboard', element: <Dashboard /> },
+            { path: '/joms/profile', element: <Profile /> },
+            { path: '/joms/myrequest', element: <MyRequest /> },
+            { path: '/joms/pending', element: <PendingRequests /> },
+            // Settings
+            { path: '/joms/settings', element: <SystemSettings /> },
+            { path: '/joms/announcements', element: <Announcement /> },
+            { path: '/joms/logs', element: <Logs /> },
+            // Users
+            { path: '/joms/users', element: <UserList /> },
+            { path: '/joms/user/details', element: <UserDetails /> },
+            { path: '/joms/user/registration', element: <UserRegistration /> },
+            // Inspection Request
+            { path: '/joms/inspection', element: <InspectionList /> },
+            { path: '/joms/inspection/form', element: <InspectionRequest /> },
+            { path: '/joms/inspection/form/:id', element: <InspectionForm /> },
+            // Facility
+            { path: '/joms/facility', element: <FacilityList /> },
+            { path: '/joms/facility/form', element: <FacilityRequest /> },
+            { path: '/joms/facility/form/:id', element: <FacilityForm /> },   
+            // Vehicle
+            { path: '/joms/vehicle', element: <VehicleList /> },
+            { path: '/joms/vehicle/form', element: <VehicleRequest /> },
+            { path: '/joms/vehicle/form/:id', element: <VehicleForm /> }, 
+            // Locator
+            { path: '/joms/locator', element: <LocatorList /> },
+            { path: '/joms/locator/form', element: <LocatorRequest /> },
+            { path: '/joms/locator/form/:id', element: <LocatorForm /> }, 
+        ] 
+    },
 ]
 
 const router = createBrowserRouter(routes);

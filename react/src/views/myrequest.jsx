@@ -181,382 +181,384 @@ export default function MyRequest() {
 
             {/* Inspection Tab */}
             {activeTab === "inspection" && (
-            <div className="tab-container">
-                {/* Top */}
-                <div className="tab-header">
-                    <div>
-                        {/* Search (LEFT) */}
-                        <input
-                            type="text"
-                            placeholder="Search here ..."
-                            value={searchInsp}
-                            onChange={(e) =>
-                            setSearchInsp(e.target.value)
-                            }
-                            className="ppa-form-search"
-                        />
-                    </div>
-                    <div>
-                        <div className="ppa-page">
-                            Page <b>{currentInspPage}</b> of <b>{lastInspPage}</b>
+                <div className="tab-container">
+                    {/* Top */}
+                    <div className="tab-header">
+                        <div>
+                            {/* Search (LEFT) */}
+                            <input
+                                type="text"
+                                placeholder="Search here ..."
+                                value={searchInsp}
+                                onChange={(e) =>
+                                setSearchInsp(e.target.value)
+                                }
+                                className="ppa-form-search"
+                            />
+                        </div>
+                        <div>
+                            <div className="ppa-page">
+                                Page <b>{currentInspPage}</b> of <b>{lastInspPage}</b>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Pagination */}
-                {lastInspPage > 1 && (
-                    <div className="mt-4">
-                        {/* Prev */}
-                        <button
-                        disabled={currentInspPage === 1}
-                        onClick={() => fetchInspection(currentInspPage - 1)}
-                        className="ppa-pagination padding-arrow arrow-left"
-                        >
-                        <FontAwesomeIcon
-                            title="Prev"
-                            icon={faChevronLeft}
-                        />
-                        </button>
-
-                        {/* Page Numbers */}
-                        {(() => {
-                            const pages = [];
-
-                            // Always show first page
-                            pages.push(1);
-
-                            // Current page range
-                            for (
-                            let i = Math.max(2, currentInspPage - 1);
-                            i <= Math.min(lastInspPage - 1, currentInspPage + 1);
-                            i++
-                            ) {
-                            pages.push(i);
-                            }
-
-                            // Always show last page
-                            if (lastInspPage > 1) {
-                            pages.push(lastInspPage);
-                            }
-
-                            // Remove duplicates
-                            const uniquePages = [...new Set(pages)];
-
-                            return uniquePages.map((page, index) => {
-                            const prevPage = uniquePages[index - 1];
-
-                            return (
-                                <React.Fragment key={page}>
-
-                                {/* Show dots */}
-                                {prevPage && page - prevPage > 1 && (
-                                    <span>...</span>
-                                )}
-
-                                {/* Page Button */}
-                                <button
-                                    onClick={() => fetchInspection(page)}
-                                    className={`${
-                                    currentInspPage === page
-                                        ? 'ppa-pagination-active ppa-page-num'
-                                        : 'ppa-pagination ppa-page-num'
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-
-                                </React.Fragment>
-                            );
-                            });
-                        })()}
-
-                        {/* Next */}
-                        <button
-                            disabled={currentInspPage === lastInspPage}
-                            onClick={() => fetchInspection(currentInspPage + 1)}
-                            className="ppa-pagination padding-arrow arrow-right"
-                        >
+                    {/* Pagination */}
+                    {lastInspPage > 1 && (
+                        <div className="mt-4">
+                            {/* Prev */}
+                            <button
+                                disabled={currentInspPage === 1 || loadingInsp}
+                                onClick={() => fetchInspection(currentInspPage - 1)}
+                                className="ppa-pagination padding-arrow arrow-left"
+                            >
                             <FontAwesomeIcon
-                            title="Next"
-                            icon={faChevronRight}
+                                title="Prev"
+                                icon={faChevronLeft}
                             />
-                        </button>
-                    </div>
-                )}
+                            </button>
 
-                {/* Table */}
-                <div className="table-wrapper mt-4">
-                    <table className="ppa-table">
-                        <thead>
-                            <tr>
-                                <th className="ppa-table-header text-center">#</th>
-                                <th className="ppa-table-header">Date Request</th>
-                                <th className="ppa-table-header">Type of Property</th>
-                                <th className="ppa-table-header">Description</th>
-                                <th className="ppa-table-header">Complain/Defect</th>
-                                <th className="ppa-table-header">Approver</th>
-                                <th className="ppa-table-header">Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loadingInsp ? (
-                                Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
-                                    <tr key={index}>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ):(
-                                inspectionForm && inspectionForm?.length > 0 ? (
-                                    inspectionForm.map(getInspData => (
-                                        <tr key={getInspData.repair_id}>
+                            {/* Page Numbers */}
+                            {(() => {
+                                const pages = [];
+
+                                // Always show first page
+                                pages.push(1);
+
+                                // Current page range
+                                for (
+                                let i = Math.max(2, currentInspPage - 1);
+                                i <= Math.min(lastInspPage - 1, currentInspPage + 1);
+                                i++
+                                ) {
+                                pages.push(i);
+                                }
+
+                                // Always show last page
+                                if (lastInspPage > 1) {
+                                pages.push(lastInspPage);
+                                }
+
+                                // Remove duplicates
+                                const uniquePages = [...new Set(pages)];
+
+                                return uniquePages.map((page, index) => {
+                                const prevPage = uniquePages[index - 1];
+
+                                return (
+                                    <React.Fragment key={page}>
+
+                                    {/* Show dots */}
+                                    {prevPage && page - prevPage > 1 && (
+                                        <span>...</span>
+                                    )}
+
+                                    {/* Page Button */}
+                                    <button
+                                        onClick={() => fetchInspection(page)}
+                                        className={`${
+                                        currentInspPage === page
+                                            ? 'ppa-pagination-active ppa-page-num'
+                                            : 'ppa-pagination ppa-page-num'
+                                        }`}
+                                        disabled = {loadingInsp}
+                                    >
+                                        {page}
+                                    </button>
+
+                                    </React.Fragment>
+                                );
+                                });
+                            })()}
+
+                            {/* Next */}
+                            <button
+                                disabled={currentInspPage === lastInspPage || loadingInsp}
+                                onClick={() => fetchInspection(currentInspPage + 1)}
+                                className="ppa-pagination padding-arrow arrow-right"
+                            >
+                                <FontAwesomeIcon
+                                title="Next"
+                                icon={faChevronRight}
+                                />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Table */}
+                    <div className="table-wrapper mt-4">
+                        <table className="ppa-table">
+                            <thead>
+                                <tr>
+                                    <th className="ppa-table-header text-center">#</th>
+                                    <th className="ppa-table-header">Date Request</th>
+                                    <th className="ppa-table-header">Type of Property</th>
+                                    <th className="ppa-table-header">Description</th>
+                                    <th className="ppa-table-header">Complain/Defect</th>
+                                    <th className="ppa-table-header">Approver</th>
+                                    <th className="ppa-table-header">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loadingInsp ? (
+                                    Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
+                                        <tr key={index}>
                                             <td className="ppa-table-body">
-                                                <Link 
-                                                    to={`/joms/inspection/form/${getInspData.repair_id}`} 
-                                                    className="link-hover-flip"
-                                                >
-                                                    <span className="repair-id"><b>{getInspData.repair_id}</b></span>
-                                                    <span className="eye-icon">
-                                                        <FontAwesomeIcon icon={faEye} />
-                                                    </span>
-                                                </Link>
+                                                <div className="skeleton hs-table"></div>
                                             </td>
-                                            <td className="ppa-table-body">{formatDate(getInspData.repair_date_request)}</td>
-                                            <td className="ppa-table-body">{getInspData.repair_type}</td>
-                                            <td className="ppa-table-body">{getInspData.repair_description}</td>
-                                            <td className="ppa-table-body">{getInspData.repair_complain}</td>
-                                            <td className="ppa-table-body">{getInspData.repair_supervisor_name}</td>
-                                            <td className="ppa-table-body">{getInspData.repair_remarks}</td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
                                         </tr>
                                     ))
                                 ):(
-                                    <tr>
-                                        <td colSpan={7} className="text-center ppa-table-body"> No List </td>
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
-                    </table>
+                                    inspectionForm && inspectionForm?.length > 0 ? (
+                                        inspectionForm.map(getInspData => (
+                                            <tr key={getInspData.repair_id}>
+                                                <td className="ppa-table-body">
+                                                    <Link 
+                                                        to={`/joms/inspection/form/${getInspData.repair_id}`} 
+                                                        className="link-hover-flip"
+                                                    >
+                                                        <span className="repair-id"><b>{getInspData.repair_id}</b></span>
+                                                        <span className="eye-icon">
+                                                            <FontAwesomeIcon icon={faEye} />
+                                                        </span>
+                                                    </Link>
+                                                </td>
+                                                <td className="ppa-table-body">{formatDate(getInspData.repair_date_request)}</td>
+                                                <td className="ppa-table-body">{getInspData.repair_type}</td>
+                                                <td className="ppa-table-body">{getInspData.repair_description}</td>
+                                                <td className="ppa-table-body">{getInspData.repair_complain}</td>
+                                                <td className="ppa-table-body">{getInspData.repair_supervisor_name}</td>
+                                                <td className="ppa-table-body">{getInspData.repair_remarks}</td>
+                                            </tr>
+                                        ))
+                                    ):(
+                                        <tr>
+                                            <td colSpan={7} className="text-center ppa-table-body"> No Request </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
             )}
 
             {/* Facility Tab */}
             {activeTab === "facility" && (
-            <div className="tab-container">
-                {/* Top */}
-                <div className="tab-header">
-                    <div>
-                        {/* Search (LEFT) */}
-                        <input
-                            type="text"
-                            placeholder="Search here ..."
-                            value={searchFac}
-                            onChange={(e) =>
-                            setSearchFac(e.target.value)
-                            }
-                            className="ppa-form-search"
-                        />
-                    </div>
-                    <div>
-                        <div className="ppa-page">
-                            Page <b>{currentFacPage}</b> of <b>{lastFacPage}</b>
+                <div className="tab-container">
+                    {/* Top */}
+                    <div className="tab-header">
+                        <div>
+                            {/* Search (LEFT) */}
+                            <input
+                                type="text"
+                                placeholder="Search here ..."
+                                value={searchFac}
+                                onChange={(e) =>
+                                setSearchFac(e.target.value)
+                                }
+                                className="ppa-form-search"
+                            />
+                        </div>
+                        <div>
+                            <div className="ppa-page">
+                                Page <b>{currentFacPage}</b> of <b>{lastFacPage}</b>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Pagination */}
-                {lastFacPage > 1 && (
-                    <div className="mt-4">
-                        {/* Prev */}
-                        <button
-                        disabled={currentFacPage === 1}
-                        onClick={() => fetchFacility(currentFacPage - 1)}
-                        className="ppa-pagination padding-arrow arrow-left"
-                        >
-                        <FontAwesomeIcon
-                            title="Prev"
-                            icon={faChevronLeft}
-                        />
-                        </button>
-
-                        {/* Page Numbers */}
-                        {(() => {
-                            const pages = [];
-
-                            // Always show first page
-                            pages.push(1);
-
-                            // Current page range
-                            for (
-                            let i = Math.max(2, currentFacPage - 1);
-                            i <= Math.min(lastFacPage - 1, currentFacPage + 1);
-                            i++
-                            ) {
-                            pages.push(i);
-                            }
-
-                            // Always show last page
-                            if (lastFacPage > 1) {
-                            pages.push(lastFacPage);
-                            }
-
-                            // Remove duplicates
-                            const uniquePages = [...new Set(pages)];
-
-                            return uniquePages.map((page, index) => {
-                            const prevPage = uniquePages[index - 1];
-
-                            return (
-                                <React.Fragment key={page}>
-
-                                {/* Show dots */}
-                                {prevPage && page - prevPage > 1 && (
-                                    <span>...</span>
-                                )}
-
-                                {/* Page Button */}
-                                <button
-                                    onClick={() => fetchFacility(page)}
-                                    className={`${
-                                    currentFacPage === page
-                                        ? 'ppa-pagination-active ppa-page-num'
-                                        : 'ppa-pagination ppa-page-num'
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-
-                                </React.Fragment>
-                            );
-                            });
-                        })()}
-
-                        {/* Next */}
-                        <button
-                            disabled={currentFacPage === lastFacPage}
-                            onClick={() => fetchFacility(currentFacPage + 1)}
-                            className="ppa-pagination padding-arrow arrow-right"
-                        >
+                    {/* Pagination */}
+                    {lastFacPage > 1 && (
+                        <div className="mt-4">
+                            {/* Prev */}
+                            <button
+                            disabled={currentFacPage === 1 || loadingFac}
+                            onClick={() => fetchFacility(currentFacPage - 1)}
+                            className="ppa-pagination padding-arrow arrow-left"
+                            >
                             <FontAwesomeIcon
-                            title="Next"
-                            icon={faChevronRight}
+                                title="Prev"
+                                icon={faChevronLeft}
                             />
-                        </button>
-                    </div>
-                )}
+                            </button>
 
-                {/* Table */}
-                <div className="table-wrapper mt-4">
-                    <table className="ppa-table">
-                        <thead>
-                            <tr>
-                                <th className="ppa-table-header text-center">#</th>
-                                <th className="ppa-table-header">Date Request</th>
-                                <th className="ppa-table-header">Request Office</th>
-                                <th className="ppa-table-header">Activity</th>
-                                <th className="ppa-table-header">Date</th>
-                                <th className="ppa-table-header">Facility/Venue</th>
-                                <th className="ppa-table-header">Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loadingFac ? (
-                                Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
-                                    <tr key={index}>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                        <td className="ppa-table-body">
-                                            <div className="skeleton hs-table"></div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ):(
-                                facilityForm  && facilityForm ?.length > 0 ? (
-                                    facilityForm.map(getFacData  => (
-                                        <tr key={getFacData.fac_id}>
+                            {/* Page Numbers */}
+                            {(() => {
+                                const pages = [];
+
+                                // Always show first page
+                                pages.push(1);
+
+                                // Current page range
+                                for (
+                                let i = Math.max(2, currentFacPage - 1);
+                                i <= Math.min(lastFacPage - 1, currentFacPage + 1);
+                                i++
+                                ) {
+                                pages.push(i);
+                                }
+
+                                // Always show last page
+                                if (lastFacPage > 1) {
+                                pages.push(lastFacPage);
+                                }
+
+                                // Remove duplicates
+                                const uniquePages = [...new Set(pages)];
+
+                                return uniquePages.map((page, index) => {
+                                const prevPage = uniquePages[index - 1];
+
+                                return (
+                                    <React.Fragment key={page}>
+
+                                    {/* Show dots */}
+                                    {prevPage && page - prevPage > 1 && (
+                                        <span>...</span>
+                                    )}
+
+                                    {/* Page Button */}
+                                    <button
+                                        onClick={() => fetchFacility(page)}
+                                        className={`${
+                                        currentFacPage === page
+                                            ? 'ppa-pagination-active ppa-page-num'
+                                            : 'ppa-pagination ppa-page-num'
+                                        }`}
+                                        disabled = {loadingFac}
+                                    >
+                                        {page}
+                                    </button>
+
+                                    </React.Fragment>
+                                );
+                                });
+                            })()}
+
+                            {/* Next */}
+                            <button
+                                disabled={currentFacPage === lastFacPage || loadingFac}
+                                onClick={() => fetchFacility(currentFacPage + 1)}
+                                className="ppa-pagination padding-arrow arrow-right"
+                            >
+                                <FontAwesomeIcon
+                                title="Next"
+                                icon={faChevronRight}
+                                />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Table */}
+                    <div className="table-wrapper mt-4">
+                        <table className="ppa-table">
+                            <thead>
+                                <tr>
+                                    <th className="ppa-table-header text-center">#</th>
+                                    <th className="ppa-table-header">Date Request</th>
+                                    <th className="ppa-table-header">Request Office</th>
+                                    <th className="ppa-table-header">Activity</th>
+                                    <th className="ppa-table-header">Date</th>
+                                    <th className="ppa-table-header">Facility/Venue</th>
+                                    <th className="ppa-table-header">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loadingFac ? (
+                                    Array.from({ length: 5 }).map((_, index) => (  // 5 skeleton rows
+                                        <tr key={index}>
                                             <td className="ppa-table-body">
-                                                <Link 
-                                                    to={`/joms/facilityvenue/form/${getFacData.fac_id}`} 
-                                                    className="link-hover-flip"
-                                                >
-                                                    <span className="repair-id"><b>{getFacData.fac_id}</b></span>
-                                                    <span className="eye-icon">
-                                                        <FontAwesomeIcon icon={faEye} />
-                                                    </span>
-                                                </Link>
-                                            </td>
-                                            <td className="ppa-table-body">{formatDate(getFacData.fac_date_request)}</td>
-                                            <td className="ppa-table-body">{getFacData.fac_request_office}</td>
-                                            <td className="ppa-table-body">{getFacData.fac_title_of_activity}</td>
-                                            <td className="ppa-table-body">
-                                                {formatDate(getFacData?.fac_date_start) ===
-                                                formatDate(getFacData?.fac_date_end) ? (
-                                                    `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
-                                                    getFacData.fac_time_start
-                                                    )} to ${formatTime(getFacData.fac_time_end)}`
-                                                ) : (
-                                                    `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
-                                                    getFacData.fac_time_start
-                                                    )} to ${formatDate(getFacData.fac_date_end)} @ ${formatTime(
-                                                    getFacData.fac_time_end
-                                                    )}`
-                                                )}
+                                                <div className="skeleton hs-table"></div>
                                             </td>
                                             <td className="ppa-table-body">
-                                                {getFacData.mph ? "Multi-Purpose Hall" : null}
-                                                {getFacData.conference ? "Conference" : null}
-                                                {getFacData.dorm ? "Dormitory" : null}
-                                                {getFacData.other ? "Other" : null}
+                                                <div className="skeleton hs-table"></div>
                                             </td>
-                                            <td className="ppa-table-body">{getFacData.fac_remarks}</td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
+                                            <td className="ppa-table-body">
+                                                <div className="skeleton hs-table"></div>
+                                            </td>
                                         </tr>
                                     ))
                                 ):(
-                                    <tr>
-                                        <td colSpan={7} className="text-center ppa-table-body"> No Announcement </td>
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
-                    </table>
+                                    facilityForm  && facilityForm ?.length > 0 ? (
+                                        facilityForm.map(getFacData  => (
+                                            <tr key={getFacData.fac_id}>
+                                                <td className="ppa-table-body">
+                                                    <Link 
+                                                        to={`/joms/facilityvenue/form/${getFacData.fac_id}`} 
+                                                        className="link-hover-flip"
+                                                    >
+                                                        <span className="repair-id"><b>{getFacData.fac_id}</b></span>
+                                                        <span className="eye-icon">
+                                                            <FontAwesomeIcon icon={faEye} />
+                                                        </span>
+                                                    </Link>
+                                                </td>
+                                                <td className="ppa-table-body">{formatDate(getFacData.fac_date_request)}</td>
+                                                <td className="ppa-table-body">{getFacData.fac_request_office}</td>
+                                                <td className="ppa-table-body">{getFacData.fac_title_of_activity}</td>
+                                                <td className="ppa-table-body">
+                                                    {formatDate(getFacData?.fac_date_start) ===
+                                                    formatDate(getFacData?.fac_date_end) ? (
+                                                        `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
+                                                        getFacData.fac_time_start
+                                                        )} to ${formatTime(getFacData.fac_time_end)}`
+                                                    ) : (
+                                                        `${formatDate(getFacData.fac_date_start)} @ ${formatTime(
+                                                        getFacData.fac_time_start
+                                                        )} to ${formatDate(getFacData.fac_date_end)} @ ${formatTime(
+                                                        getFacData.fac_time_end
+                                                        )}`
+                                                    )}
+                                                </td>
+                                                <td className="ppa-table-body">
+                                                    {getFacData.mph ? "Multi-Purpose Hall" : null}
+                                                    {getFacData.conference ? "Conference" : null}
+                                                    {getFacData.dorm ? "Dormitory" : null}
+                                                    {getFacData.other ? "Other" : null}
+                                                </td>
+                                                <td className="ppa-table-body">{getFacData.fac_remarks}</td>
+                                            </tr>
+                                        ))
+                                    ):(
+                                        <tr>
+                                            <td colSpan={7} className="text-center ppa-table-body"> No Request </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
             )}
 
             {/* Vehicle Tab */}
@@ -588,9 +590,9 @@ export default function MyRequest() {
                     <div className="mt-4">
                         {/* Prev */}
                         <button
-                        disabled={currentVehPage === 1}
-                        onClick={() => fetchVehicle(currentVehPage - 1)}
-                        className="ppa-pagination padding-arrow arrow-left"
+                            disabled={currentVehPage === 1 || loadingVeh}
+                            onClick={() => fetchVehicle(currentVehPage - 1)}
+                            className="ppa-pagination padding-arrow arrow-left"
                         >
                         <FontAwesomeIcon
                             title="Prev"
@@ -641,6 +643,7 @@ export default function MyRequest() {
                                         ? 'ppa-pagination-active ppa-page-num'
                                         : 'ppa-pagination ppa-page-num'
                                     }`}
+                                    disabled = {loadingVeh}
                                 >
                                     {page}
                                 </button>
@@ -652,7 +655,7 @@ export default function MyRequest() {
 
                         {/* Next */}
                         <button
-                            disabled={currentVehPage === lastVehPage}
+                            disabled={currentVehPage === lastVehPage || loadingVeh}
                             onClick={() => fetchVehicle(currentVehPage + 1)}
                             className="ppa-pagination padding-arrow arrow-right"
                         >
@@ -730,7 +733,7 @@ export default function MyRequest() {
                                     ))
                                 ):(
                                     <tr>
-                                        <td colSpan={7} className="text-center ppa-table-body"> No Announcement </td>
+                                        <td colSpan={7} className="text-center ppa-table-body"> No Request </td>
                                     </tr>
                                 )
                             )}

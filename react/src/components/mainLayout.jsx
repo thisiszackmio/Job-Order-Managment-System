@@ -21,6 +21,16 @@ export default function MainLayout() {
     setIsMobileOpen(v => !v);
     };
 
+    // Confirmation sound
+    const playConfirmationSound = () => {
+        const audio = new Audio("/sound/confirmation.mp3");
+
+        audio.volume = 1;
+        audio.play().catch((error) => {
+            console.warn("Unable to play confirmation sound:", error);
+        });
+    };
+
     // close helper (used for backdrop and Esc)
     const closeMobile = () => setIsMobileOpen(false);
 
@@ -73,6 +83,7 @@ export default function MainLayout() {
         // CLOSE SIDEBAR (mobile + any hover)
         setIsMobileOpen(false);
         setIsHoverOpen(false);
+        playConfirmationSound();
 
         setShowPopup(true);
         setPopupContent('logout');

@@ -220,6 +220,8 @@ span.pc-des { font-size: 0.95rem; }
 }
 
 /* Buttons */
+.request-btn { color: #FFF !important; }
+.request-btn:hover { color: #FFF !important; }
 .full-btn { width: 100%; }
 .btn-loader {
   position: relative;
@@ -945,10 +947,24 @@ span.joms-mp-total {
 }
 
 /* Table */
+.table-id { font-weight: 900; }
 .col-log-date { width: 30%; }
 .col-log-cat { width: 10%; }
 .col-log-desp { width: 60%; }
-.ppa-table { width: 100%; margin: auto; min-width: 300px; max-height: 100%; border-collapse: collapse; }
+.ppa-table {
+  width: 100%;
+  margin: auto;
+  min-width: 300px;
+  max-height: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.ppa-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #ffffff;
+}
 .ppa-page {
   font-family: "Roboto", sans-serif;
   font-size: 0.85rem;
@@ -1160,6 +1176,12 @@ span.joms-mp-total {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
+.border-form-title-full {
+  border-color: #d1d5db;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+}
 
 /* Form */
 .ppa-form-field::placeholder {
@@ -1169,12 +1191,16 @@ span.joms-mp-total {
 .form-container {
   display: grid;
   grid-template-columns: 50% 50%;
-  column-gap: 1rem;
-  row-gap: 0;
-  padding: 0 1.5rem;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 0 1rem;
+}
+.form-container-one {
+  display: block;
+  width: 50%;
+  padding: 0px 2rem;
+}
+.radius-right {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 .form-container-view { padding: 0 1.5rem; }
 .form-container-wrapper {
@@ -1207,11 +1233,20 @@ span.joms-mp-total {
 .ppa-form-container {
   display: flex;
   align-items: stretch;
+  padding: 0 1rem;
+}
+.ppa-form-container-check-fac {
+  align-items: stretch; 
+  padding: 0px 2rem;
 }
 .ppa-pro-form-wrapper { width: 60%; }
 .pro-title-width { width: 10rem; }
 .pro-title-width-insp { width: 14rem; }
 .pro-title-width-insp-separate { width: 12rem; }
+.pro-title-width-fac-date { width: 18rem; }
+.pro-title-width-fac { width: 20rem; }
+.pro-title-width-fac-check { width: 18rem; }
+.pro-form-full-width-fac { width: 100%; }
 .pro-form-full-width { width: 100%; }
 .badge-container { display: flex; align-items: center; }
 .react-datepicker-wrapper { width: 100%; } /* For the Date Picker */
@@ -1231,7 +1266,6 @@ span.form-validation {
   font-size: 1rem;
 }
 .ppa-form-field {
-  display: flex;
   align-items: center;
   background-color: #F9FBFD;
   padding: 7px 10px;
@@ -1254,7 +1288,7 @@ span.form-validation {
   border-color: rgb(19, 46, 81) !important; 
 }
 .form-separate {
-  grid-column: 1 / -1; /* span from column 1 to the end */
+  grid-column: 1 / -1;
 }
 .ppa-form-search {
   display: flex;
@@ -1280,6 +1314,20 @@ span.form-validation {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+.facility-options {
+  font-family: "Roboto", sans-serif;
+  display: flex;
+}
+.checkbox-input {
+  height: 1.6rem;
+  width: 1.6rem;
+  cursor: pointer;
+  accent-color: #132E51;
+}
+.form-title-check {
+  margin-left: 10px;
+  font-weight: 700;
 }
 
 /* Activity */
@@ -1529,7 +1577,6 @@ span.form-validation {
   .form-title-header { font-size: 1.05rem; }
   .form-title-description { font-size: 0.80rem; }
 
-  .form-container { width: 100%; display: block; }
   .ppa-form-container { display: block; margin-top: 2rem; }
   .ppa-form-title { font-size: 1rem; width: fit-content; }
 
@@ -1545,7 +1592,12 @@ span.form-validation {
   .skeleton-form { height: 38px; }
 
   .tab-wrapper { display: block; }
-  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-wrapper {
+    width: 100%;
+    max-height: 500px;
+    overflow: auto;
+    position: relative;
+  }
   .tab-btn:first-child { border-top-left-radius: 5px; border-top-right-radius: 5px; }
   .tab-btn:last-child { border-radius: unset; }
 
@@ -1577,7 +1629,7 @@ span.form-validation {
 }
 
 /* Custom Margines */
-.mob-mt-2 { margin-top: 0.5rem !important; }
+/* .mob-mt-2 { margin-top: 0.5rem !important; } */
 .mt-6, .ml-6, .mb-6, .mr-6  { margin-top: 4rem !important; }
 .mt-7, .ml-7, .mb-7, .mr-7 { margin-top: 4.5rem !important; }
 .mt-8, .ml-8, .mb-8, .mr-8 { margin-top: 5rem !important; }

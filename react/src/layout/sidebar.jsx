@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUserStateContext } from "../context/ContextProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faUser, faClipboardList, faComputer, faFilePen, faFile, faClock, faIdCard, faGear, faGears, faUsers, faBullhorn, faList, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faFileCircleCheck, faCaretDown, faUser, faClipboardList, faComputer, faFilePen, faFile, faClock, faIdCard, faGear, faGears, faUsers, faBullhorn, faList, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOpen, onLogout }) {
     const { currentUserId, currentUserAvatar, setCurrentUserToken, currentUserCode, currentUserName } = useUserStateContext();
@@ -53,6 +53,18 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
         setActiveAccordion(index === activeAccordion ? null : index);
     };
 
+    // Restrictions Condition
+    const ucode = currentUserCode;
+    const codes = ucode.split(',').map(code => code.trim());
+    const SuperAdmin = codes.includes('HACK');
+    const ITPersonnel = codes.includes('AUS');
+    const PortManager = codes.includes('PM');
+    const DivisionManager = codes.includes('DM');
+    const AdminManager = codes.includes('AM');
+    const GeneralServiceOfficer = codes.includes('GSO');
+    const AuthorizePersonnel = codes.includes('AP') || codes.includes('AUI') || codes.includes('AUF') || codes.includes('AUV');
+    const ForPending = SuperAdmin || AuthorizePersonnel || PortManager || DivisionManager || AdminManager || GeneralServiceOfficer;
+
     return(
         <div className={`ppa-sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"} ${mobileOpen ? "mobile-open" : ""}`}
             onMouseEnter={handleMouseEnter}
@@ -99,18 +111,18 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                             <img src={currentUserAvatar} alt="User Avatar" className="ppa-display-avatar" />
                             <span className={`logo-user-name ${isOpen ? "open" : "closed"}`}> {currentUserName.name} </span>
 
-                            {/* Icon arrow */}
-                            <FontAwesomeIcon
+                            
+                            {/* <FontAwesomeIcon
                                 icon={faCaretDown}
                                 className={`icon-arrow ${
                                     activeAccordion === 0 ? "rotate" : ""
                                 }`}
-                            />
+                            /> */}
                         </div>
                     </li>
 
                     {/* User Profile dropdown */}
-                    <section
+                    {/* <section
                         className={`accordion-content ${
                             activeAccordion === 0 ? "open" : ""
                         }`}
@@ -126,14 +138,21 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                     <FontAwesomeIcon className="icon-nav" icon={faClipboardList} />
                                     <span>My Request</span>
                                 </Link>
+
+                                {ForPending && (
+                                    <Link to="/joms/pending" className="submenu-item">
+                                        <FontAwesomeIcon className="icon-nav" icon={faFileCircleCheck} />
+                                        <span>Pending Task/Approval</span>
+                                    </Link>
+                                )}
                             </ul>
                         </div>
-                    </section>
+                    </section> */}
                 
                     <div className="line-separate"></div>
 
                     {/* Dashboard */}
-                    <li className="accordion-item">
+                    {/* <li className="accordion-item">
                         <Link to="/joms/dashboard" className={`nav-item ${isOpen ? "open" : "closed"}`}>
                             <FontAwesomeIcon className="icon-nav" icon={faComputer} />
 
@@ -141,19 +160,7 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 Dashboard
                             </span>
                         </Link>
-                    </li>
-
-                    
-                    {/* Pending Requests */}
-                    <li className="accordion-item">
-                        <Link to="/joms/pending" className={`nav-item ${isOpen ? "open" : "closed"}`}>
-                            <FontAwesomeIcon className="icon-nav" icon={faClock} />
-
-                            <span className={`nav-text ${isOpen ? "show" : "hide"}`}>
-                                Pending Requests
-                            </span>
-                        </Link>
-                    </li>
+                    </li> */}
 
                     {/* Request Slip */}
                     <li
@@ -192,7 +199,7 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                     <span>Facility Request</span>
                                 </Link>
 
-                                <Link to="/joms/vehicle/form" className="submenu-item">
+                                {/* <Link to="/joms/vehicle/form" className="submenu-item">
                                     <div className="abbre">VR</div>
                                     <span>Vehicle Request</span>
                                 </Link>
@@ -200,7 +207,7 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 <Link to="/joms/locator/form" className="submenu-item">
                                     <div className="abbre">LR</div>
                                     <span>Locator Request</span>
-                                </Link>
+                                </Link> */}
                             </ul>
                         </div>
                     </section>
@@ -237,7 +244,7 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                     <span>Inspection List</span>
                                 </Link>
 
-                                <Link to="/joms/facility" className="submenu-item">
+                                {/* <Link to="/joms/facility" className="submenu-item">
                                     <div className="abbre">FL</div>
                                     <span>Facility List</span>
                                 </Link>
@@ -250,13 +257,13 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 <Link to="/joms/locator" className="submenu-item">
                                     <div className="abbre">LL</div>
                                     <span>Locator List</span>
-                                </Link>
+                                </Link> */}
                             </ul>
                         </div>
                     </section>
 
                     {/* Vehicle and Driver */}
-                    <li className="accordion-item">
+                    {/* <li className="accordion-item">
                         <Link to="/joms/vehicle/details" className={`company-info nav-item ${isOpen ? "open" : "closed"}`}>
                             <FontAwesomeIcon className="icon-nav" icon={faIdCard} />
 
@@ -264,10 +271,10 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 Driver and Vehicle Mgmt
                             </span>
                         </Link>
-                    </li>
+                    </li> */}
 
                     {/* General Settings */}
-                    <li
+                    {/* <li
                         className={`accordion-item ${activeAccordion === 3 ? 'active' : ''}`}
                         onClick={() => handleToggle(3)}
                     >
@@ -283,10 +290,10 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 className={`icon-arrow ${activeAccordion === 3 ? "rotate" : ""}`}
                             />
                         </div>
-                    </li>
+                    </li> */}
 
                     {/* Form List Form */}
-                    <section
+                    {/* <section
                         className={`accordion-content ${
                             activeAccordion === 3 ? "open" : ""
                         }`}
@@ -314,7 +321,7 @@ export default function Sidebar({ isOpen, isPinnedOpen, setIsHoverOpen, mobileOp
                                 </Link>
                             </ul>
                         </div>
-                    </section>
+                    </section> */}
                 </ul>
                 
                 {isMobile && (

@@ -10,6 +10,16 @@ import { format } from "date-fns";
 export default function InspectionRequest() {
     const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
 
+    // Error sound
+    const playErrorSound = () => {
+        const audio = new Audio("/sound/error.mp3");
+
+        audio.volume = 1;
+        audio.play().catch((error) => {
+            console.warn("Unable to play error sound:", error);
+        });
+    };
+
     // Mobile
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
@@ -144,6 +154,7 @@ export default function InspectionRequest() {
                 const responseErrors = error.response.data.errors || {};
                 setShowPopup(true);
                 setPopupContent("error");
+                playErrorSound();
                 setPopupMessage(
                     <div>
                     <p className="popup-title">Error</p>
@@ -159,6 +170,7 @@ export default function InspectionRequest() {
             } else if(error.response){
                 setShowPopup(true);
                 setPopupContent('error');
+                playErrorSound();
                 setPopupMessage(
                     <div>
                     <p className="popup-title">Error</p>
@@ -171,6 +183,7 @@ export default function InspectionRequest() {
                 if(error.request){
                     setShowPopup(true);
                     setPopupContent('error');
+                    playErrorSound();
                     setPopupMessage(
                         <div>
                             <p className="popup-title">Network Error</p>
@@ -207,6 +220,7 @@ export default function InspectionRequest() {
         {/* Form Content */}
         <div className="ppa-widget mt-4">
             <div className="joms-user-info-header">Request for Pre/Post Inspection Repair</div>
+            {/* Title and Button */}
             <div className="form-header">
                 <div>
                     <div className="form-title-header">
@@ -234,9 +248,9 @@ export default function InspectionRequest() {
                   </button>
                 </div>
             </div>
-            <div className="form-container mt-4">
-               
 
+            {/* Main Form */}
+            <div className="form-container mt-4">
                 {/* 1st Column */}
                 <div>
                     {/* Date */}
@@ -272,13 +286,14 @@ export default function InspectionRequest() {
                         <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
                             <label>Acquisition Date</label>
                         </div> 
-                        <DatePicker
-                            selected={acquisitionDate}
-                            onChange={(date) => setAcquisitionDate(date)}
-                            maxDate={today}
-                            dateFormat="yyyy-MM-dd"
+                         <input
+                            type="date"
+                            name="rep_acquisition_date"
+                            id="rep_acquisition_date"
+                            value={acquisitionDate}
+                            onChange={ev => setAcquisitionDate(ev.target.value)}
+                            max={today}
                             className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholderText="Enter Acquisition Date"
                         />
                     </div>
 
@@ -338,7 +353,7 @@ export default function InspectionRequest() {
                 {/* 2nd Column */}
                 <div>
                     {/* Type of Property */}
-                    <div className="ppa-form-container mob-mt-2">
+                    <div className="ppa-form-container">
                         <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
                             <label>Type of Property</label>
                             <span className="form-validation"> * </span>
@@ -429,6 +444,7 @@ export default function InspectionRequest() {
                 <div className="ppa-form-container form-separate mt-2 mb-4">
                     <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
                         <label>Complain</label>
+                        <span className="form-validation"> * </span>
                     </div>  
                     <input
                         type="text"

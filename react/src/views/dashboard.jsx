@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosClient from "../api/axios";
 import { useUserStateContext } from "../context/ContextProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,6 +6,7 @@ import { faScrewdriverWrench, faCalendarDays, faVanShuttle, faFileContract } fro
 
 export default function Dashboard() {
     const { currentUserId, currentUserName, currentUserCode } = useUserStateContext();
+    const hasGreeted = useRef(false);
 
     // Mobile
     const [isMobile, setIsMobile] = useState(false);
@@ -202,7 +203,6 @@ export default function Dashboard() {
         }
     }
 
-
     // execute the function
     useEffect(() => {
         if (currentUserId) {
@@ -215,19 +215,58 @@ export default function Dashboard() {
         }
     }, [currentUserId]);
 
-
-
     // Codes
     const ucode = currentUserCode;
     const codes = ucode.split(',').map(code => code.trim());
-    const APM = codes.includes("PM");
+    const PM = codes.includes("PM");
+
+    // Voice over
+    useEffect(() => {
+        if (!currentUserName || hasGreeted.current) return;
+
+        const title =
+        currentUserName.gender === "Male" ? "Sir" : "Ma'am";
+
+        const greeting = `${getGreeting()} ${title}${
+        PM ? "PM" : ""
+        } ${currentUserName.firstname}`;
+
+        const speech = new SpeechSynthesisUtterance(greeting);
+        speech.lang = "en-PH";
+        speech.rate = 0.9;
+        speech.pitch = 1;
+        speech.volume = 1;
+
+        const voices = window.speechSynthesis.getVoices();
+
+        // Prefer Filipino English voices
+        const filipinoVoice =
+            voices.find((voice) => voice.lang.toLowerCase() === "en-ph") ||
+            voices.find((voice) => voice.lang.toLowerCase().startsWith("fil")) ||
+            voices.find((voice) =>
+            voice.name.toLowerCase().includes("filip")
+            ) ||
+            voices.find((voice) => voice.lang.toLowerCase().startsWith("en"));
+
+        if (filipinoVoice) {
+            speech.voice = filipinoVoice;
+            console.log("Selected voice:", filipinoVoice.name, filipinoVoice.lang);
+        }
+
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speech);
+
+        hasGreeted.current = true;
+
+    }, [currentUserName, PM]);
+
     
     return(
     <>
         {/* Greetings */}
         <div className="greet-section">
             <div className="greeting">
-                {getGreeting()} {currentUserName.gender == 'Male' ? "Sir":"Ma'am"} {APM && "APM"} {currentUserName.firstname}
+                {getGreeting()} {currentUserName.gender == 'Male' ? "Sir":"Ma'am"} {PM && "PM"} {currentUserName.firstname}
             </div>
         </div>
 

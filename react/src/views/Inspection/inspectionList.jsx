@@ -9,6 +9,16 @@ import UnauthorizedPage from "../../components/unauthorize";
 export default function InspectionList() {
     const { currentUserId, currentUserCode } = useUserStateContext();
 
+    // Error sound
+    const playErrorSound = () => {
+        const audio = new Audio("/sound/error.mp3");
+
+        audio.volume = 1;
+        audio.play().catch((error) => {
+            console.warn("Unable to play error sound:", error);
+        });
+    };
+
     //Date Format 
     function formatDate(dateString) {
         const options = { month: 'long', day: 'numeric', year: 'numeric' };
@@ -41,6 +51,7 @@ export default function InspectionList() {
         }
 
         }catch(error){
+            playErrorSound();
             console.error(error);
         } finally {
             setLoading(false);
@@ -99,9 +110,9 @@ export default function InspectionList() {
                         <div className="mt-4">
                             {/* Prev */}
                             <button
-                            disabled={currentInspPage === 1}
-                            onClick={() => fetchInspectionList(currentInspPage - 1)}
-                            className="ppa-pagination padding-arrow arrow-left"
+                                disabled={currentInspPage === 1 || loading}
+                                onClick={() => fetchInspectionList(currentInspPage - 1)}
+                                className="ppa-pagination padding-arrow arrow-left"
                             >
                             <FontAwesomeIcon
                                 title="Prev"
@@ -152,6 +163,7 @@ export default function InspectionList() {
                                             ? 'ppa-pagination-active ppa-page-num'
                                             : 'ppa-pagination ppa-page-num'
                                         }`}
+                                        disabled={loading}
                                     >
                                         {page}
                                     </button>
@@ -163,7 +175,7 @@ export default function InspectionList() {
     
                             {/* Next */}
                             <button
-                                disabled={currentInspPage === lastInspPage}
+                                disabled={currentInspPage === lastInspPage || loading}
                                 onClick={() => fetchInspectionList(currentInspPage + 1)}
                                 className="ppa-pagination padding-arrow arrow-right"
                             >

@@ -27,6 +27,7 @@ export default function TopNav({ toggleSidebar, isSidebarOpen, onLogout, onMobil
         "/joms/dashboard": "Dashboard",
         "/joms/profile": "Profile",
         "/joms/myrequest": "My Requests",
+        "/joms/pending": "Pendings",
     };
 
     let pageTitle = staticTitles[location.pathname];

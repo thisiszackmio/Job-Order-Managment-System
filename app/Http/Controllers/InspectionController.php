@@ -363,6 +363,8 @@ class InspectionController extends Controller
         // Condition for the approval
         if($ApproveRequest->date_of_filling && $ApproveRequest->before_repair_date && $ApproveRequest->after_reapir_date){
             $supApproval = 5;
+        }else if($ApproveRequest->date_of_filling && $ApproveRequest->form_status === 11){
+            $supApproval = 5;
         }else{
             $supApproval = 6;
         }

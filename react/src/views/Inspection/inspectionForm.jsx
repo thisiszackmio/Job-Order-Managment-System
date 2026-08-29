@@ -13,6 +13,16 @@ import Popup from "../../components/popup";
 export default function InspectionForm() {
     const { currentUserId, currentUserCode, currentUserName } = useUserStateContext();
 
+    // Confirmation sound
+    const playConfirmationSound = () => {
+        const audio = new Audio("/sound/confirmation.mp3");
+
+        audio.volume = 1;
+        audio.play().catch((error) => {
+            console.warn("Unable to play confirmation sound:", error);
+        });
+    };
+
     // Mobile
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
@@ -842,6 +852,7 @@ export default function InspectionForm() {
     const handleSupApprovalConfirmation = () => {
         setShowPopup(true);
         setPopupContent('InspApprove');
+        playConfirmationSound();
         setPopupMessage(
         <div>
             <p className="popup-title">Are you sure?</p>
@@ -914,6 +925,7 @@ export default function InspectionForm() {
         }else{
             setShowPopup(true);
             setPopupContent('InspDisapprove');
+            playConfirmationSound();
             setPopupMessage(
                 <div>
                 <p className="popup-title">Are you sure?</p>
@@ -961,6 +973,7 @@ export default function InspectionForm() {
     const handleAdminApprovalConfirmation = () => {
         setShowPopup(true);
         setPopupContent('InspAdmin');
+        playConfirmationSound();
         setPopupMessage(
         <div>
             <p className="popup-title">Confirmation</p>
@@ -1011,6 +1024,7 @@ export default function InspectionForm() {
     const handleCloseForm = () => {
         setShowPopup(true);
         setPopupContent('InspCancel');
+        playConfirmationSound();
         setPopupMessage(
         <div>
             <p className="popup-title">Are you sure?</p>
@@ -1118,6 +1132,7 @@ export default function InspectionForm() {
     const handleManualCompleteConfirmation = () => {
         setShowPopup(true);
         setPopupContent('ManConfirm');
+        playConfirmationSound();
         setPopupMessage(
         <div>
             <p className="popup-title">Mark as Complete</p>
@@ -1165,6 +1180,7 @@ export default function InspectionForm() {
     //Close Popup on Success
     const successPopup = () => {
         fetchInspection();
+        fetchActivity();
         setEnablePartA(false);
         setPartBForm(false);
         setEnablePartB(false);
@@ -1173,6 +1189,7 @@ export default function InspectionForm() {
         setPartDForm(false);
         setEnablePartD(false);
         setFormLoading(true);
+        setActivityLoading(true);
         setEnableSupDecline(false);
         setSubmitLoading(false);
         setShowPopup(false);
@@ -2624,7 +2641,7 @@ export default function InspectionForm() {
                                 </div>
                             </div>
                         ):(
-                            trackingForm?.length > 0 ? (
+                            trackingForm?.length > 0 && (
                                 trackingForm?.map(list => (
                                     <div key={list.id}>
                                         <div className="activity-combined">
@@ -2638,8 +2655,6 @@ export default function InspectionForm() {
                                         </div>
                                     </div>
                                 ))
-                            ):(
-                                "Wala"
                             )
                         )}
                     </div>

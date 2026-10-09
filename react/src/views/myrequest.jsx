@@ -193,7 +193,7 @@ export default function MyRequest() {
                                 onChange={(e) =>
                                 setSearchInsp(e.target.value)
                                 }
-                                className="ppa-form-search"
+                                className="ppa-form-search full-border"
                             />
                         </div>
                         <div>
@@ -375,7 +375,7 @@ export default function MyRequest() {
                                 onChange={(e) =>
                                 setSearchFac(e.target.value)
                                 }
-                                className="ppa-form-search"
+                                className="ppa-form-search full-border"
                             />
                         </div>
                         <div>
@@ -575,7 +575,7 @@ export default function MyRequest() {
                             onChange={(e) =>
                             setSearchVeh(e.target.value)
                             }
-                            className="ppa-form-search"
+                            className="ppa-form-search full-border "
                         />
                     </div>
                     <div>

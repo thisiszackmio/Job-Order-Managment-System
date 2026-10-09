@@ -3,7 +3,6 @@ import { useUserStateContext } from "../../context/ContextProvider";
 import axiosClient from "../../api/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import UnauthorizedPage from "../../components/unauthorize";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -1220,10 +1219,11 @@ export default function InspectionForm() {
             {/* 2 Columns */}
             <div className="form-request-page mt-4">
                 {/* Form Content */}
-                <div className="ppa-widget">
+                <div className="ppa-widget pb-4">
                     <div className="joms-user-info-header">Request for Pre/Post Inspection Repair</div>
 
-                    <div className="form-container-view mt-3">
+                    {/* Wrapper */}
+                    <div className="ppa-widget-wrapper mt-4">
                         {showPDF ? (
                             loadingPDF ? (
                                 <div className="pdf-animation-container">
@@ -1267,69 +1267,77 @@ export default function InspectionForm() {
                         <>
                             {/* Button Pagination */}
                             {(GSO || DivisionManager || Admin || SuperHacker || ITAdmin || AuthorityAccess) && (
-                            <div className="ppa-form-btn-wrapper">
-                                {/* Prev */}
-                                <button
-                                    onClick={handlePrev}
-                                    disabled={!paginatedInspection?.prev || formLoading}
-                                    className={`${
-                                        paginatedInspection?.prev
-                                        ? "ppa-arrow-btn"
-                                        : "ppa-arrow-btn ppa-arrow-btn-disabled"
-                                    }`}
-                                    style={{
-                                        visibility: paginatedInspection?.prev ? "visible" : "hidden"
-                                    }}
-                                    >
-                                    <span className="ppa-arrow-btn-content">
-                                        <FontAwesomeIcon
-                                        className="ppa-arrow-btn-icon"
-                                        title="Prev"
-                                        icon={faArrowLeft}
-                                        />
-                                        &nbsp; Page{" "}
-                                        {paginatedInspection?.prev && paginatedInspection?.prev}
-                                    </span>
-                                </button>
+                                <div className="ppa-form-btn-wrapper mb-5">
+                                    {/* Prev */}
+                                    <button
+                                        onClick={handlePrev}
+                                        disabled={formLoading}
+                                        className={`${
+                                            paginatedInspection?.prev
+                                            ? "ppa-arrow-btn"
+                                            : "ppa-arrow-btn ppa-arrow-btn-disabled"
+                                        }`}
+                                        >
+                                        <span className="ppa-arrow-btn-content">
+                                            
+                                            <FontAwesomeIcon
+                                            className="ppa-arrow-btn-icon"
+                                            title="Prev"
+                                            icon={faArrowLeft}
+                                            />
+                                            &nbsp;
+                                            {formLoading ? (
+                                                "Loading"
+                                            ):(
+                                            <>
+                                                Page{" "}
+                                                {paginatedInspection?.prev && paginatedInspection?.prev}
+                                            </>
+                                            )}
+                                        </span>
+                                    </button>
 
-                                {/* Next */}
-                                <button
-                                    onClick={handleNext}
-                                    disabled={!paginatedInspection?.next || formLoading}
-                                    className={`${
-                                        paginatedInspection?.next
-                                        ? "ppa-arrow-btn"
-                                        : "ppa-arrow-btn ppa-arrow-btn-disabled"
-                                    }`}
-                                    style={{
-                                        visibility: paginatedInspection?.next ? "visible" : "hidden"
-                                    }}
-                                    >
-                                    <span className="ppa-arrow-btn-content">
-                                        Page{" "}
-                                        {paginatedInspection?.next && paginatedInspection?.next}
-                                        &nbsp;
-                                        <FontAwesomeIcon
-                                        className="ppa-arrow-btn-icon"
-                                        title="Next"
-                                        icon={faArrowRight}
-                                        />
-                                    </span>
-                                </button>
-                            </div>
+                                    {/* Next */}
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={formLoading}
+                                        className={`${
+                                            paginatedInspection?.next
+                                            ? "ppa-arrow-btn"
+                                            : "ppa-arrow-btn ppa-arrow-btn-disabled"
+                                        }`}
+                                        >
+                                        <span className="ppa-arrow-btn-content">
+                                            {formLoading ? (
+                                                "Loading"
+                                            ):(
+                                            <>
+                                                Page{" "}
+                                                {paginatedInspection?.next && paginatedInspection?.next}
+                                            </>
+                                            )}
+                                            &nbsp;
+                                            <FontAwesomeIcon
+                                            className="ppa-arrow-btn-icon"
+                                            title="Next"
+                                            icon={faArrowRight}
+                                            />
+                                        </span>
+                                    </button>
+                                </div>
                             )}
 
                             {/* Form */}
-                            <div className="mt-5">
+                            <div>
                                 {/* Status */}
-                                <div className="ppa-form-container mt-2">
+                                <div className="ppa-form-container-view mt-2">
                                     <div className={`ppa-form-status ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
                                         <label>Status:</label>
                                     </div>  
                                     {formLoading ? (
-                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                        <div className={`skeleton-form full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
                                     ):(
-                                        <div className={`ppa-form-field-status pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                        <div className={`ppa-form-field-status full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
                                             {!partBForm && !partCForm && !partDForm && !enablePartA && !enablePartB && !enablePartC && !enablePartD ? (
                                                 DivisionManager && inspectionData?.form_status == 11 ? ("Waiting for your approval.")
                                                 :GSO && inspectionData?.form_status == 5 ? ("You have entered the Part B form, and it is now pending Admin Manager approval.")
@@ -1362,22 +1370,24 @@ export default function InspectionForm() {
                                 </div>
 
                                 {/* Control Number and buttons */}
-                                <div className="form-request-top-header mt-3">
+                                <div className="form-request-top-header mt-2">
+                                    {/* Control Number */}
                                     <div>
-                                        {/* Control Number */}
-                                        <div className="ppa-form-container">
-                                            <div className={`ppa-form-title ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                        <div className="ppa-form-container-view">
+                                            <div className={`label-width-control ppa-form-label center-label ${isMobile ? 'border-form-title-mobile' : 'no-right-border'}`}>
                                                 <label>Control No.</label>
                                             </div>  
                                             {formLoading ? (
-                                                <div className={`skeleton-form ctrl-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                <div className={`skeleton-form ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                             ):(
-                                                <div className={`ppa-form-field ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                <div className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                     {id}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
+                                    
+                                    {/* Button Function */}
                                     <div className="form-btn-align">
                                         {!formLoading && (
                                             (!enablePartA && !enablePartB && !enablePartC && !enablePartD && !partBForm && !partCForm && !partDForm) ? (
@@ -1694,16 +1704,17 @@ export default function InspectionForm() {
                                     </div>
                                 </div>
 
+                                {/* Form */}
                                 {enableSupDecline ? (
                                 <>
                                     {/* Reason for disapproval */}
                                     <form id="submitSupReason" onSubmit={SubmitSupReason}>
-                                        <div className="ppa-form-container form-separate mt-4">
-                                            <div className={`ppa-form-title ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                        <div className="ppa-form-container mt-4">
+                                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                 <label>Reason</label>
                                             </div> 
                                             {formLoading ? (
-                                                <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                             ):(
                                                 <input
                                                     type="text"
@@ -1728,57 +1739,57 @@ export default function InspectionForm() {
                                             <div className="form-title-header">
                                                 Part A: To be filled-up by Requesting Party
                                             </div>
+                                            {/* Button */}
                                             <div>
                                             {!formLoading && !enablePartA && !enablePartB && !enablePartC && !enablePartD && !partBForm && !partCForm && !partDForm && (
-                                            <>
-                                                {/* All Access */}
-                                                {(SuperHacker || GSO || AuthorityAccess) && inspectionData?.form_status != 0 && (
-                                                    <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-edit-form" title="Edit Part A" icon={faPenToSquare} />
-                                                )}
+                                                <>
+                                                    {/* All Access */}
+                                                    {(SuperHacker || GSO || AuthorityAccess) && inspectionData?.form_status != 0 && (
+                                                        <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-edit-form" title="Edit Part A" icon={faPenToSquare} />
+                                                    )}
 
-                                                {/* Requestor */}
-                                                {!SuperHacker && !GSO && currentUserId == inspectionData?.user_id && [8, 9, 10 ,11].includes(inspectionData?.form_status) && (
-                                                    <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-edit-form" title="Edit Part A" icon={faPenToSquare} />
+                                                    {/* Requestor */}
+                                                    {!SuperHacker && !GSO && currentUserId == inspectionData?.user_id && [8, 9, 10 ,11].includes(inspectionData?.form_status) && (
+                                                        <FontAwesomeIcon onClick={() => { setEnablePartA(true); }} className="icon-edit-form" title="Edit Part A" icon={faPenToSquare} />
+                                                    )}
+                                                </>
                                                 )}
-                                            </>
-                                            )}
                                             </div>
                                         </div>
-
-                                        {/* Form */}
-                                        <div className="form-container-wrapper">
-                                            {/* Note */}
-                                            {!PortManager && !Admin && !GSO && !SuperHacker && (
-                                            <div className="ppa-form-container form-separate">
+                                        {/* Notes */}
+                                        {!PortManager && !Admin && !GSO && !SuperHacker && (
+                                            <div>
                                                 <div className="form-notes">
                                                     <span className="note-header">Note:</span> This form can only be edited before the supervisor approves it.
                                                 </div>
                                             </div>
-                                            )}
+                                        )}
 
+                                        {/* Part A Form */}
+                                        <div className={`${isMobile ? 'form-full-width':'grid grid-col-2 mt-4 pb-4'}`}>
                                             {/* 1st Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-4':'col-span-1'}`}>
                                                 {/* Date */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Date</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                             {formatDate(inspectionData?.date_request)}
                                                         </div>
                                                     )} 
                                                 </div>
 
-                                                {/* Property No */}
+                                                {/* Property No. */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Property No.</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <input
@@ -1789,11 +1800,11 @@ export default function InspectionForm() {
                                                                 value={updatepropertyNo}
                                                                 onChange={ev => setUpdatePropertyNo(ev.target.value)}
                                                                 maxLength={255}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                                 placeholder="Enter Property Number"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.property_number}
                                                             </div>
                                                         )
@@ -1802,23 +1813,27 @@ export default function InspectionForm() {
 
                                                 {/* Acquisition Date */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Acquisition Date</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
-                                                            <DatePicker
-                                                                selected={updateacquisitionDate}
-                                                                onChange={date => setUpdateAcquisitionDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Acquisition Date"
+                                                            <input
+                                                                type="date"
+                                                                name="acquisition_date"
+                                                                id="acquisition_date"
+                                                                autoComplete="acquisition_date"
+                                                                value={updateacquisitionDate}
+                                                                onChange={ev => setUpdateAcquisitionDate(ev.target.value)}
+                                                                maxLength={255}
+                                                                max={today}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Acquisition Date"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.acquisition_date ? formatDate(inspectionData?.acquisition_date) : null}
                                                             </div>
                                                         )
@@ -1827,11 +1842,11 @@ export default function InspectionForm() {
 
                                                 {/* Acquisition Cost */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Acquisition Cost</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <input
@@ -1841,11 +1856,11 @@ export default function InspectionForm() {
                                                                 value={updateacquisitionCost ? `₱ ${formatCurrency(updateacquisitionCost)}` : ""}
                                                                 onChange={handleChange}
                                                                 maxLength={255}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                                 placeholder="Enter Acquisition Cost"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.acquisition_cost 
                                                                 ? new Intl.NumberFormat('en-PH', {
                                                                     style: 'currency',
@@ -1859,11 +1874,11 @@ export default function InspectionForm() {
 
                                                 {/* Brand/Model */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Brand/Model</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <input
@@ -1874,11 +1889,11 @@ export default function InspectionForm() {
                                                                 value={updateBrandModel}
                                                                 onChange={ev => setUpdateBrandModel(ev.target.value)}
                                                                 maxLength={255}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholder="Input Brand/Model"
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Brand/Model"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.brand_model}
                                                             </div>
                                                         )
@@ -1887,11 +1902,11 @@ export default function InspectionForm() {
 
                                                 {/* Serial/Engine No */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Serial/Engine No</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <input
@@ -1902,27 +1917,27 @@ export default function InspectionForm() {
                                                                 value={updateSerialEngineNo}
                                                                 onChange={ev => setUpdateSerialEngineNo(ev.target.value)}
                                                                 maxLength={255}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholder="Input Serial/Engine No"
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Serial/Engine No"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.serial_engine_no}
                                                             </div>
                                                         )
                                                     )} 
                                                 </div>
                                             </div>
-
+                                            
                                             {/* 2nd Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Type of Property */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Type of Property</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <select 
@@ -1931,7 +1946,7 @@ export default function InspectionForm() {
                                                                 autoComplete="rep_type_of_property"
                                                                 value={updateTypeofProperty || inspectionData?.type_of_property}
                                                                 onChange={ev => setUpdateTypeofProperty(ev.target.value)}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                             >
                                                                 <option value="" disabled>Select an option</option>
                                                                 <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
@@ -1939,35 +1954,37 @@ export default function InspectionForm() {
                                                                 <option value="Others">Others</option>
                                                             </select>
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.type_of_property}
                                                             </div>
                                                         )
                                                     )} 
                                                 </div>
-                                                
+
                                                 {/* Description */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label ${enablePartA ? 'top-label' : 'center-label'} ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Description</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <textarea
                                                                 type="text"
                                                                 name="rep_description"
                                                                 id="rep_description"
+                                                                autoComplete="rep_description"
                                                                 value={updateDescription}
                                                                 onChange={ev => setUpdateDescription(ev.target.value)}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholder="Enter Description"
                                                                 rows={3}
+                                                                maxLength={255}
                                                                 style={{ resize: "none" }}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Description"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.property_description}
                                                             </div>
                                                         )
@@ -1976,11 +1993,11 @@ export default function InspectionForm() {
 
                                                 {/* Location */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Location</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         enablePartA ? (
                                                             <input
@@ -1990,26 +2007,26 @@ export default function InspectionForm() {
                                                                 value={updateLocation}
                                                                 onChange={ev => setUpdateLocation(ev.target.value)}
                                                                 maxLength={255}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                                 placeholder="Enter Location"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.location}
                                                             </div>
                                                         )
                                                     )} 
                                                 </div>
-                                                
+
                                                 {/* Requestor */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Requestor</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                             {inspectionData?.user_name}
                                                         </div>
                                                     )} 
@@ -2017,56 +2034,62 @@ export default function InspectionForm() {
 
                                                 {/* Supervisor */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Supervisor</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                             {inspectionData?.supervisor_name}
                                                         </div>
                                                     )} 
                                                 </div>
                                             </div>
 
-                                            {/* Complain */}
-                                            <div className="ppa-form-container form-separate mt-2 mb-4">
-                                                <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                                    <label>Complain</label>
-                                                </div> 
-                                                {formLoading ? (
-                                                    <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
-                                                ):(
-                                                    enablePartA ? (
-                                                        <input
-                                                            type="text"
-                                                            name="rep_property_no"
-                                                            id="rep_property_no"
-                                                            value={updateComplain}
-                                                            onChange={ev => setUpdateComplain(ev.target.value)}
-                                                            maxLength={500}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Complain"
-                                                        />
+                                            {/* Full width */}
+                                            <div className="col-span-full mt-2">
+                                                {/* Complain */}
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp-one ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                                        <label>Complain</label>
+                                                    </div> 
+                                                    {formLoading ? (
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                                            {inspectionData?.complain}
-                                                        </div>
-                                                    )
-                                                )} 
+                                                        enablePartA ? (
+                                                            <input
+                                                                type="text"
+                                                                name="rep_complain"
+                                                                id="rep_complain"
+                                                                value={updateComplain}
+                                                                onChange={ev => setUpdateComplain(ev.target.value)}
+                                                                maxLength={500}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Location"
+                                                            />
+                                                        ):(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
+                                                                {inspectionData?.complain}
+                                                            </div>
+                                                        )
+                                                    )} 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* ------------------------------------------------------- */}
+
                                     {/* Part B */}
-                                    <div className="ppa-form-border mt-4">
+                                    <div className="ppa-form-border mt-3">
                                         {/* Header */}
                                         <div className="ppa-form-header">
                                             <div className="form-title-header">
                                                 Part B: To be filled-up by Administrative Division
                                             </div>
                                             <div>
+                                            {/* Button */}
                                             {!formLoading && !enablePartA && !enablePartB && !enablePartC && !enablePartD && !partBForm && !partCForm && !partDForm && (
                                             <>
                                                 {/* SuperHacker */}
@@ -2087,97 +2110,107 @@ export default function InspectionForm() {
                                             </div>
                                         </div>
 
-                                        {/* Form */}
-                                        <div className="form-container-wrapper">
+                                        {/* Part B Form */}
+                                        <div className={`${isMobile ? 'form-full-width':'grid grid-col-2 mt-4 pb-4'}`}>
                                             {/* 1st Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Date */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Date</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         partBForm ? (
-                                                        <DatePicker
-                                                                selected={partBdate}
-                                                                onChange={date => setPartBdate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partB_date"
+                                                                id="rep_partB_date"
+                                                                autoComplete="rep_partB_date"
+                                                                value={partBdate}
+                                                                max={today}
+                                                                onChange={ev => setPartBdate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
                                                         )
                                                         :enablePartB ? (
-                                                            <DatePicker
-                                                                selected={updatePartBdate}
-                                                                onChange={date => setUpdatePartBdate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partB_date"
+                                                                id="rep_partB_date"
+                                                                autoComplete="rep_partB_date"
+                                                                value={updatePartBdate}
+                                                                max={today}
+                                                                onChange={ev => setUpdatePartBdate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
-                                                        ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        )
+                                                        :(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.date_of_filling ? formatDate(inspectionData?.date_of_filling) : null}
                                                             </div>
                                                         )
-                                                        
                                                     )} 
                                                 </div>
 
                                                 {/* Date of Last Repair */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Date of Last Repair</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         partBForm ? (
-                                                        <DatePicker
-                                                                selected={lastfilledDate}
-                                                                onChange={date => setLastFilledDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_last_repair_date"
+                                                                id="rep_last_repair_date"
+                                                                autoComplete="rep_last_repair_date"
+                                                                value={lastfilledDate}
+                                                                onChange={ev => setLastFilledDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
+                                                                max={today}
                                                             />
                                                         )
                                                         :enablePartB ? (
-                                                            <DatePicker
-                                                                selected={updatelastfilledDate}
-                                                                onChange={date => setUpdateLastFilledDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_last_repair_date"
+                                                                id="rep_last_repair_date"
+                                                                autoComplete="rep_last_repair_date"
+                                                                value={updatelastfilledDate}
+                                                                max={today}
+                                                                onChange={ev => setUpdateLastFilledDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
-                                                        ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                                                {inspectionData?.date_of_filling ? (
-                                                                    inspectionData?.date_of_last_repair ? formatDate(inspectionData?.date_of_last_repair) : 'N/A'
-                                                                ) : null  }
+                                                        )
+                                                        :(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
+                                                                {inspectionData?.date_of_last_repair ? formatDate(inspectionData?.date_of_last_repair) : 'N/A'}
                                                             </div>
                                                         )
-                                                        
                                                     )} 
                                                 </div>
 
                                                 {/* Assign Personnel */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Assign Personnel</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         partBForm ? (
                                                             <select 
-                                                                name="rep_type_of_property" 
-                                                                id="rep_type_of_property" 
-                                                                autoComplete="rep_type_of_property"
+                                                                name="rep_assign_personnel" 
+                                                                id="rep_assign_personnel" 
+                                                                autoComplete="rep_assign_personnel"
                                                                 value={pointPersonnel.pid}
                                                                 onChange={ev => {
                                                                     const selectedPid = parseInt(ev.target.value);
@@ -2185,7 +2218,7 @@ export default function InspectionForm() {
 
                                                                     setPointPersonnel(selectedPersonnel ? { pid: selectedPersonnel.personnel_id, pname: selectedPersonnel.personnel_name } : { pid: '', pname: '' });
                                                                 }}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                             >
                                                                 <option value="" disabled>Select an option</option>
                                                                 {getPersonnel.map(data => (
@@ -2197,9 +2230,9 @@ export default function InspectionForm() {
                                                         )
                                                         :enablePartB ? (
                                                             <select 
-                                                                name="rep_type_of_property" 
-                                                                id="rep_type_of_property" 
-                                                                autoComplete="rep_type_of_property"
+                                                                name="rep_assign_personnel" 
+                                                                id="rep_assign_personnel" 
+                                                                autoComplete="rep_assign_personnel"
                                                                 value={updatepointPersonnel.pid}
                                                                 onChange={ev => {
                                                                 const selectedPid = parseInt(ev.target.value);
@@ -2211,7 +2244,7 @@ export default function InspectionForm() {
                                                                     : { pid: '', pname: '' }
                                                                 );
                                                                 }}
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
                                                                 disabled={SuperHacker || ![5, 6, 8, 9, 10, 11].includes(inspectionData?.form_status)}
                                                             >
                                                                 {/* Disabled option for current personnel */}
@@ -2227,8 +2260,9 @@ export default function InspectionForm() {
                                                                     </option>
                                                                 ))}
                                                             </select>
-                                                        ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        )
+                                                        :(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.personnel_name}
                                                             </div>
                                                         )
@@ -2237,16 +2271,16 @@ export default function InspectionForm() {
                                             </div>
 
                                             {/* 2nd Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Requested By */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Requested By</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                             {inspectionData?.date_of_filling ? nameData?.gso : null}
                                                         </div>
                                                     )} 
@@ -2254,68 +2288,73 @@ export default function InspectionForm() {
 
                                                 {/* Noted By */}
                                                 <div className="ppa-form-container mt-2">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Noted By</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                        <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                             {inspectionData?.date_of_filling ? nameData?.admin : null}
                                                         </div>
                                                     )} 
                                                 </div>
                                             </div>
 
-                                            {/* Nature of Last Repair */}
-                                            <div className="ppa-form-container form-separate mt-2 mb-4">
-                                                <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                                    <label>Nature of Last Repair</label>
-                                                </div> 
-                                                {formLoading ? (
-                                                    <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
-                                                ):(
-                                                    partBForm ? (
-                                                        <input
-                                                            id="nature_repair"
-                                                            name="nature_repair"
-                                                            value={natureRepair}
-                                                            onChange={ev => setNatureRepair(ev.target.value)}
-                                                            maxLength={255}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Nature of Last Repair"
-                                                        />
-                                                    )
-                                                    :enablePartB ? (
-                                                        <input
-                                                            id="nature_repair"
-                                                            name="nature_repair"
-                                                            value={updatenatureRepair}
-                                                            onChange={ev => setUpdateNatureRepair(ev.target.value)}
-                                                            maxLength={255}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Nature of Last Repair"
-                                                        />
+                                            {/* Full width */}
+                                            <div className="col-span-full mt-2">
+                                                {/* Nature of Last Repair */}
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp-one ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                                        <label>Nature of Last Repair</label>
+                                                    </div> 
+                                                    {formLoading ? (
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                                            {inspectionData?.date_of_filling ? (
-                                                                inspectionData?.nature_of_last_repair ? inspectionData?.nature_of_last_repair : 'N/A'
-                                                            ) : null}
-                                                        </div>
-                                                    )
-                                                    
-                                                )} 
+                                                        partBForm ? (
+                                                            <input
+                                                                id="nature_repair"
+                                                                name="nature_repair"
+                                                                value={natureRepair}
+                                                                onChange={ev => setNatureRepair(ev.target.value)}
+                                                                maxLength={255}
+                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                placeholder="Enter Nature of Last Repair"
+                                                            />
+                                                        )
+                                                        :enablePartB ? (
+                                                            <input
+                                                                id="nature_repair"
+                                                                name="nature_repair"
+                                                                value={updatenatureRepair}
+                                                                onChange={ev => setUpdateNatureRepair(ev.target.value)}
+                                                                maxLength={255}
+                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                placeholder="Enter Nature of Last Repair"
+                                                            />
+                                                        )
+                                                        :(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
+                                                                {inspectionData?.date_of_filling ? formatDate(inspectionData?.date_of_filling) : null}
+                                                            </div>
+                                                        )
+                                                    )} 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* ------------------------------------------------------- */}
+
                                     {/* Part C */}
-                                    <div className="ppa-form-border mt-4">
+                                    <div className="ppa-form-border mt-3">
                                         {/* Header */}
                                         <div className="ppa-form-header">
                                             <div className="form-title-header">
-                                                Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job                                            </div>
+                                                Part C: To be filled-up by the DESIGNATED INSPECTOR before repair job   
+                                            </div>
                                             <div>
+                                            {/* Button */}
                                             {!formLoading && !enablePartA && !enablePartB && !enablePartC && !enablePartD && !partBForm && !partCForm && !partDForm && (
                                             <>
                                                 {/* SuperHacker */}
@@ -2347,39 +2386,43 @@ export default function InspectionForm() {
                                             </div>
                                         </div>
 
-                                        {/* Form */}
-                                        <div className="form-container-wrapper">
+                                        {/* Part C Form */}
+                                        <div className={`${isMobile ? 'form-full-width':'grid grid-col-2 mt-4 pb-4'}`}>
                                             {/* 1st Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Date */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Date</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         partCForm ? (
-                                                        <DatePicker
-                                                                selected={partCDate}
-                                                                onChange={date => setPartCDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partC_date"
+                                                                id="rep_partC_date"
+                                                                autoComplete="rep_partC_date"
+                                                                value={partCDate}
+                                                                onChange={ev => setPartCDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
                                                         )
                                                         :enablePartC ? (
-                                                            <DatePicker
-                                                                selected={partCDate}
-                                                                onChange={date => setPartCDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partC_date"
+                                                                id="rep_partC_date"
+                                                                autoComplete="rep_partC_date"
+                                                                value={partCDate}
+                                                                onChange={ev => setPartCDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
                                                         ):(
-                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
                                                                 {inspectionData?.before_repair_date ? formatDate(inspectionData?.before_repair_date) : null}
                                                             </div>
                                                         )
@@ -2389,14 +2432,14 @@ export default function InspectionForm() {
                                             </div>
 
                                             {/* 2nd Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Assign Personnel */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Assign Personnel</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
                                                             {inspectionData?.before_repair_date ? inspectionData?.personnel_name : null}
@@ -2405,86 +2448,91 @@ export default function InspectionForm() {
                                                 </div>
                                             </div>
 
-                                            {/* Fidings */}
-                                            <div className="ppa-form-container form-separate mt-2">
-                                                <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                                    <label>Fidings</label>
-                                                </div> 
-                                                {formLoading ? (
-                                                    <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
-                                                ):(
-                                                    partCForm ? (
-                                                        <input
-                                                            id="findings"
-                                                            name="findings"
-                                                            value= {findings}
-                                                            onChange={ev => setFindings(ev.target.value)}
-                                                            maxLength={500}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Findings"
-                                                        />
-                                                    )
-                                                    :enablePartC ? (
-                                                        <input
-                                                            id="findings"
-                                                            name="findings"
-                                                            value= {updatefindings}
-                                                            onChange={ev => setUpdateFindings(ev.target.value)}
-                                                            maxLength={500}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Findings"
-                                                        />
+                                            {/* Full width */}
+                                            <div className="col-span-full mt-2">
+                                                {/* Fidings */}
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                                        <label>Fidings</label>
+                                                    </div> 
+                                                    {formLoading ? (
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                                            {inspectionData?.findings ? inspectionData?.findings : null}
-                                                        </div>
-                                                    )
-                                                    
-                                                )} 
-                                            </div>
+                                                        partCForm ? (
+                                                            <input
+                                                                id="findings"
+                                                                name="findings"
+                                                                value= {findings}
+                                                                onChange={ev => setFindings(ev.target.value)}
+                                                                maxLength={500}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Findings"
+                                                            />
+                                                        )
+                                                        :enablePartC ? (
+                                                            <input
+                                                                id="findings"
+                                                                name="findings"
+                                                                value= {updatefindings}
+                                                                onChange={ev => setUpdateFindings(ev.target.value)}
+                                                                maxLength={500}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Findings"
+                                                            />
+                                                        ):(
+                                                            <div className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
+                                                                {inspectionData?.findings ? inspectionData?.findings : null}
+                                                            </div>
+                                                        )
+                                                        
+                                                    )} 
+                                                </div>
 
-                                            {/* Recomendations */}
-                                            <div className="ppa-form-container form-separate mt-2 mb-4">
-                                                <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                                    <label>Recomendations</label>
-                                                </div> 
-                                                {formLoading ? (
-                                                    <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
-                                                ):(
-                                                    partCForm ? (
-                                                        <input
-                                                            id="recomendations"
-                                                            name="recomendations"
-                                                            value={recommendations}
-                                                            onChange={ev => setRecommendations(ev.target.value)}
-                                                            maxLength={500}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Recomendations"
-                                                        />
-                                                    )
-                                                    :enablePartC ? (
-                                                        <input
-                                                            id="recomendations"
-                                                            name="recomendations"
-                                                            value= {updaterecommendations}
-                                                            onChange={ev => setUpdateRecommendations(ev.target.value)}
-                                                            maxLength={500}
-                                                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                            placeholder="Enter Recomendations"
-                                                        />
+                                                {/* Recomendations */}
+                                                <div className="ppa-form-container mt-2">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                                        <label>Recomendations</label>
+                                                    </div> 
+                                                    {formLoading ? (
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
-                                                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                                            {inspectionData?.recommendations ? inspectionData?.recommendations : null}
-                                                        </div>
-                                                    )
-                                                    
-                                                )} 
+                                                        partCForm ? (
+                                                            <input
+                                                                id="recomendations"
+                                                                name="recomendations"
+                                                                value={recommendations}
+                                                                onChange={ev => setRecommendations(ev.target.value)}
+                                                                maxLength={500}
+                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                placeholder="Enter Recomendations"
+                                                            />
+                                                        )
+                                                        :enablePartC ? (
+                                                            <input
+                                                                id="recomendations"
+                                                                name="recomendations"
+                                                                value= {updaterecommendations}
+                                                                onChange={ev => setUpdateRecommendations(ev.target.value)}
+                                                                maxLength={500}
+                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                                                placeholder="Enter Recomendations"
+                                                            />
+                                                        ):(
+                                                            <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                                                {inspectionData?.recommendations ? inspectionData?.recommendations : null}
+                                                            </div>
+                                                        )
+                                                        
+                                                    )} 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* ------------------------------------------------------- */}
+
                                     {/* Part D */}
-                                    <div className="mt-4 mb-4">
+                                    <div className="mt-4">
                                         {/* Header */}
                                         <div className="ppa-form-header">
                                             <div className="form-title-header">
@@ -2523,35 +2571,39 @@ export default function InspectionForm() {
                                         </div>
 
                                         {/* Form */}
-                                        <div className="form-container-wrapper">
+                                        <div className={`${isMobile ? 'form-full-width':'grid grid-col-2 mt-4'}`}>
                                             {/* 1st Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Date */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Date</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         partDForm ? (
-                                                        <DatePicker
-                                                                selected={partDDate}
-                                                                onChange={date => setPartDDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partD_date"
+                                                                id="rep_partD_date"
+                                                                autoComplete="rep_partD_date"
+                                                                value={partDDate}
+                                                                onChange={ev => setPartDDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
                                                         )
                                                         :enablePartD ? (
-                                                            <DatePicker
-                                                                selected={partDDate}
-                                                                onChange={date => setPartDDate(date)}
-                                                                maxDate={today}
-                                                                dateFormat="yyyy-MM-dd"
-                                                                className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                                                placeholderText="Enter Date"
+                                                            <input
+                                                                type="date"
+                                                                name="rep_partD_date"
+                                                                id="rep_partD_date"
+                                                                autoComplete="rep_partD_date"
+                                                                value={partDDate}
+                                                                onChange={ev => setPartDDate(ev.target.value)}
+                                                                className={`ppa-form-field full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                                                placeholder="Enter Date"
                                                             />
                                                         ):(
                                                             <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
@@ -2564,14 +2616,14 @@ export default function InspectionForm() {
                                             </div>
 
                                             {/* 2nd Column */}
-                                            <div>
+                                            <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
                                                 {/* Assign Personnel */}
-                                                <div className="ppa-form-container mt-3">
-                                                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                                <div className="ppa-form-container">
+                                                    <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                         <label>Assign Personnel</label>
                                                     </div> 
                                                     {formLoading ? (
-                                                        <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                        <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                     ):(
                                                         <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
                                                             {inspectionData?.after_reapir_date ? inspectionData?.personnel_name : null}
@@ -2580,13 +2632,16 @@ export default function InspectionForm() {
                                                 </div>
                                             </div>
 
-                                            {/* Remarks */}
-                                            <div className="ppa-form-container form-separate mt-2">
-                                                <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                            
+                                            {/* Full width */}
+                                            <div className="col-span-full mt-2">
+                                                {/* Remarks */}
+                                                <div className="ppa-form-container form-separate">
+                                                <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
                                                     <label>Remarks</label>
                                                 </div> 
                                                 {formLoading ? (
-                                                    <div className={`skeleton-form pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}></div>
+                                                    <div className={`skeleton-form full-width ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}></div>
                                                 ):(
                                                     partDForm ? (
                                                         <input
@@ -2617,6 +2672,8 @@ export default function InspectionForm() {
                                                     
                                                 )} 
                                             </div>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </>
@@ -2627,38 +2684,7 @@ export default function InspectionForm() {
                     </div>
                 </div>
 
-                {/* Activity */}
-                <div className="ppa-widget mb-act">
-                    <div className="joms-user-info-header">Activity</div>
-                    <div className="activity-container">
-                        {activityLoading ? (
-                            <div className="activity-loading">
-                                <div className="activity-spinner">
-                                <span></span><span></span><span></span>
-                                </div>
-                                <div className="activity-text">
-                                Loading activity…
-                                </div>
-                            </div>
-                        ):(
-                            trackingForm?.length > 0 && (
-                                trackingForm?.map(list => (
-                                    <div key={list.id}>
-                                        <div className="activity-combined">
-                                            <FontAwesomeIcon className="icon-activity" icon={faCircle} />
-                                            <div className="activity-datetime">
-                                            {list.date} {list.time}
-                                            </div>
-                                            <div className="activity-remarks">
-                                            {list.remarks}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            )
-                        )}
-                    </div>
-                </div>
+                
             </div>
 
             {/* Popup */}

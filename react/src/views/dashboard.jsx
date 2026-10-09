@@ -273,7 +273,7 @@ export default function Dashboard() {
         {/* Announcement */}
         <div className="ppa-widget mt-6">
             <div className="joms-user-info-header">Announcement Board</div>
-            <div className="joms-table-standard">
+            <div className="joms-table-standard ppa-widget-wrapper">
                 <table className="ppa-table">
                     <thead>
                         <tr>
@@ -316,72 +316,64 @@ export default function Dashboard() {
         <div className="ppa-cards-grid mt-6">
             {/* Inspection */}
             <div className="ppa-widget relative">
-                <div className="ppa-inside">
+                <div className="ppa-inside ppa-widget-wrapper">
                     <FontAwesomeIcon className="icon-reqcount" icon={faScrewdriverWrench} />
-                    <div className="joms-dashboard-title text-right"> Inspection Repair Request </div>
+                    <div className="joms-dashboard-title text-right req-name"> Inspection Repair Request </div>
                     <div className="joms-count flex mt-2">
                         {formLoading ? (
-                            <div className="skeleton wskeleton-1/2 wsk-right hs-req mb-1"></div>
+                            <div className="skeleton wskeleton-full hs-req mb-1 mt-4"></div>
                         ):(totalReq.inspection.count)}
                     </div>
                     <div className="req-border"></div>
-                    {formLoading ? (
-                        <div className="skeleton hs-table mt-1"></div>
-                    ):(
+                    {!formLoading && (
                         <div className="joms-word-count">No of Request Today: <strong>{totalReq.inspection.today}</strong></div>
                     )}
                 </div>
             </div>
             {/* Facility */}
             <div className="ppa-widget relative">
-                <div className="ppa-inside">
+                <div className="ppa-inside ppa-widget-wrapper">
                     <FontAwesomeIcon className="icon-reqcount" icon={faCalendarDays} />
-                    <div className="joms-dashboard-title text-right"> Facility/Venue Request </div>
+                    <div className="joms-dashboard-title text-right req-name"> Facility/Venue Request </div>
                     <div className="joms-count flex mt-2">
                         {formLoading ? (
-                            <div className="skeleton wskeleton-1/2 wsk-right hs-req mb-1"></div>
+                            <div className="skeleton wskeleton-full hs-req mb-1 mt-4"></div>
                         ):(totalReq.facility.count)}
                     </div>
                     <div className="req-border"></div>
-                    {formLoading ? (
-                        <div className="skeleton hs-table mt-1"></div>
-                    ):(
+                    {!formLoading && (
                         <div className="joms-word-count">No of Request Today: <strong>{totalReq.facility.today}</strong></div>
                     )}
                 </div>
             </div>
             {/* Venue */}
             <div className="ppa-widget relative">
-                <div className="ppa-inside">
+                <div className="ppa-inside ppa-widget-wrapper">
                     <FontAwesomeIcon className="icon-reqcount" icon={faVanShuttle} />
-                    <div className="joms-dashboard-title text-right"> Vehicle Slip Request </div>
+                    <div className="joms-dashboard-title text-right req-name"> Vehicle Slip Request </div>
                     <div className="joms-count flex mt-2">
                         {formLoading ? (
-                            <div className="skeleton wskeleton-1/2 wsk-right hs-req mb-1"></div>
+                            <div className="skeleton wskeleton-full hs-req mb-1 mt-4"></div>
                         ):(totalReq.vehicle.count)}
                     </div>
                     <div className="req-border"></div>
-                    {formLoading ? (
-                        <div className="skeleton hs-table mt-1"></div>
-                    ):(
+                    {!formLoading && (
                         <div className="joms-word-count">No of Request Today: <strong>{totalReq.vehicle.today}</strong></div>
                     )}
                 </div>
             </div>
             {/* Locator Slip */}
             <div className="ppa-widget relative">
-                <div className="ppa-inside">
+                <div className="ppa-inside ppa-widget-wrapper">
                     <FontAwesomeIcon className="icon-reqcount" icon={faFileContract} />
-                    <div className="joms-dashboard-title text-right"> Locator Slip Request </div>
+                    <div className="joms-dashboard-title text-right req-name"> Locator Slip Request </div>
                     <div className="joms-count flex mt-2">
                         {formLoading ? (
-                            <div className="skeleton wskeleton-1/2 wsk-right hs-req mb-1"></div>
+                            <div className="skeleton wskeleton-full hs-req mb-1 mt-4"></div>
                         ):(totalReq.vehicle.count)}
                     </div>
                     <div className="req-border"></div>
-                    {formLoading ? (
-                        <div className="skeleton hs-table mt-1"></div>
-                    ):(
+                    {!formLoading && (
                         <div className="joms-word-count">No of Request Today: <strong>{totalReq.vehicle.today}</strong></div>
                     )}
                 </div>
@@ -391,7 +383,7 @@ export default function Dashboard() {
         {/* Most Requested Personnel */}
         <div className="ppa-widget mt-6">
             <div className="joms-user-info-header">Most Requested Personnel</div>
-            <div className="ppa-cards-grid mrp-grid">
+            <div className="ppa-cards-grid ppa-widget-wrapper">
                 {/* Inspection */}
                 <div className="request-personnel">
                     <div className="joms-dashboard-title">Inspection Repair Request</div>
@@ -411,8 +403,7 @@ export default function Dashboard() {
                         <div className="mrp-main">
                             {listLoading ? (
                             <>
-                                <div className="skeleton hs-table mt-1"></div>
-                                <div className="skeleton hs-table mt-1"></div>
+                                <div className="skeleton wskeleton-full hs-req mb-1 mt-1"></div>
                             </>
                         ) : (
                             <>
@@ -451,8 +442,7 @@ export default function Dashboard() {
                         <div className="mrp-main">
                             {listLoading ? (
                             <>
-                                <div className="skeleton hs-table mt-1"></div>
-                                <div className="skeleton hs-table mt-1"></div>
+                                <div className="skeleton wskeleton-full hs-req mb-1 mt-1"></div>
                             </>
                         ) : (
                             <>
@@ -491,8 +481,7 @@ export default function Dashboard() {
                         <div className="mrp-main">
                             {listLoading ? (
                             <>
-                                <div className="skeleton hs-table mt-1"></div>
-                                <div className="skeleton hs-table mt-1"></div>
+                                <div className="skeleton wskeleton-full hs-req mb-1 mt-1"></div>
                             </>
                         ) : (
                             <>
@@ -531,8 +520,7 @@ export default function Dashboard() {
                         <div className="mrp-main">
                             {listLoading ? (
                             <>
-                                <div className="skeleton hs-table mt-1"></div>
-                                <div className="skeleton hs-table mt-1"></div>
+                                <div className="skeleton wskeleton-full hs-req mb-1 mt-1"></div>
                             </>
                         ) : (
                             <>
@@ -553,13 +541,13 @@ export default function Dashboard() {
                 </div>
             </div>
         </div>
-        
+
         {/* Reports and Logs */}
         <div className="ppa-2-col mt-6">
             {/* For the Reports */}
             <div className="ppa-widget">
                 <div className="joms-user-info-header">Reports</div>
-                <div className="joms-table-standard">
+                <div className="joms-table-standard ppa-widget-wrapper">
                     <table className="ppa-table">
                         <thead>
                             <tr>
@@ -664,7 +652,7 @@ export default function Dashboard() {
             <div className="ppa-widget">
                 <div className="joms-user-info-header">Logs</div>
                 <div className="joms-date"> As for <strong>{currentDate}</strong> </div>
-                <div className="joms-table-standard">
+                <div className="joms-table-standard ppa-widget-wrapper">
                     <table className="ppa-table mt-3">
                         <thead>
                             <tr>
@@ -708,41 +696,6 @@ export default function Dashboard() {
                 </div>
             </div>
         </div>
-
-        {/* Meet the team */}
-        {!isMobile && (
-            <div className="ppa-widget mt-6">
-                <div className="joms-user-info-header">Meet the Personnel</div>
-                <div className="joms-table-team mt-4">
-                    <div className="team-grid">
-                        {personnelLoading ? (
-                            Array.from({ length: 4 }).map((_, index) => (
-                                <div className="member-info" key={index}>
-                                    <div className="team-avatar">
-                                        <div className="avatar-skel" />
-                                    </div>
-                                </div> 
-                            ))
-                        ):(
-                            teams.map(item => (
-                                <div key={item.id} className="team-card" tabIndex={0} aria-labelledby={`tm-name-${item.id}`}>
-                                    <div className="team-photo-wrap">
-                                        <img src={item.avatar} alt={`${item.name} avatar`} className="team-photo" />
-                                        <div className="team-overlay" aria-hidden="true">
-                                            <div className="team-overlay-inner">
-                                                <div id={`tm-name-${item.id}`} className="team-name">{item.name}</div>
-                                                <div className="team-role">{item.division}</div>
-                                                <div className="team-office">{item.position}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            </div>
-        )}
     </>
     );
 }

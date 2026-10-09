@@ -1,0 +1,43 @@
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+
+  /* Forms */
+  .ppa-form-container { display: block; }
+  .label-width-insp { width: 10rem; }
+
+  /* Table */
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 4px;
+  }
+  
+
+  
+}
+/* End of Mobile Responsive */

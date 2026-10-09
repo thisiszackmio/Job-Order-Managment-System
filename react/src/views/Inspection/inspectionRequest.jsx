@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useUserStateContext } from "../../context/ContextProvider";
 import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axiosClient from "../../api/axios";
 import Popup from "../../components/popup";
@@ -153,7 +152,7 @@ export default function InspectionRequest() {
             if (error.response && error.response.status === 422) {
                 const responseErrors = error.response.data.errors || {};
                 setShowPopup(true);
-                setPopupContent("error");
+                setPopupContent("check-error");
                 playErrorSound();
                 setPopupMessage(
                     <div>
@@ -220,243 +219,341 @@ export default function InspectionRequest() {
         {/* Form Content */}
         <div className="ppa-widget mt-4">
             <div className="joms-user-info-header">Request for Pre/Post Inspection Repair</div>
-            {/* Title and Button */}
-            <div className="form-header">
-                <div>
-                    <div className="form-title-header">
-                        Fill up the Form
-                    </div>
-                    <div className="form-title-description">
-                        * - fields that need to be filled out
-                    </div>
-                </div>
-                <div>
-                    {/* Button */}
-                    <button 
-                    onClick={() => submitInspForm()}
-                    type="submit"
-                    className={`${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? (
-                      <div className="flex justify-center">
-                        <span className="ml-1">Submitting</span>
-                      </div>
-                    ):(
-                      'Confirm'
-                    )}
-                  </button>
-                </div>
-            </div>
+            
+            {/* Wrapper */}
+            <div className="ppa-widget-wrapper">
 
-            {/* Main Form */}
-            <div className="form-container mt-4">
-                {/* 1st Column */}
-                <div>
-                    {/* Date */}
-                    <div className="ppa-form-container">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Date</label>
-                        </div>  
-                        <div className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                            {formatDate(today)}
+                {/* Title and Button */}
+                <div className="form-header">
+                    {/* Title */}
+                    <div>
+                        <div className="form-title-header">
+                            Fill up the Form
+                        </div>
+                        <div className="form-title-description">
+                            * - fields that need to be filled out
+                        </div>
+                    </div>
+                    {/* Button */}
+                    {!isMobile && (
+                        <div>
+                            {/* Button */}
+                            <button 
+                                onClick={() => submitInspForm()}
+                                type="submit"
+                                className={`${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                                disabled={submitLoading}
+                            >
+                                {submitLoading ? (
+                                <div className="flex justify-center">
+                                    <span className="ml-1">Submitting</span>
+                                </div>
+                                ):(
+                                'Submit'
+                                )}
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Main Form */}
+                <div className={`${isMobile ? 'form-full-width':'grid grid-col-2 mt-4 pb-4'}`} >
+                    {/* 1st Column */}
+                    <div className={`${isMobile ? 'mt-4':'col-span-1'}`}>
+                        {/* Date */}
+                        <div className="ppa-form-container">
+                            {/* Label  */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label>Date</label>
+                            </div>
+                            {/* Field className=" "*/}
+                            <div className="field-width">
+                                <div className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}>
+                                    {formatDate(today)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Property Number */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_property_no">Property Number</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="text"
+                                    name="rep_property_no"
+                                    id="rep_property_no"
+                                    autoComplete="rep_property_no"
+                                    value={propertyNo}
+                                    onChange={ev => setPropertyNo(ev.target.value)}
+                                    maxLength={255}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Property Number"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Acquisition Date */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_acquisition_date">Acquisition Date</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="date"
+                                    name="rep_acquisition_date"
+                                    id="rep_acquisition_date"
+                                    autoComplete="rep_acquisition_date"
+                                    value={acquisitionDate}
+                                    onChange={ev => setAcquisitionDate(ev.target.value)}
+                                    maxLength={255}
+                                    max={today}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Acquisition Date"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Acquisition Cost */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_acquisition_cost">Acquisition Cost</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="text"
+                                    name="rep_acquisition_cost"
+                                    id="rep_acquisition_cost"
+                                    autoComplete="rep_acquisition_cost"
+                                    value={acquisitionCost ? `₱ ${formatCurrency(acquisitionCost)}` : ""}
+                                    onChange={handleChange}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Acquisition Cost"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Brand/Model */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_brand_model">Brand/Model</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="text"
+                                    name="rep_brand_model"
+                                    id="rep_brand_model"
+                                    autoComplete="rep_brand_model"
+                                    value={BrandModel}
+                                    maxLength={255}
+                                    onChange={ev => setBrandModel(ev.target.value)}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Brand/Model"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Serial/Engine No */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_serial_engine_no">Serial/Engine No</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="text"
+                                    name="rep_serial_engine_no"
+                                    id="rep_serial_engine_no"
+                                    autoComplete="rep_serial_engine_no"
+                                    value={SerialEngineNo}
+                                    maxLength={255}
+                                    onChange={ev => setSerialEngineNo(ev.target.value)}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Serial/Engine No"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Property Number */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Property Number</label>
-                        </div>  
-                        <input
-                            type="text"
-                            name="rep_property_no"
-                            id="rep_property_no"
-                            autoComplete="rep_property_no"
-                            value={propertyNo}
-                            onChange={ev => setPropertyNo(ev.target.value)}
-                            maxLength={255}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Property Number"
-                        />
+                    {/* 2nd Column */}
+                    <div className={`${isMobile ? 'mt-2':'col-span-1'}`}>
+                        {/* Type of Property */}
+                        <div className="ppa-form-container">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_type_of_property">Type of Property</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <select 
+                                    name="rep_type_of_property" 
+                                    id="rep_type_of_property" 
+                                    autoComplete="rep_type_of_property"
+                                    value={typeOfProperty}
+                                    onChange={ev => {
+                                    setTypeOfProperty(ev.target.value);
+                                    }}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                >
+                                    <option value="" disabled>Select an option</option>
+                                    <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
+                                    <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label ${isMobile ? 'label-mobile-border center-label':' top-label no-right-border '}`}>
+                                <label htmlFor="rep_description">Description</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <textarea
+                                    name="rep_description"
+                                    id="rep_description"
+                                    autoComplete="rep_description"
+                                    value={propertyDescription}
+                                    onChange={ev => setPropertyDescription(ev.target.value)}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Description"
+                                    rows={3}
+                                    maxLength={255}
+                                    style={{ resize: "none" }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Location */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_location">Location</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <input
+                                    type="text"
+                                    name="rep_location"
+                                    id="rep_location"
+                                    autoComplete="rep_location"
+                                    value={propertyLocation}
+                                    maxLength={255}
+                                    onChange={ev => setPropertyLocation(ev.target.value)}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                    placeholder="Enter Location"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Supervisor */}
+                        <div className="ppa-form-container mt-2">
+                            {/* Label */}
+                            <div className={`label-width-insp ppa-form-label ${isMobile ? 'label-mobile-border center-label':' no-right-border top-label '}`}>
+                                <label htmlFor="rep_supervisor">Supervisor</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                <select 
+                                    name="rep_supervisor" 
+                                    id="rep_supervisor" 
+                                    autoComplete="rep_supervisor"
+                                    value={selectedSupervisor.id}
+                                    onChange={ev => {
+                                        const supervisorId = ev.target.value;
+                                        const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
+                                        
+                                        setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
+                                    }}
+                                    className={`ppa-form-field ${isMobile ? 'mobile-border-form-field':'border-form-field'}`}
+                                >
+                                    <option value="" disabled>Select your supervisor</option>
+                                    {supervisor?.supervisorData?.map((Data) => (
+                                        <option key={Data.id} value={Data.id}>
+                                        {Data.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Acquisition Date */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Acquisition Date</label>
-                        </div> 
-                         <input
-                            type="date"
-                            name="rep_acquisition_date"
-                            id="rep_acquisition_date"
-                            value={acquisitionDate}
-                            onChange={ev => setAcquisitionDate(ev.target.value)}
-                            max={today}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                        />
-                    </div>
-
-                    {/* Acquisition Cost */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Acquisition Cost</label>
-                        </div>  
-                        <input
-                            type="text"
-                            name="rep_acquisition_cost"
-                            id="rep_acquisition_cost"
-                            value={acquisitionCost ? `₱ ${formatCurrency(acquisitionCost)}` : ""}
-                            onChange={handleChange}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Acquisition Cost"
-                        />
-                    </div>
-
-                    {/* Brand/Model */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Brand/Model</label>
-                        </div>  
-                        <input
-                            type="text"
-                            name="brand_mrep_brand_model"
-                            id="rep_brand_model"
-                            autoComplete="rep_brand_model"
-                            value={BrandModel}
-                            maxLength={255}
-                            onChange={ev => setBrandModel(ev.target.value)}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Brand/Model"
-                        />
-                    </div>
-
-                    {/* Serial/Engine No */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Serial/Engine No</label>
-                        </div>  
-                        <input
-                            type="text"
-                            name="rep_serial_engine_no"
-                            id="rep_serial_engine_no"
-                            autoComplete="rep_serial_engine_no"
-                            value={SerialEngineNo}
-                            maxLength={255}
-                            onChange={ev => setSerialEngineNo(ev.target.value)}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Serial/Engine No"
-                        />
+                    {/* Full width */}
+                    <div className="col-span-full mt-2">
+                        {/* Complain */}
+                        <div className="ppa-form-container">
+                            {/* Label */}
+                            <div className={`label-width-insp-one ppa-form-label center-label ${isMobile ? 'label-mobile-border':' no-right-border '}`}>
+                                <label htmlFor="rep_complain">Complain</label>
+                            </div>
+                            {/* Field */}
+                            <div className="field-width">
+                                {isMobile ? (
+                                    <textarea
+                                        name="rep_complain"
+                                        id="rep_complain"
+                                        autoComplete="rep_complain"
+                                        value={ComplainDefect}
+                                        maxLength={500}
+                                        onChange={ev => setComplainDefect(ev.target.value)}
+                                        className="ppa-form-field mobile-border-form-field"
+                                        placeholder="Enter Complain"
+                                        rows={3}
+                                        style={{ resize: "none" }}
+                                    />
+                                ):(
+                                    <input
+                                        type="text"
+                                        name="rep_complain"
+                                        id="rep_complain"
+                                        autoComplete="rep_complain"
+                                        value={ComplainDefect}
+                                        maxLength={500}
+                                        onChange={ev => setComplainDefect(ev.target.value)}
+                                        className="ppa-form-field border-form-field"
+                                        placeholder="Enter Complain"
+                                    />
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* 2nd Column */}
-                <div>
-                    {/* Type of Property */}
+                {/* Button for Mobile Only */}
+                {isMobile && (
+                <div className="col-span-full mt-4 pb-4">
                     <div className="ppa-form-container">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Type of Property</label>
-                            <span className="form-validation"> * </span>
-                        </div>  
-                        <select 
-                            name="rep_type_of_property" 
-                            id="rep_type_of_property" 
-                            autoComplete="rep_type_of_property"
-                            value={typeOfProperty}
-                            onChange={ev => {
-                            setTypeOfProperty(ev.target.value);
-                            }}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                        {/* Button */}
+                        <button 
+                            onClick={() => submitInspForm()}
+                            type="submit"
+                            className={`full-btn ${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                            disabled={submitLoading}
                         >
-                            <option value="" disabled>Select an option</option>
-                            <option value="Vehicle Supplies & Materials">Vehicle Supplies & Materials</option>
-                            <option value="IT Equipment & Related Materials">IT Equipment & Related Materials</option>
-                            <option value="Others">Others</option>
-                        </select>
-                    </div>
-
-                    {/* Description */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Description</label>
-                            <span className="form-validation"> * </span>
-                        </div>  
-                        <textarea
-                            name="rep_description"
-                            id="rep_description"
-                            value={propertyDescription}
-                            maxLength={255}
-                            onChange={ev => setPropertyDescription(ev.target.value)}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Description"
-                            rows={3}
-                            style={{ resize: "none" }}
-                        />
-                    </div>
-
-                    {/* Location  */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Location </label>
-                            <span className="form-validation"> * </span>
-                        </div>  
-                        <input
-                            type="text"
-                            name="rep_location"
-                            id="rep_location"
-                            value={propertyLocation}
-                            maxLength={255}
-                            onChange={ev => setPropertyLocation(ev.target.value)}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                            placeholder="Enter Location "
-                        />
-                    </div>
-
-                    {/* Supervisor */}
-                    <div className="ppa-form-container mt-2">
-                        <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                            <label>Supervisor</label>
-                            <span className="form-validation"> * </span>
-                        </div>  
-                        <select 
-                            name="rep_supervisor" 
-                            id="rep_supervisor" 
-                            value={selectedSupervisor.id}
-                            onChange={ev => {
-                                const supervisorId = ev.target.value;
-                                const supervisorData = supervisor.supervisorData.find(sup => sup.id === parseInt(supervisorId));
-                                
-                                setSelectedSupervisor(supervisorData ? { id: supervisorData.id, name: supervisorData.name } : { id: '', name: '' });
-                            }}
-                            className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                        >
-                            <option value="" disabled>Select your supervisor</option>
-                            {supervisor?.supervisorData?.map((Data) => (
-                                <option key={Data.id} value={Data.id}>
-                                {Data.name}
-                                </option>
-                            ))}
-                        </select>
+                            {submitLoading ? (
+                            <div className="flex justify-center">
+                                <span className="ml-1">Submitting</span>
+                            </div>
+                            ):(
+                            'Submit'
+                            )}
+                        </button>
                     </div>
                 </div>
+                )}
 
-                {/* Complain */}
-                <div className="ppa-form-container form-separate mt-2 mb-4">
-                    <div className={`ppa-form-title pro-title-width-insp ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                        <label>Complain</label>
-                        <span className="form-validation"> * </span>
-                    </div>  
-                    <input
-                        type="text"
-                        id="rep_complain"
-                        name="rep_complain"
-                        value={ComplainDefect}
-                        maxLength={500}
-                        onChange={ev => setComplainDefect(ev.target.value)}
-                        className={`ppa-form-field pro-form-full-width ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                        placeholder="Enter Complain"
-                    />
-                </div>
             </div>
         </div>
 

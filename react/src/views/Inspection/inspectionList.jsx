@@ -83,7 +83,7 @@ export default function InspectionList() {
             <div className="ppa-widget mt-4">
                 <div className="joms-user-info-header">Pre/Post Repair Inspection Form List</div>
 
-                <div className="joms-table mt-4">
+                <div className="ppa-widget-wrapper mt-4">
                     {/* Top */}
                     <div className="tab-header">
                         <div>
@@ -95,7 +95,7 @@ export default function InspectionList() {
                                 onChange={(e) =>
                                 setSearchInsp(e.target.value)
                                 }
-                                className="ppa-form-search"
+                                className="ppa-form-search full-border"
                             />
                         </div>
                         <div>

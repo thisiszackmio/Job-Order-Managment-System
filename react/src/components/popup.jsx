@@ -7,7 +7,7 @@ export default function Popup({
     userId,
     popupContent,
     popupMessage,
-    onConfirm,
+    onConfirm, 
     onSuccess,
     inspectionID,
     InspPartB,

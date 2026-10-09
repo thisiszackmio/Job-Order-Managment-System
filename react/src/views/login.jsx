@@ -176,7 +176,7 @@ export default function Login() {
                                                 id="currentPassword"
                                                 name="currentPassword"
                                                 type="password"
-                                                className="block ppa-form"
+                                                className="block ppa-login-form"
                                                 placeholder="Current Password"
                                                 value={currentPassword}
                                                 onChange={(ev) => setCurrentPassword(ev.target.value)}
@@ -192,7 +192,7 @@ export default function Login() {
                                                 id="newPassword"
                                                 name="newPassword"
                                                 type="password"
-                                                className="block ppa-form"
+                                                className="block ppa-login-form"
                                                 placeholder="New Password"
                                                 value={newPassword}
                                                 onChange={(ev) => setNewPassword(ev.target.value)}
@@ -208,7 +208,7 @@ export default function Login() {
                                                 id="confirmPassword"
                                                 name="confirmPassword"
                                                 type="password"
-                                                className="block ppa-form"
+                                                className="block ppa-login-form"
                                                 placeholder="Confirm Password"
                                                 value={confirmPassword}
                                                 onChange={(ev) => setConfirmPassword(ev.target.value)}
@@ -251,7 +251,7 @@ export default function Login() {
                                                 id="username"
                                                 name="username"
                                                 type="text"
-                                                className="block ppa-form"
+                                                className="block ppa-login-form"
                                                 placeholder="Username"
                                                 value={username}
                                                 onChange={(ev) => setUsername(ev.target.value)}
@@ -267,7 +267,7 @@ export default function Login() {
                                                 id="password"
                                                 name="password"
                                                 type="password"
-                                                className="block ppa-form"
+                                                className="block ppa-login-form"
                                                 placeholder="Password"
                                                 value={password}
                                                 onChange={(ev) => setPassword(ev.target.value)}
@@ -281,7 +281,7 @@ export default function Login() {
                                                 onClick={() => setChangeMethod("login")} className={`full-btn ${ submitLoading ? 'btn-process' : 'btn-primary'}`} disabled={submitLoading}
                                             >
                                             {submitLoading ? (
-                                                <div className="flex w-full items-center justify-center">
+                                                <div className="flex w-full justify-center">
                                                 <span className="btn-loader"></span>
                                                 <span className="ml-1">Processing</span>
                                                 </div>

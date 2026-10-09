@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axiosClient from "../../api/axios";
+import Popup from "../../components/popup";
 
 export default function FacilityRequest() {
+    // Error sound
+    const playErrorSound = () => {
+        const audio = new Audio("/sound/error.mp3");
+
+        audio.volume = 1;
+        audio.play().catch((error) => {
+            console.warn("Unable to play error sound:", error);
+        });
+    };
+
     // Mobile
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
@@ -25,9 +37,16 @@ export default function FacilityRequest() {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
+    // Popup state
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupContent, setPopupContent] = useState("");
+    const [popupMessage, setPopupMessage] = useState("");
+
     // Function
     const [submitLoading, setSubmitLoading] = useState(false);
     const [disableForm, setDisableForm] = useState(false);
+    const [enableFacility, setEnableFacility] = useState(false);
+    const [enableDormitory, setEnableDormitory] = useState(false);
 
     //Main Form
     const [reqOffice, setRegOffice] = useState('');
@@ -41,6 +60,29 @@ export default function FacilityRequest() {
     const [dormCheck, setDormCheck] = useState(false);
     const [otherCheck, setOtherCheck] = useState(false);
     const [DateEndMin, setDateEndMin] = useState(today);
+
+    //Facility Room
+    const [checkTable, setCheckTable] = useState(false);
+    const [checkChairs, setCheckChairs] = useState(false);
+    const [checkProjector, setCheckProjector] = useState(false);
+    const [checkProjectorScreen, setCheckProjectorScreen] = useState(false);
+    const [checkDocumentCamera, setCheckDocumentCamera] = useState(false);
+    const [checkLaptop, setCheckLaptop] = useState(false);
+    const [checkTelevision, setCheckTelevision] = useState(false);
+    const [checkSoundSystem, setCheckSoundSystem] = useState(false);
+    const [checkVideoke, setCheckVideoke] = useState(false);
+    const [checkMicrphone, setCheckMicrphone] = useState(false);
+    const [checkOther, setCheckOther] = useState(false);
+    const [NoOfTable, setNoOfTable] = useState('');
+    const [NoOfChairs, setNoOfChairs] = useState('');
+    const [NoOfMicrophone, setNoOfMicrophone] = useState('');
+    const [OtherField, setOtherField] = useState('');
+    const [checkedCount, setCheckedCount] = useState(0);
+
+    // Dormitory
+    const [getMale, setGetMale] = useState('');
+    const [getFemale, setGetFemale] = useState('');
+    const [otherDetails, setOtherDetails] = useState('');
 
     // For checkbox
     const handleCheckboxChange = (setStateFunction, isChecked, ...otherStateFunctions) => {
@@ -63,7 +105,134 @@ export default function FacilityRequest() {
 
     // Check Availability
     function checkAvailability(event){
-        alert("Check Availability")   
+        event.preventDefault();
+
+        setSubmitLoading(true);  
+
+        const checkRequest = {
+            request_office: reqOffice,
+            title_of_activity: titleReq,
+            date_start: DateStart,
+            time_start: timeStart,
+            date_end: DateEnd,
+            time_end: timeEnd,
+            mph: mphCheck,
+            conference: confCheck,
+            dorm: dormCheck,
+            other: otherCheck,
+        };
+
+        axiosClient
+        .post('checkavailability', checkRequest)
+        .then((response) => {
+            const responseData = response.data.message;
+
+            // console.log(responseData);
+            if(!mphCheck && !confCheck && !dormCheck && !otherCheck){
+                setShowPopup(true);
+                setPopupContent("check-error");
+                playErrorSound();
+                setPopupMessage(
+                    <div>
+                    <p className="popup-title">Error</p>
+                    <p className="popup-message">
+                       Please enter the Facility Request Details.
+                    </p>
+                    </div>
+                );
+            }else{
+                if(responseData === 'invalidDate'){
+                    setShowPopup(true);
+                    setPopupContent('check-error');
+                    playErrorSound();
+                    setPopupMessage(
+                        <div>
+                        <p className="popup-title">Invalid!</p>
+                        <p className="popup-message">
+                            Start date and time must be today or later.
+                        </p>
+                        </div>
+                    );
+                }else if(responseData === 'checkDate'){
+                    setShowPopup(true);
+                    setPopupContent('check-error');
+                    playErrorSound();
+                    setPopupMessage(
+                        <div>
+                        <p className="popup-title">Invalid!</p>
+                        <p className="popup-message">
+                            You've entered an invalid date and time.
+                        </p>
+                        </div>
+                    );
+                }else{
+                    if(responseData === "Vacant"){
+                        if(mphCheck || confCheck || otherCheck){
+                            setEnableFacility(true);
+                            setDisableForm(true);
+                        }else{
+                            alert("Dormitory");
+                        }
+                    }
+                    else if(responseData === "Not Vacant"){
+                        alert("Not Vacant")
+                    }else{
+                        alert("pending approval")
+                    }
+                }
+            }
+        })
+        .catch((error) => {
+            if(error.response && error.response.status === 422){
+                const responseErrors = error.response.data.errors || {};
+                setShowPopup(true);
+                setPopupContent("check-error");
+                playErrorSound();
+                setPopupMessage(
+                    <div>
+                        <p className="popup-title">Error</p>
+                        <p className="popup-message">
+                            {responseErrors.request_office ? 'Please enter the Requesting Office/Division.' : 
+                            responseErrors.title_of_activity ? 'Please enter the Title/Purpose of Activity.' :
+                            responseErrors.date_start ? 'Please select the Date of Activity (Start).' :
+                            responseErrors.time_start ? 'Please select the Time of Activity (Start).' :
+                            responseErrors.date_end ? 'Please select the Date of Activity (End).' :
+                            responseErrors.time_end ? 'Please select the Time of Activity (End).' :
+                                'There something wrong with your request. Please check the form and try again.'
+                            }
+                        </p>
+                    </div>
+                );
+            }else if(error.response){
+                setShowPopup(true);
+                setPopupContent('error');
+                playErrorSound();
+                setPopupMessage(
+                    <div>
+                    <p className="popup-title">Error</p>
+                    <p className="popup-message">
+                        An issue occurred. Please contact the developer. <strong>Error code: {error.response.status}</strong>
+                    </p>
+                    </div>
+                );
+            }else{
+                if(error.request){
+                    setShowPopup(true);
+                    setPopupContent('error');
+                    playErrorSound();
+                    setPopupMessage(
+                        <div>
+                            <p className="popup-title">Network Error</p>
+                            <p className="popup-message">Cannot connect to server. Please check your connection or try again later.</p>
+                        </div>
+                    );
+                }
+            }
+        })
+        .finally(() => {
+            setSubmitLoading(false);
+            // setButtonHide(false);
+        });
     }
 
     // Check Availability
@@ -73,7 +242,20 @@ export default function FacilityRequest() {
 
     // Close Button
     function handleCancel(){
-        alert("Cancel")
+        setEnableFacility(false);
+        setDisableForm(false);
+    }
+
+    //Close Popup on Success
+    const successPopup = () => {
+        setSubmitLoading(false);
+        setShowPopup(false);
+        navigate(`/joms/myrequest#facility`);
+    }
+
+    //Close Popup on Error
+    const justClose = () => {
+        setShowPopup(false);
     }
 
     return(
@@ -95,26 +277,35 @@ export default function FacilityRequest() {
                         {/* Button */}
                         {disableForm ? (
                         <>
-                            {/* Check Form */}
-                            <button 
-                                onClick={SubmitFacilityForm} 
-                                className="w-full md:w-auto py-1.5 px-4 text-sm btn-secondary">
-                                Submit
-                            </button>
+                            <div className="form-btn-align">
+                                {/* Check Form */}
+                                <button 
+                                    onClick={SubmitFacilityForm} 
+                                    className="w-full md:w-auto py-1.5 px-4 text-sm btn-secondary">
+                                    Submit
+                                </button>
 
-                            {/* Cancel */}
-                            <button onClick={handleCancel} className="w-full md:w-auto ml-2 py-1.5 px-4 text-sm btn-cancel">
-                                Cancel
-                            </button>
+                                {/* Cancel */}
+                                <button onClick={handleCancel} className="w-full md:w-auto ml-2 py-1.5 px-4 text-sm btn-cancel">
+                                    Cancel
+                                </button>
+                            </div>
                         </>
                         ):(
                         <>
                             {/* Check Form */}
                             <button 
                                 onClick={checkAvailability} 
-                                className="w-full md:w-auto py-1.5 px-4 text-sm btn-secondary"
+                                className={`${ submitLoading ? 'btn-process' : 'btn-secondary' }`}
+                                disabled={submitLoading}
                             >
-                                Check Availability
+                                {submitLoading ? (
+                                <div className="flex justify-center">
+                                    <span className="ml-1">Checking</span>
+                                </div>
+                                ):(
+                                    'Check Availability'
+                                )}
                             </button>
                         </>
                         )}
@@ -123,283 +314,184 @@ export default function FacilityRequest() {
                 </div>
             
                 {/* Main Form Fields */}
-                <div className="form-container mt-4">
-                    {/* 1st Column */}
-                    <div>
-                        {/* Date */}
-                        <div className="ppa-form-container">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Date</label>
-                            </div>  
-                            <div className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
-                                {formatDate(today)}
-                            </div>
-                        </div>
-
-                        {/* Requesting Office/Division */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Requesting Office/Division</label>
-                            </div>  
-                            <input
-                                type="text"
-                                name="rf_request"
-                                id="rf_request"
-                                autoComplete="rf_request"
-                                value={reqOffice}
-                                onChange={ev => setRegOffice(ev.target.value)}
-                                maxLength={255}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Enter Requesting Office/Division"
-                            />
-                        </div>
-
-                        {/* Title/Purpose of Activity */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Title/Purpose of Activity</label>
-                            </div>  
-                            <input
-                                type="text"
-                                name="rep_title"
-                                id="rep_title"
-                                autoComplete="rep_title"
-                                value={titleReq}
-                                onChange={ev => setTitleReq(ev.target.value)}
-                                maxLength={255}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Enter Title/Purpose of Activity"
-                            />
-                        </div>
-
-                        {/* Date of Activity (Start) */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Date of Activity (Start)</label>
-                            </div>  
-                            <input
-                                type="date"
-                                name="date_start"
-                                id="date_start"
-                                value={DateStart}
-                                onChange={ev => {
-                                    setDateStart(ev.target.value);
-                                    setDateEndMin(ev.target.value);
-                                }}
-                                min={today}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Date of Activity"
-                            />
-                        </div>
-
-                        {/* Time of Activity (Start) */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Time of Activity (Start)</label>
-                            </div>  
-                            <input
-                                type="time"
-                                name="time_start"
-                                id="time_start"
-                                value={timeStart}
-                                onChange={ev => setTimeStart(ev.target.value)}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Time of Activity"
-                            />
-                        </div>
-
-                        {/* Date of Activity (End) */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Date of Activity (End)</label>
-                            </div>  
-                            <input
-                                type="date"
-                                name="date_end"
-                                id="date_end"
-                                value={DateEnd}
-                                onChange={ev => {
-                                setDateEnd(ev.target.value);
-                                if (ev.target.value < DateStart) {
-                                    // If DateEnd is before DateStart, set DateEnd to DateStart
-                                    setDateEnd(DateStart);
-                                }
-                                }}
-                                min={DateEndMin}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Date of Activity"
-                            />
-                        </div>
-
-                        {/* Time of Activity (End) */}
-                        <div className="ppa-form-container mt-2">
-                            <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
-                                <label>Time of Activity (End)</label>
-                            </div>  
-                            <input
-                                type="time"
-                                name="time_end"
-                                id="time_end"
-                                value={timeEnd}
-                                onChange={ev => setTimeEnd(ev.target.value)}
-                                className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
-                                placeholder="Time of Activity"
-                            />
-                        </div>
-                    </div>
-
-                    {/* 2nd Column */}
-                    <div>
-                        {/* Date */}
+                <div>
+                    <div className="form-container-facility mt-4">
                         <div>
-                            <div className={`ppa-form-title pro-title-width-fac-check ${isMobile ? 'border-form-title-mobile' : 'border-form-title-full'}`}>
-                                <label>Facilities / Venue being Requested:</label>
-                            </div>  
-                            {/* Check Area */}
-                            <div className="mt-3">
-                                {/* For MPH */}
-                                <div className="facility-options">
-                                    <div>
-                                        <input
-                                            id="mph-checkbox"
-                                            type="checkbox"
-                                            checked={mphCheck}
-                                            onChange={(ev) => {
-                                                const isChecked = ev.target.checked ? 1 : 0;
-                                                handleCheckboxChange(setMphCheck, ev.target.checked, setConfCheck, setOtherCheck, setDormCheck);
-                                                if (!ev.target.checked) {
-                                                setCheckTable(false);
-                                                setNoOfTable(null);
-                                                setCheckChairs(false);
-                                                setNoOfChairs(null);
-                                                setCheckOther(false);
-                                                setOtherField(null);
-                                                setCheckMicrphone(false);
-                                                setNoOfMicrophone(null);
-                                                setCheckVideoke(false);
-                                                setCheckSoundSystem(false);
-                                                setCheckTelevision(false);
-                                                setCheckLaptop(false);
-                                                setCheckDocumentCamera(false);
-                                                setCheckProjectorScreen(false);
-                                                setCheckProjector(false);
-                                                }
-                                                setMphCheck(isChecked);
-                                            }}
-                                            className={`checkbox-input`}
-                                        />
-                                    </div>
-                                    <div className="facility-options">
-                                        <label htmlFor="rf_request" className="form-title-check">
+                            {/* Date */}
+                            <div className="ppa-form-container">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Date</label>
+                                </div>  
+                                <div className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}>
+                                    {formatDate(today)}
+                                </div>
+                            </div>
+
+                            {/* Requesting Office/Division */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Requesting Office/Division</label>
+                                </div>  
+                                <input
+                                    type="text"
+                                    name="rf_request"
+                                    id="rf_request"
+                                    autoComplete="rf_request"
+                                    value={reqOffice}
+                                    onChange={ev => setRegOffice(ev.target.value)}
+                                    maxLength={255}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Enter Requesting Office/Division"
+                                />
+                            </div>
+
+                            {/* Title/Purpose of Activity */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Title/Purpose of Activity</label>
+                                </div>  
+                                <input
+                                    type="text"
+                                    name="rep_title"
+                                    id="rep_title"
+                                    autoComplete="rep_title"
+                                    value={titleReq}
+                                    onChange={ev => setTitleReq(ev.target.value)}
+                                    maxLength={255}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Enter Title/Purpose of Activity"
+                                />
+                            </div>
+
+                            {/* Date of Activity (Start) */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Date of Activity (Start)</label>
+                                </div>  
+                                <input
+                                    type="date"
+                                    name="date_start"
+                                    id="date_start"
+                                    value={DateStart}
+                                    onChange={ev => {
+                                        setDateStart(ev.target.value);
+                                        setDateEndMin(ev.target.value);
+                                    }}
+                                    min={today}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Date of Activity"
+                                />
+                            </div>
+
+                            {/* Time of Activity (Start) */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Time of Activity (Start)</label>
+                                </div>  
+                                <input
+                                    type="time"
+                                    name="time_start"
+                                    id="time_start"
+                                    value={timeStart}
+                                    onChange={ev => setTimeStart(ev.target.value)}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Time of Activity"
+                                />
+                            </div>
+
+                            {/* Date of Activity (End) */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Date of Activity (End)</label>
+                                </div>  
+                                <input
+                                    type="date"
+                                    name="date_end"
+                                    id="date_end"
+                                    value={DateEnd}
+                                    onChange={ev => {
+                                    setDateEnd(ev.target.value);
+                                    if (ev.target.value < DateStart) {
+                                        // If DateEnd is before DateStart, set DateEnd to DateStart
+                                        setDateEnd(DateStart);
+                                    }
+                                    }}
+                                    min={DateEndMin}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Date of Activity"
+                                />
+                            </div>
+
+                            {/* Time of Activity (End) */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Time of Activity (End)</label>
+                                </div>  
+                                <input
+                                    type="time"
+                                    name="time_end"
+                                    id="time_end"
+                                    value={timeEnd}
+                                    onChange={ev => setTimeEnd(ev.target.value)}
+                                    className={`ppa-form-field pro-form-full-width-fac ${isMobile ? 'border-form-field-mobile':'border-form-field'}`}
+                                    placeholder="Time of Activity"
+                                />
+                            </div>
+
+                            {/* Facility */}
+                            <div className="ppa-form-container mt-2">
+                                <div className={`ppa-form-title pro-title-width-fac ${isMobile ? 'border-form-title-mobile' : 'border-form-title'}`}>
+                                    <label>Facility Being Requested</label>
+                                </div>
+                                {/* Checkbox */}
+                                <div className="facility-request-row">
+                                    <input
+                                        id="mph-checkbox"
+                                        type="checkbox"
+                                        checked={Boolean(mphCheck)}
+                                        onChange={(ev) => {
+                                            const isChecked = ev.target.checked;
+                                            setMphCheck(isChecked ? 1 : 0);
+
+                                            // Keep your existing reset code here
+                                        }}
+                                        className="facility-checkbox"
+                                    />
+
+                                    <label
+                                        htmlFor="mph-checkbox"
+                                        className="facility-request-label"
+                                    >
                                         Multi-Purpose Hall (MPH)
-                                        </label> 
-                                    </div>
-                                </div>
-
-                                {/* For Conference Hall */}
-                                <div className="facility-options">
-                                    <div>
-                                        <input
-                                            id="conference-checkbox"
-                                            type="checkbox"
-                                            checked={confCheck}
-                                            onChange={(ev) => {
-                                                const isChecked = ev.target.checked ? 1 : 0;
-                                                handleCheckboxChange(setConfCheck, ev.target.checked, setOtherCheck, setDormCheck, setMphCheck);
-                                                if (!ev.target.checked) {
-                                                setCheckTable(false);
-                                                setNoOfTable(null);
-                                                setCheckChairs(false);
-                                                setNoOfChairs(null);
-                                                setCheckOther(false);
-                                                setOtherField(null);
-                                                setCheckMicrphone(false);
-                                                setNoOfMicrophone(null);
-                                                setCheckVideoke(false);
-                                                setCheckSoundSystem(false);
-                                                setCheckTelevision(false);
-                                                setCheckLaptop(false);
-                                                setCheckDocumentCamera(false);
-                                                setCheckProjectorScreen(false);
-                                                setCheckProjector(false);
-                                                }
-                                                setConfCheck(isChecked);
-                                            }}
-                                            className={`checkbox-input`}
-                                        />
-                                    </div>
-                                    <div className="facility-options">
-                                        <label htmlFor="rf_request" className="form-title-check">
-                                        Conference Hall
-                                        </label> 
-                                    </div>
-                                </div>
-
-                                {/* For Dormitory */}
-                                <div className="facility-options">
-                                    <div>
-                                        <input
-                                            id="dormitory-checkbox"
-                                            type="checkbox"
-                                            checked={dormCheck}
-                                            onChange={(ev) => {
-                                                const isChecked = ev.target.checked ? 1 : 0;
-                                                handleCheckboxChange(setDormCheck, ev.target.checked, setOtherCheck, setMphCheck, setConfCheck);
-                                                setDormCheck(isChecked);
-                                            }}
-                                            className={`checkbox-input`}
-                                        />
-                                    </div>
-                                    <div className="facility-options">
-                                        <label htmlFor="rf_request" className="form-title-check">
-                                            Dormitory
-                                        </label> 
-                                    </div>
-                                </div>
-
-                                {/* For Other */}
-                                <div className="facility-options">
-                                    <div>
-                                        <input
-                                            id="other-checkbox"
-                                            type="checkbox"
-                                            checked={otherCheck}
-                                            onChange={(ev) => {
-                                                const isChecked = ev.target.checked ? 1 : 0;
-                                                handleCheckboxChange(setOtherCheck, ev.target.checked, setMphCheck, setConfCheck, setDormCheck);
-                                                if (!ev.target.checked) {
-                                                setCheckTable(false);
-                                                setNoOfTable(null);
-                                                setCheckChairs(false);
-                                                setNoOfChairs(null);
-                                                setCheckOther(false);
-                                                setOtherField(null);
-                                                setCheckMicrphone(false);
-                                                setNoOfMicrophone(null);
-                                                setCheckVideoke(false);
-                                                setCheckSoundSystem(false);
-                                                setCheckTelevision(false);
-                                                setCheckLaptop(false);
-                                                setCheckDocumentCamera(false);
-                                                setCheckProjectorScreen(false);
-                                                setCheckProjector(false);
-                                                }
-                                                setOtherCheck(isChecked);
-                                            }}
-                                            className={`checkbox-input`}
-                                        />
-                                    </div>
-                                    <div className="facility-options">
-                                        <label htmlFor="rf_request" className="form-title-check">
-                                            Other
-                                        </label> 
-                                    </div>
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
+                    {enableFacility && (
+                    <div className="form-alignment mt-4">
+                        <div className="divider"></div>
+                        {/* Caption */}
+                        <div>
+                            <h2 className="fac-form-caption mt-3"> * For the Multi-Purpose Hall / Conference Room / Others </h2>
+                        </div>
+
+                    </div>
+                    )}
                 </div>
+                
         </div>
+
+        {/* Popup */}
+        <Popup
+            show={showPopup}
+            popupContent={popupContent}
+            popupMessage={popupMessage}
+            onSuccess={successPopup}
+            onClose={justClose}
+        />
     </>
     );
 }

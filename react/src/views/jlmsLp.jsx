@@ -65,7 +65,7 @@ export default function JLMS(){
         </div>
       </div>
 
-      <div className="row justify-content-center text-center mt-0 mt-md-5">
+      <div className="row justify-content-center text-center mt-0">
         {/* DTS */}
         <div className="col-12 col-md-3 mb-2 mb-md-0">
           {/* <Link to={`/ams/`}> </Link> */}
